@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3 uid="uid://cgcfiyoq6320p"]
+
+[ext_resource type="Resource" uid="uid://dac6uk4hxqsef" path="res://Resources/Costumes/chrcos_Selene_base.tres" id="1_k21pl"]
+[ext_resource type="Script" path="res://Scripts/CharacterData.cs" id="1_vslm7"]
+
+[resource]
+script = ExtResource("1_vslm7")
+BaseCostume = ExtResource("1_k21pl")
+maxHealth = 100.0
+size = Vector3(0.5, 2, 0.5)
+stepHeight = 0.5
+weight = 12.0
+jumpHeight = 16.0
+baseSpeed = 8.0
+sprintSpeed = 13.0
+slowSpeed = 5.0
+acceleration = 35.0
+swimMultiplier = 0.85
+evadeSpeed = 27.0
+evadeDuration = 0.6
+evadeCooldown = 0.01

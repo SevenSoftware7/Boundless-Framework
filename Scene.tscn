@@ -1,0 +1,50 @@
+[gd_scene load_steps=8 format=3 uid="uid://b505xodur2iff"]
+
+[ext_resource type="Script" path="res://Scripts/Entity.cs" id="2_plkxk"]
+[ext_resource type="Script" path="res://Scripts/EntityBehaviourManager.cs" id="3_f0grj"]
+[ext_resource type="Script" path="res://Scripts/Player.cs" id="4_kwfh8"]
+[ext_resource type="Script" path="res://Scripts/Character.cs" id="4_oaady"]
+[ext_resource type="Resource" uid="uid://cgcfiyoq6320p" path="res://Resources/Data/chr_Selene.tres" id="5_k6cjm"]
+[ext_resource type="PackedScene" uid="uid://cwllghypqnhne" path="res://Scenes/Models/Characters/chrcosmdl_Selene_base.tscn" id="6_0wopd"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_11pu2"]
+
+[node name="Node3D" type="Node3D"]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.808175, -0.274702, 0.520953, -0.588943, -0.376959, 0.714876, 0, -0.884557, -0.466433, 0, 0, 0)
+
+[node name="CSGCombiner3D" type="CSGCombiner3D" parent="."]
+calculate_tangents = false
+use_collision = true
+
+[node name="CSGBox3D" type="CSGBox3D" parent="CSGCombiner3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.16944, 0)
+size = Vector3(21.0695, 1, 13.081)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 9.19785)
+
+[node name="Player" type="Node" parent="." node_paths=PackedStringArray("PlayersList")]
+script = ExtResource("4_kwfh8")
+PlayersList = [NodePath("."), null, null, null, null, null, null, null, null, null]
+
+[node name="Entity" type="CharacterBody3D" parent="." node_paths=PackedStringArray("BehaviourManager", "CharacterInstance")]
+script = ExtResource("2_plkxk")
+BehaviourManager = NodePath("EntityBehaviourManager")
+CharacterInstance = NodePath("Character")
+
+[node name="EntityBehaviourManager" type="Node" parent="Entity" node_paths=PackedStringArray("Entity")]
+script = ExtResource("3_f0grj")
+Entity = NodePath("..")
+
+[node name="Character" type="Node" parent="Entity" node_paths=PackedStringArray("Anchor", "Model")]
+script = ExtResource("4_oaady")
+IsLoaded = true
+Anchor = NodePath("..")
+Model = NodePath("../Model")
+CharacterData = ExtResource("5_k6cjm")
+
+[node name="Model" type="CollisionShape3D" parent="Entity" instance=ExtResource("6_0wopd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.66944, 0)
+shape = SubResource("CapsuleShape3D_11pu2")
