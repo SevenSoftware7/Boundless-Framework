@@ -4,16 +4,15 @@ using Godot;
 
 namespace SevenGame.Utility;
 
-[Tool]
-public partial class TimeDuration : RefCounted {
-    [Export] public float startTime = 0;
-    
-    [Export] public float Duration {
-        get => Time.GetTicksMsec() - startTime;
-        set {;}
-    }
+public struct TimeDuration {
 
-    public TimeDuration() : base() {;}
+    public float startTime = 0;
+    public readonly float Duration => Time.GetTicksMsec() - startTime;
+
+
+
+    public TimeDuration() {;}
+
 
 
     public void Start(){

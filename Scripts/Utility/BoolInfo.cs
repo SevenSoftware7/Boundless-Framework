@@ -4,32 +4,42 @@ using Godot;
 
 namespace SevenGame.Utility;
 
-[Tool]
-public partial class BoolInfo : RefCounted {
-    [Export] public bool currentValue = false;
-    [Export] public bool lastValue = false;
+public struct BoolInfo {
+    public bool currentValue = false;
+    public bool lastValue = false;
 
-    [Export] public TimeDuration trueTimer = new();
-    [Export] public TimeDuration falseTimer = new();
+    public TimeDuration trueTimer = new();
+    public TimeDuration falseTimer = new();
 
-    [Export] public bool Started {
-        get => currentValue && !lastValue;
-        private set {;}
-    }
-    [Export] public bool Stopped {
-        get => !currentValue && lastValue;
-        private set {;}
-    }
+    public readonly bool Started => currentValue && !lastValue;
+    public readonly bool Stopped => !currentValue && lastValue;
 
-    public BoolInfo() : base() {;}
+    private bool _updatedThisStep = false;
+
+
+
+    public BoolInfo() {;}
+
 
 
     public void SetVal(bool value) {
-        if (currentValue) falseTimer.Start();
-        else trueTimer.Start();
-
-        lastValue = currentValue;
+        if ( !_updatedThisStep ) {
+            lastValue = currentValue;
+        }
         currentValue = value;
+
+        if (currentValue) {
+            falseTimer.Start();
+        } else {
+            trueTimer.Start();
+        }
+    }
+
+    public void TimeStep() {
+        if ( !_updatedThisStep ) {
+            SetVal(currentValue);
+        }
+        _updatedThisStep = false;
     }
 
 

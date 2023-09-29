@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using Godot.Collections;
 
 
 namespace SevenGame.Utility;
@@ -10,6 +11,12 @@ public static class VectorUtility {
             return vector3.Normalized() * maxLength;
         }
         return vector3;
+    }
+    public static Vector2 ClampMagnitude(this Vector2 vector2, float maxLength) {
+        if (vector2.LengthSquared() > maxLength * maxLength) {
+            return vector2.Normalized() * maxLength;
+        }
+        return vector2;
     }
 
     public static Quaternion FromToRotation(this Vector3 from, Vector3 to) {
@@ -32,7 +39,13 @@ public static class VectorUtility {
         return current + vector4 / magnitude * maxDistanceDelta;
     }
 
-    public static Vector3 NullifyInDirection( this Vector3 vector, Vector3 direction) => vector.Dot(direction) >= 0f ? vector.Project(direction) : vector;
+    /// <summary>
+    /// Returns the target vector projected onto the plane defined by the normal.
+    /// </summary>
+    /// <param name="vector"></param>
+    /// <param name="direction"></param>
+    /// <returns></returns>
+    public static Vector3 ProjectOnPlane( this Vector3 vector, Vector3 direction) => vector.Dot(direction) >= 0f ? vector.Project(direction) : vector;
 
     public static double SmoothDamp(double current, double target, ref double currentVelocity, double smoothTime, double maxSpeed, double deltaTime) {
         smoothTime = Math.Max(0.0001, smoothTime);
@@ -54,7 +67,7 @@ public static class VectorUtility {
         return num8;
     }
 
-    public static float SmoothDamp(float current, float target, ref float currentVelocity, float smoothTime, float maxSpeed, float deltaTime) {
+    public static float SmoothDamp(this float current, float target, ref float currentVelocity, float smoothTime, float maxSpeed, float deltaTime) {
         smoothTime = Math.Max(0.0001f, smoothTime);
         float num1 = 2.0f / smoothTime;
         float num2 = num1 * deltaTime;
@@ -74,7 +87,7 @@ public static class VectorUtility {
         return num8;
     }
 
-    public static Vector3 SmoothDamp(Vector3 current, Vector3 target, ref Vector3 currentVelocity, float smoothTime, float maxSpeed, float deltaTime) {
+    public static Vector3 SmoothDamp(this Vector3 current, Vector3 target, ref Vector3 currentVelocity, float smoothTime, float maxSpeed, float deltaTime) {
         smoothTime = Math.Max(0.0001f, smoothTime);
         float num1 = 2.0f / smoothTime;
         float num2 = num1 * deltaTime;
@@ -93,4 +106,49 @@ public static class VectorUtility {
         }
         return vector3_5;
     }
+
+    public static bool RayCast3D(this Node3D node, Vector3 from, Vector3 to, out RayCast3DResult result, uint collisionMask = uint.MaxValue, Array<Rid> exclude = null, bool collideWithBodies = true, bool collideWithAreas = true, bool hitFromInside = false, bool hitBackFaces = false) {
+        PhysicsDirectSpaceState3D spaceState = node.GetWorld3D().DirectSpaceState;
+        PhysicsRayQueryParameters3D parameters = PhysicsRayQueryParameters3D.Create(from, to, collisionMask, exclude); 
+        parameters.CollideWithBodies = collideWithBodies;
+        parameters.CollideWithAreas = collideWithAreas;
+        parameters.HitFromInside = hitFromInside;
+        parameters.HitBackFaces = hitBackFaces;
+        Dictionary intersect = spaceState.IntersectRay(parameters);
+        if ( intersect.Count > 0 ) {
+            result = new RayCast3DResult() {
+                HasHit = true,
+                Point = (Vector3)intersect["position"],
+                Normal = (Vector3)intersect["normal"],
+                Collider = (GodotObject)intersect["collider"],
+                Id = (ulong)intersect["collider_id"],
+                Rid = (Rid)intersect["rid"],
+                Shape = (int)intersect["shape"],
+                // Metadata = intersect["metadata"] // Can't seem to get this to work
+            };
+            return true;
+        }
+
+        result = new() {
+            HasHit = false
+        };
+        return false;
+    }
+
+    public struct RayCast3DResult {
+        public bool HasHit;
+        public Vector3 Point;
+        public Vector3 Normal;
+        public GodotObject Collider;
+        public ulong Id;
+        public Rid Rid;
+        public int Shape;
+        // public Variant Metadata;
+    }
+
+
+    public static double Deg2Rad(double degrees) => degrees * (Math.PI / 180.0);
+    public static double Rad2Deg(double radians) => radians * (180.0 / Math.PI);
+    public static float Deg2Rad(float degrees) => degrees * (Mathf.Pi / 180f);
+    public static float Rad2Deg(float radians) => radians * (180f / Mathf.Pi);
 }

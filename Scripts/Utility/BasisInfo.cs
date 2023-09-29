@@ -1,40 +1,44 @@
-// using System;
-// using Godot;
+using System;
+using Godot;
 
 
-// namespace SevenGame.Utility;
+namespace SevenGame.Utility;
 
-// [Tool]
-// public partial class BasisInfo : RefCounted {
+public struct BasisInfo {
     
-//     [Export] public Basis currentValue = Basis.Identity;
-//     [Export] public Basis lastValue = Basis.Identity;
+    [Export] public Basis currentValue = Basis.Identity;
+    [Export] public Basis lastValue = Basis.Identity;
     
-//     /* [Export]  */public Vector3 X {
-//         get => currentValue.X;
-//         private set {;}
-//     }
-//     /* [Export]  */public Vector3 Y {
-//         get => currentValue.Y;
-//         private set {;}
-//     }
-//     /* [Export]  */public Vector3 Z {
-//         get => currentValue.Z;
-//         private set {;}
-//     }
+    public readonly Vector3 X => currentValue.X;
+    public readonly Vector3 Y => currentValue.Y;
+    public readonly Vector3 Z => currentValue.Z;
 
-//     public BasisInfo() : base() {;}
+    private bool _updatedThisStep = false;
 
 
-//     public void SetVal(Basis value) { 
-//         lastValue = currentValue;
-//         currentValue = value;
-//     }
+
+    public BasisInfo() {;}
 
 
-//     public static implicit operator Basis(BasisInfo data) => data.currentValue;
-//     public static Vector3 operator *(BasisInfo a, Vector3 b) => a.currentValue * b;
-//     public static Vector3 operator *(BasisInfo a, Vector3Info b) => a.currentValue * b.currentValue;
-//     public static Basis operator *(BasisInfo a, BasisInfo b) => a.currentValue * b.currentValue;
+
+    public void SetVal(Basis value) {
+        if ( !_updatedThisStep ) {
+            lastValue = currentValue;
+        }
+        currentValue = value;
+    }
+
+    public void TimeStep() {
+        if ( !_updatedThisStep ) {
+            SetVal(Basis.Identity);
+        }
+        _updatedThisStep = false;
+    }
+
+
+    public static implicit operator Basis(BasisInfo data) => data.currentValue;
+    public static Vector3 operator *(BasisInfo a, Vector3 b) => a.currentValue * b;
+    public static Vector3 operator *(BasisInfo a, Vector3Info b) => a.currentValue * b.currentValue;
+    public static Basis operator *(BasisInfo a, BasisInfo b) => a.currentValue * b.currentValue;
     
-// }
+}

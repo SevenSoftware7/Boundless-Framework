@@ -4,29 +4,19 @@ using Godot;
 
 namespace SevenGame.Utility;
 
-[Tool]
-public partial class TimeInterval : RefCounted {
-    [Export] public ulong startTime = 0;
-    [Export] public ulong stopTime = 0;
+public struct TimeInterval {
+    public ulong startTime = 0;
+    public ulong stopTime = 0;
 
-    [Export] public bool IsDone {
-        get => Time.GetTicksMsec() >= stopTime;
-        set {;}
-    }
-    [Export] public ulong Duration {
-        get => stopTime - startTime;
-        set {;}
-    }
-    [Export] public ulong RemainingDuration {
-        get => IsDone ? 0 : stopTime - Time.GetTicksMsec();
-        set {;}
-    }
-    [Export] public float Progress {
-        get => IsDone ? 1f : (Time.GetTicksMsec() - startTime) / Duration;
-        set {;}
-    }
+    public readonly bool IsDone => Time.GetTicksMsec() >= stopTime;
+    public readonly ulong Duration => stopTime - startTime;
+    public readonly ulong RemainingDuration => IsDone ? 0 : stopTime - Time.GetTicksMsec();
+    public readonly float Progress => IsDone ? 1f : (Time.GetTicksMsec() - startTime) / Duration;
 
-    public TimeInterval() : base() {;}
+
+
+    public TimeInterval() {;}
+
 
 
     public void SetTime(ulong timeMsec){

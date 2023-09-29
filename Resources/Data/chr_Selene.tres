@@ -1,11 +1,15 @@
-[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3 uid="uid://cgcfiyoq6320p"]
+[gd_resource type="Resource" script_class="CharacterData" load_steps=5 format=3 uid="uid://dsreon2gkt4ng"]
 
-[ext_resource type="Resource" uid="uid://dac6uk4hxqsef" path="res://Resources/Costumes/chrcos_Selene_base.tres" id="1_k21pl"]
-[ext_resource type="Script" path="res://Scripts/CharacterData.cs" id="1_vslm7"]
+[ext_resource type="Script" path="res://Scripts/Character/CharacterData.cs" id="1_3pmdk"]
+[ext_resource type="Resource" uid="uid://dac6uk4hxqsef" path="res://Resources/Costumes/chrcos_Selene_base.tres" id="1_o3f6v"]
+[ext_resource type="PackedScene" uid="uid://b7njxt2tckv16" path="res://Scenes/Characters/Selene/Collisions.tscn" id="2_nmicy"]
+[ext_resource type="PackedScene" uid="uid://dy6781obdw22b" path="res://Scenes/Characters/Selene/Armature.tscn" id="3_vsice"]
 
 [resource]
-script = ExtResource("1_vslm7")
-BaseCostume = ExtResource("1_k21pl")
+script = ExtResource("1_3pmdk")
+BaseCostume = ExtResource("1_o3f6v")
+CollisionScene = ExtResource("2_nmicy")
+SkeletonScene = ExtResource("3_vsice")
 maxHealth = 100.0
 size = Vector3(0.5, 2, 0.5)
 stepHeight = 0.5

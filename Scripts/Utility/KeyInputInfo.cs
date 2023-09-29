@@ -1,57 +1,63 @@
-// using System;
-// using Godot;
+using System;
+using Godot;
 
 
-// namespace SevenGame.Utility;
+namespace SevenGame.Utility;
 
-// [Tool]
-// public partial class KeyInputInfo : RefCounted {
+public struct KeyInputInfo {
 
-//     private const float HOLD_TIME = 0.15f;
-
-
-//     [Export] public bool currentValue = false;
-//     [Export] public bool lastValue = false;
-
-//     [Export] public TimeDuration trueTimer = new();
-//     [Export] public TimeDuration falseTimer = new();
-
-//     [Export] public bool Started {
-//         get => currentValue && !lastValue;
-//         private set {;}
-//     }
-//     [Export] public bool Stopped {
-//         get => !currentValue && lastValue;
-//         private set {;}
-//     }
-
-//     public KeyInputInfo() : base() {;}
+    private const float HOLD_TIME = 0.15f;
 
 
-//     public static bool SimultaneousTap(KeyInputInfo a, KeyInputInfo b, float time = HOLD_TIME) {
-//         bool aTapped = a.trueTimer.Duration < time && b.Started;
-//         bool bTapped = b.trueTimer.Duration < time && a.Started;
-//         return aTapped || bTapped;
-//     }
+    public bool currentValue = false;
+    public bool lastValue = false;
 
-//     public bool Tapped(float time = HOLD_TIME) => Stopped && trueTimer.Duration < time;
-//     public bool Held(float time = HOLD_TIME) => currentValue && trueTimer.Duration > time;
+    public TimeDuration trueTimer = new();
+    public TimeDuration falseTimer = new();
 
-//     public bool SimultaneousTap(KeyInputInfo other, float time = HOLD_TIME) {
-//         return SimultaneousTap(this, other, time);
-//     }
+    public readonly bool Started => currentValue && !lastValue;
+    public readonly bool Stopped => !currentValue && lastValue;
+    private bool _updatedThisStep = false;
+
+
+
+    public KeyInputInfo() {;}
+
+
+
+    public static bool SimultaneousTap(KeyInputInfo a, KeyInputInfo b, float time = HOLD_TIME) {
+        bool aTapped = a.trueTimer.Duration < time && b.Started;
+        bool bTapped = b.trueTimer.Duration < time && a.Started;
+        return aTapped || bTapped;
+    }
+
+    public readonly bool Tapped(float time = HOLD_TIME) => Stopped && trueTimer.Duration < time;
+    public readonly bool Held(float time = HOLD_TIME) => currentValue && trueTimer.Duration > time;
+
+    public readonly bool SimultaneousTap(KeyInputInfo other, float time = HOLD_TIME) {
+        return SimultaneousTap(this, other, time);
+    }
     
-//     public void SetVal(bool value){
-//         if (currentValue) {
-//             falseTimer.Start();
-//         } else {
-//             trueTimer.Start();
-//         }
+    public void SetVal(bool value) {
+        if ( !_updatedThisStep ) {
+            lastValue = currentValue;
+        }
+        currentValue = value;
+        
+        if (currentValue) {
+            falseTimer.Start();
+        } else {
+            trueTimer.Start();
+        }
+    }
 
-//         lastValue = currentValue;
-//         currentValue = value;
-//     }
+    public void TimeStep() {
+        if ( !_updatedThisStep ) {
+            SetVal(currentValue);
+        }
+        _updatedThisStep = false;
+    }
 
 
-//     public static implicit operator bool(KeyInputInfo data) => data.currentValue;
-// }
+    public static implicit operator bool(KeyInputInfo data) => data.currentValue;
+}

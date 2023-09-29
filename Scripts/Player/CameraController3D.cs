@@ -1,0 +1,180 @@
+using System;
+using Godot;
+using Godot.Collections;
+
+// using UnityEngine.Rendering.Universal;
+// using UnityEngine.InputSystem;
+
+
+using SevenGame.Utility;
+
+
+namespace EndlessSkies.Core;
+
+// [DefaultExecutionOrder(50)]
+[Tool]
+[GlobalClass]
+public partial class CameraController3D : Camera3D {
+    private float distanceToSubject = -1f;
+
+    private Vector3 smoothHorizontalPosition = Vector3.Zero;
+    private Vector3 smoothVerticalPosition = Vector3.Zero;
+
+    private Vector3 verticalVelocity = Vector3.Zero;
+    private Vector3 horizontalVelocity = Vector3.Zero;
+    private float distanceVelocity = 0f;
+
+
+    [ExportGroup("Options")]
+    [Export] private Vector3 cameraOriginPosition;
+    [Export] private float distanceToPlayer = 1f;
+    [Export] private float horizontalSmoothTime = 0.02f;
+    [Export] private float verticalSmoothTime = 0.04f;
+    [Export(PropertyHint.Layers3DPhysics)] private uint CollisionMask = uint.MaxValue;
+    [ExportGroup("")]
+
+
+    [Export] private float verticalTime = 0f;
+
+
+
+    [Export] public CameraStyle CurrentStyle = CameraStyle.ThirdPersonGrounded;
+    [Export] public Basis SubjectBasis = Basis.Identity;
+    [Export] public Node3D Subject;
+
+    [Export] public Basis LocalRotation { get; private set; } = Basis.Identity;
+    
+    public Basis AbsoluteRotation => SubjectBasis * LocalRotation;
+
+
+    public void HandleCameraInput(Vector2 cameraInput) {
+        Input.MouseMode = Input.MouseModeEnum.Captured;
+        Vector3 eulerAngles = LocalRotation.GetEuler();
+        float maxAngle = Mathf.Pi / 2f - Mathf.Epsilon;
+        LocalRotation = Basis.FromEuler(new(
+            Mathf.Clamp(value: eulerAngles.X + cameraInput.Y,-maxAngle, maxAngle),
+            eulerAngles.Y - cameraInput.X,
+            0
+        ));
+    }
+
+    private void ComputeCamera(double delta) {
+        if (Subject == null) return;
+
+        float floatDelta = (float)delta;
+
+        Vector3 smoothTargetPosition = GetSmoothTargetPosition(floatDelta);
+
+
+        // Vector3 targetSubjectSpaceOffset = new(cameraOriginPosition.X, cameraOriginPosition.Y, cameraOriginPosition.Z * distanceToPlayer);
+        // subjectSpaceOffset = subjectSpaceOffset.Slerp(targetSubjectSpaceOffset, 3f * floatDelta);
+
+        Basis TargetBasis = AbsoluteRotation;
+
+        float targetDistance = cameraOriginPosition.Length();
+        Vector3 absoluteOffset = TargetBasis * (cameraOriginPosition / targetDistance);
+
+        ComputeWallCollision(smoothTargetPosition, absoluteOffset, targetDistance, ref distanceToSubject, delta);
+
+
+        Vector3 finalPos = smoothTargetPosition + absoluteOffset * distanceToSubject;
+        Transform = new(TargetBasis, finalPos);
+    }
+
+    private Vector3 GetSmoothTargetPosition(float floatDelta) {
+        // The camera's vertical movement gets faster as the player keeps moving vertically
+
+        // The camera's new vertical speed is based on the camera's current vertical velocity
+        float targetTime = Mathf.Lerp(verticalSmoothTime, horizontalSmoothTime, Mathf.Clamp(verticalVelocity.LengthSquared(), 0f, 1f));
+        // Accelerate faster than decelerate
+        float transitionSpeed = targetTime > verticalTime ? 1.5f : 0.5f;
+        verticalTime = Mathf.Lerp(verticalTime, targetTime, transitionSpeed * floatDelta);
+
+
+
+        Vector3 followPosition = Subject.GlobalPosition;
+
+        // Make The Camera Movement slower on the Y axis than on the X axis
+        Vector3 horizontalPos = followPosition.Project(-SubjectBasis.Y);
+        // delayedHorizontalPosition = camHorizontalPos;
+        if (!smoothHorizontalPosition.IsEqualApprox(horizontalPos)) {
+            smoothHorizontalPosition = smoothHorizontalPosition.SmoothDamp(horizontalPos, ref horizontalVelocity, horizontalSmoothTime, Mathf.Inf, floatDelta);
+        }
+
+        Vector3 verticalPos = followPosition - horizontalPos;
+        if (!smoothVerticalPosition.IsEqualApprox(verticalPos)) {
+            smoothVerticalPosition = smoothVerticalPosition.SmoothDamp(verticalPos, ref verticalVelocity, CurrentStyle != CameraStyle.ThirdPersonGrounded ? horizontalSmoothTime : verticalTime, Mathf.Inf, floatDelta);
+        }
+
+        Vector3 smoothPosition = smoothHorizontalPosition + smoothVerticalPosition;
+        return smoothPosition;
+    }
+
+
+    private void ComputeWallCollision(Vector3 origin, Vector3 direction, float distance, ref float cameraDistance, double delta) {
+
+        float floatDelta = (float)delta;
+
+        // Check for collision with the camera
+        const float CAM_MIN_DISTANCE_TO_WALL = 0.4f;
+
+        bool rayCastHit = Subject.RayCast3D(origin, origin + direction * (distance + CAM_MIN_DISTANCE_TO_WALL), out VectorUtility.RayCast3DResult result, CollisionMask);
+        if (rayCastHit) {
+
+            Vector3 collisionToPlayer = origin - result.Point;
+            float collisionDistance = collisionToPlayer.Length();
+            collisionToPlayer /= collisionDistance; // cheaper Normalize
+
+            // Fancy Trigonometry to keep the camera at least distanceToWall away from the wall
+            // this will keep the camera in the same direction as it would have been without collision,
+            // but at a constant distance from the wall
+            //
+            // |                                          [Camera]                  
+            // |                                        /--                         
+            // |                                     /--                            
+            // |                                  /--                               
+            // |                               /--                                  
+            // |                            /--                                     
+            // |  Collision point        [*]--> Final position                      
+            // |        ^             /-- |                                         
+            // |        |          /--    |                                         
+            // |        |       /--       +---> length of CAM_MIN_DISTANCE_TO_WALL  
+            // |        |    /--          |                                         
+            // |        | /--             |                                         
+            // +-------[*]----------------+------------------------------------------
+            float angle = collisionToPlayer.AngleTo(result.Normal);
+            float collisionAngle = (Mathf.Pi / 2f) - angle;
+            float camMargin = CAM_MIN_DISTANCE_TO_WALL / Mathf.Sin(collisionAngle);
+
+            cameraDistance = collisionDistance - camMargin;
+        } else if (!Mathf.IsEqualApprox(cameraDistance, distance)) {
+
+            cameraDistance = cameraDistance.SmoothDamp(distance, ref distanceVelocity, 0.2f, Mathf.Inf, floatDelta);
+
+        }
+    }
+
+    public override void _EnterTree() {
+        base._EnterTree();
+        distanceToSubject = cameraOriginPosition.Length();
+        verticalTime = horizontalSmoothTime;
+    }
+
+
+    public override void _Process(double delta) {
+        base._Process(delta);
+
+        if ( Engine.IsEditorHint() ) return;
+
+        ComputeCamera(delta);
+    }
+
+
+
+    public enum CameraStyle {
+        ThirdPerson,
+        ThirdPersonGrounded,
+        Fixed
+    }
+
+}
