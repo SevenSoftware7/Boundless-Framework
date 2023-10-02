@@ -109,6 +109,6 @@ public partial class TestBehaviour : EntityBehaviour {
 
 
 
-        Entity.Velocity = moveDirection * moveSpeed;
+        Entity.Movement = moveDirection * moveSpeed;
 	}
 }

@@ -43,9 +43,9 @@ public static class VectorUtility {
     /// Returns the target vector projected onto the plane defined by the normal.
     /// </summary>
     /// <param name="vector"></param>
-    /// <param name="direction"></param>
+    /// <param name="normal"></param>
     /// <returns></returns>
-    public static Vector3 ProjectOnPlane( this Vector3 vector, Vector3 direction) => vector.Dot(direction) >= 0f ? vector.Project(direction) : vector;
+    public static Vector3 NullifyInDirection( this Vector3 vector, Vector3 normal) => vector.Dot(normal) >= 0f ? vector.Slide(-normal) : vector;
 
     public static double SmoothDamp(double current, double target, ref double currentVelocity, double smoothTime, double maxSpeed, double deltaTime) {
         smoothTime = Math.Max(0.0001, smoothTime);

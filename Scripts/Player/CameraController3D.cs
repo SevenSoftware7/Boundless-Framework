@@ -24,18 +24,17 @@ public partial class CameraController3D : Camera3D {
     private Vector3 horizontalVelocity = Vector3.Zero;
     private float distanceVelocity = 0f;
 
+    private float verticalTime = 0f;
+
+
 
     [ExportGroup("Options")]
     [Export] private Vector3 cameraOriginPosition;
-    [Export] private float distanceToPlayer = 1f;
+    // [Export] private float distanceToPlayer = 1f;
     [Export] private float horizontalSmoothTime = 0.02f;
     [Export] private float verticalSmoothTime = 0.04f;
     [Export(PropertyHint.Layers3DPhysics)] private uint CollisionMask = uint.MaxValue;
     [ExportGroup("")]
-
-
-    [Export] private float verticalTime = 0f;
-
 
 
     [Export] public CameraStyle CurrentStyle = CameraStyle.ThirdPersonGrounded;
@@ -44,7 +43,10 @@ public partial class CameraController3D : Camera3D {
 
     [Export] public Basis LocalRotation { get; private set; } = Basis.Identity;
     
+
+
     public Basis AbsoluteRotation => SubjectBasis * LocalRotation;
+
 
 
     public void HandleCameraInput(Vector2 cameraInput) {
@@ -82,29 +84,29 @@ public partial class CameraController3D : Camera3D {
     }
 
     private Vector3 GetSmoothTargetPosition(float floatDelta) {
-        // The camera's vertical movement gets faster as the player keeps moving vertically
-
-        // The camera's new vertical speed is based on the camera's current vertical velocity
-        float targetTime = Mathf.Lerp(verticalSmoothTime, horizontalSmoothTime, Mathf.Clamp(verticalVelocity.LengthSquared(), 0f, 1f));
-        // Accelerate faster than decelerate
-        float transitionSpeed = targetTime > verticalTime ? 1.5f : 0.5f;
-        verticalTime = Mathf.Lerp(verticalTime, targetTime, transitionSpeed * floatDelta);
-
-
-
         Vector3 followPosition = Subject.GlobalPosition;
 
+        Vector3 verticalPos = followPosition.Project(SubjectBasis.Y);
+        if (!smoothVerticalPosition.IsEqualApprox(verticalPos)) {
+            if (CurrentStyle == CameraStyle.ThirdPersonGrounded) {
+                // The camera's new vertical speed is based on the camera's current vertical velocity
+                // The camera's vertical movement gets faster as the player keeps moving vertically
+                float targetVerticalTime = Mathf.Lerp(verticalSmoothTime, horizontalSmoothTime, Mathf.Clamp(verticalVelocity.LengthSquared(), 0f, 1f));
+
+                float transitionSpeed = targetVerticalTime > verticalTime ? 1.5f : 0.5f; // Accelerate faster than decelerate
+                verticalTime = Mathf.Lerp(verticalTime, targetVerticalTime, transitionSpeed * floatDelta);
+            } else {
+                verticalTime = horizontalSmoothTime;
+            }
+            smoothVerticalPosition = smoothVerticalPosition.SmoothDamp(verticalPos, ref verticalVelocity, verticalTime, Mathf.Inf, floatDelta);
+        }
+
         // Make The Camera Movement slower on the Y axis than on the X axis
-        Vector3 horizontalPos = followPosition.Project(-SubjectBasis.Y);
-        // delayedHorizontalPosition = camHorizontalPos;
+        Vector3 horizontalPos = followPosition - verticalPos;
         if (!smoothHorizontalPosition.IsEqualApprox(horizontalPos)) {
             smoothHorizontalPosition = smoothHorizontalPosition.SmoothDamp(horizontalPos, ref horizontalVelocity, horizontalSmoothTime, Mathf.Inf, floatDelta);
         }
 
-        Vector3 verticalPos = followPosition - horizontalPos;
-        if (!smoothVerticalPosition.IsEqualApprox(verticalPos)) {
-            smoothVerticalPosition = smoothVerticalPosition.SmoothDamp(verticalPos, ref verticalVelocity, CurrentStyle != CameraStyle.ThirdPersonGrounded ? horizontalSmoothTime : verticalTime, Mathf.Inf, floatDelta);
-        }
 
         Vector3 smoothPosition = smoothHorizontalPosition + smoothVerticalPosition;
         return smoothPosition;

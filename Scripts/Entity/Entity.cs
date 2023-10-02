@@ -1,7 +1,5 @@
 using Godot;
-using Godot.Collections;
-using System;
-using System.Reflection.PortableExecutable;
+using SevenGame.Utility;
 
 
 namespace EndlessSkies.Core;
@@ -11,6 +9,7 @@ namespace EndlessSkies.Core;
 public sealed partial class Entity : CharacterBody3D, IModelAttachment {
 
     [Export] public Vector3 Inertia = Vector3.Zero; 
+    [Export] public Vector3 Movement = Vector3.Zero; 
     
     [Export] public EntityBehaviourManager BehaviourManager { 
         get => _behaviourManager ??= GetNodeOrNull<EntityBehaviourManager>(nameof(EntityBehaviourManager)) ?? new(this);
@@ -18,13 +17,33 @@ public sealed partial class Entity : CharacterBody3D, IModelAttachment {
     }
     private EntityBehaviourManager _behaviourManager;
 
+    /// <summary>
+    /// The entity's health system.
+    /// </summary>
+    [Export] public Health Health {
+        get {
+            _health ??= GetNodeOrNull<Health>(nameof(Health));
+
+            if ( _health is null ) {
+                _health = new() {
+                    Name = "Health"
+                };
+                AddChild(_health);
+                _health.Owner = Owner;
+            }
+
+            return _health;
+        }
+        private set => _health = value;
+    }
+    private Health _health;
+
+
     [Export] public Character Character { get; private set; }
-    [Export] public CharacterModel CharacterModel { get; private set; }
 
 
     [Export] public CharacterData CharacterData {
         get => Character?.Data;
-        // private set {;}
         #if TOOLS
             private set => CallDeferred(MethodName.SetCharacter, value, null as CharacterCostume);
             // We use CallDeferred here to ensure that the CharacterModel is loaded before we set the costume, as to not create a new Model for nothing.
@@ -34,14 +53,8 @@ public sealed partial class Entity : CharacterBody3D, IModelAttachment {
     }
 
     [Export] public CharacterCostume CharacterCostume {
-        get => CharacterModel?.Costume;
-        // private set {;}
-        #if TOOLS
-            private set => CallDeferred(MethodName.SetCostume, value);
-            // Same as above.
-        #else
-            private set => SetCostume(value);
-        #endif
+        get => Character?.CharacterCostume;
+        set => Character?.SetCostume(value);
     }
 
     
@@ -60,10 +73,6 @@ public sealed partial class Entity : CharacterBody3D, IModelAttachment {
         if ( CharacterData == data ) return;
 
         Character?.UnloadModel();
-        CharacterModel?.QueueFree();
-        CharacterModel = null;
-
-        Character?.UnloadModel();
         Character?.QueueFree();
         Character = null;
 
@@ -76,19 +85,9 @@ public sealed partial class Entity : CharacterBody3D, IModelAttachment {
     }
 
     public void SetCostume(CharacterCostume costume) {
-
-        if ( !IsNodeReady() || Engine.GetProcessFrames() == 0 ) return;
-        if ( CharacterCostume == costume ) return;
-
-        CharacterModel?.UnloadModel();
-        CharacterModel?.QueueFree();
-        CharacterModel = null;
-
-        if ( costume == null ) return;
-
-        CharacterModel = costume?.CreateModel(this);
-        CharacterModel?.LoadModel();
+        Character?.SetCostume(costume);
     }
+
 
     public void HandleInput(Player.InputInfo inputInfo) {
         BehaviourManager.CurrentBehaviour?.HandleInput(inputInfo);
@@ -107,17 +106,18 @@ public sealed partial class Entity : CharacterBody3D, IModelAttachment {
 
         // if (/* GravityMultiplier == 0f || Weight == 0f ||  */gravityDown == Vector3.zero) return false;
 
-        verticalInertia = Inertia.Project( -UpDirection );
+        verticalInertia = Inertia.Project( UpDirection );
         horizontalInertia = Inertia - verticalInertia;
 
-        Vector3 gravityForce = -UpDirection * 1f;
+        Vector3 gravityForce = -UpDirection * 15f; // TODO: replace with getter
 
         verticalInertia = verticalInertia.MoveToward(gravityForce, 35f * floatDelta );
         horizontalInertia = horizontalInertia.MoveToward(Vector3.Zero, 0.25f * floatDelta );
 
-        // if (onGround) {
-        //     verticalInertia = verticalInertia.NullifyInDirection(gravityDown);
-        // }
+        if ( MotionMode == MotionModeEnum.Grounded) {
+            if ( IsOnFloor() ) verticalInertia = verticalInertia.NullifyInDirection(GetFloorNormal());
+            if ( IsOnCeiling() ) verticalInertia = verticalInertia.NullifyInDirection(UpDirection);
+        }
         
         Inertia = horizontalInertia + verticalInertia;
         return true;
@@ -131,11 +131,9 @@ public sealed partial class Entity : CharacterBody3D, IModelAttachment {
 
         
         ProcessInertia(out _, out _, delta);
-
-        Vector3 deltaInertia = Inertia * (float)delta;
-        Velocity += deltaInertia;
+;
+        Velocity = Movement + Inertia;
         MoveAndSlide();
-        Velocity -= deltaInertia;
     }
 
     public override void _Ready() {

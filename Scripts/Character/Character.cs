@@ -13,6 +13,18 @@ public partial class Character : Model, IModelAttachment {
     [Export] public Node3D Collisions { get; private set; }
     [Export] public Node3D Armature { get; private set; }
     [Export] public ModelProperties Properties { get; private set; }
+    [Export] public CharacterModel CharacterModel { get; private set; }
+
+
+    [Export] public CharacterCostume CharacterCostume {
+        get => CharacterModel?.Costume;
+        #if TOOLS
+            private set => CallDeferred(MethodName.SetCostume, value);
+            // Same as above.
+        #else
+            private set => SetCostume(value);
+        #endif
+    }
 
     public Node3D RootAttachment => this;
     public Skeleton3D Skeleton => Properties?.Skeleton;
@@ -31,6 +43,20 @@ public partial class Character : Model, IModelAttachment {
         Data = data;
     }
 
+    public void SetCostume(CharacterCostume costume) {
+        if ( !IsNodeReady() || Engine.GetProcessFrames() == 0 ) return;
+        if ( CharacterModel?.Costume == costume ) return;
+
+        CharacterModel?.UnloadModel();
+        CharacterModel?.QueueFree();
+        CharacterModel = null;
+
+        if ( costume == null ) return;
+
+        CharacterModel = costume?.CreateModel(this);
+        CharacterModel?.LoadModel();
+    }
+
 
 
     protected override bool LoadModelImmediate() {
@@ -43,12 +69,6 @@ public partial class Character : Model, IModelAttachment {
 
             Parent.AddChild(Collisions);
             Collisions.Owner = Parent.Owner;
-
-            // foreach ( Node3D child in Collisions.GetChildren().Cast<Node3D>()) {
-            //     Collisions.RemoveChild(child);
-            //     Parent.AddChild(child);
-            //     child.Owner = Parent.Owner;
-            // }
         }
 
         Armature = Data.SkeletonScene?.Instantiate() as Node3D;
@@ -60,10 +80,17 @@ public partial class Character : Model, IModelAttachment {
             Armature.Owner = Owner;
         }
 
+        // CharacterModel?.LoadModel();
+
         return true;
     }
 
     protected override bool UnloadModelImmediate() {
+
+        // CharacterModel?.UnloadModel();
+        // CharacterModel?.QueueFree();
+        // CharacterModel = null;
+
         Collisions?.QueueFree();
         Collisions = null;
         Armature?.QueueFree();

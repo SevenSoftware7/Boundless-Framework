@@ -10,13 +10,13 @@ public partial class CharacterModel : Model {
 
     [Export] private MeshInstance3D Model;
     [Export] public CharacterCostume Costume { get; private set; }
-    [Export] public Skeleton3D Skeleton { get; private set; }
+    [Export(PropertyHint.NodePathValidTypes, nameof(Skeleton3D))] public NodePath SkeletonPath { get; private set; }
 
 
 
     protected CharacterModel() : base() {;}
     public CharacterModel(IModelAttachment modelAttachment, CharacterCostume costume) : base(modelAttachment) {
-        Skeleton = modelAttachment.Skeleton;
+        SkeletonPath = modelAttachment.Skeleton.GetPath();
 
         Parent.AddChild(this);
         Owner = Parent.Owner;
@@ -28,7 +28,7 @@ public partial class CharacterModel : Model {
 
 
     protected override bool LoadModelImmediate() {
-        if ( Skeleton == null ) return false;
+        if ( SkeletonPath == null ) return false;
         if ( Costume == null ) return false;
 
         Model = Costume.ModelScene?.Instantiate() as MeshInstance3D;
@@ -38,9 +38,7 @@ public partial class CharacterModel : Model {
             Parent.AddChild(Model);
             Model.Owner = Parent.Owner;
 
-            NodePath path = Model.GetPathTo(Skeleton);
-            Model.Skeleton = path;
-
+            Model.Skeleton = SkeletonPath;
         }
 
         return true;
