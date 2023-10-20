@@ -28,7 +28,7 @@ public struct Vector2Info {
     
 
     public void SetVal(Vector2 value) {
-        if ( !_updatedThisStep ) {
+        if ( ! _updatedThisStep ) {
             lastValue = currentValue;
         }
         currentValue = value;
@@ -41,7 +41,7 @@ public struct Vector2Info {
     }
 
     public void TimeStep() {
-        if ( !_updatedThisStep ) {
+        if ( ! _updatedThisStep ) {
             SetVal(Vector2.Zero);
         }
         _updatedThisStep = false;

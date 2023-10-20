@@ -3,7 +3,7 @@ using Godot;
 using SevenGame.Utility;
 
 
-namespace EndlessSkies.Core;
+namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
@@ -15,6 +15,7 @@ public partial class KeyboardAndMouseDevice : ControlDevice {
     public KeyInputInfo moveRightKeyEvent;
     public KeyInputInfo jumpKeyEvent;
     public KeyInputInfo sprintKeyEvent;
+    public Vector2Info moveMotion;
     public Vector2Info mouseMotion;
 
     private static Dictionary<Key, Key> overrideKeyMap = null;
@@ -26,40 +27,34 @@ public partial class KeyboardAndMouseDevice : ControlDevice {
         KeyInputInfo downKey,
         KeyInputInfo leftKey,
         KeyInputInfo rightKey,
-        bool clampMagnitude = false
+        float? clampMagnitude = null
     ) {
         Vector2 result = new(
             (rightKey.currentValue ? 1 : 0) - (leftKey.currentValue ? 1 : 0),
             (downKey.currentValue ? 1 : 0) - (upKey.currentValue ? 1 : 0)
         );
-        return clampMagnitude ? result.ClampMagnitude(1f) : result;
+        
+        return clampMagnitude.HasValue ? result.ClampMagnitude(clampMagnitude.Value) : result;
     }
 
 
-    public override Vector2 GetLookDirection() {
-        return new Vector2(
-            mouseMotion.X,
-            mouseMotion.Y
-        );
+    public override Vector2Info GetLookDirection() {
+        return mouseMotion;
     }
 
-    public override Vector2 GetMoveDirection() {
-        return GetVector(
-            moveForwardKeyEvent,
-            moveBackwardKeyEvent,
-            moveLeftKeyEvent,
-            moveRightKeyEvent,
-            true
-        );
+    public override Vector2Info GetMoveDirection() {
+        return moveMotion;
     }
 
-    public override KeyInputInfo GetJumpKey() {
+    public override KeyInputInfo GetJumpInput() {
         return jumpKeyEvent;
     }
 
-    public override KeyInputInfo GetSprintKey() {
+    public override KeyInputInfo GetSprintInput() {
         return sprintKeyEvent;
     }
+
+
 
     private void KeyInfoTimeStep() {
         moveForwardKeyEvent.TimeStep();
@@ -90,22 +85,37 @@ public partial class KeyboardAndMouseDevice : ControlDevice {
                 mouseMotion.Relative.X,
                 -mouseMotion.Relative.Y
             ));
+            return;
         }
 
         if (@event is InputEventKey keyEvent) {
             Key keyCode = keyEvent.PhysicalKeycode;
-            if ( overrideKeyMap != null && overrideKeyMap.ContainsKey(keyCode) ) {
+            if ( overrideKeyMap is not null && overrideKeyMap.ContainsKey(keyCode) ) {
                 keyCode = overrideKeyMap[keyCode];
             }
 
             switch (keyCode) {
-                case Key.W: moveForwardKeyEvent.SetVal(keyEvent.Pressed); break;
-                case Key.S: moveBackwardKeyEvent.SetVal(keyEvent.Pressed); break;
-                case Key.A: moveLeftKeyEvent.SetVal(keyEvent.Pressed); break;
-                case Key.D: moveRightKeyEvent.SetVal(keyEvent.Pressed); break;
+                case Key.W: moveForwardKeyEvent.SetVal(keyEvent.Pressed); UpdateMoveMotion(); break;
+                case Key.S: moveBackwardKeyEvent.SetVal(keyEvent.Pressed); UpdateMoveMotion(); break;
+                case Key.A: moveLeftKeyEvent.SetVal(keyEvent.Pressed); UpdateMoveMotion(); break;
+                case Key.D: moveRightKeyEvent.SetVal(keyEvent.Pressed); UpdateMoveMotion(); break;
                 case Key.Space: jumpKeyEvent.SetVal(keyEvent.Pressed); break;
                 case Key.Shift: sprintKeyEvent.SetVal(keyEvent.Pressed); break;
             }
+
+            void UpdateMoveMotion() {
+                moveMotion.SetVal(
+                    GetVector(
+                        moveForwardKeyEvent,
+                        moveBackwardKeyEvent,
+                        moveLeftKeyEvent,
+                        moveRightKeyEvent,
+                        1f
+                    )
+                );
+            }
+
+            return;
         }
     }
 }

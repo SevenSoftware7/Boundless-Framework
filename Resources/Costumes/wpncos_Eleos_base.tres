@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="WeaponCostume" load_steps=3 format=3 uid="uid://x1fl320j68ft"]
+
+[ext_resource type="PackedScene" uid="uid://chsj82irsedw6" path="res://Scenes/Weapons/Eleos/Costumes/wpncosmdl_Eleos_base.tscn" id="1_6ctsv"]
+[ext_resource type="Script" path="res://Scripts/Weapon/WeaponCostume.cs" id="1_rt4qi"]
+
+[resource]
+script = ExtResource("1_rt4qi")
+ModelScene = ExtResource("1_6ctsv")

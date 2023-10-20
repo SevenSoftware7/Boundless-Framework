@@ -2,21 +2,28 @@ using Godot;
 using System;
 
 
-namespace EndlessSkies.Core;
+namespace LandlessSkies.Core;
 
 [Tool]
 public abstract partial class Model : Node3D {
-    [Export] public bool IsLoaded { get; private set; }
-    [Export] protected Node3D Parent;
+    [Export] public bool IsLoaded { 
+        get => _isLoaded;
+        private set {
+            // if ( value ) {
+            //     LoadModel();
+            // } else {
+            //     UnloadModel();
+            // }
+            _isLoaded = value;
+        }
+    }
+    private bool _isLoaded = false;
 
 
 
     protected Model() : base() {;}
-    public Model(IModelAttachment modelAttachment) : this() {
-        Parent = modelAttachment.RootAttachment;
-
-        // Parent.AddChild(this);
-        // Owner = Parent.Owner;
+    public Model(Node3D root) : this() {
+        root.AddChildSetOwner(this);
     }
 
 
@@ -24,16 +31,26 @@ public abstract partial class Model : Node3D {
     public void LoadModel() {
         if ( IsLoaded ) return;
 
-        if ( !LoadModelImmediate() ) return;
+        if ( ! LoadModelImmediate() ) return;
 
-        IsLoaded = true;
+        _isLoaded = true;
     }
+    
     public void UnloadModel() {
-        if ( !IsLoaded ) return;
+        if ( ! IsLoaded ) return;
 
-        if ( !UnloadModelImmediate() ) return;
+        if ( ! UnloadModelImmediate() ) return;
 
-        IsLoaded = false;
+        _isLoaded = false;
+    }
+
+    public virtual void ReloadModel(bool forceLoad = false) {
+        bool wasLoaded = IsLoaded;
+        UnloadModel();
+
+        if ( wasLoaded || forceLoad ) {
+            LoadModel();
+        }
     }
 
     /// <summary>
@@ -52,24 +69,18 @@ public abstract partial class Model : Node3D {
     /// </returns>
     protected abstract bool UnloadModelImmediate();
 
+
+
     public override void _EnterTree() {
         base._EnterTree();
-        if ( this.IsInvalidTreeCallback() ) return;
+        if ( Engine.GetProcessFrames() == 0 ) return;
 
-        GD.Print($"{GetType().Name} : EnterTree");
-
-        #if TOOLS
-            CallDeferred(MethodName.LoadModel);
-        #else
-            LoadModel();
-        #endif
+        this.CallDeferredIfTools( Callable.From(LoadModel) );
     }
 
     public override void _ExitTree() {
         base._ExitTree();
-        if ( this.IsInvalidTreeCallback() ) return;
-
-        GD.Print($"{GetType().Name} : ExitTree");
+        if ( Engine.GetProcessFrames() == 0 ) return;
 
         UnloadModel();
     }

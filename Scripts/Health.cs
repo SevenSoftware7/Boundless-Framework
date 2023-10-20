@@ -4,24 +4,12 @@ using Godot;
 using SevenGame.Utility;
 
 
-namespace EndlessSkies.Core;
+namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
 public partial class Health : Node {
 
-    // [Tooltip("The current health.")]
-
-    // [Tooltip("The health, before it took damage. Slowly moves toward the true health.")]
-    [Export] private float _damagedHealth;
-
-    [Export] private float _damagedHealthVelocity = 0f;
-    private TimeInterval _damagedHealthTimer = new();
-
-
-    public event Action<float> OnUpdate;
-
-    public delegate void HealthEvent(float amount);
 
 
 
@@ -43,13 +31,34 @@ public partial class Health : Node {
         set {
             _amount = value;
 
-            const float damagedHealthDuration = 1.25f;
-            _damagedHealthTimer.SetDuration((ulong)damagedHealthDuration);
+            const ulong damagedHealthDuration = (ulong)(1.25f * 1000f);
+            _damagedHealthTimer.SetDurationMSec(damagedHealthDuration);
 
-            OnUpdate?.Invoke(Amount);
+            EmitSignal(SignalName.HealthChange, Amount);
         }
     }
     private float _amount;
+
+    [Export] public float DamagedHealth {
+        get => _damagedHealth;
+        private set => _damagedHealth = value;
+    }
+    private float _damagedHealth;
+
+    private TimeInterval _damagedHealthTimer = new();
+    [Export] private float _damagedHealthVelocity = 0f;
+
+
+    [Signal] public delegate void HealthChangeEventHandler(float amount);
+
+
+
+    public Health() : base() {
+        Name = nameof(Health);
+    }
+    public Health(Node parent) : this() {
+        parent.AddChildSetOwner(this);
+    }
 
 
 
@@ -63,11 +72,11 @@ public partial class Health : Node {
     public override void _Process(double delta) {
         base._Process(delta);
 
-        // if ( _damagedHealthTimer.IsDone )
-        //     _damagedHealth = VectorUtility.SmoothDamp(_damagedHealth, _amount, ref _damagedHealthVelocity, 0.2f, Mathf.Inf, (float)delta);
-        // else {
-        //     _damagedHealthVelocity = 0f;
-        // }
-    
+        if ( _damagedHealthTimer.IsDone ) {
+            _damagedHealth = MathUtility.SmoothDamp(_damagedHealth, _amount, ref _damagedHealthVelocity, 0.2f, Mathf.Inf, (float)delta);
+        } else {
+            _damagedHealthVelocity = 0f;
+        }
     }
+
 }

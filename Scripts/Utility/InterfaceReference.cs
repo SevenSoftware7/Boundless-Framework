@@ -6,7 +6,7 @@ using Godot;
 // using Object = UnityEngine.Object;
 
 
-namespace SevenGame.Utility;
+namespace LandlessSkies.Core;
 
 // [Tool]
 // public partial class InterfaceReference : Resource {
@@ -57,4 +57,7 @@ namespace SevenGame.Utility;
 //             _reference = obj;
 //         }
 //     }
+
+
+//     public bool IsAssigned => _value != null || _reference != null;
 // }

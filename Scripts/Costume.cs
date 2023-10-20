@@ -2,11 +2,11 @@ using Godot;
 using System;
 
 
-namespace EndlessSkies.Core;
+namespace LandlessSkies.Core;
 
 [Tool]
 // [GlobalClass]
 public abstract partial class Costume : Resource {
 
-    public abstract Model CreateModel(IModelAttachment attachment);
+    public abstract Model Instantiate(Node3D root, Skeleton3D skeleton);
 }

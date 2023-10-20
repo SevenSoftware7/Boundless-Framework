@@ -9,7 +9,7 @@ using Godot.Collections;
 using SevenGame.Utility;
 
 
-namespace EndlessSkies.Core;
+namespace LandlessSkies.Core;
 
 // [DefaultExecutionOrder(50)]
 [Tool]
@@ -39,7 +39,7 @@ public partial class CameraController3D : Camera3D {
 
     [Export] public CameraStyle CurrentStyle = CameraStyle.ThirdPersonGrounded;
     [Export] public Basis SubjectBasis = Basis.Identity;
-    [Export] public Node3D Subject;
+    [Export] public Vector3 Subject;
 
     [Export] public Basis LocalRotation { get; private set; } = Basis.Identity;
     
@@ -61,7 +61,7 @@ public partial class CameraController3D : Camera3D {
     }
 
     private void ComputeCamera(double delta) {
-        if (Subject == null) return;
+        // if (Subject == null) return;
 
         float floatDelta = (float)delta;
 
@@ -80,14 +80,13 @@ public partial class CameraController3D : Camera3D {
 
 
         Vector3 finalPos = smoothTargetPosition + absoluteOffset * distanceToSubject;
-        Transform = new(TargetBasis, finalPos);
+        GlobalTransform = new(TargetBasis, finalPos);
     }
 
     private Vector3 GetSmoothTargetPosition(float floatDelta) {
-        Vector3 followPosition = Subject.GlobalPosition;
 
-        Vector3 verticalPos = followPosition.Project(SubjectBasis.Y);
-        if (!smoothVerticalPosition.IsEqualApprox(verticalPos)) {
+        Vector3 verticalPos = Subject.Project(SubjectBasis.Y);
+        if ( ! smoothVerticalPosition.IsEqualApprox(verticalPos) ) {
             if (CurrentStyle == CameraStyle.ThirdPersonGrounded) {
                 // The camera's new vertical speed is based on the camera's current vertical velocity
                 // The camera's vertical movement gets faster as the player keeps moving vertically
@@ -102,8 +101,8 @@ public partial class CameraController3D : Camera3D {
         }
 
         // Make The Camera Movement slower on the Y axis than on the X axis
-        Vector3 horizontalPos = followPosition - verticalPos;
-        if (!smoothHorizontalPosition.IsEqualApprox(horizontalPos)) {
+        Vector3 horizontalPos = Subject - verticalPos;
+        if ( ! smoothHorizontalPosition.IsEqualApprox(horizontalPos) ) {
             smoothHorizontalPosition = smoothHorizontalPosition.SmoothDamp(horizontalPos, ref horizontalVelocity, horizontalSmoothTime, Mathf.Inf, floatDelta);
         }
 
@@ -120,7 +119,7 @@ public partial class CameraController3D : Camera3D {
         // Check for collision with the camera
         const float CAM_MIN_DISTANCE_TO_WALL = 0.4f;
 
-        bool rayCastHit = Subject.RayCast3D(origin, origin + direction * (distance + CAM_MIN_DISTANCE_TO_WALL), out VectorUtility.RayCast3DResult result, CollisionMask);
+        bool rayCastHit = this.RayCast3D(origin, origin + direction * (distance + CAM_MIN_DISTANCE_TO_WALL), out MathUtility.RayCast3DResult result, CollisionMask);
         if (rayCastHit) {
 
             Vector3 collisionToPlayer = origin - result.Point;
@@ -149,7 +148,7 @@ public partial class CameraController3D : Camera3D {
             float camMargin = CAM_MIN_DISTANCE_TO_WALL / Mathf.Sin(collisionAngle);
 
             cameraDistance = collisionDistance - camMargin;
-        } else if (!Mathf.IsEqualApprox(cameraDistance, distance)) {
+        } else if ( ! Mathf.IsEqualApprox(cameraDistance, distance) ) {
 
             cameraDistance = cameraDistance.SmoothDamp(distance, ref distanceVelocity, 0.2f, Mathf.Inf, floatDelta);
 

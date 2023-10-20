@@ -39,7 +39,7 @@ public struct KeyInputInfo {
     }
     
     public void SetVal(bool value) {
-        if ( !_updatedThisStep ) {
+        if ( ! _updatedThisStep ) {
             lastValue = currentValue;
         }
         currentValue = value;
@@ -52,7 +52,7 @@ public struct KeyInputInfo {
     }
 
     public void TimeStep() {
-        if ( !_updatedThisStep ) {
+        if ( ! _updatedThisStep ) {
             SetVal(currentValue);
         }
         _updatedThisStep = false;

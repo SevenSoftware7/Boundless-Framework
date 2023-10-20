@@ -22,14 +22,14 @@ public struct BasisInfo {
 
 
     public void SetVal(Basis value) {
-        if ( !_updatedThisStep ) {
+        if ( ! _updatedThisStep ) {
             lastValue = currentValue;
         }
         currentValue = value;
     }
 
     public void TimeStep() {
-        if ( !_updatedThisStep ) {
+        if ( ! _updatedThisStep ) {
             SetVal(Basis.Identity);
         }
         _updatedThisStep = false;

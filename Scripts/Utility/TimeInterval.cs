@@ -23,7 +23,7 @@ public struct TimeInterval {
         startTime = Time.GetTicksMsec();
         stopTime = timeMsec;
     }
-    public void SetDuration(ulong durationMsec){
+    public void SetDurationMSec(ulong durationMsec){
         startTime = Time.GetTicksMsec();
         stopTime = startTime + durationMsec;
     }

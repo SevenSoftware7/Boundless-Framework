@@ -1,7 +1,10 @@
 using Godot;
 using System;
+using System.Diagnostics;
+using CharacterEmotion = LandlessSkies.Core.IPortraitProvider.CharacterEmotion;
 
-namespace EndlessSkies.Core;
+
+namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
@@ -16,21 +19,23 @@ public partial class CharacterCostume : Costume, IPortraitProvider {
     [Export] public Texture2D PortraitMelancholic { get; private set; }
     [Export] public Texture2D PortraitJoyous { get; private set; }
 
-    public override CharacterModel CreateModel(IModelAttachment modelAttachment) {
-        return new CharacterModel(modelAttachment, this);
+
+
+    public Texture2D GetPortrait(CharacterEmotion emotion) {
+        return emotion switch {
+            CharacterEmotion.Neutral => PortraitNeutral,
+            CharacterEmotion.Determined => PortraitDetermined,
+            CharacterEmotion.Hesitant => PortraitHesitant,
+            CharacterEmotion.Shocked => PortraitShocked,
+            CharacterEmotion.Disgusted => PortraitDisgusted,
+            CharacterEmotion.Melancholic => PortraitMelancholic,
+            CharacterEmotion.Joyous => PortraitJoyous,
+            _ => throw new UnreachableException("Invalid CharacterEmotion value")
+        };
     }
 
-    Texture2D IPortraitProvider.GetPortrait(IPortraitProvider.CharacterEmotion emotion) {
-        return emotion switch {
-            IPortraitProvider.CharacterEmotion.Neutral => PortraitNeutral,
-            IPortraitProvider.CharacterEmotion.Determined => PortraitDetermined,
-            IPortraitProvider.CharacterEmotion.Hesitant => PortraitHesitant,
-            IPortraitProvider.CharacterEmotion.Shocked => PortraitShocked,
-            IPortraitProvider.CharacterEmotion.Disgusted => PortraitDisgusted,
-            IPortraitProvider.CharacterEmotion.Melancholic => PortraitMelancholic,
-            IPortraitProvider.CharacterEmotion.Joyous => PortraitJoyous,
-            _ => throw new NotImplementedException(),
-        };
+    public override CharacterModel Instantiate(Node3D root, Skeleton3D skeleton) {
+        return new CharacterModel(root, skeleton, this);
     }
 
 }

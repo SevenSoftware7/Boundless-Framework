@@ -3,7 +3,7 @@ using Godot;
 using Godot.Collections;
 
 
-namespace EndlessSkies.Core;
+namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
@@ -70,7 +70,7 @@ public sealed partial class Player : Node {
                 break;
             }
         }
-        if ( !found ) {
+        if ( ! found ) {
             GD.PrintErr("No free PlayerId found.");
             return;
         }
@@ -150,9 +150,11 @@ public sealed partial class Player : Node {
 
         } else {
 
-            if (CameraController != null) {
+            if (CameraController is not null) {
                 CameraController.SubjectBasis = Entity.Transform.Basis;
-                CameraController.Subject = Entity.GetAttachment(IModelAttachment.AttachmentPart.Head);
+                
+                Vector3 camAnchor = Entity.Skeleton.GetBonePositionOrDefault("Head", Entity.Transform.Origin);
+                CameraController.Subject = camAnchor;
 
                 CameraController.HandleCameraInput(ControlDevice.GetLookDirection() * 0.005f);
             }

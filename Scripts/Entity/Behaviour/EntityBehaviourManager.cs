@@ -2,7 +2,7 @@ using Godot;
 using System;
 
 
-namespace EndlessSkies.Core;
+namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
@@ -21,9 +21,6 @@ public sealed partial class EntityBehaviourManager : Node {
     }
     public EntityBehaviourManager(Entity entity) : this() {
         Entity = entity;
-
-        entity.AddChild(this);
-        Owner = entity.Owner;
     }
     
 

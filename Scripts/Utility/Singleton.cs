@@ -15,7 +15,7 @@ public static class SingletonHelper {
     }
 
     public static void SetInstance<T>(T newInstance) where T : Node {
-        if (ISingleton<T>.instance != null && ISingleton<T>.instance != newInstance) {
+        if (ISingleton<T>.instance is not null && ISingleton<T>.instance != newInstance) {
             newInstance.QueueFree();
         }
         ISingleton<T>.instance = newInstance;

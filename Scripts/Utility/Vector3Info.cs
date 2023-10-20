@@ -29,7 +29,7 @@ public struct Vector3Info {
 
 
     public void SetVal(Vector3 value) {
-        if ( !_updatedThisStep ) {
+        if ( ! _updatedThisStep ) {
             lastValue = currentValue;
         }
         currentValue = value;
@@ -42,7 +42,7 @@ public struct Vector3Info {
     }
 
     public void TimeStep() {
-        if ( !_updatedThisStep ) {
+        if ( ! _updatedThisStep ) {
             SetVal(Vector3.Zero);
         }
         _updatedThisStep = false;

@@ -2,7 +2,7 @@ using Godot;
 using System;
 
 
-namespace EndlessSkies.Core;
+namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
@@ -14,15 +14,12 @@ public partial class CharacterModel : Model {
 
 
 
-    protected CharacterModel() : base() {;}
-    public CharacterModel(IModelAttachment modelAttachment, CharacterCostume costume) : base(modelAttachment) {
-        SkeletonPath = modelAttachment.Skeleton.GetPath();
-
-        Parent.AddChild(this);
-        Owner = Parent.Owner;
-        
+    private CharacterModel() : base() {;}
+    public CharacterModel(Node3D root, Skeleton3D skeleton, CharacterCostume costume) : base(root) {
         Name = nameof(CharacterModel);
+        
         Costume = costume;
+        SkeletonPath = GetPathTo(skeleton);
     }
 
 
@@ -32,13 +29,14 @@ public partial class CharacterModel : Model {
         if ( Costume == null ) return false;
 
         Model = Costume.ModelScene?.Instantiate() as MeshInstance3D;
-        if ( Model != null ) {
+        if ( Model is not null ) {
             Model.Name = nameof(Model);
 
-            Parent.AddChild(Model);
-            Model.Owner = Parent.Owner;
+            this.AddChildSetOwner(Model);
 
-            Model.Skeleton = SkeletonPath;
+            if ( this.TryGetNode(SkeletonPath, out Skeleton3D skeleton) ) {
+                Model.Skeleton = Model.GetPathTo(skeleton);
+            }
         }
 
         return true;
@@ -49,5 +47,13 @@ public partial class CharacterModel : Model {
         Model = null;
 
         return true;
+    }
+
+    public override void _Process(double delta) {
+        base._Process(delta);
+
+        if ( this.TryGetNode(SkeletonPath, out Skeleton3D skeleton) ) {
+            Transform = new(skeleton.Transform.Basis, skeleton.Transform.Origin);
+        }
     }
 }

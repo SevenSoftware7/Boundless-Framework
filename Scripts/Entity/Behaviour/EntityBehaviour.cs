@@ -2,7 +2,7 @@ using Godot;
 using System;
 
 
-namespace EndlessSkies.Core;
+namespace LandlessSkies.Core;
 
 [GlobalClass]
 public abstract partial class EntityBehaviour : Node {
@@ -14,8 +14,7 @@ public abstract partial class EntityBehaviour : Node {
         set {
             _behaviourManager = value;
             GetParent()?.RemoveChild(this);
-            _behaviourManager.AddChild(this);
-            Owner = _behaviourManager.Owner;
+            _behaviourManager.AddChildSetOwner(this);
         }
     }
     private EntityBehaviourManager _behaviourManager;
@@ -30,7 +29,7 @@ public abstract partial class EntityBehaviour : Node {
     public virtual void SetSpeed(MovementSpeed speed) {;}
     public virtual void Move(Vector3 direction) {;}
 
-    public abstract void Start(EntityBehaviour previousBehaviour);
+    public virtual void Start(EntityBehaviour previousBehaviour) {;}
 
     public enum MovementSpeed {
         Idle = 0,
