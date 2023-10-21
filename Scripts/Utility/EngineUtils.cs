@@ -23,7 +23,8 @@ public static class EngineUtils {
         node.IsNodeReady() && Engine.GetProcessFrames() == 0;
 
     public static void AddChildSetOwner(this Node obj, Node child) {
-        obj.AddChildSetOwner(child);
+        obj.AddChild(child);
+        child.Owner = obj.Owner;
     }
 
     public static T GetNodeByTypeName<T>(this Node obj) where T : Node {

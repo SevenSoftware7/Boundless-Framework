@@ -9,12 +9,11 @@ public abstract partial class Model : Node3D {
     [Export] public bool IsLoaded { 
         get => _isLoaded;
         private set {
-            // if ( value ) {
-            //     LoadModel();
-            // } else {
-            //     UnloadModel();
-            // }
-            _isLoaded = value;
+            if ( value ) {
+                LoadModel();
+            } else {
+                UnloadModel();
+            }
         }
     }
     private bool _isLoaded = false;

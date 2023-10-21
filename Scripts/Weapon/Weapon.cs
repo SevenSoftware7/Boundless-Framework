@@ -65,7 +65,6 @@ public partial class Weapon : Model {
 
     protected override bool UnloadModelImmediate() {
 
-        // WeaponModel?.UnloadModel();
         WeaponModel?.QueueFree();
         WeaponModel = null;
 

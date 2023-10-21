@@ -18,7 +18,7 @@ public partial class WeaponModel : Model {
     public WeaponModel(Node3D root, Skeleton3D skeleton, WeaponCostume costume) : base(root) {
         Name = nameof(WeaponModel);
 
-        SkeletonPath = GetPathTo(skeleton);
+        SkeletonPath = skeleton is not null ? GetPathTo(skeleton) : null;
         
         Costume = costume;
     }
