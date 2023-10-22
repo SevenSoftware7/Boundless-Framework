@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 
 namespace LandlessSkies.Core;
@@ -7,29 +8,36 @@ namespace LandlessSkies.Core;
 [GlobalClass]
 public abstract partial class EntityBehaviour : Node {
 
+    public abstract bool FreeOnStop { get; }
+
     [Export] public Entity Entity { get; set; }
+    [Export] public EntityBehaviourManager BehaviourManager;
 
-    [Export] public EntityBehaviourManager BehaviourManager { 
-        get => _behaviourManager;
-        set {
-            _behaviourManager = value;
-            GetParent()?.RemoveChild(this);
-            _behaviourManager.AddChildSetOwner(this);
-        }
+
+
+    public EntityBehaviour() : base() {
+        Entity ??= null !;
+        BehaviourManager ??= null !;
     }
-    private EntityBehaviourManager _behaviourManager;
+    public EntityBehaviour([MaybeNull] Entity entity, [MaybeNull] EntityBehaviourManager behaviourManager) : base() {
+        ArgumentNullException.ThrowIfNull(entity);
+        ArgumentNullException.ThrowIfNull(behaviourManager);
+
+        Entity = entity;
+        BehaviourManager = behaviourManager;
+        BehaviourManager.AddChildSetOwner(this);
+    }
 
 
 
-    public EntityBehaviour() : base() {}
+    public virtual void HandleInput(Player.InputInfo inputInfo) {}
+
+    public virtual void SetSpeed(MovementSpeed speed) {}
+    public virtual void Move(Vector3 direction) {}
+
+    public virtual void Start(EntityBehaviour? previousBehaviour) {}
 
 
-    public virtual void HandleInput(Player.InputInfo inputInfo) {;}
-
-    public virtual void SetSpeed(MovementSpeed speed) {;}
-    public virtual void Move(Vector3 direction) {;}
-
-    public virtual void Start(EntityBehaviour previousBehaviour) {;}
 
     public enum MovementSpeed {
         Idle = 0,

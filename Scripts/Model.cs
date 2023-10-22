@@ -19,10 +19,13 @@ public abstract partial class Model : Node3D {
     private bool _isLoaded = false;
 
 
+    [Signal] public delegate void ModelLoadedEventHandler(bool isLoaded);
+
+
 
     protected Model() : base() {;}
-    public Model(Node3D root) : this() {
-        root.AddChildSetOwner(this);
+    public Model(Node3D? root) : this() {
+        root?.AddChildSetOwner(this);
     }
 
 
@@ -33,6 +36,7 @@ public abstract partial class Model : Node3D {
         if ( ! LoadModelImmediate() ) return;
 
         _isLoaded = true;
+        EmitSignal(SignalName.ModelLoaded, true);
     }
     
     public void UnloadModel() {
@@ -41,6 +45,7 @@ public abstract partial class Model : Node3D {
         if ( ! UnloadModelImmediate() ) return;
 
         _isLoaded = false;
+        EmitSignal(SignalName.ModelLoaded, false);
     }
 
     public virtual void ReloadModel(bool forceLoad = false) {

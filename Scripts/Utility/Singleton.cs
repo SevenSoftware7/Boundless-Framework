@@ -5,12 +5,12 @@ namespace SevenGame.Utility;
 
 public interface ISingleton<T> where T : Node {
 
-    public static T instance;
+    public static T? instance;
     
 }
 
 public static class SingletonHelper {
-    public static T GetInstance<T>() where T : Node {
+    public static T? GetInstance<T>() where T : Node {
         return ISingleton<T>.instance;
     }
 

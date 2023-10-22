@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Godot;
 using SevenGame.Utility;
 
@@ -10,49 +11,36 @@ public sealed partial class Entity : CharacterBody3D {
     
     [ExportGroup("Dependencies")]
     
-    [Export] public EntityBehaviourManager BehaviourManager { 
-        get {
-            _behaviourManager ??= this.GetNodeByTypeName<EntityBehaviourManager>();
-            if ( _behaviourManager is null ) {
-                _behaviourManager = new(this);
-                this.AddChildSetOwner(_behaviourManager);
-            }
-
-            return _behaviourManager;
-        }
+    [Export] public EntityBehaviourManager? BehaviourManager { 
+        get => _behaviourManager ??= this.GetNodeByTypeName<EntityBehaviourManager>();
         private set => _behaviourManager = value;
     }
-    private EntityBehaviourManager _behaviourManager;
+    private EntityBehaviourManager? _behaviourManager;
 
-    [Export] public Health Health { 
-        get {
-            _health ??= this.GetNodeByTypeName<Health>();
-            if ( _health is null ) {
-                _health = new(this);
-                this.AddChildSetOwner(_health);
-            }
-
-            return _health;
-        }
+    [Export] public Health? Health { 
+        get => _health ??= this.GetNodeByTypeName<Health>();
         private set => _health = value;
     }
-    private Health _health;
+    private Health? _health;
 
-    [Export] public WeaponInventory WeaponInventory { 
+    [Export] public WeaponInventory? WeaponInventory { 
         get {
-            _weaponInventory ??= this.GetNodeByTypeName<WeaponInventory>();
-            if ( _weaponInventory is not null ) {
-                if ( Skeleton is not null ) {
-                    _weaponInventory.SkeletonPath = _weaponInventory.GetPathTo(Skeleton);
+            if ( _weaponInventory is null ) {
+                _weaponInventory = this.GetNodeByTypeName<WeaponInventory>();
+
+                if (_weaponInventory is null) return null;
+
+                if ( Armature is not null ) {
+                    _weaponInventory.SkeletonPath = _weaponInventory.GetPathTo(Armature);
                 }
-                // _weaponInventory.ReloadModel(Character?.IsLoaded ?? false);
+                _weaponInventory.ReloadModel(Character?.IsLoaded ?? false);
             }
 
             return _weaponInventory;
         }
         private set => _weaponInventory = value;
     }
-    private WeaponInventory _weaponInventory;
+    private WeaponInventory? _weaponInventory;
 
 
 
@@ -98,53 +86,53 @@ public sealed partial class Entity : CharacterBody3D {
 
     [Export] public Character Character { get; private set; }
 
-    [Export] public CharacterData CharacterData {
+    [Export] public CharacterData? CharacterData {
         get => Character?.Data;
         private set => this.CallDeferredIfTools( Callable.From(() => SetCharacter(value)) );
     }
 
-    [Export] public CharacterCostume CharacterCostume {
+    [Export] public CharacterCostume? CharacterCostume {
         get => Character?.CharacterCostume;
         private set => this.CallDeferredIfTools( Callable.From(() => SetCostume(value)) );
     }
 
     
-    public Skeleton3D Skeleton => Character?.Skeleton;
+    public Skeleton3D? Armature => Character?.Armature;
 
 
-    [Signal] public delegate void CharacterChangedEventHandler(CharacterData newCharacter, CharacterData oldCharacter);
-    [Signal] public delegate void CostumeChangedEventHandler(CharacterCostume newCostume, CharacterCostume oldCostume);
+    [Signal] public delegate void CharacterChangedEventHandler(CharacterData? newCharacter, CharacterData? oldCharacter);
 
 
     public Entity() : base() {
         CollisionLayer = 1 << 1;
+
+        _behaviourManager ??= null !;
+        Character ??= null !;
     }
 
 
 
-    public void SetCharacter(CharacterData data, CharacterCostume costume = null) {
+    public void SetCharacter(CharacterData? data, CharacterCostume? costume = null) {
         if ( this.IsInvalidTreeCallback() ) return;
         if ( CharacterData == data ) return;
 
-        // Character?.UnloadModel();
         Character?.QueueFree();
-        Character = null;
+        Character = null !;
 
-        CharacterData oldData = CharacterData;
+        CharacterData? oldData = CharacterData;
         if ( data is not null ) {
-            Character = data?.Instantiate(this);
+            Character = data.Instantiate(this);
             Character?.LoadModel();
         }
-        EmitSignal(SignalName.CharacterChanged, data, oldData);
+        EmitSignal(SignalName.CharacterChanged, data!, oldData!);
 
         if ( data is not null ) {
-            SetCostume(costume ?? data?.BaseCostume);
+            SetCostume(costume ?? data.BaseCostume);
         }
     }
 
-    public void SetCostume(CharacterCostume costume) {
+    public void SetCostume(CharacterCostume? costume) {
         Character?.SetCostume(costume);
-        EmitSignal(SignalName.CostumeChanged, costume);
     }
 
 
@@ -173,11 +161,16 @@ public sealed partial class Entity : CharacterBody3D {
         return true;
     }
 
-    private void OnCharacterChanged(CharacterData newCharacter, CharacterData oldCharacter) {        
+    private void OnCharacterLoadChanged(bool isLoaded) {
         if ( _weaponInventory is null ) return;
 
-        _weaponInventory.SkeletonPath = Skeleton is null ? null : _weaponInventory.GetPathTo(Skeleton);
-        _weaponInventory.ReloadModel(oldCharacter is null);
+        _weaponInventory.SkeletonPath = Armature is not null ? _weaponInventory.GetPathTo(Armature) : new();
+        _weaponInventory.ReloadModel();
+    }
+
+    private void OnCharacterChanged(CharacterData? newCharacter, CharacterData? oldCharacter) {
+        Character.ModelLoaded += OnCharacterLoadChanged;
+        OnCharacterLoadChanged(Character.IsLoaded);
     }
 
 
@@ -210,7 +203,11 @@ public sealed partial class Entity : CharacterBody3D {
 
         if ( Engine.IsEditorHint() ) return;
 
-        BehaviourManager.SetBehaviour<TestBehaviour>();
+        BehaviourManager?.SetBehaviour<TestBehaviour>(
+            () => new(this, BehaviourManager) {
+                Name = nameof(TestBehaviour)
+            }
+        );
 	}
 
 }

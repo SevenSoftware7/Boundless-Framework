@@ -3,5 +3,6 @@
     <TargetFramework>net7.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>LandlessSkies</RootNamespace>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 </Project>

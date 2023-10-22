@@ -1,6 +1,7 @@
 using Godot;
 using SevenGame.Utility;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 
@@ -10,39 +11,55 @@ namespace LandlessSkies.Core;
 [GlobalClass]
 public partial class Character : Model {
 
-    [Export] public CharacterData Data { get; private set; }
-    [Export] public Node3D Collisions { get; private set; }
-    [Export] public Skeleton3D Armature { get; private set; }
-    [Export] public CharacterModel CharacterModel { get; private set; }
+    [Export] public Node3D? Collisions { get; private set; }
+    [Export] public Skeleton3D? Armature { get; private set; }
+    [Export] public CharacterModel? CharacterModel { get; private set; }
+
+
+    [Export] public CharacterData Data { 
+        get => _data;
+        private set => _data ??= value;
+    }
+    private CharacterData _data;
+
+    [Export] public CharacterCostume? CharacterCostume {
+        get => _characterCostume ??= CharacterModel?.Costume;
+        private set => this.CallDeferredIfTools( Callable.From(() => SetCostume(value)) );
+    }
+    private CharacterCostume? _characterCostume;
 
 
     public Basis CharacterRotation { get; private set; } = Basis.Identity;
 
 
-    [Export] public CharacterCostume CharacterCostume {
-        get => CharacterModel?.Costume;
-        private set => this.CallDeferredIfTools( Callable.From(() => SetCostume(value)) );
-    }
-
-
-    public Skeleton3D Skeleton => Armature;
+    [Signal] public delegate void CostumeChangedEventHandler(CharacterCostume? newCostume, CharacterCostume? oldCostume);
 
 
 
-    public Character() : base() {;}
-    public Character(Node3D root, CharacterData data) : base(root) {
+    public Character() : base() {
+        _data ??= null !;
+
         Name = nameof(Character);
+    }
+    public Character(Node3D? root, CharacterData data) : base(root) {
+        ArgumentNullException.ThrowIfNull(data);
 
-        Data = data;
+        _data = data;
+
+        Name = nameof(Character);
     }
 
 
-    public void SetCostume(CharacterCostume costume) {
+
+    public void SetCostume(CharacterCostume? costume, bool forceLoad = false) {
         if ( this.IsInvalidTreeCallback() ) return;
-        if ( CharacterModel?.Costume == costume ) return;
+        if ( CharacterCostume == costume ) return;
 
         CharacterModel?.QueueFree();
-        CharacterModel = null;
+        CharacterModel = null !;
+
+        _characterCostume = costume;
+        EmitSignal(SignalName.CostumeChanged, costume!);
 
         if ( costume is null ) return;
 
@@ -69,24 +86,23 @@ public partial class Character : Model {
             this.AddChildSetOwner(Armature);
         }
 
-        RefreshRotation();
+        CharacterModel = _characterCostume?.Instantiate(this, Armature);
+        CharacterModel?.LoadModel();
 
-        // CharacterModel?.LoadModel();
+        RefreshRotation();
 
         return true;
     }
 
     protected override bool UnloadModelImmediate() {
-
-        // CharacterModel?.UnloadModel();
-        // CharacterModel?.QueueFree();
-        // CharacterModel = null;
-
         Collisions?.QueueFree();
-        Collisions = null;
+        Collisions = null !;
 
         Armature?.QueueFree();
-        Armature = null;
+        Armature = null !;
+
+        CharacterModel?.QueueFree();
+        CharacterModel = null !;
 
         return true;
     }
@@ -97,9 +113,6 @@ public partial class Character : Model {
         RefreshRotation();
     }
 
-    // public void RotateTowards(Vector3 newForward, Vector3 newUp, double delta, float speed = 12f) =>
-    //     RotateTowards(Basis.LookingAt(newForward, newUp), delta, speed);
-
     protected virtual void RefreshRotation() {
         Transform = new(CharacterRotation, Transform.Origin);
 
@@ -107,6 +120,33 @@ public partial class Character : Model {
 
         Collisions.Transform = new(CharacterRotation, Collisions.Transform.Origin);
     }
+
+
+// #if TOOLS
+//     public override string[] _GetConfigurationWarnings() {
+//         string[] baseWarnings = base._GetConfigurationWarnings();
+
+//         if ( Collisions is null ) {
+//             baseWarnings ??= Array.Empty<string>();
+//             Array.Resize(ref baseWarnings, baseWarnings.Length + 1);
+//             baseWarnings[^1] = $"{nameof(Collisions)} is null.";
+//         }
+
+//         if ( Armature is null ) {
+//             baseWarnings ??= Array.Empty<string>();
+//             Array.Resize(ref baseWarnings, baseWarnings.Length + 1);
+//             baseWarnings[^1] = $"{nameof(Armature)} is null.";
+//         }
+
+//         if ( CharacterModel is null ) {
+//             baseWarnings ??= Array.Empty<string>();
+//             Array.Resize(ref baseWarnings, baseWarnings.Length + 1);
+//             baseWarnings[^1] = $"{nameof(CharacterModel)} is null.";
+//         }
+
+//         return baseWarnings;
+//     }
+// #endif
 
 
 }

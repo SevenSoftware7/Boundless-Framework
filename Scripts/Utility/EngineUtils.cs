@@ -27,7 +27,7 @@ public static class EngineUtils {
         child.Owner = obj.Owner;
     }
 
-    public static T GetNodeByTypeName<T>(this Node obj) where T : Node {
+    public static T? GetNodeByTypeName<T>(this Node obj) where T : Node {
         return obj.GetNodeOrNull<T>(typeof(T).Name);
     }
 
@@ -46,7 +46,7 @@ public static class EngineUtils {
 
     public static bool TryGetNode<T>(this Node obj, NodePath nodePath, out T node) where T : Node {
         if ( nodePath is null ) {
-            node = null;
+            node = default!;
             return false;
         }
         node = obj.GetNodeOrNull<T>(nodePath);

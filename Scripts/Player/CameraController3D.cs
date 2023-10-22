@@ -48,6 +48,18 @@ public partial class CameraController3D : Camera3D {
     public Basis AbsoluteRotation => SubjectBasis * LocalRotation;
 
 
+    public void SetEntityAsSubject(Entity entity) {
+        Subject = entity.Transform.Origin;
+        if ( entity.Armature is not null ) {
+            Subject = entity.Armature.GetBonePositionOrDefault("Head", Subject);
+        }
+
+        SubjectBasis = entity.Transform.Basis;
+    }
+
+    public void HandleCamera(ControlDevice controlDevice) {
+        HandleCameraInput(controlDevice.GetLookDirection() * 0.005f); // TODO : Proper sensitivity adjustments
+    }
 
     public void HandleCameraInput(Vector2 cameraInput) {
         Input.MouseMode = Input.MouseModeEnum.Captured;

@@ -13,7 +13,7 @@ public sealed partial class Player : Node {
     public const string PlayerIdRange = "0,9,"; // MaxPlayers - 1
 
     
-    public static readonly Player[] Players = new Player[MaxPlayers];
+    public static readonly Player?[] Players = new Player[MaxPlayers];
 
     [Export(PropertyHint.Range, PlayerIdRange)] public byte PlayerId { 
         get => _playerId;
@@ -26,25 +26,23 @@ public sealed partial class Player : Node {
     private byte _playerId;
 
 
-    [Export] public Entity Entity { get; private set; }
-    
-    [Export] public CameraController3D CameraController { 
-        get => _cameraController ??= GetNodeOrNull<CameraController3D>(nameof(CameraController)) ?? new();
+
+    [Export] public CameraController3D? CameraController { 
+        get => _cameraController ??= GetNodeOrNull<CameraController3D>(nameof(CameraController));
         private set => _cameraController = value;
     }
-    private CameraController3D _cameraController;
+    private CameraController3D? _cameraController;
 
-    [Export] public ControlDevice ControlDevice { get; private set; }
+    [Export] public Entity? Entity { get; private set; }
 
-
-
-    private Vector2 _cameraMovementInput;
+    [Export] public ControlDevice? ControlDevice { get; private set; }
 
 
 
     public Player() : base() {
         Name = nameof(Player);
     }
+
 
 
     private void SetPlayerId(byte value) {
@@ -131,40 +129,25 @@ public sealed partial class Player : Node {
 
     #endif
 
-    // public override void _Input(InputEvent @event) {
-    //     base._Input(@event);
-
-    //     // get mouse input
-    //     if ( @event is InputEventMouseMotion mouseMotion ) {
-    //         _cameraMovementInput = new(
-    //             mouseMotion.Relative.X,
-    //             -mouseMotion.Relative.Y
-    //         );
-    //     }
-    // }
-
     public override void _Process(double delta) {
         base._Process(delta);
 
-        if ( Engine.IsEditorHint() ) {
+        if ( Engine.IsEditorHint() ) return;
 
-        } else {
-
-            if (CameraController is not null) {
-                CameraController.SubjectBasis = Entity.Transform.Basis;
-                
-                Vector3 camAnchor = Entity.Skeleton.GetBonePositionOrDefault("Head", Entity.Transform.Origin);
-                CameraController.Subject = camAnchor;
-
-                CameraController.HandleCameraInput(ControlDevice.GetLookDirection() * 0.005f);
-            }
-
-            Entity.HandleInput(new(
-                ControlDevice,
-                CameraController,
-                Entity
-            ));
+        if ( Entity is not null) {
+            CameraController?.SetEntityAsSubject(Entity);
         }
+        if ( ControlDevice is not null) {
+            CameraController?.HandleCamera(ControlDevice);
+        }
+
+        if ( Entity is null || CameraController is null || ControlDevice is null ) return;
+
+        Entity.HandleInput(new(
+            ControlDevice,
+            CameraController,
+            Entity
+        ));
     }
 
     public override void _Ready() {
@@ -187,10 +170,10 @@ public sealed partial class Player : Node {
     }
 
 
-    public struct InputInfo {
-        public ControlDevice ControlDevice;
-        private CameraController3D CameraController;
-        private Entity Entity;
+    public readonly struct InputInfo {
+        public readonly Entity Entity;
+        public readonly ControlDevice ControlDevice;
+        public readonly CameraController3D CameraController;
 
 
         public InputInfo(ControlDevice controlDevice, CameraController3D cameraController, Entity entity) {

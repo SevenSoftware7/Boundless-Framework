@@ -7,6 +7,9 @@ namespace LandlessSkies.Core;
 
 public partial class TestBehaviour : EntityBehaviour {
 
+    public override bool FreeOnStop => false;
+
+    
     private Vector3 _moveDirection;
     private Vector3 _rotationForward = Vector3.Forward;
     private float _moveSpeed;
@@ -14,7 +17,11 @@ public partial class TestBehaviour : EntityBehaviour {
 
 
 
-    public override void Start(EntityBehaviour previousBehaviour) {
+    public TestBehaviour(Entity entity, EntityBehaviourManager behaviourManager) : base(entity, behaviourManager) {}
+
+
+
+    public override void Start(EntityBehaviour? previousBehaviour) {
         base.Start(previousBehaviour);
 
         Entity.MotionMode = CharacterBody3D.MotionModeEnum.Grounded;
@@ -72,12 +79,7 @@ public partial class TestBehaviour : EntityBehaviour {
         Entity.Inertia += Entity.UpDirection * 15f;
     }
 
-    // Called when the node enters the scene tree for the first time.
-    public override void _Ready()
-	{
-	}
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta) {
         float floatDelta = (float)delta;
 
@@ -96,7 +98,7 @@ public partial class TestBehaviour : EntityBehaviour {
             //     // Debug.DrawRay(Entity.transform.position, groundedMovement, Color.blue);
             // }
 
-            Entity.AbsoluteForward = Entity.AbsoluteForward.SafeSlerp( normalizedDirection, Entity.Character.Data.rotationSpeed * floatDelta);
+            Entity.AbsoluteForward = Entity.AbsoluteForward.SafeSlerp( normalizedDirection, Entity.Character?.Data.rotationSpeed ?? CharacterData.DEFAULT_ROTATION_SPEED * floatDelta);
             
 
             // if ( isCurrentlyEvading ) {
@@ -107,19 +109,20 @@ public partial class TestBehaviour : EntityBehaviour {
 
             /// Select the speed based on the movement type
             newSpeed = _movementSpeed switch {
+                _ when Entity.CharacterData is null => CharacterData.DEFAULT_BASE_SPEED,
                 MovementSpeed.Walk => Entity.CharacterData.slowSpeed,
                 MovementSpeed.Run => Entity.CharacterData.baseSpeed,
                 MovementSpeed.Sprint => Entity.CharacterData.sprintSpeed,
                 _ => newSpeed
             };
 
-            Entity.Character.RotateTowards(Basis.LookingAt(_rotationForward, Entity.UpDirection), delta);
+            Entity.Character?.RotateTowards(Basis.LookingAt(_rotationForward, Entity.UpDirection), delta);
         }
 
         
         float speedDelta = Mathf.Abs(newSpeed - _moveSpeed) * (newSpeed != 0f ? 1f / newSpeed : 1f); // Accelerate faster depending on how big the difference between current and target speeds are
         speedDelta = Mathf.Clamp(_moveSpeed < newSpeed ? speedDelta : speedDelta * 0.5f, 0f, 1f); // Slow down faster than speeding up, clamped to 0-1
-        _moveSpeed = Mathf.MoveToward(_moveSpeed, newSpeed, speedDelta * Entity.CharacterData.acceleration * floatDelta);
+        _moveSpeed = Mathf.MoveToward(_moveSpeed, newSpeed, speedDelta * Entity.CharacterData?.acceleration ?? CharacterData.DEFAULT_ACCELERATION * floatDelta);
 
         Entity.Movement = _moveDirection * _moveSpeed;
 

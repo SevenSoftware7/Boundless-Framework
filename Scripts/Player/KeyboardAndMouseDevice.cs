@@ -18,7 +18,7 @@ public partial class KeyboardAndMouseDevice : ControlDevice {
     public Vector2Info moveMotion;
     public Vector2Info mouseMotion;
 
-    private static Dictionary<Key, Key> overrideKeyMap = null;
+    private static readonly Dictionary<Key, Key> overrideKeyMap = new();
 
     
 
@@ -90,7 +90,7 @@ public partial class KeyboardAndMouseDevice : ControlDevice {
 
         if (@event is InputEventKey keyEvent) {
             Key keyCode = keyEvent.PhysicalKeycode;
-            if ( overrideKeyMap is not null && overrideKeyMap.ContainsKey(keyCode) ) {
+            if ( overrideKeyMap.ContainsKey(keyCode) ) {
                 keyCode = overrideKeyMap[keyCode];
             }
 

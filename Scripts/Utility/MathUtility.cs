@@ -144,7 +144,7 @@ public static class MathUtility {
         return vector3_5;
     }
 
-    public static bool RayCast3D(this Node3D node, Vector3 from, Vector3 to, out RayCast3DResult result, uint collisionMask = uint.MaxValue, Array<Rid> exclude = null, bool collideWithBodies = true, bool collideWithAreas = true, bool hitFromInside = false, bool hitBackFaces = false) {
+    public static bool RayCast3D(this Node3D node, Vector3 from, Vector3 to, out RayCast3DResult result, uint collisionMask = uint.MaxValue, Array<Rid>? exclude = null, bool collideWithBodies = true, bool collideWithAreas = true, bool hitFromInside = false, bool hitBackFaces = false) {
         PhysicsDirectSpaceState3D spaceState = node.GetWorld3D().DirectSpaceState;
         PhysicsRayQueryParameters3D parameters = PhysicsRayQueryParameters3D.Create(from, to, collisionMask, exclude); 
         parameters.CollideWithBodies = collideWithBodies;

@@ -8,19 +8,32 @@ namespace LandlessSkies.Core;
 [GlobalClass]
 public partial class WeaponModel : Model {
 
-    [Export] private MeshInstance3D Model;
-    [Export] public WeaponCostume Costume { get; private set; }
-    [Export(PropertyHint.NodePathValidTypes, nameof(Skeleton3D))] public NodePath SkeletonPath { get; private set; }
+    [Export(PropertyHint.NodePathValidTypes, nameof(Skeleton3D))] public NodePath SkeletonPath { get; private set; } = new();
+    [Export] private MeshInstance3D? Model;
+    
+    [Export] public WeaponCostume Costume { 
+        get => _costume;
+        private set {;}
+    }
+    private WeaponCostume _costume;
 
 
 
-    private WeaponModel() : base() {;}
-    public WeaponModel(Node3D root, Skeleton3D skeleton, WeaponCostume costume) : base(root) {
+    private WeaponModel() : base() {
+        _costume ??= null !;
+
         Name = nameof(WeaponModel);
+    }
+    public WeaponModel(Node3D root, Skeleton3D? skeleton, WeaponCostume costume) : base(root) {
+        if ( costume is null ) {
+            QueueFree();
+            throw new ArgumentNullException(nameof(costume));
+        }
 
-        SkeletonPath = skeleton is not null ? GetPathTo(skeleton) : null;
-        
-        Costume = costume;
+        SkeletonPath = skeleton is not null ? GetPathTo(skeleton) : new();
+        _costume = costume;
+
+        Name = nameof(WeaponModel);
     }
 
 
@@ -29,7 +42,7 @@ public partial class WeaponModel : Model {
         if ( SkeletonPath == null ) return false;
         if ( Costume == null ) return false;
 
-        Model = Costume.ModelScene?.Instantiate() as MeshInstance3D;
+        Model = Costume?.ModelScene?.Instantiate() as MeshInstance3D;
         if ( Model is not null ) {
             Model.Name = nameof(Model);
 
@@ -52,8 +65,6 @@ public partial class WeaponModel : Model {
 
     public override void _Process(double delta) {
         base._Process(delta);
-
-        // if ( Engine.IsEditorHint() ) return;
 
         if ( this.TryGetNode(SkeletonPath, out Skeleton3D skeleton) && skeleton.TryGetBoneTransform("RightHand", out Transform3D rightHandTransform) ) {
             GlobalTransform = rightHandTransform;

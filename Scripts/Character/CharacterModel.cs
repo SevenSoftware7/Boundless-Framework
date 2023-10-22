@@ -8,18 +8,31 @@ namespace LandlessSkies.Core;
 [GlobalClass]
 public partial class CharacterModel : Model {
 
-    [Export] private MeshInstance3D Model;
-    [Export] public CharacterCostume Costume { get; private set; }
-    [Export(PropertyHint.NodePathValidTypes, nameof(Skeleton3D))] public NodePath SkeletonPath { get; private set; }
+    [Export(PropertyHint.NodePathValidTypes, nameof(Skeleton3D))] public NodePath SkeletonPath { get; private set; } = new();
+
+    [Export] private MeshInstance3D? Model;
+
+    
+    [Export] public CharacterCostume Costume { 
+        get => _costume;
+        private set {;}
+    }
+    private CharacterCostume _costume;
 
 
 
-    private CharacterModel() : base() {;}
-    public CharacterModel(Node3D root, Skeleton3D skeleton, CharacterCostume costume) : base(root) {
-        Name = nameof(CharacterModel);
+    private CharacterModel() : base() {
+        _costume ??= null !;
         
-        Costume = costume;
-        SkeletonPath = GetPathTo(skeleton);
+        Name = nameof(CharacterModel);
+    }
+    public CharacterModel(Node3D? root, Skeleton3D? skeleton, CharacterCostume costume) : base(root) {
+        ArgumentNullException.ThrowIfNull(costume);
+        
+        SkeletonPath = skeleton is not null ? GetPathTo(skeleton) : SkeletonPath;
+        _costume = costume;
+        
+        Name = nameof(CharacterModel);
     }
 
 
@@ -30,7 +43,7 @@ public partial class CharacterModel : Model {
 
         Model = Costume.ModelScene?.Instantiate() as MeshInstance3D;
         if ( Model is not null ) {
-            Model.Name = nameof(Model);
+            Model.Name = nameof(CharacterModel);
 
             this.AddChildSetOwner(Model);
 
@@ -48,6 +61,7 @@ public partial class CharacterModel : Model {
 
         return true;
     }
+
 
     public override void _Process(double delta) {
         base._Process(delta);
