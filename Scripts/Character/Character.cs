@@ -16,7 +16,7 @@ public partial class Character : Model {
     [Export] public CharacterModel? CharacterModel { get; private set; }
 
 
-    [Export] public CharacterData Data { 
+    [Export] public CharacterData Data {
         get => _data;
         private set => _data ??= value;
     }

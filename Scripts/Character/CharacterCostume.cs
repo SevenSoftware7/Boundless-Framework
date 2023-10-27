@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using CharacterEmotion = LandlessSkies.Core.IPortraitProvider.CharacterEmotion;
 
@@ -8,9 +9,8 @@ namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
-public partial class CharacterCostume : Costume, IPortraitProvider {
+public abstract partial class CharacterCostume : Costume, IPortraitProvider {
 
-    [Export] public PackedScene? ModelScene { get; private set; }
     [Export] public Texture2D? PortraitNeutral { get; private set; }
     [Export] public Texture2D? PortraitDetermined { get; private set; }
     [Export] public Texture2D? PortraitHesitant { get; private set; }
@@ -23,19 +23,18 @@ public partial class CharacterCostume : Costume, IPortraitProvider {
 
     public Texture2D? GetPortrait(CharacterEmotion emotion) {
         return emotion switch {
-            CharacterEmotion.Neutral => PortraitNeutral,
-            CharacterEmotion.Determined => PortraitDetermined,
-            CharacterEmotion.Hesitant => PortraitHesitant,
-            CharacterEmotion.Shocked => PortraitShocked,
-            CharacterEmotion.Disgusted => PortraitDisgusted,
-            CharacterEmotion.Melancholic => PortraitMelancholic,
-            CharacterEmotion.Joyous => PortraitJoyous,
-            _ => throw new UnreachableException("Invalid CharacterEmotion value")
+            CharacterEmotion.Neutral        => PortraitNeutral,
+            CharacterEmotion.Determined     => PortraitDetermined,
+            CharacterEmotion.Hesitant       => PortraitHesitant,
+            CharacterEmotion.Shocked        => PortraitShocked,
+            CharacterEmotion.Disgusted      => PortraitDisgusted,
+            CharacterEmotion.Melancholic    => PortraitMelancholic,
+            CharacterEmotion.Joyous         => PortraitJoyous,
+            _ when Enum.IsDefined(emotion)  => throw new UnreachableException($"Case for {nameof(CharacterEmotion)} {emotion} not implemented."),
+            _                               => throw new InvalidEnumArgumentException()
         };
     }
 
-    public override CharacterModel Instantiate(Node3D root, Skeleton3D? skeleton) {
-        return new CharacterModel(root, skeleton, this);
-    }
+    public abstract override CharacterModel Instantiate(Node3D root, Skeleton3D? skeleton);
 
 }

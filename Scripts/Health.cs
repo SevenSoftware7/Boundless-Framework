@@ -10,9 +10,6 @@ namespace LandlessSkies.Core;
 [GlobalClass]
 public partial class Health : Node {
 
-
-
-
     [Export] public float MaxAmount {
         get => _maxAmount;
         set {
@@ -21,7 +18,6 @@ public partial class Health : Node {
         }
     }
     private float _maxAmount = 100f;
-
 
     [Export] public float Amount {
         get {

@@ -84,14 +84,14 @@ public sealed partial class Entity : CharacterBody3D {
     [ExportGroup("")]
 
 
-    [Export] public Character Character { get; private set; }
+    [Export] [MaybeNull] public Character Character { get; private set; }
 
-    [Export] public CharacterData? CharacterData {
+    [Export] [MaybeNull] public CharacterData? CharacterData {
         get => Character?.Data;
         private set => this.CallDeferredIfTools( Callable.From(() => SetCharacter(value)) );
     }
 
-    [Export] public CharacterCostume? CharacterCostume {
+    [Export] [MaybeNull] public CharacterCostume? CharacterCostume {
         get => Character?.CharacterCostume;
         private set => this.CallDeferredIfTools( Callable.From(() => SetCostume(value)) );
     }
@@ -169,8 +169,10 @@ public sealed partial class Entity : CharacterBody3D {
     }
 
     private void OnCharacterChanged(CharacterData? newCharacter, CharacterData? oldCharacter) {
-        Character.ModelLoaded += OnCharacterLoadChanged;
-        OnCharacterLoadChanged(Character.IsLoaded);
+        if ( Character is not null ) {
+            Character.ModelLoaded += OnCharacterLoadChanged;
+        }
+        OnCharacterLoadChanged(Character?.IsLoaded ?? false);
     }
 
 

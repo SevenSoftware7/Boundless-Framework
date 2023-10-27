@@ -1,8 +1,4 @@
 using Godot;
-using SevenGame.Utility;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 
 namespace LandlessSkies.Core;
@@ -34,7 +30,7 @@ public partial class Weapon : Model {
 
         Name = nameof(Weapon);
     }
-    public Weapon(Node3D root, Skeleton3D skeleton, [NotNull]WeaponData data) : base(root) {        
+    public Weapon(Node3D root, Skeleton3D skeleton, WeaponData data) : base(root) {        
         _data = data;
         SkeletonPath = skeleton is not null ? GetPathTo(skeleton) : new();
 
