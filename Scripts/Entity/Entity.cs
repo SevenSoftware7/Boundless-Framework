@@ -9,9 +9,24 @@ namespace LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public sealed partial class Entity : CharacterBody3D {
+    [Export] public Character? Character { 
+        get => _character;
+        private set => _character ??= value;
+    }
+    private Character? _character;
+
+    [Export] public CharacterData? CharacterData {
+        get => Character?.Data;
+        private set => SetCharacter(value);
+    }
+
+    [Export] public CharacterCostume? CharacterCostume {
+        get => Character?.CharacterCostume;
+        private set => SetCostume(value);
+    }
+
     
     [ExportGroup("Dependencies")]
-    
     [Export] public EntityBehaviourManager? BehaviourManager { 
         get => _behaviourManager ??= this.GetNodeByTypeName<EntityBehaviourManager>();
         private set => _behaviourManager = value;
@@ -24,7 +39,7 @@ public sealed partial class Entity : CharacterBody3D {
     }
     private Health? _health;
 
-    // [Export] IWeaponReference IWeaponRef = new();
+
     [Export] private NodePath WeaponPath {
         get => _weaponPath;
         set {
@@ -61,7 +76,6 @@ public sealed partial class Entity : CharacterBody3D {
 
 
     [ExportGroup("Movement")]
-
     [Export] public Vector3 Inertia = Vector3.Zero; 
     [Export] public Vector3 Movement = Vector3.Zero; 
 
@@ -96,25 +110,7 @@ public sealed partial class Entity : CharacterBody3D {
         }
     }
     private Vector3 _relativeForward;
-
     [ExportGroup("")]
-
-
-    [Export] public Character? Character { 
-        get => _character;
-        private set => _character ??= value;
-    }
-    private Character? _character;
-
-    [Export] public CharacterData? CharacterData {
-        get => Character?.Data;
-        private set => SetCharacter(value);
-    }
-
-    [Export] public CharacterCostume? CharacterCostume {
-        get => Character?.CharacterCostume;
-        private set => SetCostume(value);
-    }
 
     
     public Skeleton3D? Armature => Character?.Armature;
@@ -133,7 +129,8 @@ public sealed partial class Entity : CharacterBody3D {
 
 
     public void SetCharacter(CharacterData? data, CharacterCostume? costume = null) {
-        if ( CharacterData == data ) return;
+        CharacterData? oldData = CharacterData;
+        if ( data == oldData ) return;
 
 #if TOOLS
         // Call Deferred to wait for the Editor to set all necessary Fields
@@ -143,7 +140,7 @@ public sealed partial class Entity : CharacterBody3D {
         this.UpdateLoadable<Character, CharacterData>()
             .WithConstructor(() => data?.Instantiate(costume).SetOwnerAndParentTo(this))
             .OnLoadUnloadEvent(OnCharacterLoadedUnloaded)
-            .WhenFinished((_) => EmitSignal(SignalName.CharacterChanged, data!, CharacterData!))
+            .WhenFinished((_) => EmitSignal(SignalName.CharacterChanged, data!, oldData!))
             .Execute(ref _character);
     }
 

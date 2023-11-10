@@ -37,7 +37,7 @@ public static class EngineUtils {
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void UnparentAndQueueFree(this Node obj) {
-        obj.GetParent().RemoveChild(obj);
+        obj.GetParent()?.RemoveChild(obj);
         obj.QueueFree();
     }
 

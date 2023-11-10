@@ -14,49 +14,8 @@ namespace LandlessSkies.Core;
 [GlobalClass]
 public partial class WeaponInventory : Loadable, IWeapon {
 
-    [Export(PropertyHint.NodePathValidTypes, nameof(Skeleton3D))] public NodePath SkeletonPath { 
-        get => _skeletonPath;
-        set => SetSkeleton(GetNodeOrNull<Skeleton3D>(value));
-    }
-    private NodePath _skeletonPath = new();
-
-    [Export] private uint CurrentIndex {
-        get => _currentIndex;
-        set {
-            if ( ! IsNodeReady() ) {
-                _currentIndex = value;
-                return;
-            }
-
-            SwitchTo(value);
-        }
-    }
-    private uint _currentIndex = 0;
-
-    [Export] private Weapon? CurrentWeapon {
-        get => IndexInBounds(CurrentIndex) ? _weapons[(int)CurrentIndex] : null;
-        set {
-            if (value is not null && _weapons.Contains(value)) {
-                CurrentIndex = (uint)_weapons.IndexOf(value);
-            }
-        }
-    }
-
-    [Export] public IWeapon.Handedness WeaponHandedness {
-        get => IndexInBounds(CurrentIndex) ? _weapons[(int)CurrentIndex].WeaponHandedness : IWeapon.Handedness.Right;
-        set {
-            if ( CurrentWeapon is Weapon currentWeapon ) {
-                currentWeapon.WeaponHandedness = value;
-            }
-        }
-    }
-    
-
-    [Export] private Array<Weapon> _weapons = new();
-
 
 #if TOOLS
-    [ExportGroup("Set Weapons")]
     [Export] private Array<WeaponData> WeaponDatas {
         get {
             if (_weaponDatas is null || (_weapons.Count != 0 && _weaponDatas.Count < _weapons.Count)) {
@@ -110,9 +69,52 @@ public partial class WeaponInventory : Loadable, IWeapon {
         }
     }
     private Array<WeaponData>? _weaponDatas = null;
-    // [ExportGroup("")]
 
 #endif
+    
+
+    [Export] private Array<Weapon> _weapons = new();
+
+
+    [ExportGroup("Current Weapon")]
+    [Export] private uint CurrentIndex {
+        get => _currentIndex;
+        set {
+            if ( ! IsNodeReady() ) {
+                _currentIndex = value;
+                return;
+            }
+
+            SwitchTo(value);
+        }
+    }
+    private uint _currentIndex = 0;
+
+    [Export] private Weapon? CurrentWeapon {
+        get => IndexInBounds(CurrentIndex) ? _weapons[(int)CurrentIndex] : null;
+        set {
+            if (value is not null && _weapons.Contains(value)) {
+                CurrentIndex = (uint)_weapons.IndexOf(value);
+            }
+        }
+    }
+
+    [Export] public IWeapon.Handedness WeaponHandedness {
+        get => IndexInBounds(CurrentIndex) ? _weapons[(int)CurrentIndex].WeaponHandedness : IWeapon.Handedness.Right;
+        set {
+            if ( CurrentWeapon is Weapon currentWeapon ) {
+                currentWeapon.WeaponHandedness = value;
+            }
+        }
+    }
+
+
+    [ExportGroup("Dependencies")]
+    [Export(PropertyHint.NodePathValidTypes, nameof(Skeleton3D))] public NodePath SkeletonPath { 
+        get => _skeletonPath;
+        set => SetSkeleton(GetNodeOrNull<Skeleton3D>(value));
+    }
+    private NodePath _skeletonPath = new();
 
 
 
@@ -163,9 +165,9 @@ public partial class WeaponInventory : Loadable, IWeapon {
 
     public void SetWeapon(int index, WeaponData? data, WeaponCostume? costume = null) {
         if ( ! IsNodeReady() ) return;
-        Weapon? weapon = _weapons.Count > index ? _weapons[index] : null;
 
-        if ( weapon?.Data == data ) return;
+        Weapon? weapon = _weapons.Count > index ? _weapons[index] : null;
+        if ( data is not null && weapon?.Data == data ) return;
 
         this.UpdateLoadable<Weapon, WeaponData>()
             .WithConstructor(() => data?.Instantiate(costume).SetOwnerAndParentTo(this))
@@ -184,14 +186,14 @@ public partial class WeaponInventory : Loadable, IWeapon {
     }
 
     public void RemoveWeapon(int index) {
-    #if TOOLS
-        WeaponDatas.RemoveAt(index);
-    #endif
-        
         Weapon? weapon = _weapons.Count > index ? _weapons[index] : null;
         this.DestroyLoadable<Weapon>()
             .AfterUnload((_) => _weapons.RemoveAt(index))
             .Execute(ref weapon);
+
+    #if TOOLS
+        WeaponDatas.RemoveAt(index);
+    #endif
     }
 
     public void SetCostume(int index, WeaponCostume? costume) {

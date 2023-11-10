@@ -8,26 +8,30 @@ namespace LandlessSkies.Core;
 [GlobalClass]
 public partial class Weapon : Loadable, IWeapon {
 
-    [Export(PropertyHint.NodePathValidTypes, nameof(Skeleton3D))] public NodePath SkeletonPath { 
-        get => _skeletonPath;
-        set => SetSkeleton(GetNodeOrNull<Skeleton3D>(value));
-    }
-    private NodePath _skeletonPath = new();
-
-    [Export] private WeaponModel? WeaponModel;
-
-
     [Export] public WeaponData Data { 
         get => _data;
         private set => _data ??= value;
     }
     private WeaponData _data;
+    
+    [Export] public IWeapon.Handedness WeaponHandedness { get; set; }
+
+
+    [ExportGroup("Costume")]
+    [Export] private WeaponModel? WeaponModel;
 
     [Export] public WeaponCostume? WeaponCostume {
         get => WeaponModel?.Costume;
         private set => SetCostume(value);
     }
-    [Export] public IWeapon.Handedness WeaponHandedness { get; set; }
+
+
+    [ExportGroup("Dependencies")]
+    [Export(PropertyHint.NodePathValidTypes, nameof(Skeleton3D))] public NodePath SkeletonPath { 
+        get => _skeletonPath;
+        set => SetSkeleton(GetNodeOrNull<Skeleton3D>(value));
+    }
+    private NodePath _skeletonPath = new();
     
 
     [Signal] public delegate void CostumeChangedEventHandler(WeaponCostume? newCostume, WeaponCostume? oldCostume);
@@ -35,14 +39,14 @@ public partial class Weapon : Loadable, IWeapon {
 
 
     public Weapon() : base() {
-        _data ??= null !;
+        Data ??= null !;
 
         Name = nameof(Weapon);
     }
     public Weapon(WeaponData data, WeaponCostume? costume) : base() {        
         ArgumentNullException.ThrowIfNull(data);
         
-        _data = data;
+        Data = data;
         SetCostume(costume);
 
         Name = nameof(Weapon);
@@ -51,14 +55,15 @@ public partial class Weapon : Loadable, IWeapon {
 
 
     public override void SetSkeleton(Skeleton3D? skeleton) {
-        SkeletonPath = skeleton is not null ? GetPathTo(skeleton) : new();
+        _skeletonPath = skeleton is not null ? GetPathTo(skeleton) : new();
         WeaponModel?.SetSkeleton(skeleton);
         ReloadModel();
     }
 
 
     public void SetCostume(WeaponCostume? costume) {
-        if ( costume == WeaponCostume ) return;
+        WeaponCostume? oldCostume = WeaponCostume;
+        if ( costume == oldCostume ) return;
 
 #if TOOLS
         Callable.From(SetCostume).CallDeferred();
@@ -67,7 +72,7 @@ public partial class Weapon : Loadable, IWeapon {
         this.UpdateLoadable<WeaponModel, WeaponCostume>()
             .WithConstructor(() => costume?.Instantiate().SetOwnerAndParentTo(this))
             .BeforeLoad((model) => model.SetSkeleton(GetNodeOrNull<Skeleton3D>(SkeletonPath)))
-            .WhenFinished((_) => EmitSignal(SignalName.CostumeChanged, costume!, WeaponCostume!))
+            .WhenFinished((_) => EmitSignal(SignalName.CostumeChanged, costume!, oldCostume!))
             .Execute(ref WeaponModel);
     }
 

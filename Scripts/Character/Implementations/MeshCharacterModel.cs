@@ -6,14 +6,17 @@ namespace LandlessSkies.Core;
 [Tool]
 public sealed partial class MeshCharacterModel : CharacterModel {
 
-    [Export(PropertyHint.NodePathValidTypes, nameof(Skeleton3D))] public NodePath SkeletonPath { get; private set; } = new();
 
     [Export] private MeshInstance3D? Model;
 
-    
+    [ExportGroup("Dependencies")]
+    [Export(PropertyHint.NodePathValidTypes, nameof(Skeleton3D))] public NodePath SkeletonPath { get; private set; } = new();
+
+
 
     private MeshCharacterModel() : base() {}
     public MeshCharacterModel(MeshCharacterCostume costume) : base(costume) {}
+
 
 
     public override void SetSkeleton(Skeleton3D? skeleton) {

@@ -74,7 +74,6 @@ public record struct LoadableUpdater<TLoadable, TProvider> where TLoadable : Loa
 
 
 
-
     public LoadableUpdater<TLoadable, TProvider> OnLoadUnloadEvent(Loadable.LoadedUnloadedEventHandler onLoadUnload) =>
         this with {onLoadUnload = onLoadUnload, destructor = destructor.OnLoadUnload(onLoadUnload)};
 
@@ -124,5 +123,3 @@ public static class LoadableExtensions {
     public static LoadableUpdater<TLoadable, TProvider> UpdateLoadable<TLoadable, TProvider>(this Node caller) where TLoadable : Loadable where TProvider : Resource =>
         new(caller);
 }
-
-// public delegate void Action(ref TLoadable loadable) where TLoadable : Loadable?;

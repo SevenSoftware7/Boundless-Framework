@@ -13,15 +13,16 @@ public partial class Character : Loadable {
 
     [Export] public Node3D? Collisions { get; private set; }
     [Export] public Skeleton3D? Armature { get; private set; }
-    
-    [Export] private CharacterModel? CharacterModel;
-
 
     [Export] public CharacterData Data {
         get => _data;
         private set => _data ??= value;
     }
     private CharacterData _data;
+    
+
+    [ExportGroup("Costume")]
+    [Export] private CharacterModel? CharacterModel;
 
     [Export] public CharacterCostume? CharacterCostume {
         get => CharacterModel?.Costume;
@@ -37,14 +38,14 @@ public partial class Character : Loadable {
 
 
     public Character() : base() {
-        _data ??= null !;
+        Data ??= null !;
 
         Name = nameof(Character);
     }
     public Character(CharacterData data, CharacterCostume? costume) : base() {
         ArgumentNullException.ThrowIfNull(data);
 
-        _data = data;
+        Data = data;
         SetCostume(costume);
 
         Name = nameof(Character);
@@ -53,7 +54,8 @@ public partial class Character : Loadable {
 
 
     public void SetCostume(CharacterCostume? costume, bool forceLoad = false) {
-        if ( CharacterCostume == costume ) return;
+        CharacterCostume? oldCostume = CharacterCostume;
+        if ( costume == oldCostume ) return;
 
 #if TOOLS
         Callable.From(SetCostume).CallDeferred();
@@ -62,7 +64,7 @@ public partial class Character : Loadable {
         this.UpdateLoadable<CharacterModel, CharacterCostume>()
             .WithConstructor(() => costume?.Instantiate().SetOwnerAndParentTo(this))
             .BeforeLoad((model) => model.SetSkeleton(Armature))
-            .WhenFinished((_) => EmitSignal(SignalName.CostumeChanged, costume!, CharacterCostume!))
+            .WhenFinished((_) => EmitSignal(SignalName.CostumeChanged, costume!, oldCostume!))
             .Execute(ref CharacterModel);
     }
 

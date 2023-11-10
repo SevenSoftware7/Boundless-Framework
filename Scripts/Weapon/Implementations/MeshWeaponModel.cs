@@ -6,8 +6,10 @@ namespace LandlessSkies.Core;
 [Tool]
 public sealed partial class MeshWeaponModel : WeaponModel {
 
-    [Export(PropertyHint.NodePathValidTypes, nameof(Skeleton3D))] public NodePath SkeletonPath { get; private set; } = new();
     [Export] private MeshInstance3D? Model;
+
+    [ExportGroup("Dependencies")]
+    [Export(PropertyHint.NodePathValidTypes, nameof(Skeleton3D))] public NodePath SkeletonPath { get; private set; } = new();
 
 
 
