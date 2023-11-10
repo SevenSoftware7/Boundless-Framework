@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using Godot;
 using SevenGame.Utility;
@@ -23,24 +24,39 @@ public sealed partial class Entity : CharacterBody3D {
     }
     private Health? _health;
 
-    [Export] public WeaponInventory? WeaponInventory { 
-        get {
-            if ( _weaponInventory is null ) {
-                _weaponInventory = this.GetNodeByTypeName<WeaponInventory>();
+    // [Export] IWeaponReference IWeaponRef = new();
+    [Export] private NodePath WeaponPath {
+        get => _weaponPath;
+        set {
+            this.SetValueFromNode<IWeapon>(value, ref _weaponPath);
 
-                if (_weaponInventory is null) return null;
-
-                if ( Armature is not null ) {
-                    _weaponInventory.SkeletonPath = _weaponInventory.GetPathTo(Armature);
-                }
-                _weaponInventory.ReloadModel(Character?.IsLoaded ?? false);
+            IWeapon? weapon = Weapon;
+            if ( weapon is not null ) {
+                weapon.SetSkeleton(Armature);
+                weapon.ReloadModel(Character?.IsLoaded ?? false);
             }
-
-            return _weaponInventory;
         }
-        private set => _weaponInventory = value;
     }
-    private WeaponInventory? _weaponInventory;
+    private NodePath _weaponPath = new();
+
+    public IWeapon? Weapon {
+        get {
+            this.TryGetNode(_weaponPath, out IWeapon weapon);
+            return weapon;
+        }
+        private set {
+            if ( value is not Node node ) {
+                return;
+            }
+            _weaponPath = GetPathTo(node);
+            
+            IWeapon? weapon = Weapon;
+            if ( weapon is not null ) {
+                weapon.SetSkeleton(Armature);
+                weapon.ReloadModel(Character?.IsLoaded ?? false);
+            }
+        }
+    }
 
 
 
@@ -60,7 +76,7 @@ public sealed partial class Entity : CharacterBody3D {
         get => _absoluteForward; 
         set { 
             _absoluteForward = value.Normalized(); 
-            _relativeForward = Transform.Basis.Inverse() * _absoluteForward; 
+            _relativeForward = Transform.Basis.Inverse() * _absoluteForward;
         } 
     }
     private Vector3 _absoluteForward;
@@ -84,16 +100,20 @@ public sealed partial class Entity : CharacterBody3D {
     [ExportGroup("")]
 
 
-    [Export] [MaybeNull] public Character Character { get; private set; }
+    [Export] public Character? Character { 
+        get => _character;
+        private set => _character ??= value;
+    }
+    private Character? _character;
 
-    [Export] [MaybeNull] public CharacterData? CharacterData {
+    [Export] public CharacterData? CharacterData {
         get => Character?.Data;
-        private set => this.CallDeferredIfTools( Callable.From(() => SetCharacter(value)) );
+        private set => SetCharacter(value);
     }
 
-    [Export] [MaybeNull] public CharacterCostume? CharacterCostume {
+    [Export] public CharacterCostume? CharacterCostume {
         get => Character?.CharacterCostume;
-        private set => this.CallDeferredIfTools( Callable.From(() => SetCostume(value)) );
+        private set => SetCostume(value);
     }
 
     
@@ -107,33 +127,28 @@ public sealed partial class Entity : CharacterBody3D {
         CollisionLayer = 1 << 1;
 
         _behaviourManager ??= null !;
-        Character ??= null !;
+        _character ??= null !;
     }
 
 
 
     public void SetCharacter(CharacterData? data, CharacterCostume? costume = null) {
-        if ( this.IsInvalidTreeCallback() ) return;
         if ( CharacterData == data ) return;
 
-        Character?.QueueFree();
-        Character = null !;
-
-        CharacterData? oldData = CharacterData;
-        if ( data is not null ) {
-            Character = data.Instantiate(this);
-            Character?.LoadModel();
-        }
-        EmitSignal(SignalName.CharacterChanged, data!, oldData!);
-
-        if ( data is not null ) {
-            SetCostume(costume ?? data.BaseCostume);
-        }
+#if TOOLS
+        // Call Deferred to wait for the Editor to set all necessary Fields
+        Callable.From(SetCharacter).CallDeferred();
+        void SetCharacter() =>
+#endif
+        this.UpdateLoadable<Character, CharacterData>()
+            .WithConstructor(() => data?.Instantiate(costume).SetOwnerAndParentTo(this))
+            .OnLoadUnloadEvent(OnCharacterLoadedUnloaded)
+            .WhenFinished((_) => EmitSignal(SignalName.CharacterChanged, data!, CharacterData!))
+            .Execute(ref _character);
     }
 
-    public void SetCostume(CharacterCostume? costume) {
+    public void SetCostume(CharacterCostume? costume) =>
         Character?.SetCostume(costume);
-    }
 
 
     public void HandleInput(Player.InputInfo inputInfo) {
@@ -161,30 +176,22 @@ public sealed partial class Entity : CharacterBody3D {
         return true;
     }
 
-    private void OnCharacterLoadChanged(bool isLoaded) {
-        if ( _weaponInventory is null ) return;
-
-        _weaponInventory.SkeletonPath = Armature is not null ? _weaponInventory.GetPathTo(Armature) : new();
-        _weaponInventory.ReloadModel();
+    private void OnCharacterLoadedUnloaded(bool isLoaded) {
+        Weapon?.SetSkeleton(Armature);
     }
 
     private void OnCharacterChanged(CharacterData? newCharacter, CharacterData? oldCharacter) {
-        if ( Character is not null ) {
-            Character.ModelLoaded += OnCharacterLoadChanged;
-        }
-        OnCharacterLoadChanged(Character?.IsLoaded ?? false);
+        OnCharacterLoadedUnloaded(Character?.IsLoaded ?? false);
     }
 
 
     public override void _EnterTree() {
         base._EnterTree();
+        
+        CharacterChanged -= OnCharacterChanged;
         CharacterChanged += OnCharacterChanged;
     }
 
-    public override void _ExitTree() {
-        base._ExitTree();
-        CharacterChanged -= OnCharacterChanged;
-    }
 
     public override void _Process(double delta) {
         base._Process(delta);
@@ -211,5 +218,14 @@ public sealed partial class Entity : CharacterBody3D {
             }
         );
 	}
+
+    public override void _Notification(int what) {
+        base._Notification(what);
+        if (what == NotificationWMWindowFocusIn) {
+            // NotificationWMWindowFocusIn is also called on Rebuilding the project;
+            // Reconnect to signal on Recompile
+            _EnterTree();
+        }
+    }
 
 }

@@ -5,12 +5,11 @@ using System;
 namespace LandlessSkies.Core;
 
 [Tool]
-[GlobalClass]
-public abstract partial class WeaponModel : Model {
+public abstract partial class WeaponModel : Loadable {
     
     [Export] public WeaponCostume Costume { 
         get => _costume;
-        private set {;}
+        private set => _costume ??= value;
     }
     private WeaponCostume _costume;
 
@@ -21,7 +20,7 @@ public abstract partial class WeaponModel : Model {
 
         Name = nameof(WeaponModel);
     }
-    public WeaponModel(Node3D? root, Skeleton3D? skeleton, WeaponCostume costume) : base(root) {
+    public WeaponModel(WeaponCostume costume) : base() {
         ArgumentNullException.ThrowIfNull(costume);
 
         _costume = costume;

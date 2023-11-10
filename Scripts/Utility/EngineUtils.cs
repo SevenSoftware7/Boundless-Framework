@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+using System.Text;
 using Godot;
 
 
@@ -5,68 +7,70 @@ namespace LandlessSkies.Core;
 
 public static class EngineUtils {
 
-    /// <summary>
-    /// Returns true if the Node is Ready but the Project is still loading.
-    /// This can be used to avoid calling _EnterTree and _ExitTree after _Ready on Project load.
-    /// </summary>
-    /// <example>Return out of an "redundant" _EnterTree call:
-    /// <code>
-    /// public override void _EnterTree() {
-    ///    if ( this.IsInvalidTreeCallback() ) return;
-    ///    base._EnterTree();
-    /// }
-    /// </code>
-    /// </example>
-    /// <param name="node"></param>
-    /// <returns></returns>
-    public static bool IsInvalidTreeCallback(this Node node) => 
-        node.IsNodeReady() && Engine.GetProcessFrames() == 0;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsInvalidEnterTree(this Node node) {
+        return node.IsNodeReady() || Engine.GetProcessFrames() == 0;
+    }
 
-    public static void AddChildSetOwner(this Node obj, Node child) {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsInvalidExitTree(this Node node) {
+        return !node.IsNodeReady() || !node.IsQueuedForDeletion();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void AddChildAndSetOwner(this Node obj, Node child) {
         obj.AddChild(child);
         child.Owner = obj.Owner;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static TNode ParentTo<TNode>(this TNode child, Node parent) where TNode : Node {
+        parent.AddChild(child);
+        return child;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static TNode SetOwnerAndParentTo<TNode>(this TNode child, Node parent) where TNode : Node {
+        parent.AddChildAndSetOwner(child);
+        return child;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void UnparentAndQueueFree(this Node obj) {
+        obj.GetParent().RemoveChild(obj);
+        obj.QueueFree();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T? GetNodeByTypeName<T>(this Node obj) where T : Node {
         return obj.GetNodeOrNull<T>(typeof(T).Name);
     }
 
-    public static T GetOrCreateNode<T>(this Node obj, ref T node, string name) where T : Node, new() {
-        node ??= obj.GetNodeOrNull<T>(name);
-
-        if ( node is null ) {
-            node = new() {
-                Name = name
-            };
-            obj.AddChildSetOwner(node);
-        }
-
-        return node;
-    }
-
-    public static bool TryGetNode<T>(this Node obj, NodePath nodePath, out T node) where T : Node {
-        if ( nodePath is null ) {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool TryGetNode<T>(this Node obj, NodePath nodePath, out T node) where T : class {
+        if ( nodePath is null || ! obj.HasNode(nodePath) ) {
             node = default!;
             return false;
         }
-        node = obj.GetNodeOrNull<T>(nodePath);
-        return node is not null;
-
+        Node nodeOrNull = obj.GetNodeOrNull(nodePath);
+        if ( nodeOrNull is T tNode ) {
+            node = tNode;
+            return true;
+        }
+        node = default!;
+        return false;
     }
 
-    public static void CallDeferredIfTools(this Node obj, StringName method, params Variant[] args) {
-        #if TOOLS
-            obj.CallDeferred(method, args);
-        #else
-            obj.Call(method, args);
-        #endif
-    }
 
-    public static void CallDeferredIfTools(this Node obj, Callable method) {
-        #if TOOLS
-            method.CallDeferred();
-        #else
-            method.Call();
-        #endif
+    public static void SetValueFromNode<T>(this Node obj, NodePath path, ref NodePath valToSet) where T : class {
+        if ( ! obj.IsNodeReady() ) {
+            valToSet = path;
+            return;
+        }
+        if ( ! path.IsEmpty && ! obj.TryGetNode<T>(path, out _) ) {
+            GD.PushWarning($"Reference ({path}) is not assignable to Class {typeof(T).Name}");
+            return;
+        }
+        valToSet = path;
     }
 }

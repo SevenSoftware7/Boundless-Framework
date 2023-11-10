@@ -27,7 +27,7 @@ public partial class Health : Node {
         set {
             _amount = value;
 
-            const ulong damagedHealthDuration = (ulong)(1.25f * 1000f);
+            const ulong damagedHealthDuration = (ulong)(1.25 * 1000);
             _damagedHealthTimer.SetDurationMSec(damagedHealthDuration);
 
             EmitSignal(SignalName.HealthChange, Amount);
@@ -51,9 +51,6 @@ public partial class Health : Node {
 
     public Health() : base() {
         Name = nameof(Health);
-    }
-    public Health(Node parent) : this() {
-        parent.AddChildSetOwner(this);
     }
 
 

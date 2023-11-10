@@ -25,7 +25,7 @@ public abstract partial class EntityBehaviour : Node {
 
         Entity = entity;
         BehaviourManager = behaviourManager;
-        BehaviourManager.AddChildSetOwner(this);
+        BehaviourManager.AddChildAndSetOwner(this);
     }
 
 

@@ -4,9 +4,9 @@ using Godot;
 namespace LandlessSkies.Core;
 
 [Tool]
-// [GlobalClass]
-public abstract partial class WeaponCostume : Costume {
+[GlobalClass]
+public abstract partial class WeaponCostume : Resource {
 
-    public override abstract WeaponModel Instantiate(Node3D root, Skeleton3D? skeleton);
+    public abstract WeaponModel Instantiate();
 
 }

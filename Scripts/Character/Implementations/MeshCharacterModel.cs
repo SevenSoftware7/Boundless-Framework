@@ -13,11 +13,12 @@ public sealed partial class MeshCharacterModel : CharacterModel {
     
 
     private MeshCharacterModel() : base() {}
-    public MeshCharacterModel(Node3D? root, Skeleton3D? skeleton, MeshCharacterCostume costume) : base(root, skeleton, costume) {
-        SkeletonPath = skeleton is not null ? GetPathTo(skeleton) : SkeletonPath;
+    public MeshCharacterModel(MeshCharacterCostume costume) : base(costume) {}
+
+
+    public override void SetSkeleton(Skeleton3D? skeleton) {
+        SkeletonPath = skeleton is not null ? GetPathTo(skeleton) : new();
     }
-
-
 
     protected override bool LoadModelImmediate() {
         if ( SkeletonPath == null ) return false;
@@ -27,7 +28,7 @@ public sealed partial class MeshCharacterModel : CharacterModel {
         if ( meshCostume.ModelScene?.Instantiate() is not MeshInstance3D model ) return false;
         Model = model;
 
-        this.AddChildSetOwner(Model);
+        this.AddChildAndSetOwner(Model);
         Model.Name = nameof(CharacterModel);
 
         if ( this.TryGetNode(SkeletonPath, out Skeleton3D skeleton) ) {

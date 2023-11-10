@@ -9,7 +9,7 @@ public sealed partial class MeshWeaponCostume : WeaponCostume {
 
     [Export] public PackedScene? ModelScene { get; private set; }
 
-    public override WeaponModel Instantiate(Node3D root, Skeleton3D? skeleton) {
-        return new MeshWeaponModel(root, skeleton, this);
+    public override WeaponModel Instantiate() {
+        return new MeshWeaponModel(this);
     }
 }

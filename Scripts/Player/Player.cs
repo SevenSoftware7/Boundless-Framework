@@ -17,11 +17,7 @@ public sealed partial class Player : Node {
 
     [Export(PropertyHint.Range, PlayerIdRange)] public byte PlayerId { 
         get => _playerId;
-        #if TOOLS
-            private set => CallDeferred(nameof(SetPlayerId), value);
-        #else
-            private set => SetPlayerId(value);
-        #endif
+        private set => SetPlayerId(value);
     }
     private byte _playerId;
 
@@ -46,6 +42,10 @@ public sealed partial class Player : Node {
 
 
     private void SetPlayerId(byte value) {
+        if ( ! IsNodeReady() ) {
+            _playerId = value;
+            return;
+        }
         UnsetPlayerId();
 
         if ( Players[value] == null ) {
@@ -85,7 +85,7 @@ public sealed partial class Player : Node {
 
     #if TOOLS
 
-    // TODO: wait for Godot to Implement a PropertyUsageFlags attribute to simplifly this
+    // TODO: wait for Godot to Implement a PropertyUsageFlags attribute to simplify this
     // example:
     // [Export] [PropertyUsageFlags((int)PropertyUsageFlags.Editor)] public Array<Player> PlayersList {
     //     get => new (Players);
@@ -156,14 +156,14 @@ public sealed partial class Player : Node {
 
 
     public override void _EnterTree() {
-        if ( this.IsInvalidTreeCallback() ) return;
+        if ( this.IsInvalidEnterTree() ) return;
         base._EnterTree();
 
         FindFreeId();
     }
 
     public override void _ExitTree() {
-        if ( this.IsInvalidTreeCallback() ) return;
+        if ( this.IsInvalidExitTree() ) return;
         base._ExitTree();
         
         UnsetPlayerId();

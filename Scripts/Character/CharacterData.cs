@@ -54,7 +54,7 @@ public partial class CharacterData : Resource {
 
 
 
-    public virtual Character Instantiate(Node3D? root) {
-        return new Character(root, this);
+    public virtual Character Instantiate(CharacterCostume? costume = null) {
+        return new Character(this, costume ?? BaseCostume);
     }
 }

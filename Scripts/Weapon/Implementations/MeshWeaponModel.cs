@@ -12,32 +12,31 @@ public sealed partial class MeshWeaponModel : WeaponModel {
 
 
     private MeshWeaponModel() : base() {}
-    public MeshWeaponModel(Node3D? root, Skeleton3D? skeleton, MeshWeaponCostume costume) : base(root, skeleton, costume) {
-        SkeletonPath = skeleton is not null ? GetPathTo(skeleton) : SkeletonPath;
+    public MeshWeaponModel(MeshWeaponCostume costume) : base(costume) {}
+
+
+
+    public override void SetSkeleton(Skeleton3D? skeleton) {
+        SkeletonPath = skeleton is not null ? GetPathTo(skeleton) : new();
     }
 
-
-
     protected override bool LoadModelImmediate() {
-        if ( SkeletonPath == null ) return false;
-        if ( Costume == null ) return false;
-        if ( Costume is not MeshWeaponCostume meshCostume ) return false;
+        if ( Costume is null || Costume is not MeshWeaponCostume meshCostume ) return false;
+        if ( ! this.TryGetNode(SkeletonPath, out Skeleton3D skeleton) ) return false;
 
         if ( meshCostume.ModelScene?.Instantiate() is not MeshInstance3D model ) return false;
         Model = model;
 
-        this.AddChildSetOwner(Model);
+        this.AddChildAndSetOwner(Model);
         Model.Name = nameof(WeaponModel);
 
-        if ( this.TryGetNode(SkeletonPath, out Skeleton3D skeleton) ) {
-            Model.Skeleton = Model.GetPathTo(skeleton);
-        }
+        Model.Skeleton = Model.GetPathTo(skeleton);
 
         return true;
     }
 
     protected override bool UnloadModelImmediate() {
-        Model?.QueueFree();
+        Model?.UnparentAndQueueFree();
         Model = null;
 
         return true;

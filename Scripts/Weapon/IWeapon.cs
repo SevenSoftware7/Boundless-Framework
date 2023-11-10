@@ -1,13 +1,15 @@
 
 using System;
+using Godot;
+
 
 namespace LandlessSkies.Core;
 
-public interface IWeapon {
+public interface IWeapon : ILoadable {
 
 
-    Type WeaponType { get; }
-    Handedness WeaponHandedness { get; }
+    // Type WeaponType { get; }
+    Handedness WeaponHandedness { get; set; }
 
 
     // for each attack, evaluate the desirability, return one according to the "skill" level of the IA
