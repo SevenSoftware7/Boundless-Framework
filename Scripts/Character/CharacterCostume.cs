@@ -35,6 +35,6 @@ public abstract partial class CharacterCostume : Resource, IPortraitProvider {
         };
     }
 
-    public abstract CharacterModel Instantiate();
+    public abstract CharacterModel Instantiate(Node3D root);
 
 }

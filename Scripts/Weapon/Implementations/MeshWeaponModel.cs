@@ -14,7 +14,7 @@ public sealed partial class MeshWeaponModel : WeaponModel {
 
 
     private MeshWeaponModel() : base() {}
-    public MeshWeaponModel(MeshWeaponCostume costume) : base(costume) {}
+    public MeshWeaponModel(MeshWeaponCostume costume, Node3D root) : base(costume, root) {}
 
 
 
@@ -23,15 +23,14 @@ public sealed partial class MeshWeaponModel : WeaponModel {
     }
 
     protected override bool LoadModelImmediate() {
-        if ( Costume is null || Costume is not MeshWeaponCostume meshCostume ) return false;
+        if ( GetParent() is null || Owner is null ) return false;
+        if ( Costume is not MeshWeaponCostume meshCostume ) return false;
         if ( ! this.TryGetNode(SkeletonPath, out Skeleton3D skeleton) ) return false;
 
         if ( meshCostume.ModelScene?.Instantiate() is not MeshInstance3D model ) return false;
-        Model = model;
-
-        this.AddChildAndSetOwner(Model);
+        
+        Model = model.SetOwnerAndParentTo(this);
         Model.Name = nameof(WeaponModel);
-
         Model.Skeleton = Model.GetPathTo(skeleton);
 
         return true;

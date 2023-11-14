@@ -7,15 +7,29 @@ namespace LandlessSkies.Core;
 
 public static class EngineUtils {
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsInvalidEnterTree(this Node node) {
-        return node.IsNodeReady() || Engine.GetProcessFrames() == 0;
+    private static readonly ulong buildFrame = 0;
+
+
+
+    static EngineUtils() {
+        buildFrame = Engine.GetProcessFrames();
     }
 
+
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsInvalidExitTree(this Node node) {
-        return !node.IsNodeReady() || !node.IsQueuedForDeletion();
-    }
+    public static bool IsEditorGetSetter(this Node node) =>
+        !node.IsNodeReady() || Engine.GetProcessFrames() == buildFrame;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsEditorEnterTree(this Node node) =>
+        node.IsNodeReady() || Engine.GetProcessFrames() == buildFrame;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsEditorExitTree(this Node node) =>
+        !node.IsNodeReady() || Engine.GetProcessFrames() == buildFrame;
+
+
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void AddChildAndSetOwner(this Node obj, Node child) {
@@ -37,8 +51,8 @@ public static class EngineUtils {
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void UnparentAndQueueFree(this Node obj) {
-        obj.GetParent()?.RemoveChild(obj);
         obj.QueueFree();
+        obj.GetParent()?.RemoveChild(obj);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

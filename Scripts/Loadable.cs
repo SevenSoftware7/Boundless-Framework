@@ -28,7 +28,11 @@ public abstract partial class Loadable : Node3D, ILoadable {
 
 
 
-    protected Loadable() : base() {;}
+    public Loadable() : base() {}
+    public Loadable(Node3D root) {
+        root.AddChildAndSetOwner(this);
+    }
+
 
 
     public virtual void SetSkeleton(Skeleton3D? skeleton) {;}
@@ -80,18 +84,14 @@ public abstract partial class Loadable : Node3D, ILoadable {
 
     public override void _EnterTree() {
         base._EnterTree();
-        if ( this.IsInvalidEnterTree() ) return;
+        if ( this.IsEditorEnterTree() ) return;
 
-#if TOOLS
-        Callable.From(LoadModel).CallDeferred();
-#else
         LoadModel();
-#endif
     }
 
     public override void _ExitTree() {
         base._ExitTree();
-        if ( this.IsInvalidExitTree() ) return;
+        if ( this.IsEditorExitTree() ) return;
 
         UnloadModel();
     }

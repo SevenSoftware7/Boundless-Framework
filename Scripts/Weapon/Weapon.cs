@@ -39,14 +39,14 @@ public partial class Weapon : Loadable, IWeapon {
 
 
     public Weapon() : base() {
-        Data ??= null !;
+        _data ??= null !;
 
         Name = nameof(Weapon);
     }
-    public Weapon(WeaponData data, WeaponCostume? costume) : base() {        
+    public Weapon(WeaponData data, WeaponCostume? costume, Node3D root) : base(root) {        
         ArgumentNullException.ThrowIfNull(data);
         
-        Data = data;
+        _data = data;
         SetCostume(costume);
 
         Name = nameof(Weapon);
@@ -62,18 +62,16 @@ public partial class Weapon : Loadable, IWeapon {
 
 
     public void SetCostume(WeaponCostume? costume) {
+        if ( this.IsEditorGetSetter() ) return;
+        
         WeaponCostume? oldCostume = WeaponCostume;
         if ( costume == oldCostume ) return;
 
-#if TOOLS
-        Callable.From(SetCostume).CallDeferred();
-        void SetCostume() =>
-#endif
-        this.UpdateLoadable<WeaponModel, WeaponCostume>()
-            .WithConstructor(() => costume?.Instantiate().SetOwnerAndParentTo(this))
-            .BeforeLoad((model) => model.SetSkeleton(GetNodeOrNull<Skeleton3D>(SkeletonPath)))
-            .WhenFinished((_) => EmitSignal(SignalName.CostumeChanged, costume!, oldCostume!))
-            .Execute(ref WeaponModel);
+        LoadableExtensions.UpdateLoadable(ref WeaponModel)
+            .WithConstructor(() => costume?.Instantiate(this))
+            .BeforeLoad(() => WeaponModel?.SetSkeleton(GetNodeOrNull<Skeleton3D>(SkeletonPath)))
+            .WhenFinished(() => EmitSignal(SignalName.CostumeChanged, costume!, oldCostume!))
+            .Execute();
     }
 
 

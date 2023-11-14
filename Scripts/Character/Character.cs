@@ -38,14 +38,14 @@ public partial class Character : Loadable {
 
 
     public Character() : base() {
-        Data ??= null !;
+        _data ??= null !;
 
         Name = nameof(Character);
     }
-    public Character(CharacterData data, CharacterCostume? costume) : base() {
+    public Character(CharacterData data, CharacterCostume? costume, Node3D root) : base(root) {
         ArgumentNullException.ThrowIfNull(data);
 
-        Data = data;
+        _data = data;
         SetCostume(costume);
 
         Name = nameof(Character);
@@ -54,24 +54,22 @@ public partial class Character : Loadable {
 
 
     public void SetCostume(CharacterCostume? costume, bool forceLoad = false) {
+        if ( this.IsEditorGetSetter() ) return;
+
         CharacterCostume? oldCostume = CharacterCostume;
         if ( costume == oldCostume ) return;
 
-#if TOOLS
-        Callable.From(SetCostume).CallDeferred();
-        void SetCostume() =>
-#endif
-        this.UpdateLoadable<CharacterModel, CharacterCostume>()
-            .WithConstructor(() => costume?.Instantiate().SetOwnerAndParentTo(this))
-            .BeforeLoad((model) => model.SetSkeleton(Armature))
-            .WhenFinished((_) => EmitSignal(SignalName.CostumeChanged, costume!, oldCostume!))
-            .Execute(ref CharacterModel);
+        LoadableExtensions.UpdateLoadable(ref CharacterModel)
+            .WithConstructor(() => costume?.Instantiate(this))
+            .BeforeLoad(() => CharacterModel?.SetSkeleton(Armature))
+            .WhenFinished(() => EmitSignal(SignalName.CostumeChanged, costume!, oldCostume!))
+            .Execute();
     }
 
 
     protected override bool LoadModelImmediate() {
-        Node parent = GetParent();
-        if ( parent is null ) return false;
+        Node? parent = GetParent();
+        if ( parent is null || Owner is null) return false;
         if ( Data is null ) return false;
 
         Collisions = Data.CollisionScene?.Instantiate() as Node3D;

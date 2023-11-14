@@ -129,19 +129,16 @@ public sealed partial class Entity : CharacterBody3D {
 
 
     public void SetCharacter(CharacterData? data, CharacterCostume? costume = null) {
+        if ( this.IsEditorGetSetter() ) return;
+
         CharacterData? oldData = CharacterData;
         if ( data == oldData ) return;
 
-#if TOOLS
-        // Call Deferred to wait for the Editor to set all necessary Fields
-        Callable.From(SetCharacter).CallDeferred();
-        void SetCharacter() =>
-#endif
-        this.UpdateLoadable<Character, CharacterData>()
-            .WithConstructor(() => data?.Instantiate(costume).SetOwnerAndParentTo(this))
+        LoadableExtensions.UpdateLoadable(ref _character)
+            .WithConstructor(() => data?.Instantiate(this, costume))
             .OnLoadUnloadEvent(OnCharacterLoadedUnloaded)
-            .WhenFinished((_) => EmitSignal(SignalName.CharacterChanged, data!, oldData!))
-            .Execute(ref _character);
+            .WhenFinished(() => EmitSignal(SignalName.CharacterChanged, data!, oldData!))
+            .Execute();
     }
 
     public void SetCostume(CharacterCostume? costume) =>

@@ -20,7 +20,7 @@ public abstract partial class WeaponModel : Loadable {
 
         Name = nameof(WeaponModel);
     }
-    public WeaponModel(WeaponCostume costume) : base() {
+    public WeaponModel(WeaponCostume costume, Node3D root) : base(root) {
         ArgumentNullException.ThrowIfNull(costume);
 
         _costume = costume;

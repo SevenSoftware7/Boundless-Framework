@@ -30,7 +30,7 @@ public partial class WeaponInventory : Loadable, IWeapon {
             return _weaponDatas;
         }
         set {
-            if ( ! IsNodeReady() ) return;
+            if ( this.IsEditorGetSetter() ) return;
             Callable.From( UpdateWeaponDatas ).CallDeferred();
 
             void UpdateWeaponDatas() {
@@ -164,36 +164,36 @@ public partial class WeaponInventory : Loadable, IWeapon {
     }
 
     public void SetWeapon(int index, WeaponData? data, WeaponCostume? costume = null) {
-        if ( ! IsNodeReady() ) return;
+        if ( this.IsEditorGetSetter() ) return;
 
         Weapon? weapon = _weapons.Count > index ? _weapons[index] : null;
         if ( data is not null && weapon?.Data == data ) return;
 
-        this.UpdateLoadable<Weapon, WeaponData>()
-            .WithConstructor(() => data?.Instantiate(costume).SetOwnerAndParentTo(this))
-            .AfterUnload((_) => _weapons.RemoveAt(index))
-            .BeforeLoad((weapon) => weapon.SetSkeleton(GetNodeOrNull<Skeleton3D>(SkeletonPath)))
-            .AfterLoad((weapon) => _weapons.Insert(index, weapon))
-            .Execute(ref weapon);
+        LoadableExtensions.UpdateLoadable(ref weapon)
+            .WithConstructor(() => data?.Instantiate(this, costume))
+            .AfterUnload(() => _weapons.RemoveAt(index))
+            .BeforeLoad(() => weapon?.SetSkeleton(GetNodeOrNull<Skeleton3D>(SkeletonPath)))
+            .AfterLoad(() => _weapons.Insert(index, weapon!))
+            .Execute();
 
-    #if TOOLS
+#if TOOLS
         Array<WeaponData> datas = WeaponDatas;
         if ( index < datas.Count ) {
             datas.RemoveAt(index);
         }
         datas.Insert(index, data!);
-    #endif
+#endif
     }
 
     public void RemoveWeapon(int index) {
         Weapon? weapon = _weapons.Count > index ? _weapons[index] : null;
-        this.DestroyLoadable<Weapon>()
-            .AfterUnload((_) => _weapons.RemoveAt(index))
-            .Execute(ref weapon);
+        LoadableExtensions.DestroyLoadable<Weapon>(ref weapon)
+            .AfterUnload(() => _weapons.RemoveAt(index))
+            .Execute();
 
-    #if TOOLS
+#if TOOLS
         WeaponDatas.RemoveAt(index);
-    #endif
+#endif
     }
 
     public void SetCostume(int index, WeaponCostume? costume) {

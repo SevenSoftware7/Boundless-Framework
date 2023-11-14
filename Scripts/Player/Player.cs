@@ -83,7 +83,7 @@ public sealed partial class Player : Node {
     }
 
 
-    #if TOOLS
+#if TOOLS
 
     // TODO: wait for Godot to Implement a PropertyUsageFlags attribute to simplify this
     // example:
@@ -127,7 +127,7 @@ public sealed partial class Player : Node {
         return warnings;
     }
 
-    #endif
+#endif
 
     public override void _Process(double delta) {
         base._Process(delta);
@@ -156,14 +156,14 @@ public sealed partial class Player : Node {
 
 
     public override void _EnterTree() {
-        if ( this.IsInvalidEnterTree() ) return;
+        if ( this.IsEditorEnterTree() ) return;
         base._EnterTree();
 
         FindFreeId();
     }
 
     public override void _ExitTree() {
-        if ( this.IsInvalidExitTree() ) return;
+        if ( this.IsEditorExitTree() ) return;
         base._ExitTree();
         
         UnsetPlayerId();
