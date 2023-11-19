@@ -12,12 +12,13 @@ public ref struct LoadableDestructor<TLoadable> where TLoadable : Loadable {
     private Loadable.LoadedUnloadedEventHandler? onLoadUnload;
     private Action? onBeforeUnload;
     private Action? onAfterUnload;
-    private Action? onFinished;
+
 
 
     internal LoadableDestructor(ref TLoadable? loadable) {
         this.loadable = ref loadable;
     }
+
 
 
     public LoadableDestructor<TLoadable> OnLoadUnload(Loadable.LoadedUnloadedEventHandler onLoadUnload) =>
@@ -28,9 +29,6 @@ public ref struct LoadableDestructor<TLoadable> where TLoadable : Loadable {
 
     public LoadableDestructor<TLoadable> AfterUnload(Action onAfterUnload) =>
         this with {onAfterUnload = onAfterUnload};
-
-    public LoadableDestructor<TLoadable> WhenFinished(Action onFinished) =>
-        this with {onFinished = onFinished};
 
 
     public readonly void Execute() {
@@ -45,8 +43,6 @@ public ref struct LoadableDestructor<TLoadable> where TLoadable : Loadable {
             loadable.UnparentAndQueueFree();
             loadable = null !;
         }
-
-        onFinished?.Invoke();
     }
 }
 
@@ -57,7 +53,6 @@ public ref struct LoadableUpdater<TLoadable> where TLoadable : Loadable {
     private Loadable.LoadedUnloadedEventHandler? onLoadUnload;
     private Action? onBeforeLoad;
     private Action? onAfterLoad;
-    private Action? onFinished;
     private LoadableDestructor<TLoadable> destructor;
 
 
@@ -87,8 +82,6 @@ public ref struct LoadableUpdater<TLoadable> where TLoadable : Loadable {
     public LoadableUpdater<TLoadable> AfterLoad(Action onAfterLoad) =>
         this with {onAfterLoad = onAfterLoad};
 
-    public LoadableUpdater<TLoadable> WhenFinished(Action onFinished) =>
-        this with {onFinished = onFinished};
 
 
     public readonly void Execute() {
@@ -104,8 +97,6 @@ public ref struct LoadableUpdater<TLoadable> where TLoadable : Loadable {
 
             onAfterLoad?.Invoke();
         }
-
-        onFinished?.Invoke();
     }
 }
 

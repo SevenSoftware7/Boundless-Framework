@@ -70,8 +70,9 @@ public partial class Weapon : Loadable, IWeapon {
         LoadableExtensions.UpdateLoadable(ref WeaponModel)
             .WithConstructor(() => costume?.Instantiate(this))
             .BeforeLoad(() => WeaponModel?.SetSkeleton(GetNodeOrNull<Skeleton3D>(SkeletonPath)))
-            .WhenFinished(() => EmitSignal(SignalName.CostumeChanged, costume!, oldCostume!))
             .Execute();
+
+        EmitSignal(SignalName.CostumeChanged, costume!, oldCostume!);
     }
 
 

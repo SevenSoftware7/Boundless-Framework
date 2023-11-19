@@ -137,8 +137,9 @@ public sealed partial class Entity : CharacterBody3D {
         LoadableExtensions.UpdateLoadable(ref _character)
             .WithConstructor(() => data?.Instantiate(this, costume))
             .OnLoadUnloadEvent(OnCharacterLoadedUnloaded)
-            .WhenFinished(() => EmitSignal(SignalName.CharacterChanged, data!, oldData!))
             .Execute();
+
+        EmitSignal(SignalName.CharacterChanged, data!, oldData!);
     }
 
     public void SetCostume(CharacterCostume? costume) =>
@@ -179,14 +180,6 @@ public sealed partial class Entity : CharacterBody3D {
     }
 
 
-    public override void _EnterTree() {
-        base._EnterTree();
-        
-        CharacterChanged -= OnCharacterChanged;
-        CharacterChanged += OnCharacterChanged;
-    }
-
-
     public override void _Process(double delta) {
         base._Process(delta);
 
@@ -204,6 +197,8 @@ public sealed partial class Entity : CharacterBody3D {
     public override void _Ready() {
         base._Ready();
 
+        CharacterChanged += OnCharacterChanged;
+
         if ( Engine.IsEditorHint() ) return;
 
         BehaviourManager?.SetBehaviour<TestBehaviour>(
@@ -213,12 +208,19 @@ public sealed partial class Entity : CharacterBody3D {
         );
 	}
 
+    public override void _ExitTree() {
+        base._ExitTree();
+        
+        CharacterChanged -= OnCharacterChanged;
+    }
+
     public override void _Notification(int what) {
         base._Notification(what);
         if (what == NotificationWMWindowFocusIn) {
             // NotificationWMWindowFocusIn is also called on Rebuilding the project;
             // Reconnect to signal on Recompile
-            _EnterTree();
+            CharacterChanged -= OnCharacterChanged;
+            CharacterChanged += OnCharacterChanged;
         }
     }
 

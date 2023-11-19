@@ -6,5 +6,4 @@
 [resource]
 script = ExtResource("1_40dpk")
 BaseCostume = ExtResource("1_7d8w5")
-Handedness = 0
 Type = 0
