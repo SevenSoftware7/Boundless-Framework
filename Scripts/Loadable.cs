@@ -35,8 +35,6 @@ public abstract partial class Loadable : Node3D, ILoadable {
 
 
 
-    public virtual void SetSkeleton(Skeleton3D? skeleton) {;}
-
     public void LoadModel() {
         if ( IsLoaded ) return;
 
@@ -95,4 +93,5 @@ public abstract partial class Loadable : Node3D, ILoadable {
 
         UnloadModel();
     }
+
 }

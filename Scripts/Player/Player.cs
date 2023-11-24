@@ -10,12 +10,11 @@ namespace LandlessSkies.Core;
 public sealed partial class Player : Node {
 
     public const byte MaxPlayers = 10;
-    public const string PlayerIdRange = "0,9,"; // MaxPlayers - 1
 
     
     public static readonly Player?[] Players = new Player[MaxPlayers];
 
-    [Export(PropertyHint.Range, PlayerIdRange)] public byte PlayerId { 
+    public byte PlayerId {
         get => _playerId;
         private set => SetPlayerId(value);
     }
@@ -81,53 +80,6 @@ public sealed partial class Player : Node {
             Players[_playerId] = null;
         }
     }
-
-
-#if TOOLS
-
-    // TODO: wait for Godot to Implement a PropertyUsageFlags attribute to simplify this
-    // example:
-    // [Export] [PropertyUsageFlags((int)PropertyUsageFlags.Editor)] public Array<Player> PlayersList {
-    //     get => new (Players);
-    //     private set {;}
-    // }
-    public override Array<Dictionary> _GetPropertyList() {
-        Array<Dictionary> defaultValue = base._GetPropertyList() ?? new();
-
-        defaultValue.Add(
-            new Dictionary() {
-                { "name", "PlayersList" },
-                { "type", (int)Variant.Type.Array },
-                { "hint", (int)PropertyHint.None },
-                { "hint_string", $"{Variant.Type.Object:D}/{PropertyHint.NodeType:D}:Player" },
-                { "usage", (int)PropertyUsageFlags.Editor },
-            }
-        );
-
-        return defaultValue;
-    }
-    public override Variant _Get(StringName property) {
-        if ( property == "PlayersList" ) {
-            return new Array(Players);
-        }
-        return base._Get(property);
-    }
-
-
-    public override string[] _GetConfigurationWarnings() {
-        string[] warnings = base._GetConfigurationWarnings();
-
-        if ( Players[PlayerId] != this) {
-            warnings ??= System.Array.Empty<string>();
-
-            System.Array.Resize(ref warnings, warnings.Length + 1);
-            warnings[^1] = $"PlayerId {PlayerId} is already in use.";
-        }
-
-        return warnings;
-    }
-
-#endif
 
     public override void _Process(double delta) {
         base._Process(delta);

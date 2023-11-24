@@ -112,7 +112,7 @@ public partial class WeaponInventory : Loadable, IWeapon {
     [ExportGroup("Dependencies")]
     [Export(PropertyHint.NodePathValidTypes, nameof(Skeleton3D))] public NodePath SkeletonPath { 
         get => _skeletonPath;
-        set => SetSkeleton(GetNodeOrNull<Skeleton3D>(value));
+        set => Inject(GetNodeOrNull<Skeleton3D>(value));
     }
     private NodePath _skeletonPath = new();
 
@@ -122,21 +122,17 @@ public partial class WeaponInventory : Loadable, IWeapon {
         Name = nameof(WeaponInventory);
     }
 
-    public WeaponInventory(Skeleton3D skeleton) : base() {
-        SetSkeleton(skeleton);
-    }
-
 
 
     private bool IndexInBounds(uint index) {
         return index < _weapons.Count;
     }
 
-    public override void SetSkeleton(Skeleton3D? skeleton) {
+    public void Inject(Skeleton3D? skeleton) {
         _skeletonPath = skeleton is not null ? GetPathTo(skeleton) : new();
         for ( int i = 0; i < _weapons?.Count; i++ ) {
             if ( _weapons[i] is Weapon weapon ) {
-                weapon.SetSkeleton(skeleton);
+                weapon.Inject(skeleton);
             }
         }
     }
@@ -172,7 +168,7 @@ public partial class WeaponInventory : Loadable, IWeapon {
         LoadableExtensions.UpdateLoadable(ref weapon)
             .WithConstructor(() => data?.Instantiate(this, costume))
             .AfterUnload(() => _weapons.RemoveAt(index))
-            .BeforeLoad(() => weapon?.SetSkeleton(GetNodeOrNull<Skeleton3D>(SkeletonPath)))
+            .BeforeLoad(() => weapon?.Inject(GetNodeOrNull<Skeleton3D>(SkeletonPath)))
             .AfterLoad(() => _weapons.Insert(index, weapon!))
             .Execute();
 

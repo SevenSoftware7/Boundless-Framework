@@ -29,7 +29,7 @@ public partial class Weapon : Loadable, IWeapon {
     [ExportGroup("Dependencies")]
     [Export(PropertyHint.NodePathValidTypes, nameof(Skeleton3D))] public NodePath SkeletonPath { 
         get => _skeletonPath;
-        set => SetSkeleton(GetNodeOrNull<Skeleton3D>(value));
+        set => Inject(GetNodeOrNull<Skeleton3D>(value));
     }
     private NodePath _skeletonPath = new();
     
@@ -54,9 +54,9 @@ public partial class Weapon : Loadable, IWeapon {
 
 
 
-    public override void SetSkeleton(Skeleton3D? skeleton) {
+    public void Inject(Skeleton3D? skeleton) {
         _skeletonPath = skeleton is not null ? GetPathTo(skeleton) : new();
-        WeaponModel?.SetSkeleton(skeleton);
+        WeaponModel?.Inject(skeleton);
         ReloadModel();
     }
 
@@ -69,7 +69,7 @@ public partial class Weapon : Loadable, IWeapon {
 
         LoadableExtensions.UpdateLoadable(ref WeaponModel)
             .WithConstructor(() => costume?.Instantiate(this))
-            .BeforeLoad(() => WeaponModel?.SetSkeleton(GetNodeOrNull<Skeleton3D>(SkeletonPath)))
+            .BeforeLoad(() => WeaponModel!.Inject(GetNodeOrNull<Skeleton3D>(SkeletonPath)))
             .Execute();
 
         EmitSignal(SignalName.CostumeChanged, costume!, oldCostume!);

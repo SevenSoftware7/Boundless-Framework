@@ -61,7 +61,7 @@ public partial class Character : Loadable {
 
         LoadableExtensions.UpdateLoadable(ref CharacterModel)
             .WithConstructor(() => costume?.Instantiate(this))
-            .BeforeLoad(() => CharacterModel?.SetSkeleton(Armature))
+            .BeforeLoad(() => CharacterModel!.Inject(Armature))
             .Execute();
         
         EmitSignal(SignalName.CostumeChanged, costume!, oldCostume!);
@@ -85,7 +85,7 @@ public partial class Character : Loadable {
             Armature.SetOwnerAndParentTo(this);
         }
 
-        CharacterModel?.SetSkeleton(Armature);
+        CharacterModel?.Inject(Armature);
         CharacterModel?.LoadModel();
 
         RefreshRotation();

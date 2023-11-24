@@ -40,14 +40,15 @@ public sealed partial class Entity : CharacterBody3D {
     private Health? _health;
 
 
-    [Export] private NodePath WeaponPath {
+    // TODO: create list of types that implement IWeapon and inherit Node and create a hint string in a source generator
+    [Export(PropertyHint.NodePathValidTypes, "WeaponInventory")] private NodePath WeaponPath {
         get => _weaponPath;
         set {
             this.SetValueFromNode<IWeapon>(value, ref _weaponPath);
 
             IWeapon? weapon = Weapon;
             if ( weapon is not null ) {
-                weapon.SetSkeleton(Armature);
+                weapon.Inject(Armature);
                 weapon.ReloadModel(Character?.IsLoaded ?? false);
             }
         }
@@ -67,7 +68,7 @@ public sealed partial class Entity : CharacterBody3D {
             
             IWeapon? weapon = Weapon;
             if ( weapon is not null ) {
-                weapon.SetSkeleton(Armature);
+                weapon.Inject(Armature);
                 weapon.ReloadModel(Character?.IsLoaded ?? false);
             }
         }
@@ -146,6 +147,7 @@ public sealed partial class Entity : CharacterBody3D {
         Character?.SetCostume(costume);
 
 
+
     public void HandleInput(Player.InputInfo inputInfo) {
         BehaviourManager?.CurrentBehaviour?.HandleInput(inputInfo);
     }
@@ -172,7 +174,7 @@ public sealed partial class Entity : CharacterBody3D {
     }
 
     private void OnCharacterLoadedUnloaded(bool isLoaded) {
-        Weapon?.SetSkeleton(Armature);
+        Weapon?.Inject(Armature);
     }
 
     private void OnCharacterChanged(CharacterData? newCharacter, CharacterData? oldCharacter) {

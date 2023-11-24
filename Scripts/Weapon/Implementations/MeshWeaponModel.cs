@@ -18,7 +18,7 @@ public sealed partial class MeshWeaponModel : WeaponModel {
 
 
 
-    public override void SetSkeleton(Skeleton3D? skeleton) {
+    public void Inject(Skeleton3D? skeleton) {
         SkeletonPath = skeleton is not null ? GetPathTo(skeleton) : new();
     }
 
