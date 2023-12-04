@@ -29,7 +29,7 @@ public partial class Weapon : Loadable, IWeapon {
     [ExportGroup("Dependencies")]
     [Export(PropertyHint.NodePathValidTypes, nameof(Skeleton3D))] public NodePath SkeletonPath { 
         get => _skeletonPath;
-        set => Inject(GetNodeOrNull<Skeleton3D>(value));
+        private set => Inject(GetNodeOrNull<Skeleton3D>(value));
     }
     private NodePath _skeletonPath = new();
     

@@ -41,10 +41,11 @@ public sealed partial class Player : Node {
 
 
     private void SetPlayerId(byte value) {
-        if ( ! IsNodeReady() ) {
+        if ( this.IsEditorGetSetter() ) {
             _playerId = value;
             return;
         }
+        
         UnsetPlayerId();
 
         if ( Players[value] == null ) {

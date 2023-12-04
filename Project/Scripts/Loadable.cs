@@ -9,7 +9,7 @@ public abstract partial class Loadable : Node3D, ILoadable {
     [Export] public bool IsLoaded { 
         get => _isLoaded;
         set {
-            if ( ! IsNodeReady() ) {
+            if ( this.IsEditorGetSetter() ) {
                 _isLoaded = value;
                 return;
             }
@@ -93,5 +93,4 @@ public abstract partial class Loadable : Node3D, ILoadable {
 
         UnloadModel();
     }
-
 }

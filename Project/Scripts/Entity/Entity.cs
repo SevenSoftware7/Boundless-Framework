@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using Godot;
 using SevenGame.Utility;
 
@@ -51,7 +50,7 @@ public sealed partial class Entity : CharacterBody3D {
             }
 
             weapon.Inject(Armature);
-            weapon.ReloadModel(Character?.IsLoaded ?? false);
+            // weapon.ReloadModel(Character?.IsLoaded ?? false);
         }
     }
     private NodePath _weaponPath = new();

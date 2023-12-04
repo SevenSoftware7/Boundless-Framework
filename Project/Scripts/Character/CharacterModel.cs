@@ -5,7 +5,7 @@ using System;
 namespace LandlessSkies.Core;
 
 [Tool]
-public abstract partial class CharacterModel : Loadable {
+public abstract partial class CharacterModel : Loadable, IInjectable<Skeleton3D?> {
 
     
     [Export] public CharacterCostume Costume { 
@@ -28,4 +28,6 @@ public abstract partial class CharacterModel : Loadable {
         
         Name = nameof(CharacterModel);
     }
+    
+    public virtual void Inject(Skeleton3D? value) {}
 }

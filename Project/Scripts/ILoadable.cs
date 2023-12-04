@@ -4,7 +4,7 @@ using Godot;
 
 namespace LandlessSkies.Core;
 
-public interface ILoadable : IInjectable<Skeleton3D?> {
+public interface ILoadable {
     
     bool IsLoaded { get; set; }
 

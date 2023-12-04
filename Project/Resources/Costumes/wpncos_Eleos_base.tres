@@ -6,4 +6,3 @@
 [resource]
 script = ExtResource("1_rt4qi")
 ModelScene = ExtResource("1_6ctsv")
-test = 0

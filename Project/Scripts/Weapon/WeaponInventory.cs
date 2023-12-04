@@ -19,7 +19,7 @@ public partial class WeaponInventory : Loadable, IWeapon {
     [Export] private Array<WeaponData> WeaponDatas {
         get {
             if (_weaponDatas is null || (_weapons.Count != 0 && _weaponDatas.Count < _weapons.Count)) {
-                _weaponDatas = new();
+                _weaponDatas = [];
                 for ( int i = 0; i < _weapons.Count; i++ ) {
                     Weapon weapon = _weapons[i];
                     if ( weapon is not null && weapon.Data is not null )
@@ -31,41 +31,41 @@ public partial class WeaponInventory : Loadable, IWeapon {
         }
         set {
             if ( this.IsEditorGetSetter() ) return;
-            Callable.From( UpdateWeaponDatas ).CallDeferred();
 
-            void UpdateWeaponDatas() {
+            if ( _weaponDatas is not null && value is not null && _weaponDatas.RecursiveEqual(value) ) return;
 
-                if ( _weaponDatas is not null && value is not null && _weaponDatas.RecursiveEqual(value) ) return;
-
-                if ( _weaponDatas is null && value is not null ) {
-                    _weaponDatas = new();
-                    for ( int i = 0; i < value.Count; i++ ) {
-                        SetWeapon(i, value[i]);
-                    }
-                }
-
-                if ( value is null || value.Count == 0 ) {
-                    for ( int i = 0; i < _weapons.Count; i++ ) {
-                        _weapons[i].QueueFree();
-                    }
-                    _weapons?.Clear();
-                    _weaponDatas?.Clear();
-                    NotifyPropertyListChanged();
-                    return;
-                }
-
-
-                Array<WeaponData> current = WeaponDatas;
-                int maxCount = Math.Max(current.Count, value.Count);
-                for ( int i = 0; i < maxCount; i++ ) {
-                    if ( i >= value.Count ) {
-                        RemoveWeapon(i);
-                    } else if ( i >= current.Count || current[i] != value[i] ) {
-                        SetWeapon(i, value[i]);
-                    }
+            // Initialize on first addition
+            if ( _weaponDatas is null && value is not null ) {
+                _weaponDatas = [];
+                for ( int i = 0; i < value.Count; i++ ) {
+                    SetWeapon(i, value[i]);
                 }
                 NotifyPropertyListChanged();
+                return;
             }
+
+            // Clear
+            if ( value is null || value.Count == 0 ) {
+                for ( int i = 0; i < _weapons.Count; i++ ) {
+                    _weapons[i].QueueFree();
+                }
+                _weapons?.Clear();
+                _weaponDatas?.Clear();
+                NotifyPropertyListChanged();
+                return;
+            }
+
+            // Add and remove when applicable
+            Array<WeaponData> current = WeaponDatas;
+            int maxCount = Math.Max(current.Count, value.Count);
+            for ( int i = 0; i < maxCount; i++ ) {
+                if ( i >= value.Count ) {
+                    RemoveWeapon(i);
+                } else if ( i >= current.Count || current[i] != value[i] ) {
+                    SetWeapon(i, value[i]);
+                }
+            }
+            NotifyPropertyListChanged();
         }
     }
     private Array<WeaponData>? _weaponDatas = null;
@@ -73,14 +73,14 @@ public partial class WeaponInventory : Loadable, IWeapon {
 #endif
     
 
-    [Export] private Array<Weapon> _weapons = new();
+    [Export] private Array<Weapon> _weapons = [];
 
 
     [ExportGroup("Current Weapon")]
     [Export] private uint CurrentIndex {
         get => _currentIndex;
         set {
-            if ( ! IsNodeReady() ) {
+            if ( this.IsEditorGetSetter() ) {
                 _currentIndex = value;
                 return;
             }
@@ -90,9 +90,9 @@ public partial class WeaponInventory : Loadable, IWeapon {
     }
     private uint _currentIndex = 0;
 
-    [Export] private Weapon? CurrentWeapon {
+    [Export] public Weapon? CurrentWeapon {
         get => IndexInBounds(CurrentIndex) ? _weapons[(int)CurrentIndex] : null;
-        set {
+        private set {
             if (value is not null && _weapons.Contains(value)) {
                 CurrentIndex = (uint)_weapons.IndexOf(value);
             }
@@ -101,7 +101,7 @@ public partial class WeaponInventory : Loadable, IWeapon {
 
     [Export] public IWeapon.Handedness WeaponHandedness {
         get => IndexInBounds(CurrentIndex) ? _weapons[(int)CurrentIndex].WeaponHandedness : IWeapon.Handedness.Right;
-        set {
+        private set {
             if ( CurrentWeapon is Weapon currentWeapon ) {
                 currentWeapon.WeaponHandedness = value;
             }
@@ -130,6 +130,7 @@ public partial class WeaponInventory : Loadable, IWeapon {
 
     public void Inject(Skeleton3D? skeleton) {
         _skeletonPath = skeleton is not null ? GetPathTo(skeleton) : new();
+
         for ( int i = 0; i < _weapons?.Count; i++ ) {
             if ( _weapons[i] is Weapon weapon ) {
                 weapon.Inject(skeleton);
@@ -183,7 +184,7 @@ public partial class WeaponInventory : Loadable, IWeapon {
 
     public void RemoveWeapon(int index) {
         Weapon? weapon = _weapons.Count > index ? _weapons[index] : null;
-        LoadableExtensions.DestroyLoadable<Weapon>(ref weapon)
+        LoadableExtensions.DestroyLoadable(ref weapon)
             .AfterUnload(() => _weapons.RemoveAt(index))
             .Execute();
 
