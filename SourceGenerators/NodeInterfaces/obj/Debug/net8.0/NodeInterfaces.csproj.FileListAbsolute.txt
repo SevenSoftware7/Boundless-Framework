@@ -1,0 +1,12 @@
+C:\Users\spagh\Documents\GodotProjects\LandlessSkies\CodeGenerator\NodeInterfaces\bin\Debug\net8.0\NodeInterfaces.deps.json
+C:\Users\spagh\Documents\GodotProjects\LandlessSkies\CodeGenerator\NodeInterfaces\bin\Debug\net8.0\NodeInterfaces.dll
+C:\Users\spagh\Documents\GodotProjects\LandlessSkies\CodeGenerator\NodeInterfaces\bin\Debug\net8.0\NodeInterfaces.pdb
+C:\Users\spagh\Documents\GodotProjects\LandlessSkies\CodeGenerator\NodeInterfaces\obj\Debug\net8.0\NodeInterfaces.csproj.AssemblyReference.cache
+C:\Users\spagh\Documents\GodotProjects\LandlessSkies\CodeGenerator\NodeInterfaces\obj\Debug\net8.0\NodeInterfaces.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\spagh\Documents\GodotProjects\LandlessSkies\CodeGenerator\NodeInterfaces\obj\Debug\net8.0\NodeInterfaces.AssemblyInfoInputs.cache
+C:\Users\spagh\Documents\GodotProjects\LandlessSkies\CodeGenerator\NodeInterfaces\obj\Debug\net8.0\NodeInterfaces.AssemblyInfo.cs
+C:\Users\spagh\Documents\GodotProjects\LandlessSkies\CodeGenerator\NodeInterfaces\obj\Debug\net8.0\NodeInterfaces.csproj.CoreCompileInputs.cache
+C:\Users\spagh\Documents\GodotProjects\LandlessSkies\CodeGenerator\NodeInterfaces\obj\Debug\net8.0\NodeInterfaces.dll
+C:\Users\spagh\Documents\GodotProjects\LandlessSkies\CodeGenerator\NodeInterfaces\obj\Debug\net8.0\refint\NodeInterfaces.dll
+C:\Users\spagh\Documents\GodotProjects\LandlessSkies\CodeGenerator\NodeInterfaces\obj\Debug\net8.0\NodeInterfaces.pdb
+C:\Users\spagh\Documents\GodotProjects\LandlessSkies\CodeGenerator\NodeInterfaces\obj\Debug\net8.0\ref\NodeInterfaces.dll

@@ -1,0 +1,12 @@
+<Project Sdk="Godot.NET.Sdk/4.2.0">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <RootNamespace>LandlessSkies</RootNamespace>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SourceGenerators\NodeInterfaces\NodeInterfaces.csproj" PrivateAssets="all" OutputItemType="analyzer" />
+    <ProjectReference Include="..\SourceGenerators\NodeInterfaces.types\NodeInterfaces.types.csproj" />
+  </ItemGroup>
+</Project>

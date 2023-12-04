@@ -1,0 +1,50 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Landless Skies"
+run/main_scene="res://Scene.tscn"
+config/features=PackedStringArray("4.2", "C#", "Forward Plus")
+boot_splash/show_image=false
+config/icon="res://icon.svg"
+
+[display]
+
+window/size/mode=4
+window/size/borderless=true
+
+[dotnet]
+
+project/assembly_name="Landless Skies"
+
+[editor]
+
+naming/node_name_num_separator=2
+naming/default_signal_callback_name="_{node_name}{signal_name}"
+naming/default_signal_callback_to_self_name="_{signal_name}"
+naming/scene_name_casing=1
+
+[file_customization]
+
+folder_colors={
+"res://Resources/Costumes/": "purple",
+"res://Resources/Data/": "red"
+}
+
+[layer_names]
+
+3d_physics/layer_1="Terrain"
+3d_physics/layer_2="Entity"
+3d_physics/layer_3="Water"
+
+[rendering]
+
+anti_aliasing/quality/screen_space_aa=1
