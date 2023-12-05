@@ -21,3 +21,15 @@ C:\Users\spagh\Documents\GodotProjects\LandlessSkies\SourceGenerators\NodeInterf
 C:\Users\spagh\Documents\GodotProjects\LandlessSkies\SourceGenerators\NodeInterfaces.types\obj\Debug\net8.0\refint\NodeInterfaces.types.dll
 C:\Users\spagh\Documents\GodotProjects\LandlessSkies\SourceGenerators\NodeInterfaces.types\obj\Debug\net8.0\NodeInterfaces.types.pdb
 C:\Users\spagh\Documents\GodotProjects\LandlessSkies\SourceGenerators\NodeInterfaces.types\obj\Debug\net8.0\ref\NodeInterfaces.types.dll
+C:\LandlessSkies\SourceGenerators\NodeInterfaces.types\bin\Debug\net8.0\NodeInterfaces.types.deps.json
+C:\LandlessSkies\SourceGenerators\NodeInterfaces.types\bin\Debug\net8.0\NodeInterfaces.types.dll
+C:\LandlessSkies\SourceGenerators\NodeInterfaces.types\bin\Debug\net8.0\NodeInterfaces.types.pdb
+C:\LandlessSkies\SourceGenerators\NodeInterfaces.types\obj\Debug\net8.0\NodeInterfaces.types.GeneratedMSBuildEditorConfig.editorconfig
+C:\LandlessSkies\SourceGenerators\NodeInterfaces.types\obj\Debug\net8.0\NodeInterfaces.types.AssemblyInfoInputs.cache
+C:\LandlessSkies\SourceGenerators\NodeInterfaces.types\obj\Debug\net8.0\NodeInterfaces.types.AssemblyInfo.cs
+C:\LandlessSkies\SourceGenerators\NodeInterfaces.types\obj\Debug\net8.0\NodeInterfaces.types.csproj.CoreCompileInputs.cache
+C:\LandlessSkies\SourceGenerators\NodeInterfaces.types\obj\Debug\net8.0\NodeInterfaces.types.sourcelink.json
+C:\LandlessSkies\SourceGenerators\NodeInterfaces.types\obj\Debug\net8.0\NodeInterfaces.types.dll
+C:\LandlessSkies\SourceGenerators\NodeInterfaces.types\obj\Debug\net8.0\refint\NodeInterfaces.types.dll
+C:\LandlessSkies\SourceGenerators\NodeInterfaces.types\obj\Debug\net8.0\NodeInterfaces.types.pdb
+C:\LandlessSkies\SourceGenerators\NodeInterfaces.types\obj\Debug\net8.0\ref\NodeInterfaces.types.dll

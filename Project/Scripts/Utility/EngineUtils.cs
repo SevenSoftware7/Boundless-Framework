@@ -74,17 +74,4 @@ public static class EngineUtils {
         node = default!;
         return false;
     }
-
-
-    public static void SetValueFromPath<T>(this Node obj, NodePath path, ref NodePath valToSet) where T : class {
-        if ( ! obj.IsNodeReady() ) {
-            valToSet = path;
-            return;
-        }
-        if ( ! path.IsEmpty && ! obj.TryGetNode<T>(path, out _) ) {
-            // GD.PushWarning($"Reference ({path}) is not assignable to Class {typeof(T).Name}");
-            return;
-        }
-        valToSet = path;
-    }
 }

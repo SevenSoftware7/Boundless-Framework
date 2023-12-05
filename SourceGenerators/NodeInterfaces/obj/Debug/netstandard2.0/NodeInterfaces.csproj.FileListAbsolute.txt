@@ -19,3 +19,14 @@ C:\Users\spagh\Documents\GodotProjects\LandlessSkies\SourceGenerators\NodeInterf
 C:\Users\spagh\Documents\GodotProjects\LandlessSkies\SourceGenerators\NodeInterfaces\obj\Debug\netstandard2.0\NodeInterfaces.sourcelink.json
 C:\Users\spagh\Documents\GodotProjects\LandlessSkies\SourceGenerators\NodeInterfaces\obj\Debug\netstandard2.0\NodeInterfaces.dll
 C:\Users\spagh\Documents\GodotProjects\LandlessSkies\SourceGenerators\NodeInterfaces\obj\Debug\netstandard2.0\NodeInterfaces.pdb
+C:\LandlessSkies\SourceGenerators\NodeInterfaces\bin\Debug\netstandard2.0\NodeInterfaces.deps.json
+C:\LandlessSkies\SourceGenerators\NodeInterfaces\bin\Debug\netstandard2.0\NodeInterfaces.dll
+C:\LandlessSkies\SourceGenerators\NodeInterfaces\bin\Debug\netstandard2.0\NodeInterfaces.pdb
+C:\LandlessSkies\SourceGenerators\NodeInterfaces\obj\Debug\netstandard2.0\NodeInterfaces.csproj.AssemblyReference.cache
+C:\LandlessSkies\SourceGenerators\NodeInterfaces\obj\Debug\netstandard2.0\NodeInterfaces.GeneratedMSBuildEditorConfig.editorconfig
+C:\LandlessSkies\SourceGenerators\NodeInterfaces\obj\Debug\netstandard2.0\NodeInterfaces.AssemblyInfoInputs.cache
+C:\LandlessSkies\SourceGenerators\NodeInterfaces\obj\Debug\netstandard2.0\NodeInterfaces.AssemblyInfo.cs
+C:\LandlessSkies\SourceGenerators\NodeInterfaces\obj\Debug\netstandard2.0\NodeInterfaces.csproj.CoreCompileInputs.cache
+C:\LandlessSkies\SourceGenerators\NodeInterfaces\obj\Debug\netstandard2.0\NodeInterfaces.sourcelink.json
+C:\LandlessSkies\SourceGenerators\NodeInterfaces\obj\Debug\netstandard2.0\NodeInterfaces.dll
+C:\LandlessSkies\SourceGenerators\NodeInterfaces\obj\Debug\netstandard2.0\NodeInterfaces.pdb

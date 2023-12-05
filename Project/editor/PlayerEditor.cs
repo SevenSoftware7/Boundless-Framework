@@ -39,7 +39,7 @@ public partial class Player {
         string[] warnings = base._GetConfigurationWarnings();
 
         if ( Players[PlayerId] != this) {
-            warnings ??= System.Array.Empty<string>();
+            warnings ??= [];
 
             System.Array.Resize(ref warnings, warnings.Length + 1);
             warnings[^1] = $"PlayerId {PlayerId} is already in use.";
@@ -55,7 +55,7 @@ public partial class Player {
     //     private set {;}
     // }
     public override Array<Dictionary> _GetPropertyList() {
-        Array<Dictionary> defaultValue = base._GetPropertyList() ?? new();
+        Array<Dictionary> defaultValue = base._GetPropertyList() ?? [];
 
         defaultValue.Add(
             new Dictionary() {

@@ -1,7 +1,4 @@
-// #undef TOOLS
-
 using System;
-using System.Collections;
 using System.Linq;
 using Godot;
 using Godot.Collections;
@@ -12,72 +9,13 @@ namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
-public partial class WeaponInventory : Loadable, IWeapon {
+public partial class WeaponInventory : Loadable3D, IWeapon {    
 
-
-#if TOOLS
-    [Export] private Array<WeaponData> WeaponDatas {
-        get {
-            if (_weaponDatas is null || (_weapons.Count != 0 && _weaponDatas.Count < _weapons.Count)) {
-                _weaponDatas = [];
-                for ( int i = 0; i < _weapons.Count; i++ ) {
-                    Weapon weapon = _weapons[i];
-                    if ( weapon is not null && weapon.Data is not null )
-
-                    _weaponDatas.Add(weapon.Data);
-                }
-            }
-            return _weaponDatas;
-        }
-        set {
-            if ( this.IsEditorGetSetter() ) return;
-
-            if ( _weaponDatas is not null && value is not null && _weaponDatas.RecursiveEqual(value) ) return;
-
-            // Initialize on first addition
-            if ( _weaponDatas is null && value is not null ) {
-                _weaponDatas = [];
-                for ( int i = 0; i < value.Count; i++ ) {
-                    SetWeapon(i, value[i]);
-                }
-                NotifyPropertyListChanged();
-                return;
-            }
-
-            // Clear
-            if ( value is null || value.Count == 0 ) {
-                for ( int i = 0; i < _weapons.Count; i++ ) {
-                    _weapons[i].QueueFree();
-                }
-                _weapons?.Clear();
-                _weaponDatas?.Clear();
-                NotifyPropertyListChanged();
-                return;
-            }
-
-            // Add and remove when applicable
-            Array<WeaponData> current = WeaponDatas;
-            int maxCount = Math.Max(current.Count, value.Count);
-            for ( int i = 0; i < maxCount; i++ ) {
-                if ( i >= value.Count ) {
-                    RemoveWeapon(i);
-                } else if ( i >= current.Count || current[i] != value[i] ) {
-                    SetWeapon(i, value[i]);
-                }
-            }
-            NotifyPropertyListChanged();
-        }
-    }
-    private Array<WeaponData>? _weaponDatas = null;
-
-#endif
-    
-
-    [Export] private Array<Weapon> _weapons = [];
+    [Export] private Array<IWeaponWrapper> _weapons = [];
 
 
     [ExportGroup("Current Weapon")]
-    [Export] private uint CurrentIndex {
+    [Export] private int CurrentIndex {
         get => _currentIndex;
         set {
             if ( this.IsEditorGetSetter() ) {
@@ -88,25 +26,35 @@ public partial class WeaponInventory : Loadable, IWeapon {
             SwitchTo(value);
         }
     }
-    private uint _currentIndex = 0;
+    private int _currentIndex = 0;
 
-    [Export] public Weapon? CurrentWeapon {
-        get => IndexInBounds(CurrentIndex) ? _weapons[(int)CurrentIndex] : null;
+    public IWeapon? CurrentWeapon {
+        get => IndexInBounds(CurrentIndex) ? this[CurrentIndex] : null;
         private set {
-            if (value is not null && _weapons.Contains(value)) {
-                CurrentIndex = (uint)_weapons.IndexOf(value);
+            IWeaponWrapper? index = _weapons.Where((wrapper) => wrapper.Get(this) == value).FirstOrDefault();
+            if (value is not null && index is not null) {
+                CurrentIndex = _weapons.IndexOf(index);
             }
         }
     }
 
-    [Export] public IWeapon.Handedness WeaponHandedness {
-        get => IndexInBounds(CurrentIndex) ? _weapons[(int)CurrentIndex].WeaponHandedness : IWeapon.Handedness.Right;
-        private set {
-            if ( CurrentWeapon is Weapon currentWeapon ) {
-                currentWeapon.WeaponHandedness = value;
+    public WeaponData Data => CurrentWeapon?.Data!;
+    public WeaponCostume? Costume {
+        get => CurrentWeapon?.Costume;
+        set {
+            if (CurrentWeapon is IWeapon currWeapon) {
+                currWeapon.Costume = value;
             }
         }
     }
+    public IWeapon.Handedness WeaponHandedness {
+        get {
+            if ( ! IndexInBounds(CurrentIndex) ) return IWeapon.Handedness.Right;
+            if ( this[CurrentIndex] is not IWeapon weapon ) return IWeapon.Handedness.Right;
+
+            return weapon.WeaponHandedness;
+        }
+    } 
 
 
     [ExportGroup("Dependencies")]
@@ -117,108 +65,135 @@ public partial class WeaponInventory : Loadable, IWeapon {
     private NodePath _skeletonPath = new();
 
 
-
-    private WeaponInventory() : base() {
-        Name = nameof(WeaponInventory);
+    public IWeapon? this[int index] {
+        get => _weapons[index].Get(this);
+        set => _weapons[index].Set(this, value);
     }
 
 
 
-    private bool IndexInBounds(uint index) {
+    private WeaponInventory() : base() {}
+
+
+
+    private bool IndexInBounds(int index) {
         return index < _weapons.Count;
     }
 
-    public void Inject(Skeleton3D? skeleton) {
-        _skeletonPath = skeleton is not null ? GetPathTo(skeleton) : new();
-
-        for ( int i = 0; i < _weapons?.Count; i++ ) {
-            if ( _weapons[i] is Weapon weapon ) {
-                weapon.Inject(skeleton);
-            }
-        }
-    }
-
-    public void SwitchTo(uint index) {
-        if ( _weapons.Count == 0 ) {
+    public void SwitchTo(int index) {
+        if ( _weapons is null || _weapons.Count == 0 ) {
             _currentIndex = 0;
             return;
         }
 
-        uint maxCount = (uint)(_weapons.Count - 1);
+        int maxCount = _weapons.Count - 1;
         _currentIndex = index > maxCount ? maxCount : index;
 
         for (int i = 0; i < _weapons.Count; i++) {
-            if ( _weapons[i] is Weapon weapon ) {
-                weapon.SetProcess(false);
-                weapon.Visible = false;
-            }
+            this[i]?.Disable();
         }
 
-        if ( _weapons[(int)index] is Weapon currWeapon ) {
-            currWeapon.SetProcess(true);
-            currWeapon.Visible = true;
-        }
+        this[_currentIndex]?.Enable();
+    }
+
+    public void AddWeapon(WeaponData? data, WeaponCostume? costume = null) {
+        int index = _weapons.Count;
+
+        _weapons.Add(new());
+#if TOOLS
+        _weaponDatas.Add(null!);
+#endif
+
+        SetWeapon(index, data, costume);
     }
 
     public void SetWeapon(int index, WeaponData? data, WeaponCostume? costume = null) {
-        if ( this.IsEditorGetSetter() ) return;
+        if (index >= _weapons.Count) return;
 
-        Weapon? weapon = _weapons.Count > index ? _weapons[index] : null;
+        IWeaponWrapper weaponWrapper = _weapons[index] ??= new();
+        IWeapon? weapon = weaponWrapper.Get(this);
         if ( data is not null && weapon?.Data == data ) return;
 
-        LoadableExtensions.UpdateLoadable(ref weapon)
-            .WithConstructor(() => data?.Instantiate(this, costume))
-            .AfterUnload(() => _weapons.RemoveAt(index))
+        LoadableExtensions.UpdateLoadable(ref weapon!)
+            .WithConstructor(() => {
+                IWeapon? weapon = data?.Instantiate(this, costume);
+                weaponWrapper.Set(this, weapon);
+                return weapon;
+            })
             .BeforeLoad(() => weapon?.Inject(GetNodeOrNull<Skeleton3D>(SkeletonPath)))
-            .AfterLoad(() => _weapons.Insert(index, weapon!))
             .Execute();
 
 #if TOOLS
-        Array<WeaponData> datas = WeaponDatas;
-        if ( index < datas.Count ) {
-            datas.RemoveAt(index);
-        }
-        datas.Insert(index, data!);
+        _weaponDatas[index] = data!;
 #endif
     }
 
     public void RemoveWeapon(int index) {
-        Weapon? weapon = _weapons.Count > index ? _weapons[index] : null;
+        if (index >= _weapons.Count) return;
+
+        IWeaponWrapper weaponWrapper = _weapons[index];
+        IWeapon? weapon = weaponWrapper.Get(this);
+
         LoadableExtensions.DestroyLoadable(ref weapon)
-            .AfterUnload(() => _weapons.RemoveAt(index))
             .Execute();
 
+        _weapons.RemoveAt(index);
 #if TOOLS
         WeaponDatas.RemoveAt(index);
 #endif
     }
 
     public void SetCostume(int index, WeaponCostume? costume) {
-        _weapons[index]?.SetCostume(costume);
+        if (index >= _weapons.Count) return;
+
+        if (this[index] is IWeapon weapon) {
+            weapon.Costume = costume;
+        }
+    }
+
+    
+    public void Inject(Skeleton3D? skeleton) {
+        _skeletonPath = skeleton is not null ? GetPathTo(skeleton) : new();
+
+        for ( int i = 0; i < _weapons?.Count; i++ ) {
+            this[i]?.Inject(skeleton);
+        }
+    }
+
+    public override void Enable() {
+        for ( int i = 0; i < _weapons?.Count; i++ ) {
+            this[i]?.Enable();
+        }
+    }
+
+    public override void Disable() {
+        for ( int i = 0; i < _weapons?.Count; i++ ) {
+            this[i]?.Disable();
+        }
+    }
+
+    public override void Destroy() {
+        for ( int i = 0; i < _weapons?.Count; i++ ) {
+            this[i]?.Destroy();
+        }
     }
 
     public override void ReloadModel(bool forceLoad = false) {
         for ( int i = 0; i < _weapons.Count; i++ ) {
-            if ( _weapons[i] is Weapon weapon ) {
-                weapon.ReloadModel(forceLoad);
-            }
+            this[i]?.ReloadModel(forceLoad);
         }
     }
 
     protected override bool LoadModelImmediate() {
         for ( int i = 0; i < _weapons.Count; i++ ) {
-            if ( _weapons[i] is Weapon weapon ) {
-                weapon.LoadModel();
-            }
+            this[i]?.LoadModel();
         }
         return true;
     }
 
     protected override bool UnloadModelImmediate() {
         for ( int i = 0; i < _weapons.Count; i++ ) {
-            if ( _weapons[i] is Weapon weapon ) {
-                weapon.UnloadModel();
-            }
+            this[i]?.UnloadModel();
         }
         return true;
     }

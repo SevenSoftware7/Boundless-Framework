@@ -8,6 +8,6 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = true
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = NodeInterfaces
-build_property.ProjectDir = C:\Users\spagh\Documents\GodotProjects\LandlessSkies\SourceGenerators\NodeInterfaces\
+build_property.ProjectDir = C:\LandlessSkies\SourceGenerators\NodeInterfaces\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 

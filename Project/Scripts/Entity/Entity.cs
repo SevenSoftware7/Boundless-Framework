@@ -8,7 +8,7 @@ namespace LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public sealed partial class Entity : CharacterBody3D {
-    [Export] public Character? Character { 
+    [Export] public Character? Character {
         get => _character;
         private set => _character ??= value;
     }
@@ -20,7 +20,7 @@ public sealed partial class Entity : CharacterBody3D {
     }
 
     [Export] public CharacterCostume? CharacterCostume {
-        get => Character?.CharacterCostume;
+        get => Character?.Costume;
         private set => SetCostume(value);
     }
 
@@ -39,32 +39,12 @@ public sealed partial class Entity : CharacterBody3D {
     private Health? _health;
 
 
-    // Exported in editor partial EntityEditor.cs
-    private NodePath WeaponPath {
-        get => _weaponPath;
-        set {
-            this.SetValueFromPath<IWeapon>(value, ref _weaponPath);
-
-            if ( Weapon is not IWeapon weapon ) {
-                return;
-            }
-
-            weapon.Inject(Armature);
-            // weapon.ReloadModel(Character?.IsLoaded ?? false);
-        }
-    }
-    private NodePath _weaponPath = new();
-
+    [Export] private IWeaponWrapper? weaponPath = new();
     public IWeapon? Weapon {
-        get {
-            this.TryGetNode(_weaponPath, out IWeapon weapon);
-            return weapon;
-        }
-        private set {
-            if ( value is not Node node ) {
-                return;
-            }
-            WeaponPath = GetPathTo(node);
+        get => weaponPath?.Get(this);
+        set {
+            weaponPath?.Set(this, value);
+            Weapon?.Inject(Armature);
         }
     }
 

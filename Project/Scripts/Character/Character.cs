@@ -9,7 +9,7 @@ namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
-public partial class Character : Loadable {
+public partial class Character : Loadable3D, IDataContainer<CharacterData, CharacterCostume> {
 
     [Export] public Node3D? Collisions { get; private set; }
     [Export] public Skeleton3D? Armature { get; private set; }
@@ -24,9 +24,9 @@ public partial class Character : Loadable {
     [ExportGroup("Costume")]
     [Export] private CharacterModel? CharacterModel;
 
-    [Export] public CharacterCostume? CharacterCostume {
+    [Export] public CharacterCostume? Costume {
         get => CharacterModel?.Costume;
-        private set => SetCostume(value);
+        set => SetCostume(value);
     }
 
 
@@ -56,7 +56,7 @@ public partial class Character : Loadable {
     public void SetCostume(CharacterCostume? costume, bool forceLoad = false) {
         if ( this.IsEditorGetSetter() ) return;
 
-        CharacterCostume? oldCostume = CharacterCostume;
+        CharacterCostume? oldCostume = Costume;
         if ( costume == oldCostume ) return;
 
         LoadableExtensions.UpdateLoadable(ref CharacterModel)

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "D3a/QqZ72sH3TyVOmGnbLqbDy57l5o75SS5w1fEl5TSXqZ9sdv0rYieeJruawul4JSFFT+8jMODuUFsBGhPE5Q==",
+  "dgSpecHash": "AN1zsmzYGewIwUhpQAOgl6TDwhXzVdEuEFF1RZR3MTOwuIrbFl49FaxRY72qkgkOfCbeUJUM4LCwQpd2bKuvVA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\spagh\\Documents\\GodotProjects\\LandlessSkies\\SourceGenerators\\NodeInterfaces\\NodeInterfaces.csproj",
+  "projectFilePath": "C:\\LandlessSkies\\SourceGenerators\\NodeInterfaces\\NodeInterfaces.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\spagh\\.nuget\\packages\\microsoft.codeanalysis.analyzers\\3.3.4\\microsoft.codeanalysis.analyzers.3.3.4.nupkg.sha512",
     "C:\\Users\\spagh\\.nuget\\packages\\microsoft.codeanalysis.common\\4.8.0\\microsoft.codeanalysis.common.4.8.0.nupkg.sha512",

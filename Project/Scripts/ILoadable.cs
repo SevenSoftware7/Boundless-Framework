@@ -4,10 +4,11 @@ using Godot;
 
 namespace LandlessSkies.Core;
 
-public interface ILoadable {
+public interface ILoadable : IDestroyable, IEnablable {
     
     bool IsLoaded { get; set; }
 
+    event Loadable3D.LoadedUnloadedEventHandler LoadUnloadEvent;
 
     
     void LoadModel();

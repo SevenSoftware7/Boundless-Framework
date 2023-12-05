@@ -7,9 +7,9 @@ using Godot;
 namespace LandlessSkies.Core;
 
 
-public ref struct LoadableDestructor<TLoadable> where TLoadable : Loadable {
+public ref struct LoadableDestructor<TLoadable> where TLoadable : ILoadable {
     private ref TLoadable? loadable;
-    private Loadable.LoadedUnloadedEventHandler? onLoadUnload;
+    private Loadable3D.LoadedUnloadedEventHandler? onLoadUnload;
     private Action? onBeforeUnload;
     private Action? onAfterUnload;
 
@@ -21,7 +21,7 @@ public ref struct LoadableDestructor<TLoadable> where TLoadable : Loadable {
 
 
 
-    public LoadableDestructor<TLoadable> OnLoadUnload(Loadable.LoadedUnloadedEventHandler onLoadUnload) =>
+    public LoadableDestructor<TLoadable> OnLoadUnload(Loadable3D.LoadedUnloadedEventHandler onLoadUnload) =>
         this with {onLoadUnload = onLoadUnload};
 
     public LoadableDestructor<TLoadable> BeforeUnload(Action onBeforeUnload) =>
@@ -35,22 +35,22 @@ public ref struct LoadableDestructor<TLoadable> where TLoadable : Loadable {
         if ( loadable is not null ) {
             onBeforeUnload?.Invoke();
 
-            loadable.LoadedUnloaded -= onLoadUnload;
+            loadable.LoadUnloadEvent -= onLoadUnload;
             loadable.UnloadModel();
 
             onAfterUnload?.Invoke();
 
-            loadable.UnparentAndQueueFree();
-            loadable = null !;
+            loadable.Destroy();
+            loadable = default;
         }
     }
 }
 
 
-public ref struct LoadableUpdater<TLoadable> where TLoadable : Loadable {
+public ref struct LoadableUpdater<TLoadable> where TLoadable : ILoadable {
     private ref TLoadable? loadable;
     private Func<TLoadable?>? instantiator;
-    private Loadable.LoadedUnloadedEventHandler? onLoadUnload;
+    private Loadable3D.LoadedUnloadedEventHandler? onLoadUnload;
     private Action? onBeforeLoad;
     private Action? onAfterLoad;
     private LoadableDestructor<TLoadable> destructor;
@@ -64,7 +64,7 @@ public ref struct LoadableUpdater<TLoadable> where TLoadable : Loadable {
 
 
 
-    public LoadableUpdater<TLoadable> OnLoadUnloadEvent(Loadable.LoadedUnloadedEventHandler onLoadUnload) =>
+    public LoadableUpdater<TLoadable> OnLoadUnloadEvent(Loadable3D.LoadedUnloadedEventHandler onLoadUnload) =>
         this with {onLoadUnload = onLoadUnload, destructor = destructor.OnLoadUnload(onLoadUnload)};
 
     public LoadableUpdater<TLoadable> BeforeUnload(Action onBeforeUnload) =>
@@ -93,7 +93,7 @@ public ref struct LoadableUpdater<TLoadable> where TLoadable : Loadable {
             onBeforeLoad?.Invoke();
 
             loadable.LoadModel();
-            loadable.LoadedUnloaded += onLoadUnload;
+            loadable.LoadUnloadEvent += onLoadUnload;
 
             onAfterLoad?.Invoke();
         }
@@ -101,10 +101,10 @@ public ref struct LoadableUpdater<TLoadable> where TLoadable : Loadable {
 }
 
 public static class LoadableExtensions {
-    public static LoadableDestructor<TLoadable> DestroyLoadable<TLoadable>(ref TLoadable? loadable) where TLoadable : Loadable =>
+    public static LoadableDestructor<TLoadable> DestroyLoadable<TLoadable>(ref TLoadable? loadable) where TLoadable : ILoadable =>
         new(ref loadable);
 
-    public static LoadableUpdater<TLoadable> UpdateLoadable<TLoadable>(ref TLoadable? loadable) where TLoadable : Loadable =>
+    public static LoadableUpdater<TLoadable> UpdateLoadable<TLoadable>(ref TLoadable? loadable) where TLoadable : ILoadable =>
         new(ref loadable);
 
 }

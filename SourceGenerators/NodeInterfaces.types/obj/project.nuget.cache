@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "D3ZMAKz50BTXBrbFno6qKnymJ1LgUtsG+vDhU4yAbHWWmhXVzREeDbWIY9TGSfq1fFeKbh5k1efM2sgefzWn6g==",
+  "dgSpecHash": "ZAO9QIM2bd/tM/5sVpa9/8Fw2amB+I8jKv379TZu0gnIIp/yBRRD8JjDsyBmOC1Ilo/DovbGorU97eIpwWu+Eg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\spagh\\Documents\\GodotProjects\\LandlessSkies\\SourceGenerators\\NodeInterfaces.types\\NodeInterfaces.types.csproj",
+  "projectFilePath": "C:\\LandlessSkies\\SourceGenerators\\NodeInterfaces.types\\NodeInterfaces.types.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

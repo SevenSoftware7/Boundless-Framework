@@ -6,9 +6,9 @@ namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
-public partial class Weapon : Loadable, IWeapon {
+public partial class Weapon : Loadable3D, IWeapon {
 
-    [Export] public WeaponData Data { 
+    [Export] public WeaponData Data {
         get => _data;
         private set => _data ??= value;
     }
@@ -20,9 +20,9 @@ public partial class Weapon : Loadable, IWeapon {
     [ExportGroup("Costume")]
     [Export] private WeaponModel? WeaponModel;
 
-    [Export] public WeaponCostume? WeaponCostume {
+    [Export] public WeaponCostume? Costume {
         get => WeaponModel?.Costume;
-        private set => SetCostume(value);
+        set => SetCostume(value);
     }
 
 
@@ -40,31 +40,19 @@ public partial class Weapon : Loadable, IWeapon {
 
     public Weapon() : base() {
         _data ??= null !;
-
-        Name = nameof(Weapon);
     }
     public Weapon(WeaponData data, WeaponCostume? costume, Node3D root) : base(root) {        
         ArgumentNullException.ThrowIfNull(data);
         
         _data = data;
         SetCostume(costume);
-
-        Name = nameof(Weapon);
-    }
-
-
-
-    public void Inject(Skeleton3D? skeleton) {
-        _skeletonPath = skeleton is not null ? GetPathTo(skeleton) : new();
-        WeaponModel?.Inject(skeleton);
-        ReloadModel();
     }
 
 
     public void SetCostume(WeaponCostume? costume) {
         if ( this.IsEditorGetSetter() ) return;
         
-        WeaponCostume? oldCostume = WeaponCostume;
+        WeaponCostume? oldCostume = Costume;
         if ( costume == oldCostume ) return;
 
         LoadableExtensions.UpdateLoadable(ref WeaponModel)
@@ -76,6 +64,11 @@ public partial class Weapon : Loadable, IWeapon {
     }
 
 
+    public void Inject(Skeleton3D? skeleton) {
+        _skeletonPath = skeleton is not null ? GetPathTo(skeleton) : new();
+        WeaponModel?.Inject(skeleton);
+        ReloadModel();
+    }
 
     protected override bool LoadModelImmediate() {
         WeaponModel?.LoadModel();

@@ -5,7 +5,7 @@ using System;
 namespace LandlessSkies.Core;
 
 [Tool]
-public abstract partial class WeaponModel : Loadable, IInjectable<Skeleton3D?> {
+public abstract partial class WeaponModel : Loadable3D, IInjectable<Skeleton3D?> {
     
     [Export] public WeaponCostume Costume { 
         get => _costume;
