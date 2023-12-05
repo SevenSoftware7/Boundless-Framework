@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NodeInterfaces.types")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c7b1108ad958f4e69e1bf13330e21e9847e49aba")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+445c0dcf9fbcf90fdcbbe95fac7f399f29a6e8fd")]
 [assembly: System.Reflection.AssemblyProductAttribute("NodeInterfaces.types")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NodeInterfaces.types")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

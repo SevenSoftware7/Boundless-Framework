@@ -41,18 +41,25 @@ public class NodeInterfaceGenerator : ISourceGenerator {
                 .ToList()!;
             
             if (implementingClasses != null && implementingClasses.Any()) {
-                string code = GenerateCode(interfaceSymbol, implementingClasses);
+                string infoSource = GenerateInfoCode(interfaceSymbol, implementingClasses);
                 
-                string fileName = $"{interfaceSymbol.Name}.nodes.cs";
-                SyntaxTree? syntaxTree = SyntaxFactory.ParseSyntaxTree(code, encoding: Encoding.UTF8);
-                // var formattedTree = syntaxTree.NormalizeWhitespace();
+                string infoFileName = $"{interfaceSymbol.Name}.info.cs";
+                SyntaxTree? infoSyntaxTree = SyntaxFactory.ParseSyntaxTree(infoSource, encoding: Encoding.UTF8);
 
-                context.AddSource(fileName, syntaxTree.GetText());
+                context.AddSource(infoFileName, infoSyntaxTree.GetText());
+
+                
+                string wrapperSource = GenerateWrapperCode(interfaceSymbol, implementingClasses);
+                
+                string wrapperFileName = $"{interfaceSymbol.Name}.wrapper.cs";
+                SyntaxTree? wrappperSyntaxTree = SyntaxFactory.ParseSyntaxTree(wrapperSource, encoding: Encoding.UTF8);
+
+                context.AddSource(wrapperFileName, wrappperSyntaxTree.GetText());
             }
         }
     }
 
-    private string GenerateCode(INamedTypeSymbol interfaceSymbol, IEnumerable<INamedTypeSymbol> implementingClasses) {
+    private string GenerateInfoCode(INamedTypeSymbol interfaceSymbol, IEnumerable<INamedTypeSymbol> implementingClasses) {
         string className = $"{interfaceSymbol.Name}Info";
         StringBuilder codeBuilder = new();
         
@@ -83,6 +90,47 @@ public class NodeInterfaceGenerator : ISourceGenerator {
         }
 
         codeBuilder.AppendLine("    };");
+        codeBuilder.AppendLine("}");
+
+        return codeBuilder.ToString();
+    }
+    private string GenerateWrapperCode(INamedTypeSymbol interfaceSymbol, IEnumerable<INamedTypeSymbol> implementingClasses) {
+        string className = $"{interfaceSymbol.Name}WrapperTest";
+        StringBuilder codeBuilder = new();
+        
+        // List<string> namespaces = implementingClasses
+        //     .Select(symbol => symbol.ContainingNamespace.Name)
+        //     .Distinct()
+        //     .Where(ns => ns != interfaceSymbol.ContainingNamespace.Name)
+        //     .ToList();
+        
+        // string hintString = string.Join(",", implementingClasses.Select(symbol => symbol.Name));
+
+        
+
+        codeBuilder.AppendLine("using Godot;");
+        codeBuilder.AppendLine("using System;");
+        // foreach (string @namespace in namespaces) {
+        //     codeBuilder.AppendLine($"using {@namespace};");
+        // }
+        codeBuilder.AppendLine();
+        codeBuilder.AppendLine();
+        codeBuilder.AppendLine($"namespace {interfaceSymbol.ContainingNamespace};");
+        codeBuilder.AppendLine();
+        codeBuilder.AppendLine("[Tool]");
+        codeBuilder.AppendLine("[GlobalClass]");
+        codeBuilder.AppendLine($"public partial class {className} : Resource {{");
+        codeBuilder.AppendLine($"   static {className}() {{");
+        codeBuilder.AppendLine("        GD.Print(\"TestFromClass\");");
+        codeBuilder.AppendLine("    }");
+        // codeBuilder.AppendLine($"    public const string HintString = \"{hintString}\";");
+        // codeBuilder.AppendLine($"    public static readonly Type[] Implementations = {{");
+
+        // foreach (INamedTypeSymbol implementingClass in implementingClasses) {
+        //     codeBuilder.AppendLine($"        typeof({implementingClass.Name}),");
+        // }
+
+        // codeBuilder.AppendLine("    };");
         codeBuilder.AppendLine("}");
 
         return codeBuilder.ToString();

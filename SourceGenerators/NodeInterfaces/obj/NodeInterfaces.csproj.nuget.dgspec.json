@@ -1,26 +1,27 @@
 {
   "format": 1,
   "restore": {
-    "C:\\LandlessSkies\\SourceGenerators\\NodeInterfaces\\NodeInterfaces.csproj": {}
+    "C:\\Users\\spagh\\Documents\\GodotProjects\\LandlessSkies\\SourceGenerators\\NodeInterfaces\\NodeInterfaces.csproj": {}
   },
   "projects": {
-    "C:\\LandlessSkies\\SourceGenerators\\NodeInterfaces\\NodeInterfaces.csproj": {
+    "C:\\Users\\spagh\\Documents\\GodotProjects\\LandlessSkies\\SourceGenerators\\NodeInterfaces\\NodeInterfaces.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\LandlessSkies\\SourceGenerators\\NodeInterfaces\\NodeInterfaces.csproj",
+        "projectUniqueName": "C:\\Users\\spagh\\Documents\\GodotProjects\\LandlessSkies\\SourceGenerators\\NodeInterfaces\\NodeInterfaces.csproj",
         "projectName": "NodeInterfaces",
-        "projectPath": "C:\\LandlessSkies\\SourceGenerators\\NodeInterfaces\\NodeInterfaces.csproj",
+        "projectPath": "C:\\Users\\spagh\\Documents\\GodotProjects\\LandlessSkies\\SourceGenerators\\NodeInterfaces\\NodeInterfaces.csproj",
         "packagesPath": "C:\\Users\\spagh\\.nuget\\packages\\",
-        "outputPath": "C:\\LandlessSkies\\SourceGenerators\\NodeInterfaces\\obj\\",
+        "outputPath": "C:\\Users\\spagh\\Documents\\GodotProjects\\LandlessSkies\\SourceGenerators\\NodeInterfaces\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\spagh\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\spagh\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "netstandard2.0"
         ],
         "sources": {
-          "https://api.nuget.org/v3/index.json": {}
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {}
         },
         "frameworks": {
           "netstandard2.0": {

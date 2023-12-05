@@ -4,13 +4,16 @@ using Godot.Collections;
 
 namespace LandlessSkies.Core;
 
-public abstract partial class InterfaceWrapper<T> : Resource where T : class {
+public abstract partial class InterfaceWrapper : Resource {
 
     public abstract string HintString { get; }
-    private NodePath Path = new();
+    protected NodePath Path { get; private set; } = new();
 
-    public T? Get(Node root) => root.GetNodeOrNull(Path) as T;
-    public void Set(Node root, T? val) {
+    protected T? Get<T>(Node root) where T : class {
+        return root.GetNodeOrNull(Path) as T;
+    }
+
+    protected void Set<T>(Node root, T? val) where T : class {
         if (val is null) {
             Path = new();
             return;
@@ -20,6 +23,7 @@ public abstract partial class InterfaceWrapper<T> : Resource where T : class {
             Path = root.GetPathTo(node);
         }
     }
+
 
     public override Array<Dictionary> _GetPropertyList() {
         return [new Dictionary() {
