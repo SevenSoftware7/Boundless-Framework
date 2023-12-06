@@ -5,6 +5,6 @@ using Godot;
 
 namespace LandlessSkies.Core;
 
-public interface IDataContainer<T, TCostume> : ICostumable<TCostume> where T : Resource where TCostume : Resource {
+public interface IDataContainer<T> where T : Resource {
     T Data { get; }
 }

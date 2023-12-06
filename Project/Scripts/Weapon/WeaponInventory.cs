@@ -47,6 +47,8 @@ public partial class WeaponInventory : Loadable3D, IWeapon {
             }
         }
     }
+    
+    public IWeapon.Type WeaponType => CurrentWeapon?.WeaponType ?? 0;
     public IWeapon.Handedness WeaponHandedness {
         get {
             if ( ! IndexInBounds(CurrentIndex) ) return IWeapon.Handedness.Right;

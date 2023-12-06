@@ -18,7 +18,7 @@ public partial class WeaponData : Resource {
 
 
 
-    public virtual Weapon Instantiate(Node3D root, WeaponCostume? costume = null) {
+    public virtual IWeapon Instantiate(Node3D root, WeaponCostume? costume = null) {
         return new Weapon(this, costume ?? BaseCostume, root);
     }
 

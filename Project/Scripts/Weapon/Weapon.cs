@@ -15,6 +15,11 @@ public partial class Weapon : Loadable3D, IWeapon {
     private WeaponData _data;
     
     [Export] public IWeapon.Handedness WeaponHandedness { get; set; }
+    [Export] public IWeapon.Type WeaponType {
+        get => Data?.Type ?? 0;
+        set {}
+    }
+    
 
 
     [ExportGroup("Costume")]

@@ -7,10 +7,10 @@ using LandlessSkies.Generators;
 namespace LandlessSkies.Core;
 
 [NodeInterface]
-public interface IWeapon : IDataContainer<WeaponData, WeaponCostume>, ILoadable, IInjectable<Skeleton3D?> {
+public interface IWeapon : IDataContainer<WeaponData>, ICostumable<WeaponCostume>, ILoadable, IInjectable<Skeleton3D?> {
 
 
-    // Type WeaponType { get; }
+    Type WeaponType { get; }
     Handedness WeaponHandedness { get; }
 
 

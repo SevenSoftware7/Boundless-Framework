@@ -9,7 +9,7 @@ namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
-public partial class Character : Loadable3D, IDataContainer<CharacterData, CharacterCostume> {
+public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICostumable<CharacterCostume> {
 
     [Export] public Node3D? Collisions { get; private set; }
     [Export] public Skeleton3D? Armature { get; private set; }

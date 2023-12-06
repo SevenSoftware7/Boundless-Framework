@@ -39,11 +39,11 @@ public sealed partial class Entity : CharacterBody3D {
     private Health? _health;
 
 
-    [Export] private IWeaponWrapper? weaponPath = new();
+    [Export] private IWeaponWrapper? _weaponPath = new();
     public IWeapon? Weapon {
-        get => weaponPath?.Get(this);
+        get => _weaponPath?.Get(this);
         set {
-            weaponPath?.Set(this, value);
+            _weaponPath?.Set(this, value);
             Weapon?.Inject(Armature);
         }
     }
