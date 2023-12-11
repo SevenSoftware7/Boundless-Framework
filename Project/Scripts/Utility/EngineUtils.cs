@@ -32,8 +32,8 @@ public static class EngineUtils {
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void AddChildAndSetOwner(this Node obj, Node child) {
-        obj.AddChild(child);
+    public static void AddChildAndSetOwner(this Node obj, Node child, bool forceReadableName = false) {
+        obj.AddChild(child, forceReadableName);
         child.Owner = obj.Owner;
     }
 
@@ -62,16 +62,14 @@ public static class EngineUtils {
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool TryGetNode<T>(this Node obj, NodePath nodePath, out T node) where T : class {
-        if ( nodePath is null || ! obj.HasNode(nodePath) ) {
-            node = default!;
-            return false;
-        }
-        Node nodeOrNull = obj.GetNodeOrNull(nodePath);
-        if ( nodeOrNull is T tNode ) {
+        node = default!;
+        if ( ! obj.HasNode(nodePath) ) return false;
+
+        if ( obj.GetNodeOrNull(nodePath) is T tNode ) {
             node = tNode;
             return true;
         }
-        node = default!;
+
         return false;
     }
 }

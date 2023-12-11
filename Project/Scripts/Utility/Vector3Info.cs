@@ -15,7 +15,6 @@ public struct Vector3Info {
     public readonly float X => currentValue.X;
     public readonly float Y => currentValue.Y;
     public readonly float Z => currentValue.Z;
-    private bool _updatedThisStep = false;
 
 
 
@@ -29,9 +28,6 @@ public struct Vector3Info {
 
 
     public void SetVal(Vector3 value) {
-        if ( ! _updatedThisStep ) {
-            lastValue = currentValue;
-        }
         currentValue = value;
         
         if ( LengthSquared() == 0 ) {
@@ -41,16 +37,7 @@ public struct Vector3Info {
         }
     }
 
-    public void TimeStep() {
-        if ( ! _updatedThisStep ) {
-            SetVal(Vector3.Zero);
-        }
-        _updatedThisStep = false;
-    }
-
-
     public static implicit operator Vector3(Vector3Info data) => data.currentValue;
     public static Vector3 operator *(Vector3Info a, float b) => a.currentValue * b;
     public static Vector3 operator *(float a, Vector3Info b) => a * b.currentValue;
-    
 }

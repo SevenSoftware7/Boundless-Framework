@@ -32,11 +32,12 @@ public partial class Weapon : Loadable3D, IWeapon {
 
 
     [ExportGroup("Dependencies")]
-    [Export(PropertyHint.NodePathValidTypes, nameof(Skeleton3D))] public NodePath SkeletonPath { 
-        get => _skeletonPath;
-        private set => Inject(GetNodeOrNull<Skeleton3D>(value));
+    [Export]
+    public Skeleton3D? Skeleton { 
+        get => _skeleton;
+        private set => Inject(value);
     }
-    private NodePath _skeletonPath = new();
+    private Skeleton3D? _skeleton;
     
 
     [Signal] public delegate void CostumeChangedEventHandler(WeaponCostume? newCostume, WeaponCostume? oldCostume);
@@ -62,7 +63,7 @@ public partial class Weapon : Loadable3D, IWeapon {
 
         LoadableExtensions.UpdateLoadable(ref WeaponModel)
             .WithConstructor(() => costume?.Instantiate(this))
-            .BeforeLoad(() => WeaponModel!.Inject(GetNodeOrNull<Skeleton3D>(SkeletonPath)))
+            .BeforeLoad(() => WeaponModel!.Inject(Skeleton))
             .Execute();
 
         EmitSignal(SignalName.CostumeChanged, costume!, oldCostume!);
@@ -70,8 +71,11 @@ public partial class Weapon : Loadable3D, IWeapon {
 
 
     public void Inject(Skeleton3D? skeleton) {
-        _skeletonPath = skeleton is not null ? GetPathTo(skeleton) : new();
-        WeaponModel?.Inject(skeleton);
+        _skeleton = skeleton;
+        if ( this.IsEditorGetSetter() ) {
+            return;
+        }
+        WeaponModel?.Inject(skeleton); 
         ReloadModel();
     }
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Godot.Collections;
@@ -11,7 +12,16 @@ namespace LandlessSkies.Core;
 [GlobalClass]
 public partial class WeaponInventory : Loadable3D, IWeapon {    
 
-    [Export] private Array<IWeaponWrapper> _weapons = [];
+    [Export] private Array<IWeaponWrapper> Weapons {
+        get => [.. _weapons];
+        set {
+            _weapons = value.Select(w => w ?? new(OnWeaponPathChanged)).ToList();
+#if TOOLS
+            ResetData();
+#endif
+        }
+    }
+    private List<IWeaponWrapper> _weapons = [];
 
 
     [ExportGroup("Current Weapon")]
@@ -31,7 +41,7 @@ public partial class WeaponInventory : Loadable3D, IWeapon {
     public IWeapon? CurrentWeapon {
         get => IndexInBounds(CurrentIndex) ? this[CurrentIndex] : null;
         private set {
-            IWeaponWrapper? index = _weapons.Where((wrapper) => wrapper.Get(this) == value).FirstOrDefault();
+            IWeaponWrapper? index = _weapons.Where(wrapper => wrapper.Get(this) == value).FirstOrDefault();
             if (value is not null && index is not null) {
                 CurrentIndex = _weapons.IndexOf(index);
             }
@@ -51,8 +61,7 @@ public partial class WeaponInventory : Loadable3D, IWeapon {
     public IWeapon.Type WeaponType => CurrentWeapon?.WeaponType ?? 0;
     public IWeapon.Handedness WeaponHandedness {
         get {
-            if ( ! IndexInBounds(CurrentIndex) ) return IWeapon.Handedness.Right;
-            if ( this[CurrentIndex] is not IWeapon weapon ) return IWeapon.Handedness.Right;
+            if ( ! IndexInBounds(CurrentIndex) || this[CurrentIndex] is not IWeapon weapon ) return IWeapon.Handedness.Right;
 
             return weapon.WeaponHandedness;
         }
@@ -60,11 +69,12 @@ public partial class WeaponInventory : Loadable3D, IWeapon {
 
 
     [ExportGroup("Dependencies")]
-    [Export(PropertyHint.NodePathValidTypes, nameof(Skeleton3D))] public NodePath SkeletonPath { 
-        get => _skeletonPath;
-        set => Inject(GetNodeOrNull<Skeleton3D>(value));
+    [Export]
+    public Skeleton3D? Skeleton { 
+        get => _skeleton;
+        set => Inject(value);
     }
-    private NodePath _skeletonPath = new();
+    private Skeleton3D? _skeleton;
 
 
     public IWeapon? this[int index] {
@@ -98,10 +108,17 @@ public partial class WeaponInventory : Loadable3D, IWeapon {
         this[_currentIndex]?.Enable();
     }
 
+    private void OnWeaponPathChanged() {
+        Inject(Skeleton);
+#if TOOLS
+        ResetData();
+#endif
+    }
+
     public void AddWeapon(WeaponData? data, WeaponCostume? costume = null) {
         int index = _weapons.Count;
 
-        _weapons.Add(new());
+        _weapons.Add(new(OnWeaponPathChanged));
 #if TOOLS
         _weaponDatas.Add(null!);
 #endif
@@ -112,7 +129,7 @@ public partial class WeaponInventory : Loadable3D, IWeapon {
     public void SetWeapon(int index, WeaponData? data, WeaponCostume? costume = null) {
         if (index >= _weapons.Count) return;
 
-        IWeaponWrapper weaponWrapper = _weapons[index] ??= new();
+        IWeaponWrapper weaponWrapper = _weapons[index] ??= new(OnWeaponPathChanged);
         IWeapon? weapon = weaponWrapper.Get(this);
         if ( data is not null && weapon?.Data == data ) return;
 
@@ -122,7 +139,7 @@ public partial class WeaponInventory : Loadable3D, IWeapon {
                 weaponWrapper.Set(this, weapon);
                 return weapon;
             })
-            .BeforeLoad(() => weapon?.Inject(GetNodeOrNull<Skeleton3D>(SkeletonPath)))
+            .BeforeLoad(() => weapon?.Inject(Skeleton))
             .Execute();
 
 #if TOOLS
@@ -133,15 +150,13 @@ public partial class WeaponInventory : Loadable3D, IWeapon {
     public void RemoveWeapon(int index) {
         if (index >= _weapons.Count) return;
 
-        IWeaponWrapper weaponWrapper = _weapons[index];
-        IWeapon? weapon = weaponWrapper.Get(this);
-
+        IWeapon? weapon = _weapons[index].Get(this);
         LoadableExtensions.DestroyLoadable(ref weapon)
             .Execute();
 
         _weapons.RemoveAt(index);
 #if TOOLS
-        WeaponDatas.RemoveAt(index);
+        _weaponDatas.RemoveAt(index);
 #endif
     }
 
@@ -155,7 +170,7 @@ public partial class WeaponInventory : Loadable3D, IWeapon {
 
     
     public void Inject(Skeleton3D? skeleton) {
-        _skeletonPath = skeleton is not null ? GetPathTo(skeleton) : new();
+        _skeleton = skeleton;
 
         for ( int i = 0; i < _weapons?.Count; i++ ) {
             this[i]?.Inject(skeleton);

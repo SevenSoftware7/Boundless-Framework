@@ -10,15 +10,31 @@ namespace LandlessSkies.Core;
 public partial class KeyboardAndMouseDevice : ControlDevice {
 
     public KeyInputInfo moveForwardKeyEvent;
+    public bool moveForwardKeyUpdated;
+    
     public KeyInputInfo moveBackwardKeyEvent;
+    public bool moveBackwardKeyUpdated;
+    
     public KeyInputInfo moveLeftKeyEvent;
+    public bool moveLeftKeyUpdated;
+    
     public KeyInputInfo moveRightKeyEvent;
+    public bool moveRightKeyUpdated;
+    
     public KeyInputInfo jumpKeyEvent;
+    public bool jumpKeyUpdated;
+    
     public KeyInputInfo sprintKeyEvent;
-    public Vector2Info moveMotion;
-    public Vector2Info mouseMotion;
+    public bool sprintKeyUpdated;
 
-    private static readonly Dictionary<Key, Key> overrideKeyMap = new();
+    public Vector2Info mouseMotion;
+    public bool mouseMotionUpdated;
+    
+    public Vector2Info moveMotion;
+
+    
+
+    private static readonly Dictionary<Key, Key> overrideKeyMap = [];
 
     
 
@@ -57,14 +73,28 @@ public partial class KeyboardAndMouseDevice : ControlDevice {
 
 
     private void KeyInfoTimeStep() {
-        moveForwardKeyEvent.TimeStep();
-        moveBackwardKeyEvent.TimeStep();
-        moveLeftKeyEvent.TimeStep();
-        moveRightKeyEvent.TimeStep();
-        jumpKeyEvent.TimeStep();
-        sprintKeyEvent.TimeStep();
+        if ( ! moveForwardKeyUpdated ) moveForwardKeyEvent.SetVal(moveForwardKeyEvent.currentValue); 
+        moveForwardKeyUpdated = true;
 
-        mouseMotion.TimeStep();
+        if ( ! moveBackwardKeyUpdated ) moveBackwardKeyEvent.SetVal(moveBackwardKeyEvent.currentValue); 
+        moveBackwardKeyUpdated = true;
+
+        if ( ! moveLeftKeyUpdated ) moveLeftKeyEvent.SetVal(moveLeftKeyEvent.currentValue); 
+        moveLeftKeyUpdated = true;
+
+        if ( ! moveRightKeyUpdated ) moveRightKeyEvent.SetVal(moveRightKeyEvent.currentValue); 
+        moveRightKeyUpdated = true;
+
+        if ( ! jumpKeyUpdated ) jumpKeyEvent.SetVal(jumpKeyEvent.currentValue); 
+        jumpKeyUpdated = true;
+
+        if ( ! sprintKeyUpdated ) sprintKeyEvent.SetVal(sprintKeyEvent.currentValue); 
+        sprintKeyUpdated = true;
+
+
+        if ( ! mouseMotionUpdated ) mouseMotion.SetVal(Vector2.Zero); 
+        mouseMotionUpdated = true;
+
     }
 
 
@@ -74,7 +104,7 @@ public partial class KeyboardAndMouseDevice : ControlDevice {
 
         if ( Engine.IsEditorHint() ) return;
 
-        CallDeferred(MethodName.KeyInfoTimeStep);
+        Callable.From(KeyInfoTimeStep).CallDeferred();
     }
 
     public override void _Input(InputEvent @event) {
@@ -85,22 +115,23 @@ public partial class KeyboardAndMouseDevice : ControlDevice {
                 mouseMotion.Relative.X,
                 -mouseMotion.Relative.Y
             ));
+            mouseMotionUpdated = true;
             return;
         }
 
         if (@event is InputEventKey keyEvent) {
             Key keyCode = keyEvent.PhysicalKeycode;
-            if ( overrideKeyMap.ContainsKey(keyCode) ) {
-                keyCode = overrideKeyMap[keyCode];
+            if ( overrideKeyMap.TryGetValue(keyCode, out Key value)) {
+                keyCode = value;
             }
 
             switch (keyCode) {
-                case Key.W: moveForwardKeyEvent.SetVal(keyEvent.Pressed); UpdateMoveMotion(); break;
-                case Key.S: moveBackwardKeyEvent.SetVal(keyEvent.Pressed); UpdateMoveMotion(); break;
-                case Key.A: moveLeftKeyEvent.SetVal(keyEvent.Pressed); UpdateMoveMotion(); break;
-                case Key.D: moveRightKeyEvent.SetVal(keyEvent.Pressed); UpdateMoveMotion(); break;
-                case Key.Space: jumpKeyEvent.SetVal(keyEvent.Pressed); break;
-                case Key.Shift: sprintKeyEvent.SetVal(keyEvent.Pressed); break;
+                case Key.W: moveForwardKeyEvent.SetVal(keyEvent.Pressed); UpdateMoveMotion(); moveForwardKeyUpdated = true; break;
+                case Key.S: moveBackwardKeyEvent.SetVal(keyEvent.Pressed); UpdateMoveMotion(); moveBackwardKeyUpdated = true; break;
+                case Key.A: moveLeftKeyEvent.SetVal(keyEvent.Pressed); UpdateMoveMotion(); moveLeftKeyUpdated = true; break;
+                case Key.D: moveRightKeyEvent.SetVal(keyEvent.Pressed); UpdateMoveMotion(); moveRightKeyUpdated = true; break;
+                case Key.Space: jumpKeyEvent.SetVal(keyEvent.Pressed); jumpKeyUpdated = true; break;
+                case Key.Shift: sprintKeyEvent.SetVal(keyEvent.Pressed); sprintKeyUpdated = true; break;
             }
 
             void UpdateMoveMotion() {

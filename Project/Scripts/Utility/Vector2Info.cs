@@ -14,7 +14,6 @@ public struct Vector2Info {
 
     public readonly float X => currentValue.X;
     public readonly float Y => currentValue.Y;
-    private bool _updatedThisStep = false;
 
 
 
@@ -28,9 +27,6 @@ public struct Vector2Info {
     
 
     public void SetVal(Vector2 value) {
-        if ( ! _updatedThisStep ) {
-            lastValue = currentValue;
-        }
         currentValue = value;
         
         if ( LengthSquared() == 0 ) {
@@ -39,14 +35,6 @@ public struct Vector2Info {
             zeroTimer.Start();
         }
     }
-
-    public void TimeStep() {
-        if ( ! _updatedThisStep ) {
-            SetVal(Vector2.Zero);
-        }
-        _updatedThisStep = false;
-    }
-
 
     public static implicit operator Vector2(Vector2Info data) => data.currentValue;
     public static Vector2 operator *(Vector2Info a, float b) => a.currentValue * b;

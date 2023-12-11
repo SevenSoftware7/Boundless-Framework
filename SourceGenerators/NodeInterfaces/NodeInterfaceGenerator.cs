@@ -17,9 +17,19 @@ public class NodeInterfaceGenerator : ISourceGenerator {
 
     public void Execute(GeneratorExecutionContext context) {
 
+        INamedTypeSymbol? nodeClass = context.Compilation.GetTypeByMetadataName("Godot.Node") ?? throw new NullReferenceException("Node type cannot be found");
+        INamedTypeSymbol? resourceClass = context.Compilation.GetTypeByMetadataName("Godot.Resource") ?? throw new NullReferenceException("Resource type cannot be found");
+        INamedTypeSymbol? attributeClass = context.Compilation.GetTypeByMetadataName("LandlessSkies.Generators.NodeInterfaceAttribute") ?? throw new NullReferenceException("Interface Attribute cannot be found");
+
+        IEnumerable<SyntaxNode> syntaxNodes = context.Compilation.SyntaxTrees
+            .SelectMany(tree => tree.GetRoot().DescendantNodesAndSelf());
+
+        IEnumerable<ClassDeclarationSyntax> classes = syntaxNodes
+            .OfType<ClassDeclarationSyntax>();
+
         // Find all interface declarations with the "NodeInterface" attribute
-        List<InterfaceDeclarationSyntax>? interfaces = context.Compilation.SyntaxTrees
-            .SelectMany(tree => tree.GetRoot().DescendantNodesAndSelf().OfType<InterfaceDeclarationSyntax>())
+        List<InterfaceDeclarationSyntax>? interfaces = syntaxNodes
+            .OfType<InterfaceDeclarationSyntax>()
             .Where(
                 interfaceSyntax => interfaceSyntax.AttributeLists.Any(attrList => 
                     attrList.Attributes.Any(attr => attr.Name.ToString().Contains("NodeInterface"))
@@ -37,31 +47,45 @@ public class NodeInterfaceGenerator : ISourceGenerator {
             IEnumerable<INamedTypeSymbol> implementingClasses = context.Compilation.SyntaxTrees
                 .SelectMany(tree => tree.GetRoot().DescendantNodesAndSelf().OfType<ClassDeclarationSyntax>())
                 .Select(classSyntax => context.Compilation.GetSemanticModel(classSyntax.SyntaxTree).GetDeclaredSymbol(classSyntax))
-                .Where(type => type is not null && type.BaseType is not null && type.AllInterfaces.Contains(interfaceSymbol)/*  && type.BaseType.Name.Contains("Node") */)
-                .ToList()!;
-            
-            if (implementingClasses != null && implementingClasses.Any()) {
-                string infoSource = GenerateInfoCode(interfaceSymbol, implementingClasses);
-                
-                string infoFileName = $"{interfaceSymbol.Name}.info.cs";
-                SyntaxTree? infoSyntaxTree = SyntaxFactory.ParseSyntaxTree(infoSource, encoding: Encoding.UTF8);
+                .Where(type => type is not null && type.BaseType is not null && type.AllInterfaces.Contains(interfaceSymbol))!;
 
-                context.AddSource(infoFileName, infoSyntaxTree.GetText());
-            }
+            IEnumerable<INamedTypeSymbol> nodeClasses = implementingClasses.Where(type => InheritsFrom(type, nodeClass));
+            IEnumerable<INamedTypeSymbol> resourceClasses = implementingClasses.Where(type => InheritsFrom(type, resourceClass));
+
+            
+            string infoSource = GenerateInfoCode(interfaceSymbol, nodeClasses, resourceClasses);
+            
+            string infoFileName = $"{interfaceSymbol.Name}.info.cs";
+            SyntaxTree? infoSyntaxTree = SyntaxFactory.ParseSyntaxTree(infoSource, encoding: Encoding.UTF8);
+
+            context.AddSource(infoFileName, infoSyntaxTree.GetText());
         }
     }
 
-    private string GenerateInfoCode(INamedTypeSymbol interfaceSymbol, IEnumerable<INamedTypeSymbol> implementingClasses) {
+    private bool InheritsFrom(INamedTypeSymbol childType, INamedTypeSymbol baseType) {
+        while (childType.BaseType is not null) {
+            if (childType.BaseType.ToString() == baseType.ToString()) {
+                return true;
+            }
+
+            childType = childType.BaseType;
+        }
+
+        return false;
+    }
+
+    private string GenerateInfoCode(INamedTypeSymbol interfaceSymbol, IEnumerable<INamedTypeSymbol> nodeClasses, IEnumerable<INamedTypeSymbol> resourceClasses) {
         string className = $"{interfaceSymbol.Name}Info";
         StringBuilder codeBuilder = new();
         
-        List<string> namespaces = implementingClasses
+        List<string> namespaces = nodeClasses.Concat(resourceClasses)
             .Select(symbol => symbol.ContainingNamespace.Name)
             .Distinct()
             .Where(ns => ns != interfaceSymbol.ContainingNamespace.Name)
             .ToList();
         
-        string hintString = string.Join(",", implementingClasses.Select(symbol => symbol.Name));
+        string nodeHintString = string.Join(",", nodeClasses.Select(symbol => symbol.Name).Distinct());
+        string resourceHintString = string.Join(",", resourceClasses.Select(symbol => symbol.Name).Distinct());
 
         
 
@@ -74,14 +98,23 @@ public class NodeInterfaceGenerator : ISourceGenerator {
         codeBuilder.AppendLine($"namespace {interfaceSymbol.ContainingNamespace};");
         codeBuilder.AppendLine();
         codeBuilder.AppendLine($"public static class {className} {{");
-        codeBuilder.AppendLine($"    public const string HintString = \"{hintString}\";");
-        codeBuilder.AppendLine($"    public static readonly Type[] Implementations = {{");
 
-        foreach (INamedTypeSymbol implementingClass in implementingClasses) {
+        codeBuilder.AppendLine($"    public const string NodeHintString = \"{nodeHintString}\";");
+
+        codeBuilder.AppendLine($"    public const string ResourceHintString = \"{resourceHintString}\";");
+
+        codeBuilder.AppendLine($"    public static readonly Type[] NodeImplementations = {{");
+        foreach (INamedTypeSymbol implementingClass in nodeClasses) {
             codeBuilder.AppendLine($"        typeof({implementingClass.Name}),");
         }
-
         codeBuilder.AppendLine("    };");
+
+        codeBuilder.AppendLine($"    public static readonly Type[] ResourceImplementations = {{");
+        foreach (INamedTypeSymbol implementingClass in resourceClasses) {
+            codeBuilder.AppendLine($"        typeof({implementingClass.Name}),");
+        }
+        codeBuilder.AppendLine("    };");
+
         codeBuilder.AppendLine("}");
 
         return codeBuilder.ToString();

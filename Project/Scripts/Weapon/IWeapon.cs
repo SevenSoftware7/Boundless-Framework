@@ -27,9 +27,8 @@ public interface IWeapon : IDataContainer<WeaponData>, ICostumable<WeaponCostume
         OneHanded = 1 << 1,
         TwoHanded = 1 << 2,
         Polearm = 1 << 3,
-        Dual = 1 << 4,
-        Shield = 1 << 5,
-        Dagger = 1 << 6,
+        Shield = 1 << 4,
+        Dagger = 1 << 5,
         // = 1 << 7 /// Do not exceed 8 flags <see cref="byte"/>
     };
 

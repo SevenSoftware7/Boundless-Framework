@@ -34,7 +34,7 @@ public abstract partial class Loadable3D : Node3D, ILoadable {
 
     public Loadable3D() : base() {}
     public Loadable3D(Node3D root) {
-        root.AddChildAndSetOwner(this);
+        root.AddChildAndSetOwner(this, Engine.IsEditorHint());
     }
 
 

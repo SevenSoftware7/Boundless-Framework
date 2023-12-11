@@ -1,6 +1,5 @@
 using Godot;
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 
 namespace LandlessSkies.Core;
@@ -76,7 +75,7 @@ public sealed partial class EntityBehaviourManager : Node {
         if ( Engine.IsEditorHint() ) return baseWarnings;
 
         if ( Entity is null ) {
-            baseWarnings ??= Array.Empty<string>();
+            baseWarnings ??= [];
             Array.Resize(ref baseWarnings, baseWarnings.Length + 1);
             baseWarnings[^1] = "Entity is null. EntityBehaviourManager requires an Entity.";
         }

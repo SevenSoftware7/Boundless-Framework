@@ -39,11 +39,11 @@ public sealed partial class Entity : CharacterBody3D {
     private Health? _health;
 
 
-    [Export] private IWeaponWrapper? _weaponPath = new();
+    [Export] private IWeaponWrapper? _weapon = new();
     public IWeapon? Weapon {
-        get => _weaponPath?.Get(this);
+        get => _weapon?.Get(this);
         set {
-            _weaponPath?.Set(this, value);
+            _weapon?.Set(this, value);
             Weapon?.Inject(Armature);
         }
     }
@@ -156,6 +156,22 @@ public sealed partial class Entity : CharacterBody3D {
     }
 
 
+    private void ConnectEvents() {
+        CharacterChanged += OnCharacterChanged;
+        if (Character is not null) {
+            Character.LoadedUnloaded += OnCharacterLoadedUnloaded;
+        }
+        _weapon?.SetChangeCallback(() => Weapon?.Inject(Armature));
+    }
+
+    private void DisconnectEvents() {
+        CharacterChanged -= OnCharacterChanged;
+        if (Character is not null) {
+            Character.LoadedUnloaded -= OnCharacterLoadedUnloaded;
+        }
+    }
+
+
     public override void _Process(double delta) {
         base._Process(delta);
 
@@ -173,21 +189,17 @@ public sealed partial class Entity : CharacterBody3D {
     public override void _Ready() {
         base._Ready();
 
-        CharacterChanged += OnCharacterChanged;
+        ConnectEvents();
 
         if ( Engine.IsEditorHint() ) return;
 
-        BehaviourManager?.SetBehaviour<TestBehaviour>(
-            () => new(this, BehaviourManager) {
-                Name = nameof(TestBehaviour)
-            }
-        );
+        BehaviourManager?.SetBehaviour<TestBehaviour>( () => new(this, BehaviourManager) );
 	}
 
     public override void _ExitTree() {
         base._ExitTree();
-        
-        CharacterChanged -= OnCharacterChanged;
+
+        DisconnectEvents();
     }
 
     public override void _Notification(int what) {
@@ -195,8 +207,8 @@ public sealed partial class Entity : CharacterBody3D {
         if (what == NotificationWMWindowFocusIn) {
             // NotificationWMWindowFocusIn is also called on Rebuilding the project;
             // Reconnect to signal on Recompile
-            CharacterChanged -= OnCharacterChanged;
-            CharacterChanged += OnCharacterChanged;
+            DisconnectEvents();
+            ConnectEvents();
         }
     }
 

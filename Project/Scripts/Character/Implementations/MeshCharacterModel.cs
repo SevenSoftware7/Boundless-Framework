@@ -10,7 +10,8 @@ public sealed partial class MeshCharacterModel : CharacterModel {
     [Export] private MeshInstance3D? Model;
 
     [ExportGroup("Dependencies")]
-    [Export(PropertyHint.NodePathValidTypes, nameof(Skeleton3D))] public NodePath SkeletonPath { get; private set; } = new();
+    [Export] 
+    public Skeleton3D? Skeleton;
 
 
 
@@ -20,19 +21,19 @@ public sealed partial class MeshCharacterModel : CharacterModel {
 
 
     public override void Inject(Skeleton3D? skeleton) {
-        SkeletonPath = skeleton is not null ? GetPathTo(skeleton) : new();
+        Skeleton = skeleton;
     }
 
     protected override bool LoadModelImmediate() {
-        if ( GetParent() is null || Owner is null ) return false;
         if ( Costume is not MeshCharacterCostume meshCostume ) return false;
-        if ( SkeletonPath == null || ! this.TryGetNode(SkeletonPath, out Skeleton3D skeleton) ) return false;
+        if ( GetParent() is null || Owner is null ) return false;
+        if ( Skeleton is null ) return false;
 
         if ( meshCostume.ModelScene?.Instantiate() is not MeshInstance3D model ) return false;
 
         Model = model.SetOwnerAndParentTo(this);
         Model.Name = nameof(CharacterModel);
-        Model.Skeleton = Model.GetPathTo(skeleton);
+        Model.Skeleton = Model.GetPathTo(Skeleton);
 
         return true;
     }
@@ -49,8 +50,8 @@ public sealed partial class MeshCharacterModel : CharacterModel {
     public override void _Process(double delta) {
         base._Process(delta);
 
-        if ( this.TryGetNode(SkeletonPath, out Skeleton3D skeleton) ) {
-            Transform = new(skeleton.Transform.Basis, skeleton.Transform.Origin);
+        if ( Skeleton is not null ) {
+            Transform = new(Skeleton.Transform.Basis, Skeleton.Transform.Origin);
         }
     }
 }

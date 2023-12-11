@@ -66,7 +66,7 @@ public partial class CameraController3D : Camera3D {
         Vector3 eulerAngles = LocalRotation.GetEuler();
         float maxAngle = Mathf.Pi / 2f - Mathf.Epsilon;
         LocalRotation = Basis.FromEuler(new(
-            Mathf.Clamp(value: eulerAngles.X + cameraInput.Y,-maxAngle, maxAngle),
+            Mathf.Clamp(eulerAngles.X + cameraInput.Y, -maxAngle, maxAngle),
             eulerAngles.Y - cameraInput.X,
             0
         ));
@@ -132,39 +132,41 @@ public partial class CameraController3D : Camera3D {
         const float CAM_MIN_DISTANCE_TO_WALL = 0.4f;
 
         bool rayCastHit = this.RayCast3D(origin, origin + direction * (distance + CAM_MIN_DISTANCE_TO_WALL), out MathUtility.RayCast3DResult result, CollisionMask);
-        if (rayCastHit) {
+        if ( ! rayCastHit ) {
+            if ( ! Mathf.IsEqualApprox(cameraDistance, distance) ) {
+                cameraDistance = cameraDistance.SmoothDamp(distance, ref distanceVelocity, 0.2f, Mathf.Inf, floatDelta);
+            }
 
-            Vector3 collisionToPlayer = origin - result.Point;
-            float collisionDistance = collisionToPlayer.Length();
-            collisionToPlayer /= collisionDistance; // cheaper Normalize
-
-            // Fancy Trigonometry to keep the camera at least distanceToWall away from the wall
-            // this will keep the camera in the same direction as it would have been without collision,
-            // but at a constant distance from the wall
-            //
-            // |                                          [Camera]                  
-            // |                                        /--                         
-            // |                                     /--                            
-            // |                                  /--                               
-            // |                               /--                                  
-            // |                            /--                                     
-            // |  Collision point        [*]--> Final position                      
-            // |        ^             /-- |                                         
-            // |        |          /--    |                                         
-            // |        |       /--       +---> length of CAM_MIN_DISTANCE_TO_WALL  
-            // |        |    /--          |                                         
-            // |        | /--             |                                         
-            // +-------[*]----------------+------------------------------------------
-            float angle = collisionToPlayer.AngleTo(result.Normal);
-            float collisionAngle = (Mathf.Pi / 2f) - angle;
-            float camMargin = CAM_MIN_DISTANCE_TO_WALL / Mathf.Sin(collisionAngle);
-
-            cameraDistance = collisionDistance - camMargin;
-        } else if ( ! Mathf.IsEqualApprox(cameraDistance, distance) ) {
-
-            cameraDistance = cameraDistance.SmoothDamp(distance, ref distanceVelocity, 0.2f, Mathf.Inf, floatDelta);
-
+            return;
         }
+
+
+        Vector3 collisionToPlayer = origin - result.Point;
+        float collisionDistance = collisionToPlayer.Length();
+        collisionToPlayer /= collisionDistance; // cheaper than Normalize, since we already have the length
+
+        // Fancy Trigonometry to keep the camera at least distanceToWall away from the wall
+        // this will keep the camera in the same direction as it would have been without collision,
+        // but at a constant distance from the wall
+        //
+        // |                                          [Camera]                  
+        // |                                        /--                         
+        // |                                     /--                            
+        // |                                  /--                               
+        // |                               /--                                  
+        // |                            /--                                     
+        // |  Collision point        [*]--> Final position                      
+        // |        ^             /-- |                                         
+        // |        |          /--    |                                         
+        // |        |       /--       +---> length of CAM_MIN_DISTANCE_TO_WALL  
+        // |        |    /--          |                                         
+        // |        | /--             |                                         
+        // +-------[*]----------------+------------------------------------------
+        float angle = collisionToPlayer.AngleTo(result.Normal);
+        float collisionAngle = (Mathf.Pi / 2f) - angle;
+        float camMargin = CAM_MIN_DISTANCE_TO_WALL / Mathf.Sin(collisionAngle);
+
+        cameraDistance = collisionDistance - camMargin;
     }
 
     public override void _EnterTree() {

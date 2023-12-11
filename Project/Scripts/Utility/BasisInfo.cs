@@ -13,8 +13,6 @@ public struct BasisInfo {
     public readonly Vector3 Y => currentValue.Y;
     public readonly Vector3 Z => currentValue.Z;
 
-    private bool _updatedThisStep = false;
-
 
 
     public BasisInfo() {;}
@@ -22,19 +20,8 @@ public struct BasisInfo {
 
 
     public void SetVal(Basis value) {
-        if ( ! _updatedThisStep ) {
-            lastValue = currentValue;
-        }
         currentValue = value;
     }
-
-    public void TimeStep() {
-        if ( ! _updatedThisStep ) {
-            SetVal(Basis.Identity);
-        }
-        _updatedThisStep = false;
-    }
-
 
     public static implicit operator Basis(BasisInfo data) => data.currentValue;
     public static Vector3 operator *(BasisInfo a, Vector3 b) => a.currentValue * b;

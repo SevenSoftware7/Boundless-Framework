@@ -107,33 +107,25 @@ public sealed partial class Player : Node {
         base._Ready();
     }
 
-
     public override void _EnterTree() {
-        if ( this.IsEditorEnterTree() ) return;
         base._EnterTree();
+        if ( this.IsEditorEnterTree() ) return;
 
         FindFreeId();
     }
 
     public override void _ExitTree() {
-        if ( this.IsEditorExitTree() ) return;
         base._ExitTree();
+        if ( this.IsEditorExitTree() ) return;
         
         UnsetPlayerId();
     }
 
 
-    public readonly struct InputInfo {
-        public readonly Entity Entity;
-        public readonly ControlDevice ControlDevice;
-        public readonly CameraController3D CameraController;
-
-
-        public InputInfo(ControlDevice controlDevice, CameraController3D cameraController, Entity entity) {
-            ControlDevice = controlDevice;
-            CameraController = cameraController;
-            Entity = entity;
-        }
+    public readonly struct InputInfo(ControlDevice controlDevice, CameraController3D cameraController, Entity entity) {
+        public Entity Entity => entity;
+        public ControlDevice ControlDevice => controlDevice;
+        public CameraController3D CameraController => cameraController;
 
 
         public readonly void RawInputToGroundedMovement(out Basis camRotation, out Vector3 groundedMovement){
