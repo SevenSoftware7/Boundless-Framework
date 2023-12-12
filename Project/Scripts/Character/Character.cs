@@ -18,7 +18,7 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
         get => _data;
         private set => _data ??= value;
     }
-    private CharacterData _data;
+    private CharacterData _data = null!;
     
 
     [ExportGroup("Costume")]
@@ -38,8 +38,6 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 
 
     public Character() : base() {
-        _data ??= null !;
-
         Name = nameof(Character);
     }
     public Character(CharacterData data, CharacterCostume? costume, Node3D root) : base(root) {
@@ -100,6 +98,7 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
         Armature?.UnparentAndQueueFree();
         Armature = null;
 
+        CharacterModel?.Inject(null);
         CharacterModel?.UnloadModel();
 
         return true;

@@ -10,15 +10,12 @@ public abstract partial class EntityBehaviour : Node {
 
     public abstract bool FreeOnStop { get; }
 
-    [Export] public Entity Entity { get; set; }
-    [Export] public EntityBehaviourManager BehaviourManager;
+    [Export] public Entity Entity = null!;
+    [Export] public EntityBehaviourManager BehaviourManager = null!;
 
 
 
-    public EntityBehaviour() : base() {
-        Entity ??= null !;
-        BehaviourManager ??= null !;
-    }
+    public EntityBehaviour() : base() {}
     public EntityBehaviour([MaybeNull] Entity entity, [MaybeNull] EntityBehaviourManager behaviourManager) : base() {
         ArgumentNullException.ThrowIfNull(entity);
         ArgumentNullException.ThrowIfNull(behaviourManager);

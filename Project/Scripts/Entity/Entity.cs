@@ -26,27 +26,20 @@ public sealed partial class Entity : CharacterBody3D {
 
     
     [ExportGroup("Dependencies")]
-    [Export] public EntityBehaviourManager? BehaviourManager { 
-        get => _behaviourManager ??= this.GetNodeByTypeName<EntityBehaviourManager>();
-        private set => _behaviourManager = value;
-    }
-    private EntityBehaviourManager? _behaviourManager;
-
-    [Export] public Health? Health { 
-        get => _health ??= this.GetNodeByTypeName<Health>();
-        private set => _health = value;
-    }
-    private Health? _health;
+    [Export] public EntityBehaviourManager? BehaviourManager;
+    [Export] public Health? Health;
 
 
-    [Export] private IWeaponWrapper? _weapon = new();
-    public IWeapon? Weapon {
-        get => _weapon?.Get(this);
+    [Export] public Weapon? Weapon {
+        get => _weapon;
         set {
-            _weapon?.Set(this, value);
-            Weapon?.Inject(Armature);
+            _weapon?.Inject(null);
+
+            _weapon = value;
+            _weapon?.Inject(this);
         }
     }
+    private Weapon? _weapon;
 
 
 
@@ -92,13 +85,16 @@ public sealed partial class Entity : CharacterBody3D {
 
 
     [Signal] public delegate void CharacterChangedEventHandler(CharacterData? newCharacter, CharacterData? oldCharacter);
+    [Signal] public delegate void CharacterLoadedUnloadedEventHandler(bool isLoaded);
+
 
 
     public Entity() : base() {
         CollisionLayer = 1 << 1;
 
-        _behaviourManager ??= null !;
-        _character ??= null !;
+        if ( this.JustBuilt() ) {
+            Callable.From( ConnectEvents ).CallDeferred();
+        }
     }
 
 
@@ -117,8 +113,9 @@ public sealed partial class Entity : CharacterBody3D {
         EmitSignal(SignalName.CharacterChanged, data!, oldData!);
     }
 
-    public void SetCostume(CharacterCostume? costume) =>
+    public void SetCostume(CharacterCostume? costume) {
         Character?.SetCostume(costume);
+    }
 
 
 
@@ -147,8 +144,10 @@ public sealed partial class Entity : CharacterBody3D {
         return true;
     }
 
+
+
     private void OnCharacterLoadedUnloaded(bool isLoaded) {
-        Weapon?.Inject(Armature);
+        EmitSignal(SignalName.CharacterLoadedUnloaded, Armature!);
     }
 
     private void OnCharacterChanged(CharacterData? newCharacter, CharacterData? oldCharacter) {
@@ -161,7 +160,6 @@ public sealed partial class Entity : CharacterBody3D {
         if (Character is not null) {
             Character.LoadedUnloaded += OnCharacterLoadedUnloaded;
         }
-        _weapon?.SetChangeCallback(() => Weapon?.Inject(Armature));
     }
 
     private void DisconnectEvents() {
@@ -200,16 +198,8 @@ public sealed partial class Entity : CharacterBody3D {
         base._ExitTree();
 
         DisconnectEvents();
-    }
-
-    public override void _Notification(int what) {
-        base._Notification(what);
-        if (what == NotificationWMWindowFocusIn) {
-            // NotificationWMWindowFocusIn is also called on Rebuilding the project;
-            // Reconnect to signal on Recompile
-            DisconnectEvents();
-            ConnectEvents();
-        }
+        
+        _weapon?.Inject(null);
     }
 
 }

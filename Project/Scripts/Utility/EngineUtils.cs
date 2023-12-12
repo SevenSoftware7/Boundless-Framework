@@ -18,6 +18,10 @@ public static class EngineUtils {
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool JustBuilt(this Node node) =>
+        node.IsNodeReady() && Engine.GetProcessFrames() == buildFrame;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsEditorGetSetter(this Node node) =>
         !node.IsNodeReady() || Engine.GetProcessFrames() == buildFrame;
     

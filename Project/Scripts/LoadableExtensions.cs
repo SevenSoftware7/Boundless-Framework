@@ -32,17 +32,17 @@ public ref struct LoadableDestructor<TLoadable> where TLoadable : ILoadable {
 
 
     public readonly void Execute() {
-        if ( loadable is not null ) {
-            onBeforeUnload?.Invoke();
+        if ( loadable is null ) return;
 
-            loadable.LoadUnloadEvent -= onLoadUnload;
-            loadable.UnloadModel();
+        onBeforeUnload?.Invoke();
 
-            onAfterUnload?.Invoke();
+        loadable.LoadUnloadEvent -= onLoadUnload;
+        loadable.UnloadModel();
 
-            loadable.Destroy();
-            loadable = default;
-        }
+        onAfterUnload?.Invoke();
+
+        loadable.Destroy();
+        loadable = default;
     }
 }
 
@@ -86,17 +86,16 @@ public ref struct LoadableUpdater<TLoadable> where TLoadable : ILoadable {
 
     public readonly void Execute() {
         destructor.Execute();
+        if ( instantiator is null || instantiator() is not TLoadable instantiated ) return;
 
-        if ( instantiator is not null && instantiator() is TLoadable instantiated ) {
-            loadable = instantiated;
+        loadable = instantiated;
 
-            onBeforeLoad?.Invoke();
+        onBeforeLoad?.Invoke();
 
-            loadable.LoadModel();
-            loadable.LoadUnloadEvent += onLoadUnload;
+        loadable.LoadModel();
+        loadable.LoadUnloadEvent += onLoadUnload;
 
-            onAfterLoad?.Invoke();
-        }
+        onAfterLoad?.Invoke();
     }
 }
 

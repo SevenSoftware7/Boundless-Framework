@@ -8,33 +8,6 @@ namespace LandlessSkies.Core;
 
 public partial class Player {
 
-    // private bool ExtendInspectorProperty(ExtendableInspector inspector, Variant.Type type, string name, PropertyHint hintType, string hintString, PropertyUsageFlags usageFlags, bool wide) {
-    //     if (name == PropertyName.PlayerId) {
-    //         EditorProperty splitContainer = new() {
-    //             Label = "Player Id",
-    //             Checkable = true
-    //         };
-
-    //         EditorSpinSlider playerIdSlider = new() {
-    //             MinValue = 0,
-    //             MaxValue = MaxPlayers - 1,
-    //             Step = 1,
-    //             Value = PlayerId,
-    //         };
-    //         playerIdSlider.ValueChanged += (newVal) => {
-    //             PlayerId = (byte)newVal;
-    //             NotifyPropertyListChanged();
-    //         };
-
-    //         splitContainer.AddChild(playerIdSlider);
-    //         splitContainer.AddFocusable(playerIdSlider);
-    //         inspector.AddCustomControl(splitContainer);
-            
-    //         return true;
-    //     }
-    //     return false;
-    // }
-
     public override string[] _GetConfigurationWarnings() {
         string[] warnings = base._GetConfigurationWarnings();
 

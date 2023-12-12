@@ -12,13 +12,11 @@ public abstract partial class CharacterModel : Loadable3D, IInjectable<Skeleton3
         get => _costume;
         private set => _costume ??= value;
     }
-    private CharacterCostume _costume;
+    private CharacterCostume _costume = null!;
 
 
 
     protected CharacterModel() : base() {
-        _costume ??= null !;
-        
         Name = nameof(CharacterModel);
     }
     public CharacterModel(CharacterCostume costume, Node3D root) : base(root) {

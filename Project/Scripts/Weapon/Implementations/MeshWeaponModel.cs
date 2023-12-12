@@ -11,6 +11,7 @@ public sealed partial class MeshWeaponModel : WeaponModel {
     [ExportGroup("Dependencies")]
     [Export]
     public Skeleton3D? Skeleton { get; private set; }
+    public IWeapon.Handedness Handedness { get; private set; }
 
 
 
@@ -18,10 +19,6 @@ public sealed partial class MeshWeaponModel : WeaponModel {
     public MeshWeaponModel(MeshWeaponCostume costume, Node3D root) : base(costume, root) {}
 
 
-
-    public override void Inject(Skeleton3D? skeleton) {
-        Skeleton = skeleton;
-    }
 
     protected override bool LoadModelImmediate() {
         if ( Costume is not MeshWeaponCostume meshCostume ) return false;
@@ -44,12 +41,27 @@ public sealed partial class MeshWeaponModel : WeaponModel {
         return true;
     }
 
+    public override void Inject(Skeleton3D? skeleton) {
+        Skeleton = skeleton;
+        ReloadModel(true);
+    }
+
+    public override void Inject(IWeapon.Handedness handedness) {
+        Handedness = handedness;
+    }
+
+
 
     public override void _Process(double delta) {
         base._Process(delta);
 
-        if ( Skeleton is not null && Skeleton.TryGetBoneTransform("RightHand", out Transform3D rightHandTransform) ) {
-            GlobalTransform = rightHandTransform;
+        string boneName = Handedness switch {
+            IWeapon.Handedness.Left         => "LeftHand",
+            IWeapon.Handedness.Right or _   => "RightHand",
+        };
+
+        if ( Skeleton is not null && Skeleton.TryGetBoneTransform(boneName, out Transform3D handTransform) ) {
+            GlobalTransform = handTransform;
         }
     }
 }

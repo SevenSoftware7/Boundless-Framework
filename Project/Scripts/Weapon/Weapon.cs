@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 
 
@@ -6,16 +7,16 @@ namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
-public partial class Weapon : Loadable3D, IWeapon {
+public abstract partial class Weapon : Loadable3D, IWeapon, IInjectable<Entity?> {
 
-    [Export] public WeaponData Data {
-        get => _data;
-        private set => _data ??= value;
-    }
-    private WeaponData _data;
+    [Export]
+    public abstract WeaponData Data { get; protected set; }
     
-    [Export] public IWeapon.Handedness WeaponHandedness { get; set; }
-    [Export] public IWeapon.Type WeaponType {
+    [Export]
+    public abstract IWeapon.Handedness WeaponHandedness { get; set; }
+
+    [Export]
+    public IWeapon.Type WeaponType {
         get => Data?.Type ?? 0;
         set {}
     }
@@ -23,73 +24,29 @@ public partial class Weapon : Loadable3D, IWeapon {
 
 
     [ExportGroup("Costume")]
-    [Export] private WeaponModel? WeaponModel;
-
-    [Export] public WeaponCostume? Costume {
-        get => WeaponModel?.Costume;
-        set => SetCostume(value);
-    }
-
-
-    [ExportGroup("Dependencies")]
     [Export]
-    public Skeleton3D? Skeleton { 
-        get => _skeleton;
-        private set => Inject(value);
-    }
-    private Skeleton3D? _skeleton;
+    public abstract WeaponCostume? Costume { get; set; }
     
 
     [Signal] public delegate void CostumeChangedEventHandler(WeaponCostume? newCostume, WeaponCostume? oldCostume);
 
 
-
-    public Weapon() : base() {
-        _data ??= null !;
-    }
+    public Weapon() : base() {}
     public Weapon(WeaponData data, WeaponCostume? costume, Node3D root) : base(root) {        
         ArgumentNullException.ThrowIfNull(data);
         
-        _data = data;
+        Data = data;
         SetCostume(costume);
     }
 
 
-    public void SetCostume(WeaponCostume? costume) {
-        if ( this.IsEditorGetSetter() ) return;
-        
-        WeaponCostume? oldCostume = Costume;
-        if ( costume == oldCostume ) return;
 
-        LoadableExtensions.UpdateLoadable(ref WeaponModel)
-            .WithConstructor(() => costume?.Instantiate(this))
-            .BeforeLoad(() => WeaponModel!.Inject(Skeleton))
-            .Execute();
-
-        EmitSignal(SignalName.CostumeChanged, costume!, oldCostume!);
-    }
+    public abstract IEnumerable<IAttack.AttackInfo> GetAttacks(Entity target);
 
 
-    public void Inject(Skeleton3D? skeleton) {
-        _skeleton = skeleton;
-        if ( this.IsEditorGetSetter() ) {
-            return;
-        }
-        WeaponModel?.Inject(skeleton); 
-        ReloadModel();
-    }
+    public virtual void Inject(Entity? owner) {}
 
-    protected override bool LoadModelImmediate() {
-        WeaponModel?.LoadModel();
-
-        return true;
-    }
-
-    protected override bool UnloadModelImmediate() {
-        WeaponModel?.UnloadModel();
-
-        return true;
-    }
+    public abstract void SetCostume(WeaponCostume? costume);
 
 
 }

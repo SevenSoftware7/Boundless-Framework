@@ -8,13 +8,11 @@ namespace LandlessSkies.Core;
 [GlobalClass]
 public sealed partial class EntityBehaviourManager : Node {
 
-    [Export] public Entity Entity { get; private set; }
+    [Export] public Entity Entity { get; private set; } = null!;
     [Export] public EntityBehaviour? CurrentBehaviour { get; private set; }
 
 
     public EntityBehaviourManager() : base() {
-        Entity ??= null !;
-
         Name = nameof(EntityBehaviourManager);
     }
     public EntityBehaviourManager(Entity entity) : this() {
