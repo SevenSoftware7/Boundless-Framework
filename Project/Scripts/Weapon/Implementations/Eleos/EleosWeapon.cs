@@ -4,15 +4,25 @@ using Godot;
 
 namespace LandlessSkies.Core;
 
-public partial class EleosWeapon : SimpleWeapon {
-
-    public EleosWeapon() : base() {}
-    public EleosWeapon(EleosWeaponData data, WeaponCostume? costume, Node3D root) : base(data, costume, root) {}
+public partial class EleosWeapon(EleosWeaponData data, WeaponCostume? costume, Node3D root) : SimpleWeapon(data, costume, root) {
+    private Attacks attacks;
 
 
-    public override IEnumerable<IAttack.AttackInfo> GetAttacks(Entity target) {
+    protected override void InitializeAttacks() {
+        base.InitializeAttacks();
+        attacks = new(this);
+    }
+
+    public override IEnumerable<IAttack.Info> GetAttacks(Entity target) {
         return [
-            // new IAttack.AttackInfo()
+            attacks.slashAttack,
         ];
+    }
+
+
+
+    private readonly struct Attacks(EleosWeapon weapon) {
+        public readonly SlashAttack.Info slashAttack = new(weapon);
+        
     }
 }

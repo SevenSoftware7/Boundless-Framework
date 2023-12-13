@@ -46,6 +46,7 @@ public partial class SimpleWeapon : Weapon {
 
     public SimpleWeapon() : base() {
         Name = GetType().Name;
+        InitializeAttacks();
 
         // Reconnect events on build
         if ( this.JustBuilt() ) {
@@ -54,8 +55,11 @@ public partial class SimpleWeapon : Weapon {
     }
     public SimpleWeapon(WeaponData data, WeaponCostume? costume, Node3D root) : base(data, costume, root) {
         Name = GetType().Name;
+        InitializeAttacks();
     }
 
+
+    protected virtual void InitializeAttacks() {}
 
 
     public override void SetCostume(WeaponCostume? costume) {
@@ -105,7 +109,7 @@ public partial class SimpleWeapon : Weapon {
     }
 
 
-    public override IEnumerable<IAttack.AttackInfo> GetAttacks(Entity target) {
+    public override IEnumerable<IAttack.Info> GetAttacks(Entity target) {
         return [];
     }
 

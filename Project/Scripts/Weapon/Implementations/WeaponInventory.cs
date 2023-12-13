@@ -172,7 +172,7 @@ public partial class WeaponInventory : Weapon {
     public override void SetCostume(WeaponCostume? costume) =>
         CurrentWeapon?.SetCostume(costume);
 
-    public override IEnumerable<IAttack.AttackInfo> GetAttacks(Entity target) =>
+    public override IEnumerable<IAttack.Info> GetAttacks(Entity target) =>
         CurrentWeapon?.GetAttacks(target) ?? [];
         // return _weapons.SelectMany( (w) => w.GetAttacks(target) ); // TODO: Implement attack proxy to switch to weapon on attack execution
 

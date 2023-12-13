@@ -9,7 +9,7 @@ public interface IWeapon : IDataContainer<WeaponData>, ICostumable<WeaponCostume
     Type WeaponType { get; }
     Handedness WeaponHandedness { get; }
 
-    IEnumerable<IAttack.AttackInfo> GetAttacks(Entity target);
+    IEnumerable<IAttack.Info> GetAttacks(Entity target);
 
     
 

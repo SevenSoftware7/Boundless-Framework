@@ -41,7 +41,7 @@ public abstract partial class Weapon : Loadable3D, IWeapon, IInjectable<Entity?>
 
 
 
-    public abstract IEnumerable<IAttack.AttackInfo> GetAttacks(Entity target);
+    public abstract IEnumerable<IAttack.Info> GetAttacks(Entity target);
 
 
     public virtual void Inject(Entity? owner) {}

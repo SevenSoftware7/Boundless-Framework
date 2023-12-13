@@ -57,7 +57,8 @@ public sealed partial class Player : Node {
     }
 
     private void FindFreeId() {
-        if ( _playerId != 0 || Players[0] == this ) return; // PlayerId is already set to 0 (default) or the PlayerId is already set to this Player.
+        // PlayerId is already set to 0 (default) or the PlayerId is already set to this Player.
+        if ( _playerId != 0 || Players[0] == this ) return;
 
         byte emptySpot = 0;
         bool found = false;
@@ -86,13 +87,8 @@ public sealed partial class Player : Node {
         base._Process(delta);
 
         if ( Engine.IsEditorHint() ) return;
-
-        if ( Entity is not null) {
-            CameraController?.SetEntityAsSubject(Entity);
-        }
-        if ( ControlDevice is not null) {
-            CameraController?.HandleCamera(ControlDevice);
-        }
+        if ( Entity is not null) CameraController?.SetEntityAsSubject(Entity);
+        if ( ControlDevice is not null) CameraController?.HandleCamera(ControlDevice);
 
         if ( Entity is null || CameraController is null || ControlDevice is null ) return;
 
@@ -105,12 +101,7 @@ public sealed partial class Player : Node {
 
     public override void _Ready() {
         base._Ready();
-    }
-
-    public override void _EnterTree() {
-        base._EnterTree();
-        if ( this.IsEditorEnterTree() ) return;
-
+        
         FindFreeId();
     }
 
