@@ -4,8 +4,14 @@ using Godot;
 
 namespace LandlessSkies.Core;
 
-public partial class EleosWeapon(EleosWeaponData data, WeaponCostume? costume, Node3D root) : SimpleWeapon(data, costume, root) {
+[Tool]
+[GlobalClass]
+public partial class EleosWeapon : SimpleWeapon {
     private Attacks attacks;
+
+
+    public EleosWeapon() : base() {}
+    public EleosWeapon(EleosWeaponData data, WeaponCostume? costume, Node3D root) : base(data, costume, root) {}
 
 
     protected override void InitializeAttacks() {
