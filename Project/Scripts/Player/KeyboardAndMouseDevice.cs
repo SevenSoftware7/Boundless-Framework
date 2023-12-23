@@ -1,6 +1,6 @@
-using System.Collections.Generic;
+using System;
+using System.Diagnostics;
 using Godot;
-using SevenGame.Utility;
 
 
 namespace LandlessSkies.Core;
@@ -9,144 +9,98 @@ namespace LandlessSkies.Core;
 [GlobalClass]
 public partial class KeyboardAndMouseDevice : ControlDevice {
 
-    public KeyInputInfo moveForwardKeyEvent;
-    public bool moveForwardKeyUpdated;
-    
-    public KeyInputInfo moveBackwardKeyEvent;
-    public bool moveBackwardKeyUpdated;
-    
-    public KeyInputInfo moveLeftKeyEvent;
-    public bool moveLeftKeyUpdated;
-    
-    public KeyInputInfo moveRightKeyEvent;
-    public bool moveRightKeyUpdated;
-    
-    public KeyInputInfo jumpKeyEvent;
-    public bool jumpKeyUpdated;
-    
-    public KeyInputInfo sprintKeyEvent;
-    public bool sprintKeyUpdated;
+	private static readonly StringName EvadeName = new("KeyboardEvade");
+	private static readonly StringName JumpName = new("KeyboardJump");
+	private static readonly StringName LightAttackName = new("KeyboardLightAttack");
+	private static readonly StringName HeavyAttackName = new("KeyboardHeavyAttack");
+	private static readonly StringName MoveForwardName = new("KeyboardMoveForward");
+	private static readonly StringName MoveBackwardName = new("KeyboardMoveBackward");
+	private static readonly StringName MoveLeftName = new("KeyboardMoveLeft");
+	private static readonly StringName MoveRightName = new("KeyboardMoveRight");
 
-    public Vector2Info mouseMotion;
-    public bool mouseMotionUpdated;
-    
-    public Vector2Info moveMotion;
-
-    
-
-    private static readonly Dictionary<Key, Key> overrideKeyMap = [];
-
-    
-
-    private static Vector2 GetVector(
-        KeyInputInfo upKey,
-        KeyInputInfo downKey,
-        KeyInputInfo leftKey,
-        KeyInputInfo rightKey,
-        float? clampMagnitude = null
-    ) {
-        Vector2 result = new(
-            (rightKey.currentValue ? 1 : 0) - (leftKey.currentValue ? 1 : 0),
-            (downKey.currentValue ? 1 : 0) - (upKey.currentValue ? 1 : 0)
-        );
-        
-        return clampMagnitude.HasValue ? result.ClampMagnitude(clampMagnitude.Value) : result;
-    }
-
-
-    public override Vector2Info GetLookDirection() {
-        return mouseMotion;
-    }
-
-    public override Vector2Info GetMoveDirection() {
-        return moveMotion;
-    }
-
-    public override KeyInputInfo GetJumpInput() {
-        return jumpKeyEvent;
-    }
-
-    public override KeyInputInfo GetSprintInput() {
-        return sprintKeyEvent;
-    }
+	private static InputEventMouseMotion mouseMotion = new();
 
 
 
-    private void KeyInfoTimeStep() {
-        if ( ! moveForwardKeyUpdated ) moveForwardKeyEvent.SetVal(moveForwardKeyEvent.currentValue); 
-        moveForwardKeyUpdated = true;
-
-        if ( ! moveBackwardKeyUpdated ) moveBackwardKeyEvent.SetVal(moveBackwardKeyEvent.currentValue); 
-        moveBackwardKeyUpdated = true;
-
-        if ( ! moveLeftKeyUpdated ) moveLeftKeyEvent.SetVal(moveLeftKeyEvent.currentValue); 
-        moveLeftKeyUpdated = true;
-
-        if ( ! moveRightKeyUpdated ) moveRightKeyEvent.SetVal(moveRightKeyEvent.currentValue); 
-        moveRightKeyUpdated = true;
-
-        if ( ! jumpKeyUpdated ) jumpKeyEvent.SetVal(jumpKeyEvent.currentValue); 
-        jumpKeyUpdated = true;
-
-        if ( ! sprintKeyUpdated ) sprintKeyEvent.SetVal(sprintKeyEvent.currentValue); 
-        sprintKeyUpdated = true;
+	public override Vector2 GetVector(MotionType motion, float deadzone = -1) {
+		if (motion == MotionType.Look) {
+			return mouseMotion.Relative * new Vector2(1, -1);
+		}
+		return base.GetVector(motion, deadzone);
+	}
 
 
-        if ( ! mouseMotionUpdated ) mouseMotion.SetVal(Vector2.Zero); 
-        mouseMotionUpdated = true;
+	protected override StringName GetActionName(InputType input) {
+		return input switch {
+			InputType.Evade                 => EvadeName,
+			InputType.Jump                  => JumpName,
+			InputType.LightAttack           => LightAttackName,
+			InputType.HeavyAttack           => HeavyAttackName,
+			_ when Enum.IsDefined(input)    => throw new UnreachableException($"Undefined Action Name for {input}"),
+			_                               => throw new ArgumentOutOfRangeException(nameof(input))
+		};
+	}
+	protected override StringName GetActionName(MotionType motion, MotionDirection direction) {
+		return motion switch {
+			MotionType.Move					=> direction switch {
+				MotionDirection.Forward		=> MoveForwardName,
+				MotionDirection.Backward	=> MoveBackwardName,
+				MotionDirection.Left		=> MoveLeftName,
+				MotionDirection.Right		=> MoveRightName,
+				_							=> throw new ArgumentOutOfRangeException(nameof(direction))
+			},
+			MotionType.Look                 => string.Empty,
+			_ when Enum.IsDefined(motion)   => throw new UnreachableException($"Undefined Action Name for {motion}"),
+			_                               => throw new ArgumentOutOfRangeException(nameof(motion))
+		};
+	}
 
-    }
+	public override void _Ready() {
+		base._Ready();
 
+		if ( Engine.IsEditorHint() ) return;
 
+		RebindInput(InputType.Evade, new InputEventKey() 								{ PhysicalKeycode = Key.Shift });
+		RebindInput(InputType.Jump, new InputEventKey() 								{ PhysicalKeycode = Key.Space });
+		RebindInput(InputType.LightAttack, new InputEventMouseButton() 					{ ButtonIndex = MouseButton.Left });
+		RebindInput(InputType.HeavyAttack, new InputEventMouseButton() 					{ ButtonIndex = MouseButton.Right });
+		RebindInput(MotionType.Move, MotionDirection.Forward, new InputEventKey() 		{ PhysicalKeycode = Key.W });
+		RebindInput(MotionType.Move, MotionDirection.Backward, new InputEventKey() 		{ PhysicalKeycode = Key.S });
+		RebindInput(MotionType.Move, MotionDirection.Left, new InputEventKey() 			{ PhysicalKeycode = Key.A });
+		RebindInput(MotionType.Move, MotionDirection.Right, new InputEventKey() 		{ PhysicalKeycode = Key.D });
+	}
 
-    public override void _Process(double delta) {
-        base._Process(delta);
+	public override void _ExitTree() {
+		base._ExitTree();
 
-        if ( Engine.IsEditorHint() ) return;
+		if ( Engine.IsEditorHint() ) return;
+		if ( this.IsEditorExitTree() ) return;
 
-        Callable.From(KeyInfoTimeStep).CallDeferred();
-    }
+		UnbindInput(InputType.Evade);
+		UnbindInput(InputType.Jump);
+		UnbindInput(InputType.LightAttack);
+		UnbindInput(InputType.HeavyAttack);
+		UnbindInput(MotionType.Move, MotionDirection.Forward);
+		UnbindInput(MotionType.Move, MotionDirection.Backward);
+		UnbindInput(MotionType.Move, MotionDirection.Left);
+		UnbindInput(MotionType.Move, MotionDirection.Right);
+	}
 
-    public override void _Input(InputEvent @event) {
-        base._Input(@event);
-        
-        if (@event is InputEventMouseMotion mouseMotion) {
-            this.mouseMotion.SetVal(new(
-                mouseMotion.Relative.X,
-                -mouseMotion.Relative.Y
-            ));
-            mouseMotionUpdated = true;
-            return;
-        }
+	public override void _Process(double delta) {
+		base._Process(delta);
 
-        if (@event is InputEventKey keyEvent) {
-            Key keyCode = keyEvent.PhysicalKeycode;
-            if ( overrideKeyMap.TryGetValue(keyCode, out Key value)) {
-                keyCode = value;
-            }
+		if ( Engine.IsEditorHint() ) return;
 
-            switch (keyCode) {
-                case Key.W: moveForwardKeyEvent.SetVal(keyEvent.Pressed); UpdateMoveMotion(); moveForwardKeyUpdated = true; break;
-                case Key.S: moveBackwardKeyEvent.SetVal(keyEvent.Pressed); UpdateMoveMotion(); moveBackwardKeyUpdated = true; break;
-                case Key.A: moveLeftKeyEvent.SetVal(keyEvent.Pressed); UpdateMoveMotion(); moveLeftKeyUpdated = true; break;
-                case Key.D: moveRightKeyEvent.SetVal(keyEvent.Pressed); UpdateMoveMotion(); moveRightKeyUpdated = true; break;
-                case Key.Space: jumpKeyEvent.SetVal(keyEvent.Pressed); jumpKeyUpdated = true; break;
-                case Key.Shift: sprintKeyEvent.SetVal(keyEvent.Pressed); sprintKeyUpdated = true; break;
-            }
+		Callable.From(() => mouseMotion = new()).CallDeferred();
+	}
 
-            void UpdateMoveMotion() {
-                moveMotion.SetVal(
-                    GetVector(
-                        moveForwardKeyEvent,
-                        moveBackwardKeyEvent,
-                        moveLeftKeyEvent,
-                        moveRightKeyEvent,
-                        1f
-                    )
-                );
-            }
+	public override void _Input(InputEvent @event) {
+		base._Input(@event);
 
-            return;
-        }
-    }
+		if ( Engine.IsEditorHint() ) return;
+		
+		if (@event is InputEventMouseMotion mouseMotion) {
+			KeyboardAndMouseDevice.mouseMotion = mouseMotion;
+		}
+	}
 }

@@ -7,28 +7,42 @@ namespace LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public partial class EleosWeapon : SimpleWeapon {
-    private Attacks attacks;
 
-
-    public EleosWeapon() : base() {}
-    public EleosWeapon(EleosWeaponData data, WeaponCostume? costume, Node3D root) : base(data, costume, root) {}
-
-
-    protected override void InitializeAttacks() {
-        base.InitializeAttacks();
-        attacks = new(this);
-    }
-
-    public override IEnumerable<IAttack.Info> GetAttacks(Entity target) {
-        return [
-            attacks.slashAttack,
-        ];
-    }
+	private Attacks attacks;
 
 
 
-    private readonly struct Attacks(EleosWeapon weapon) {
-        public readonly SlashAttack.Info slashAttack = new(weapon);
-        
-    }
+	protected EleosWeapon() : base() {}
+	public EleosWeapon(EleosWeaponData data, WeaponCostume? costume, Node3D root) : base(data, costume, root) {}
+
+
+
+	protected override void InitializeAttacks() {
+		base.InitializeAttacks();
+		attacks = new(this);
+	}
+
+	public override IEnumerable<AttackAction.Info> GetAttacks(Entity target) {
+		return [
+			attacks.slashAttack,
+		];
+	}
+
+
+	public override void HandleInput(Player.InputInfo inputInfo) {
+		base.HandleInput(inputInfo);
+
+		if ( Entity is null ) return;
+		if ( ! (Entity.CurrentAction?.IsCancellable ?? true) ) return;
+
+		if ( inputInfo.ControlDevice.IsInputJustPressed(ControlDevice.InputType.LightAttack) ) {
+			Entity.ExecuteAction(attacks.slashAttack);
+		}
+	}
+
+
+	private readonly struct Attacks(EleosWeapon weapon) {
+		public readonly SlashAttack.Info slashAttack = new(weapon);
+
+	}
 }

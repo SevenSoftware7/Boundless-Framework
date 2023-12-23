@@ -6,40 +6,38 @@ using System.Diagnostics.CodeAnalysis;
 namespace LandlessSkies.Core;
 
 [GlobalClass]
-public abstract partial class EntityBehaviour : Node {
+public abstract partial class EntityBehaviour : Node, IInputReader {
 
-    public abstract bool FreeOnStop { get; }
+	[Export] public Entity Entity = null!;
 
-    [Export] public Entity Entity = null!;
-    [Export] public EntityBehaviourManager BehaviourManager = null!;
-
-
-
-    public EntityBehaviour() : base() {}
-    public EntityBehaviour([MaybeNull] Entity entity, [MaybeNull] EntityBehaviourManager behaviourManager) : base() {
-        ArgumentNullException.ThrowIfNull(entity);
-        ArgumentNullException.ThrowIfNull(behaviourManager);
-
-        Entity = entity;
-        BehaviourManager = behaviourManager;
-        BehaviourManager.AddChildAndSetOwner(this);
-    }
+	public abstract bool FreeOnStop { get; }
 
 
 
-    public virtual void HandleInput(Player.InputInfo inputInfo) {}
+	public EntityBehaviour() : base() {}
+	public EntityBehaviour([MaybeNull] Entity entity) : base() {
+		ArgumentNullException.ThrowIfNull(entity);
 
-    public virtual void SetSpeed(MovementSpeed speed) {}
-    public virtual void Move(Vector3 direction) {}
-
-    public virtual void Start(EntityBehaviour? previousBehaviour) {}
-
+		Entity = entity;
+		Entity.AddChildAndSetOwner(this);
+	}
 
 
-    public enum MovementSpeed {
-        Idle = 0,
-        Walk = 1,
-        Run = 2,
-        Sprint = 3
-    }
+
+	public virtual void HandleInput(Player.InputInfo inputInfo) {}
+
+	public virtual bool SetSpeed(MovementSpeed speed) => true;
+	public virtual bool Move(Vector3 direction) => true;
+	public virtual bool Jump(Vector3? target = null) => true;
+
+	public virtual void Start(EntityBehaviour? previousBehaviour) {}
+
+
+
+	public enum MovementSpeed {
+		Idle = 0,
+		Walk = 1,
+		Run = 2,
+		Sprint = 3
+	}
 }

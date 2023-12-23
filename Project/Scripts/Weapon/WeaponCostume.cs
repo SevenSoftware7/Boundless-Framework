@@ -7,6 +7,6 @@ namespace LandlessSkies.Core;
 [GlobalClass]
 public abstract partial class WeaponCostume : Resource {
 
-    public abstract WeaponModel Instantiate(Node3D root);
+	public abstract WeaponModel Instantiate(Node3D root);
 
 }

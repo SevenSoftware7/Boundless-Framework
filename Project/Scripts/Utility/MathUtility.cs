@@ -39,7 +39,7 @@ public static class MathUtility {
         if (from.IsEqualApprox(to)) {
             return from;
         }
-        return from.Slerp(to, weight);
+        return from.Orthonormalized().Slerp(to.Orthonormalized(), weight);
     }
 
     
@@ -81,8 +81,9 @@ public static class MathUtility {
     /// <param name="vector"></param>
     /// <param name="direction"></param>
     /// <returns></returns>
-    public static Vector3 FlattenInDirection( this Vector3 vector, Vector3 direction ) =>
-        vector - direction * vector.Dot(direction);
+    public static Vector3 FlattenInDirection( this Vector3 vector, Vector3 direction ) {
+        return vector - direction * Mathf.Max(vector.Project(direction).Dot(direction), 0);
+    }
 
     public static double SmoothDamp(double current, double target, ref double currentVelocity, double smoothTime, double maxSpeed, double deltaTime) {
         smoothTime = Math.Max(0.0001, smoothTime);

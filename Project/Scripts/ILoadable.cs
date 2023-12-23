@@ -5,15 +5,15 @@ using Godot;
 namespace LandlessSkies.Core;
 
 public interface ILoadable : IDestroyable, IEnablable {
-    
-    bool IsLoaded { get; set; }
 
-    event Loadable3D.LoadedUnloadedEventHandler LoadUnloadEvent;
+	bool IsLoaded { get; set; }
 
-    
-    void LoadModel();
-    
-    void UnloadModel();
+	event Loadable3D.LoadedUnloadedEventHandler LoadUnloadEvent;
 
-    void ReloadModel(bool forceLoad = false);
+
+	void LoadModel();
+
+	void UnloadModel();
+
+	void ReloadModel(bool forceLoad = false);
 }

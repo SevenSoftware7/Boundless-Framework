@@ -9,134 +9,138 @@ namespace LandlessSkies.Core;
 [GlobalClass]
 public partial class SimpleWeapon : Weapon {
 
-    public override WeaponData Data {
-        get => _data;
-        protected set => _data ??= value;
-    }
-    private WeaponData _data = null!;
+	private Entity? _entity;
+	private WeaponData _data = null!;
+	private IWeapon.Handedness _weaponHandedness = IWeapon.Handedness.Right;
+	
+	
 
-    public override WeaponCostume? Costume {
-        get => WeaponModel?.Costume;
-        set => SetCostume(value);
-    }
+	public override WeaponData Data {
+		get => _data;
+		protected set => _data ??= value;
+	}
 
-    public override IWeapon.Handedness WeaponHandedness { 
-        get => _weaponHandedness;
-        set {
-            _weaponHandedness = value;
-            WeaponModel?.Inject(value);
-        }
-    }
-    private IWeapon.Handedness _weaponHandedness = IWeapon.Handedness.Right;
-    
+	public override WeaponCostume? Costume {
+		get => WeaponModel?.Costume;
+		set => SetCostume(value);
+	}
 
-    [ExportGroup("Costume")]
-    [Export] private WeaponModel? WeaponModel;
-
-
-    [ExportGroup("Dependencies")]
-    [Export]
-    public Entity? Entity { 
-        get => _entity;
-        private set => Inject(value);
-    }
-    private Entity? _entity;
+	public override IWeapon.Handedness WeaponHandedness {
+		get => _weaponHandedness;
+		set {
+			_weaponHandedness = value;
+			WeaponModel?.Inject(value);
+		}
+	}
 
 
-
-    public SimpleWeapon() : base() {
-        Name = GetType().Name;
-        InitializeAttacks();
-
-        // Reconnect events on build
-        if ( this.JustBuilt() ) {
-            Callable.From( ConnectEvents ).CallDeferred();
-        }
-    }
-    public SimpleWeapon(WeaponData data, WeaponCostume? costume, Node3D root) : base(data, costume, root) {
-        Name = GetType().Name;
-        InitializeAttacks();
-    }
+	[ExportGroup("Costume")]
+	[Export] private WeaponModel? WeaponModel;
 
 
-    protected virtual void InitializeAttacks() {}
+	[ExportGroup("Dependencies")]
+	[Export]
+	public Entity? Entity {
+		get => _entity;
+		private set => Inject(value);
+	}
 
 
-    public override void SetCostume(WeaponCostume? costume) {
-        if ( this.IsEditorGetSetter() ) return;
-        
-        WeaponCostume? oldCostume = Costume;
-        if ( costume == oldCostume ) return;
 
-        LoadableExtensions.UpdateLoadable(ref WeaponModel)
-            .WithConstructor(() => costume?.Instantiate(this))
-            .BeforeLoad(() => {
-                WeaponModel!.Inject(Entity?.Armature);
-                WeaponModel!.Inject(WeaponHandedness);
-            })
-            .Execute();
+	protected SimpleWeapon() : base() {
+		Name = GetType().Name;
+		InitializeAttacks();
 
-        EmitSignal(SignalName.CostumeChanged, costume!, oldCostume!);
-    }
-
-    public override void Inject(Entity? entity) {
-        DisconnectEvents();
-        _entity = entity;
-        if ( this.IsEditorGetSetter() ) {
-            return;
-        }
-        ConnectEvents();
-        
-        WeaponModel?.Inject(entity?.Armature); 
-        ReloadModel();
-    }
+		// Reconnect events on build
+		if ( this.JustBuilt() ) {
+			Callable.From( ConnectEvents ).CallDeferred();
+		}
+	}
+	public SimpleWeapon(WeaponData data, WeaponCostume? costume, Node3D root) : base(data, costume, root) {
+		Name = GetType().Name;
+		InitializeAttacks();
+	}
 
 
-    private void OnCharacterLoadedUnloaded(bool isLoaded) {
-        WeaponModel?.Inject(Entity?.Armature);
-    }
+
+	protected virtual void InitializeAttacks() {}
 
 
-    private void ConnectEvents() {
-        if (_entity is not null) {
-            _entity.CharacterLoadedUnloaded += OnCharacterLoadedUnloaded; 
-        }
-    }
-    private void DisconnectEvents() {
-        if (_entity is not null) {
-            _entity.CharacterLoadedUnloaded -= OnCharacterLoadedUnloaded; 
-        }
-    }
+	public override void SetCostume(WeaponCostume? costume) {
+		if ( this.IsEditorGetSetter() ) return;
+
+		WeaponCostume? oldCostume = Costume;
+		if ( costume == oldCostume ) return;
+
+		LoadableExtensions.UpdateLoadable(ref WeaponModel)
+			.WithConstructor(() => costume?.Instantiate(this))
+			.BeforeLoad(() => {
+				WeaponModel!.Inject(Entity?.Armature);
+				WeaponModel!.Inject(WeaponHandedness);
+			})
+			.Execute();
+
+		EmitSignal(SignalName.CostumeChanged, costume!, oldCostume!);
+	}
+
+	public override void Inject(Entity? entity) {
+		DisconnectEvents();
+		_entity = entity;
+		if ( this.IsEditorGetSetter() ) {
+			return;
+		}
+		ConnectEvents();
+
+		WeaponModel?.Inject(entity?.Armature);
+		ReloadModel();
+	}
 
 
-    public override IEnumerable<IAttack.Info> GetAttacks(Entity target) {
-        return [];
-    }
+	private void OnCharacterLoadedUnloaded(bool isLoaded) {
+		WeaponModel?.Inject(Entity?.Armature);
+	}
 
 
-    protected override bool LoadModelImmediate() {
-        WeaponModel?.LoadModel();
+	private void ConnectEvents() {
+		if (_entity is not null) {
+			_entity.CharacterLoadedUnloaded += OnCharacterLoadedUnloaded;
+		}
+	}
+	private void DisconnectEvents() {
+		if (_entity is not null) {
+			_entity.CharacterLoadedUnloaded -= OnCharacterLoadedUnloaded;
+		}
+	}
 
-        return true;
-    }
 
-    protected override bool UnloadModelImmediate() {
-        WeaponModel?.UnloadModel();
+	public override IEnumerable<AttackAction.Info> GetAttacks(Entity target) {
+		return [];
+	}
 
-        return true;
-    }
 
-    public override void _Ready() {
-        base._Ready();
+	protected override bool LoadModelImmediate() {
+		WeaponModel?.LoadModel();
 
-        ConnectEvents();
-    }
+		return true;
+	}
 
-    public override void _ExitTree() {
-        base._ExitTree();
+	protected override bool UnloadModelImmediate() {
+		WeaponModel?.UnloadModel();
 
-        DisconnectEvents();
+		return true;
+	}
 
-        WeaponModel?.Inject(null);
-    }
+	public override void _Ready() {
+		base._Ready();
+
+		ConnectEvents();
+	}
+
+	public override void _ExitTree() {
+		base._ExitTree();
+
+		DisconnectEvents();
+
+		WeaponModel?.Inject(null);
+	}
 }

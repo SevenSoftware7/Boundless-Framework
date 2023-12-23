@@ -18,7 +18,9 @@ public struct TimeInterval {
     public TimeInterval() {;}
 
 
-
+    public void End() {
+        stopTime = Time.GetTicksMsec();
+    }
     public void SetTime(ulong timeMsec){
         startTime = Time.GetTicksMsec();
         stopTime = timeMsec;
