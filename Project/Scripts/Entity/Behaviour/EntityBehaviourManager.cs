@@ -5,7 +5,6 @@ using System;
 namespace LandlessSkies.Core;
 
 public sealed class EntityBehaviourManager {
-
 	public Entity Entity { get; private set; } = null!;
 	public EntityBehaviour? CurrentBehaviour { get; private set; }
 
@@ -52,5 +51,4 @@ public sealed class EntityBehaviourManager {
 
 		SetBehaviour(behaviour, creator);
 	}
-
 }

@@ -9,7 +9,9 @@ namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
-public abstract partial class CharacterCostume : Resource, IPortraitProvider {
+public abstract partial class CharacterCostume : Resource, IPortraitProvider, IUIObject {
+	[Export] public string DisplayName { get; private set; } = "";
+	public Texture2D? DisplayPortrait => PortraitNeutral;
 
 	[Export] public Texture2D? PortraitNeutral { get; private set; }
 	[Export] public Texture2D? PortraitDetermined { get; private set; }
@@ -36,5 +38,4 @@ public abstract partial class CharacterCostume : Resource, IPortraitProvider {
 	}
 
 	public abstract CharacterModel Instantiate(Node3D root);
-
 }

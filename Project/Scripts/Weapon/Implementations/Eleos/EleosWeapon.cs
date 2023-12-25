@@ -7,7 +7,6 @@ namespace LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public partial class EleosWeapon : SimpleWeapon {
-
 	private Attacks attacks;
 
 
@@ -28,7 +27,6 @@ public partial class EleosWeapon : SimpleWeapon {
 		];
 	}
 
-
 	public override void HandleInput(Player.InputInfo inputInfo) {
 		base.HandleInput(inputInfo);
 
@@ -39,6 +37,7 @@ public partial class EleosWeapon : SimpleWeapon {
 			Entity.ExecuteAction(attacks.slashAttack);
 		}
 	}
+
 
 
 	private readonly struct Attacks(EleosWeapon weapon) {

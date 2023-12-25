@@ -7,6 +7,7 @@
 
 [resource]
 script = ExtResource("1_3pmdk")
+DisplayName = "Selene"
 BaseCostume = ExtResource("1_771lm")
 CollisionScene = ExtResource("1_clfsy")
 SkeletonScene = ExtResource("2_fe422")
@@ -19,7 +20,3 @@ rotationSpeed = 100.0
 baseSpeed = 8.0
 sprintSpeed = 13.0
 slowSpeed = 5.0
-swimMultiplier = 4.25
-evadeSpeed = 27.0
-evadeDuration = 0.6
-evadeCooldown = 0.6

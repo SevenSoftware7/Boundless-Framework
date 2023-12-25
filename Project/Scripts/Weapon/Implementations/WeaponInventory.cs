@@ -10,8 +10,7 @@ namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
-public sealed partial class WeaponInventory : Weapon {
-
+public sealed partial class WeaponInventory : Weapon, IUIObject {
 	private Entity? _entity;
 	private List<Weapon> _weapons = [];
 	private int _currentIndex = 0;
@@ -88,6 +87,12 @@ public sealed partial class WeaponInventory : Weapon {
 		get => _entity;
 		set => Inject(value);
 	}
+
+	public string DisplayName => "Inventory";
+	public Texture2D? DisplayPortrait => CurrentWeapon?.UIObject.DisplayPortrait;
+
+	public override IUIObject UIObject => this;
+	public override ICustomizable[] Children => [.. base.Children.Concat( _weapons.Cast<ICustomizable>() )];
 
 
 
@@ -211,13 +216,10 @@ public sealed partial class WeaponInventory : Weapon {
 
 	public override void Enable() =>
 		CurrentWeapon?.Enable();
-
 	public override void Disable() =>
 		_weapons?.ForEach(w => w?.Disable());
-
 	public override void Destroy() =>
 		_weapons?.ForEach(w => w?.Destroy());
-
 	public override void ReloadModel(bool forceLoad = false) =>
 		_weapons?.ForEach(w => w?.ReloadModel(forceLoad));
 
@@ -226,10 +228,8 @@ public sealed partial class WeaponInventory : Weapon {
 		_weapons?.ForEach(w => w?.LoadModel());
 		return true;
 	}
-
 	protected override bool UnloadModelImmediate() {
 		_weapons?.ForEach(w => w?.UnloadModel());
 		return true;
 	}
-
 }

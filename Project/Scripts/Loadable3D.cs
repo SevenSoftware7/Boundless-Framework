@@ -1,11 +1,13 @@
 using Godot;
-using System;
-
 
 namespace LandlessSkies.Core;
 
 [Tool]
 public abstract partial class Loadable3D : Node3D, ILoadable {
+	private bool _isLoaded = false;
+
+
+
 	[Export] public bool IsLoaded {
 		get => _isLoaded;
 		set {
@@ -21,20 +23,21 @@ public abstract partial class Loadable3D : Node3D, ILoadable {
 			}
 		}
 	}
-	private bool _isLoaded = false;
-
-
-
 
 	public event LoadedUnloadedEventHandler LoadUnloadEvent {
 		add => LoadedUnloaded += value;
 		remove => LoadedUnloaded -= value;
 	}
+
+
+
 	[Signal] public delegate void LoadedUnloadedEventHandler(bool isLoaded);
 
 
 
-	public Loadable3D() : base() {}
+	public Loadable3D() : base() {
+		Name = GetType().Name;
+	}
 	public Loadable3D(Node3D root) : this() {
 		root.AddChildAndSetOwner(this, Engine.IsEditorHint());
 	}
@@ -49,7 +52,6 @@ public abstract partial class Loadable3D : Node3D, ILoadable {
 		_isLoaded = true;
 		EmitSignal(SignalName.LoadedUnloaded, true);
 	}
-
 	public void UnloadModel() {
 		if ( ! IsLoaded ) return;
 
@@ -58,7 +60,6 @@ public abstract partial class Loadable3D : Node3D, ILoadable {
 		_isLoaded = false;
 		EmitSignal(SignalName.LoadedUnloaded, false);
 	}
-
 	public virtual void ReloadModel(bool forceLoad = false) {
 		bool wasLoaded = IsLoaded;
 		UnloadModel();
@@ -88,12 +89,10 @@ public abstract partial class Loadable3D : Node3D, ILoadable {
 		SetProcess(true);
 		Visible = true;
 	}
-
 	public virtual void Disable() {
 		SetProcess(false);
 		Visible = false;
 	}
-
 	public virtual void Destroy() {
 		this.UnparentAndQueueFree();
 	}
@@ -106,7 +105,6 @@ public abstract partial class Loadable3D : Node3D, ILoadable {
 
 		LoadModel();
 	}
-
 	public override void _ExitTree() {
 		base._ExitTree();
 		if ( this.IsEditorExitTree() ) return;

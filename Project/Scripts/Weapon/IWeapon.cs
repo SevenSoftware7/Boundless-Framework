@@ -5,7 +5,6 @@ using System.Collections.Generic;
 namespace LandlessSkies.Core;
 
 public interface IWeapon : IDataContainer<WeaponData>, ICostumable<WeaponCostume> {
-
 	Type WeaponType { get; }
 	Handedness WeaponHandedness { get; }
 
@@ -30,5 +29,4 @@ public interface IWeapon : IDataContainer<WeaponData>, ICostumable<WeaponCostume
 		Left = 1 << 0,
 		Right = 1 << 1,
 	}
-
 }

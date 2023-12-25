@@ -7,7 +7,6 @@ using Godot.Collections;
 namespace LandlessSkies.Core;
 
 public partial class Player {
-
     public override string[] _GetConfigurationWarnings() {
         string[] warnings = base._GetConfigurationWarnings();
 
@@ -68,7 +67,5 @@ public partial class Player {
         }
         return base._Set(property, value);
     }
-
 }
-
 #endif

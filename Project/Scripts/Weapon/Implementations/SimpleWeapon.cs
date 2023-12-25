@@ -8,16 +8,20 @@ namespace LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public partial class SimpleWeapon : Weapon {
-
 	private Entity? _entity;
 	private WeaponData _data = null!;
 	private IWeapon.Handedness _weaponHandedness = IWeapon.Handedness.Right;
 	
 	
-
 	public override WeaponData Data {
 		get => _data;
-		protected set => _data ??= value;
+		protected set {
+			if (_data is not null) return;
+			_data = value;
+
+			if (Costume is not null) return;
+			SetCostume(_data.BaseCostume);
+		}
 	}
 
 	public override WeaponCostume? Costume {
@@ -39,25 +43,21 @@ public partial class SimpleWeapon : Weapon {
 
 
 	[ExportGroup("Dependencies")]
-	[Export]
-	public Entity? Entity {
+	[Export] public Entity? Entity {
 		get => _entity;
 		private set => Inject(value);
 	}
+	public override ICustomizable[] Children => [WeaponModel!];
 
 
 
 	protected SimpleWeapon() : base() {
-		Name = GetType().Name;
 		InitializeAttacks();
 
 		// Reconnect events on build
-		if ( this.JustBuilt() ) {
-			Callable.From( ConnectEvents ).CallDeferred();
-		}
+		if ( this.JustBuilt() ) Callable.From(ConnectEvents).CallDeferred();
 	}
 	public SimpleWeapon(WeaponData data, WeaponCostume? costume, Node3D root) : base(data, costume, root) {
-		Name = GetType().Name;
 		InitializeAttacks();
 	}
 
@@ -123,19 +123,18 @@ public partial class SimpleWeapon : Weapon {
 
 		return true;
 	}
-
 	protected override bool UnloadModelImmediate() {
 		WeaponModel?.UnloadModel();
 
 		return true;
 	}
 
+
 	public override void _Ready() {
 		base._Ready();
 
 		ConnectEvents();
 	}
-
 	public override void _ExitTree() {
 		base._ExitTree();
 

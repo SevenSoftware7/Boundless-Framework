@@ -8,7 +8,6 @@ namespace LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public sealed partial class Entity : CharacterBody3D, IInputReader {
-
 	private Character? _character;
 	private Weapon? _weapon;
 	private Vector3 _absoluteForward;
@@ -97,7 +96,7 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	public Entity() : base() {
 		CollisionLayer = 1 << 1;
 
-		if ( this.JustBuilt() ) Callable.From( ConnectEvents ).CallDeferred();
+		if ( this.JustBuilt() ) Callable.From(ConnectEvents).CallDeferred();
 	}
 
 
@@ -207,5 +206,4 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 
 		_weapon?.Inject(null);
 	}
-
 }

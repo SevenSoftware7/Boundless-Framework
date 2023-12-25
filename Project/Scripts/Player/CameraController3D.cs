@@ -1,17 +1,9 @@
-using System;
 using Godot;
-using Godot.Collections;
-
-// using UnityEngine.Rendering.Universal;
-// using UnityEngine.InputSystem;
-
-
 using SevenGame.Utility;
 
 
 namespace LandlessSkies.Core;
 
-// [DefaultExecutionOrder(50)]
 [Tool]
 [GlobalClass]
 public partial class CameraController3D : Camera3D {
@@ -73,8 +65,6 @@ public partial class CameraController3D : Camera3D {
 	}
 
 	private void ComputeCamera(double delta) {
-		// if (Subject == null) return;
-
 		float floatDelta = (float)delta;
 
 		Vector3 smoothTargetPosition = GetSmoothTargetPosition(floatDelta);
@@ -96,8 +86,8 @@ public partial class CameraController3D : Camera3D {
 	}
 
 	private Vector3 GetSmoothTargetPosition(float floatDelta) {
-
 		Vector3 verticalPos = Subject.Project(SubjectBasis.Y);
+
 		if ( ! smoothVerticalPosition.IsEqualApprox(verticalPos) ) {
 			if (CurrentStyle == CameraStyle.ThirdPersonGrounded) {
 				// The camera's new vertical speed is based on the camera's current vertical velocity
@@ -123,9 +113,7 @@ public partial class CameraController3D : Camera3D {
 		return smoothPosition;
 	}
 
-
 	private void ComputeWallCollision(Vector3 origin, Vector3 direction, float distance, ref float cameraDistance, double delta) {
-
 		float floatDelta = (float)delta;
 
 		// Check for collision with the camera
@@ -191,5 +179,4 @@ public partial class CameraController3D : Camera3D {
 		ThirdPersonGrounded,
 		Fixed
 	}
-
 }

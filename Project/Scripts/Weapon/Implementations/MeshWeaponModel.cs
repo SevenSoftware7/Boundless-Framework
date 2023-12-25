@@ -5,12 +5,10 @@ namespace LandlessSkies.Core;
 
 [Tool]
 public sealed partial class MeshWeaponModel : WeaponModel {
-
 	[Export] private MeshInstance3D? Model;
 
 	[ExportGroup("Dependencies")]
-	[Export]
-	public Skeleton3D? Skeleton { get; private set; }
+	[Export] public Skeleton3D? Skeleton { get; private set; }
 	public IWeapon.Handedness Handedness { get; private set; }
 
 
@@ -33,7 +31,6 @@ public sealed partial class MeshWeaponModel : WeaponModel {
 
 		return true;
 	}
-
 	protected override bool UnloadModelImmediate() {
 		Model?.UnparentAndQueueFree();
 		Model = null;
@@ -43,13 +40,13 @@ public sealed partial class MeshWeaponModel : WeaponModel {
 
 	public override void Inject(Skeleton3D? skeleton) {
 		Skeleton = skeleton;
-		ReloadModel(true);
+		if ( Model is null ) return;
+		
+		Model.Skeleton = Model.GetPathTo(Skeleton);
 	}
-
 	public override void Inject(IWeapon.Handedness handedness) {
 		Handedness = handedness;
 	}
-
 
 
 	public override void _Process(double delta) {

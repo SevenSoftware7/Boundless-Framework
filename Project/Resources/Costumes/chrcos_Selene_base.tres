@@ -6,3 +6,4 @@
 [resource]
 script = ExtResource("1_e5pc2")
 ModelScene = ExtResource("1_dga8b")
+DisplayName = "Selene (base)"

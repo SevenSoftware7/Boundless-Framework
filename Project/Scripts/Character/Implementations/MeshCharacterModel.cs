@@ -5,8 +5,6 @@ namespace LandlessSkies.Core;
 
 [Tool]
 public sealed partial class MeshCharacterModel : CharacterModel {
-
-
 	[Export] private MeshInstance3D? Model;
 
 	[ExportGroup("Dependencies")]
@@ -36,9 +34,7 @@ public sealed partial class MeshCharacterModel : CharacterModel {
 
 		return true;
 	}
-
 	protected override bool UnloadModelImmediate() {
-
 		Model?.QueueFree();
 		Model = null;
 

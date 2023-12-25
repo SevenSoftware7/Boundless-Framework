@@ -70,5 +70,4 @@ public partial class Health : Node {
 			_damagedHealthVelocity = 0f;
 		}
 	}
-
 }

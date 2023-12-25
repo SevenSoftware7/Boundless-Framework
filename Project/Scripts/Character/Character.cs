@@ -1,16 +1,13 @@
 using Godot;
 using SevenGame.Utility;
 using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 
 namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
-public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICostumable<CharacterCostume>, IInputReader {
-
+public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICostumable<CharacterCostume>, IInputReader, ICustomizable {
 	private CharacterData _data = null!;
 	
 	
@@ -23,9 +20,14 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 
 	[Export] public CharacterData Data {
 		get => _data;
-		private set => _data ??= value;
-	}
+		private set {
+			if (_data is not null) return;
+			_data = value;
 
+			if (Costume is not null) return;
+			SetCostume(_data.BaseCostume);
+		}
+	}
 
 	[ExportGroup("Costume")]
 	[Export] private CharacterModel? CharacterModel;
@@ -36,21 +38,21 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 	}
 
 
+	public virtual IUIObject UIObject => Data;
+	public virtual ICustomizable[] Children => [CharacterModel!];
+	public virtual ICustomizationParameter[] Customizations => [];
+
 
 	[Signal] public delegate void CostumeChangedEventHandler(CharacterCostume? newCostume, CharacterCostume? oldCostume);
 
 
 
-	public Character() : base() {
-		Name = nameof(Character);
-	}
+	public Character() : base() {}
 	public Character(CharacterData data, CharacterCostume? costume, Node3D root) : base(root) {
 		ArgumentNullException.ThrowIfNull(data);
 
 		_data = data;
-		SetCostume(costume);
-
-		Name = nameof(Character);
+		SetCostume(costume ?? data.BaseCostume);
 	}
 
 
@@ -94,7 +96,6 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 
 		return true;
 	}
-
 	protected override bool UnloadModelImmediate() {
 		Collisions?.UnparentAndQueueFree();
 		Collisions = null;

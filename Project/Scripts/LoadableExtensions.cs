@@ -1,11 +1,6 @@
-
-
 using System;
-using Godot;
-
 
 namespace LandlessSkies.Core;
-
 
 public ref struct LoadableDestructor<TLoadable> where TLoadable : ILoadable {
 	private ref TLoadable? loadable;
@@ -22,13 +17,13 @@ public ref struct LoadableDestructor<TLoadable> where TLoadable : ILoadable {
 
 
 	public LoadableDestructor<TLoadable> OnLoadUnload(Loadable3D.LoadedUnloadedEventHandler onLoadUnload) =>
-		this with {onLoadUnload = onLoadUnload};
+		this with {onLoadUnload = this.onLoadUnload + onLoadUnload};
 
 	public LoadableDestructor<TLoadable> BeforeUnload(Action onBeforeUnload) =>
-		this with {onBeforeUnload = onBeforeUnload};
+		this with {onBeforeUnload = this.onBeforeUnload + onBeforeUnload};
 
 	public LoadableDestructor<TLoadable> AfterUnload(Action onAfterUnload) =>
-		this with {onAfterUnload = onAfterUnload};
+		this with {onAfterUnload = this.onAfterUnload + onAfterUnload};
 
 
 	public readonly void Execute() {
@@ -65,7 +60,7 @@ public ref struct LoadableUpdater<TLoadable> where TLoadable : ILoadable {
 
 
 	public LoadableUpdater<TLoadable> OnLoadUnloadEvent(Loadable3D.LoadedUnloadedEventHandler onLoadUnload) =>
-		this with {onLoadUnload = onLoadUnload, destructor = destructor.OnLoadUnload(onLoadUnload)};
+		this with {onLoadUnload = this.onLoadUnload + onLoadUnload, destructor = destructor.OnLoadUnload(onLoadUnload)};
 
 	public LoadableUpdater<TLoadable> BeforeUnload(Action onBeforeUnload) =>
 		this with {destructor = destructor.BeforeUnload(onBeforeUnload)};
@@ -77,10 +72,10 @@ public ref struct LoadableUpdater<TLoadable> where TLoadable : ILoadable {
 		this with {instantiator = instantiator};
 
 	public LoadableUpdater<TLoadable> BeforeLoad(Action onBeforeLoad) =>
-		this with {onBeforeLoad = onBeforeLoad};
+		this with {onBeforeLoad = this.onBeforeLoad + onBeforeLoad};
 
 	public LoadableUpdater<TLoadable> AfterLoad(Action onAfterLoad) =>
-		this with {onAfterLoad = onAfterLoad};
+		this with {onAfterLoad = this.onAfterLoad + onAfterLoad};
 
 
 

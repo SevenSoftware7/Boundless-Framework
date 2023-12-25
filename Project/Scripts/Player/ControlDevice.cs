@@ -8,7 +8,6 @@ namespace LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public abstract partial class ControlDevice : Node, IDisposable {
-
 	private bool _disposed = false;
 
 
@@ -96,5 +95,4 @@ public abstract partial class ControlDevice : Node, IDisposable {
 		LightAttack,
 		HeavyAttack
 	}
-
 }

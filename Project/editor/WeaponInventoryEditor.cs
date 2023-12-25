@@ -10,6 +10,10 @@ namespace LandlessSkies.Core;
 
 
 public partial class WeaponInventory {
+    private List<WeaponData> _weaponDatas = [];
+    
+    
+    
     [Export] private Array<WeaponData> WeaponDatas {
         get => [.. _weaponDatas];
         set {
@@ -34,7 +38,6 @@ public partial class WeaponInventory {
             NotifyPropertyListChanged();
         }
     }
-    private List<WeaponData> _weaponDatas = [];
 
 
 
@@ -49,7 +52,5 @@ public partial class WeaponInventory {
         
         ResetData();
 	}
-
 }
-
 #endif

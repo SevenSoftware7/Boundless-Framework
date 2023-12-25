@@ -8,15 +8,14 @@ namespace LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public partial class KeyboardAndMouseDevice : ControlDevice {
-
-	private static readonly StringName EvadeName = new("KeyboardEvade");
-	private static readonly StringName JumpName = new("KeyboardJump");
-	private static readonly StringName LightAttackName = new("KeyboardLightAttack");
-	private static readonly StringName HeavyAttackName = new("KeyboardHeavyAttack");
-	private static readonly StringName MoveForwardName = new("KeyboardMoveForward");
-	private static readonly StringName MoveBackwardName = new("KeyboardMoveBackward");
-	private static readonly StringName MoveLeftName = new("KeyboardMoveLeft");
-	private static readonly StringName MoveRightName = new("KeyboardMoveRight");
+	private static readonly StringName EvadeName = "KeyboardEvade";
+	private static readonly StringName JumpName = "KeyboardJump";
+	private static readonly StringName LightAttackName = "KeyboardLightAttack";
+	private static readonly StringName HeavyAttackName = "KeyboardHeavyAttack";
+	private static readonly StringName MoveForwardName = "KeyboardMoveForward";
+	private static readonly StringName MoveBackwardName = "KeyboardMoveBackward";
+	private static readonly StringName MoveLeftName = "KeyboardMoveLeft";
+	private static readonly StringName MoveRightName = "KeyboardMoveRight";
 
 	private static InputEventMouseMotion mouseMotion = new();
 
@@ -91,7 +90,11 @@ public partial class KeyboardAndMouseDevice : ControlDevice {
 
 		if ( Engine.IsEditorHint() ) return;
 
-		Callable.From(() => mouseMotion = new()).CallDeferred();
+		Callable.From(UpdateMouse).CallDeferred();
+
+		static void UpdateMouse() {
+			mouseMotion = new();
+		}
 	}
 
 	public override void _Input(InputEvent @event) {

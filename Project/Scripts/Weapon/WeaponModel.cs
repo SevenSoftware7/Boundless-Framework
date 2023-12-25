@@ -5,7 +5,7 @@ using System;
 namespace LandlessSkies.Core;
 
 [Tool]
-public abstract partial class WeaponModel : Loadable3D, IInjectable<Skeleton3D?>, IInjectable<IWeapon.Handedness> {
+public abstract partial class WeaponModel : Loadable3D, IInjectable<Skeleton3D?>, IInjectable<IWeapon.Handedness>, ICustomizable {
 
 	private WeaponCostume _costume = null!;
 
@@ -15,17 +15,17 @@ public abstract partial class WeaponModel : Loadable3D, IInjectable<Skeleton3D?>
 		private set => _costume ??= value;
 	}
 
+	public virtual IUIObject UIObject => Costume;
+	public virtual ICustomizable[] Children => [];
+	public virtual ICustomizationParameter[] Customizations => [];
 
 
-	protected WeaponModel() : base() {
-		Name = nameof(WeaponModel);
-	}
+
+	protected WeaponModel() : base() {}
 	public WeaponModel(WeaponCostume costume, Node3D root) : base(root) {
 		ArgumentNullException.ThrowIfNull(costume);
 
 		_costume = costume;
-
-		Name = nameof(WeaponModel);
 	}
 	
 	

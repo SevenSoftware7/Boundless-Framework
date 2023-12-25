@@ -1,3 +1,5 @@
+using System;
+using System.Runtime.CompilerServices;
 using Godot;
 
 using Godot.Collections;
@@ -8,7 +10,6 @@ namespace LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public sealed partial class Player : Node {
-	
 	private byte _playerId;
 	private CameraController3D? _cameraController;
 
@@ -93,11 +94,15 @@ public sealed partial class Player : Node {
 
 		if ( Entity is null || CameraController is null || ControlDevice is null ) return;
 
-		Callable.From( () => Entity.HandleInput(new(
-			ControlDevice,
-			CameraController,
-			Entity
-		)) ).CallDeferred();
+		Callable.From(SendInput).CallDeferred();
+
+		void SendInput() {
+			Entity.HandleInput(new(
+				ControlDevice,
+				CameraController,
+				Entity
+			));
+		}
 	}
 
 	public override void _Ready() {

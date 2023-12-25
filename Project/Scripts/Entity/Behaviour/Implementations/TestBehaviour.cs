@@ -8,7 +8,6 @@ using static LandlessSkies.Core.ControlDevice.InputType;
 namespace LandlessSkies.Core;
 
 public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
-
 	private Vector3 _moveDirection;
 	private Vector3 _rotationForward = Vector3.Forward;
 	private float _moveSpeed;
@@ -57,34 +56,27 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 
 		if (Entity.IsOnFloor() && Entity.CurrentAction is not EvadeAction) {
 			if ( speed == MovementSpeed.Idle ) {
-
 				// MovementStopAnimation();
-
 			} else if ( (int)speed > (int)_movementSpeed ) {
-
 				// MovementStartAnimation(speed);
-
 			}
 		}
 
 		_movementSpeed = speed;
 		return true;
 	}
-
 	public override bool Move(Vector3 direction) {
 		if ( ! base.Move(direction) ) return false;
 
 		_moveDirection = direction;
 		return true;
 	}
-
 	public override bool Jump(Vector3? target = null) {
 		if ( ! base.Jump(target) ) return false;
 
 		jumpBuffer.SetDurationMSec(125);
 		return true;
 	}
-	
 	
 
 	public override void _Process(double delta) {

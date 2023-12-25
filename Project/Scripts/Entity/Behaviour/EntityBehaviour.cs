@@ -7,7 +7,6 @@ namespace LandlessSkies.Core;
 
 [GlobalClass]
 public abstract partial class EntityBehaviour : Node, IInputReader {
-
 	[Export] public Entity Entity = null!;
 
 	public abstract bool FreeOnStop { get; }
