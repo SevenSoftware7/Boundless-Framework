@@ -6,7 +6,10 @@ namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
-public partial class WeaponData : Resource {
+public partial class WeaponData : Resource, IUIObject {
+	
+	[Export] public string DisplayName { get; private set; } = "";
+	public Texture2D? DisplayPortrait => BaseCostume?.DisplayPortrait;
 
 	[Export] public WeaponCostume? BaseCostume { get; private set; }
 

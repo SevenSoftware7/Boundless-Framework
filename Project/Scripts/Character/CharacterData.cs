@@ -5,11 +5,15 @@ namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
-public partial class CharacterData : Resource {
+public partial class CharacterData : Resource, IUIObject {
+	
+	[Export] public string DisplayName { get; private set; } = "";
+	public Texture2D? DisplayPortrait => BaseCostume?.DisplayPortrait;
 
 	[Export] public CharacterCostume? BaseCostume { get; private set; }
 	[Export] public PackedScene? CollisionScene { get; private set; }
 	[Export] public PackedScene? SkeletonScene { get; private set; }
+
 
 	public const float DEFAULT_MAX_HEALTH = 100f;
 	[Export] public float maxHealth = DEFAULT_MAX_HEALTH;
