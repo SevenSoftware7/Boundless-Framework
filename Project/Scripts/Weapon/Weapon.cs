@@ -7,17 +7,17 @@ namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
-public abstract partial class Weapon : Loadable3D, IWeapon, IInjectable<Entity?>, IInputReader, ICustomizable {
+public abstract partial class Weapon : Loadable3D, IWeapon, IInjectable<Entity?> {
 	[Export] public abstract WeaponData Data { get; protected set; }
 
-	[Export] public abstract IWeapon.Handedness WeaponHandedness { get; set; }
-	[Export] public IWeapon.Type WeaponType {
-		get => Data?.Type ?? 0;
-		set {}
-	}
 
 	[ExportGroup("Costume")]
 	[Export] public abstract WeaponCostume? Costume { get; set; }
+
+
+
+	public IWeapon.Type WeaponType => Data?.Type ?? 0;
+	public abstract IWeapon.Handedness WeaponHandedness { get; set; }
 
 	public virtual IUIObject UIObject => Data;
 	public virtual ICustomizable[] Children => [];
@@ -28,7 +28,7 @@ public abstract partial class Weapon : Loadable3D, IWeapon, IInjectable<Entity?>
 
 
 
-	public Weapon() : base() {}
+	protected Weapon() : base() {}
 	public Weapon(WeaponData data, WeaponCostume? costume, Node3D root) : base(root) {
 		ArgumentNullException.ThrowIfNull(data);
 
@@ -38,12 +38,13 @@ public abstract partial class Weapon : Loadable3D, IWeapon, IInjectable<Entity?>
 
 
 
-	public virtual void HandleInput(Player.InputInfo inputInfo) {}
-
-	public abstract IEnumerable<AttackAction.Info> GetAttacks(Entity target);
+	public abstract void SetCostume(WeaponCostume? costume);
 
 
+	public abstract IEnumerable<AttackAction.IAttackInfo> GetAttacks(Entity target);
 	public virtual void Inject(Entity? owner) {}
 
-	public abstract void SetCostume(WeaponCostume? costume);
+
+	public virtual void HandleInput(Player.InputInfo inputInfo) {}
+
 }

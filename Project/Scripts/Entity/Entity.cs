@@ -119,7 +119,9 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 		Character?.SetCostume(costume);
 	}
 
-	public void ExecuteAction(EntityAction.Info action) {
+	public void ExecuteAction(EntityAction.IInfo action, bool ignoreCancellability = false) {
+		if ( CurrentAction is EntityAction currentAction && ! currentAction.IsCancellable && ! ignoreCancellability ) return;
+
 		try {
 			CurrentAction?.Dispose();
 			CurrentAction = null;
@@ -193,17 +195,24 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 
 		ConnectEvents();
 
-		if ( Engine.IsEditorHint() ) return;
+		if ( ! Engine.IsEditorHint() ) {
+			BehaviourManager ??= new(this);
+			BehaviourManager?.SetBehaviour<TestBehaviour>( () => new(this) );
+		}
 
-		BehaviourManager ??= new(this);
-		BehaviourManager?.SetBehaviour<TestBehaviour>( () => new(this) );
 	}
+
 
 	public override void _ExitTree() {
 		base._ExitTree();
 
 		DisconnectEvents();
+	}
 
-		_weapon?.Inject(null);
+	public override void _Notification(int what) {
+		base._Notification(what);
+		if (what == NotificationUnparented) { // TODO: Wait for NotificationPredelete to be fixed (never lol)
+			Callable.From(() => _weapon?.Inject(null)).CallDeferred();
+		}
 	}
 }

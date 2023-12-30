@@ -8,7 +8,8 @@ public abstract class EvadeAction : EntityAction {
 
 
 
-	public new abstract class Info() : EntityAction.Info() {
-		protected abstract override EvadeAction Build();
+	public interface IEvadeInfo : IInfo {
+		public new EvadeAction Build();
+		EntityAction IInfo.Build() => Build();
 	}
 }

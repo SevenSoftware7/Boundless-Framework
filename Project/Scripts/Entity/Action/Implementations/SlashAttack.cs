@@ -3,7 +3,7 @@ using Godot;
 
 namespace LandlessSkies.Core;
 
-public class SlashAttack : AttackAction {
+public sealed class SlashAttack : AttackAction {
 	public override bool IsCancellable => false;
 	public override bool IsKnockable => true;
 
@@ -16,12 +16,19 @@ public class SlashAttack : AttackAction {
 
 
 
-	public new class Info(Weapon weapon) : AttackAction.Info(weapon) {
-		public override float PotentialDamage => 2f;
-		public override AttackType Type => AttackType.Melee | AttackType.Parry;
+	public record struct Info(Weapon Weapon) : IAttackInfo {
+		public Weapon Weapon { get; init; } = Weapon;
+		public readonly float PotentialDamage => 2f;
+		public readonly AttackType Type => AttackType.Melee | AttackType.Parry;
 
-		protected override SlashAttack Build() {
+		public Action? BeforeExecute { get; set; }
+		public Action? AfterExecute { get; set; }
+
+
+
+		public readonly AttackAction Build() {
 			return new SlashAttack();
 		}
+
 	}
 }

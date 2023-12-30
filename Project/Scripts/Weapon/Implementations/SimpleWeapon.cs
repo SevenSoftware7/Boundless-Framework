@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 
@@ -13,6 +13,8 @@ public partial class SimpleWeapon : Weapon {
 	private IWeapon.Handedness _weaponHandedness = IWeapon.Handedness.Right;
 	
 	
+
+	
 	public override WeaponData Data {
 		get => _data;
 		protected set {
@@ -20,14 +22,24 @@ public partial class SimpleWeapon : Weapon {
 			_data = value;
 
 			if (Costume is not null) return;
-			SetCostume(_data.BaseCostume);
+			SetCostume(_data?.BaseCostume);
 		}
 	}
 
+	[ExportGroup("Costume")]
 	public override WeaponCostume? Costume {
 		get => WeaponModel?.Costume;
 		set => SetCostume(value);
 	}
+	[Export] private WeaponModel? WeaponModel;
+
+
+	[ExportGroup("Dependencies")]
+	[Export] public Entity? Entity {
+		get => _entity;
+		private set => Inject(value);
+	}
+
 
 	public override IWeapon.Handedness WeaponHandedness {
 		get => _weaponHandedness;
@@ -37,17 +49,7 @@ public partial class SimpleWeapon : Weapon {
 		}
 	}
 
-
-	[ExportGroup("Costume")]
-	[Export] private WeaponModel? WeaponModel;
-
-
-	[ExportGroup("Dependencies")]
-	[Export] public Entity? Entity {
-		get => _entity;
-		private set => Inject(value);
-	}
-	public override ICustomizable[] Children => [WeaponModel!];
+	public override ICustomizable[] Children => [.. base.Children.Append(WeaponModel!)];
 
 
 
@@ -113,7 +115,7 @@ public partial class SimpleWeapon : Weapon {
 	}
 
 
-	public override IEnumerable<AttackAction.Info> GetAttacks(Entity target) {
+	public override IEnumerable<AttackAction.IAttackInfo> GetAttacks(Entity target) {
 		return [];
 	}
 

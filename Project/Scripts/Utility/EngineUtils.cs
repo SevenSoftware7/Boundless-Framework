@@ -6,6 +6,8 @@ using Godot;
 namespace LandlessSkies.Core;
 
 public static class EngineUtils {
+
+#if TOOLS
 	private static readonly ulong buildFrame = 0;
 
 
@@ -13,24 +15,41 @@ public static class EngineUtils {
 	static EngineUtils() {
 		buildFrame = Engine.GetProcessFrames();
 	}
+#endif
 
 
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool JustBuilt(this Node node) =>
+#if TOOLS
 		node.IsNodeReady() && Engine.GetProcessFrames() == buildFrame;
+#else
+		false;
+#endif
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool IsEditorGetSetter(this Node node) =>
+#if TOOLS
 		!node.IsNodeReady() || Engine.GetProcessFrames() == buildFrame;
+#else
+		false;
+#endif
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool IsEditorEnterTree(this Node node) =>
-		node.IsNodeReady() || Engine.GetProcessFrames() == buildFrame;
+#if TOOLS
+		node.IsNodeReady() || Engine.GetProcessFrames() == buildFrame; // TODO: Make this return true when switching scene
+#else
+		false;
+#endif
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool IsEditorExitTree(this Node node) =>
-		!node.IsNodeReady() || Engine.GetProcessFrames() == buildFrame;
+#if TOOLS
+		!node.IsNodeReady() || Engine.GetProcessFrames() == buildFrame; // TODO: Make this return true when switching scene
+#else
+		false;
+#endif
 
 
 

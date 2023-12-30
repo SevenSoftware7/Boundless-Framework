@@ -21,17 +21,18 @@ public partial class EleosWeapon : SimpleWeapon {
 		attacks = new(this);
 	}
 
-	public override IEnumerable<AttackAction.Info> GetAttacks(Entity target) {
+	public override IEnumerable<AttackAction.IAttackInfo> GetAttacks(Entity target) {
 		return [
 			attacks.slashAttack,
 		];
 	}
 
+
 	public override void HandleInput(Player.InputInfo inputInfo) {
 		base.HandleInput(inputInfo);
 
 		if ( Entity is null ) return;
-		if ( ! (Entity.CurrentAction?.IsCancellable ?? true) ) return;
+		if ( Entity.CurrentAction is EntityAction action && action.IsCancellable ) return;
 
 		if ( inputInfo.ControlDevice.IsInputJustPressed(ControlDevice.InputType.LightAttack) ) {
 			Entity.ExecuteAction(attacks.slashAttack);

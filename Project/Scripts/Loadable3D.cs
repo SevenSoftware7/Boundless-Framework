@@ -35,7 +35,7 @@ public abstract partial class Loadable3D : Node3D, ILoadable {
 
 
 
-	public Loadable3D() : base() {
+	protected Loadable3D() : base() {
 		Name = GetType().Name;
 	}
 	public Loadable3D(Node3D root) : this() {
@@ -98,17 +98,18 @@ public abstract partial class Loadable3D : Node3D, ILoadable {
 	}
 
 
-
-	public override void _EnterTree() {
-		base._EnterTree();
-		if ( this.IsEditorEnterTree() ) return;
-
-		LoadModel();
-	}
-	public override void _ExitTree() {
-		base._ExitTree();
-		if ( this.IsEditorExitTree() ) return;
-
-		UnloadModel();
+	public override void _Notification(int what) {
+		base._Notification(what);
+		switch((long)what) {
+			case NotificationUnparented:
+				Callable.From(UnloadModel).CallDeferred();
+				break;
+			case NotificationParented:
+				Callable.From(LoadModel).CallDeferred();
+				break;
+		}
+		// if (what == NotificationUnparented) { // TODO: Wait for NotificationPredelete to be fixed (never lol)
+		// 	Callable.From(UnloadModel).CallDeferred();
+		// }
 	}
 }

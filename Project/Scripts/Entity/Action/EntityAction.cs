@@ -43,22 +43,21 @@ public abstract class EntityAction : IDisposable, IInputReader {
 
 
 
-	public abstract class Info {
-		public abstract float PotentialDamage { get; }
-
-		public event Action? BeforeExecute;
-		public event Action? AfterExecute;
+	public interface IInfo {
+		Action? BeforeExecute { get; set; }
+		Action? AfterExecute { get; set; }
 
 
-		public EntityAction Execute() {
-			BeforeExecute?.Invoke();
-			EntityAction attack = Build();
-			attack.OnDispose += AfterExecute;
+		EntityAction Build();
+	}
+}
 
-			BeforeExecute = null;
-			AfterExecute = null;
-			return attack;
-		}
-		protected abstract EntityAction Build();
+public static class EntityActionExtensions {
+	public static EntityAction Execute(this EntityAction.IInfo info) {
+		info.BeforeExecute?.Invoke();
+		EntityAction action = info.Build();
+		action.OnDispose += info.AfterExecute;
+
+		return action;
 	}
 }

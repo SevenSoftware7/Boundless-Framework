@@ -8,16 +8,19 @@ namespace LandlessSkies.Core;
 
 public abstract class AttackAction : EntityAction {
 
-	public new abstract class Info(Weapon weapon) : EntityAction.Info() {
-		public readonly Weapon Weapon = weapon;
-		public abstract AttackType Type { get; }
+	public interface IAttackInfo : IInfo {
+		public Weapon Weapon { get; init; }
+
+		float PotentialDamage { get; }
+		AttackType Type { get; }
 
 
 
-		protected abstract override AttackAction Build();
+		public new AttackAction Build();
+		EntityAction IInfo.Build() => Build();
 
 		
-		public static Info SelectAttack(Info[] attacks, IComparer<Info> priority, float skillLevel = 0.5f) {
+		public static IAttackInfo SelectAttack(IAttackInfo[] attacks, IComparer<IAttackInfo> priority, float skillLevel = 0.5f) {
 			skillLevel = Mathf.Clamp(skillLevel, 0, 1);
 
 			Array.Sort(attacks, priority);
@@ -28,28 +31,29 @@ public abstract class AttackAction : EntityAction {
 			return attacks[weightedIndex];
 		}
 
-		[Flags]
-		public enum AttackType : byte {
-			Melee = 1 << 0,
-			Projectile = 1 << 1,
-			Hitscan = 1 << 2,
-			Parry = 1 << 3,
-		}
-
 
 
 		public static class Comparers {
-			public readonly static IComparer<Info> PureDamage = new ComparisonComparer<Info>(
+			public readonly static IComparer<IAttackInfo> PureDamage = new ComparisonComparer(
 				(a, b) => a?.PotentialDamage.CompareTo(b?.PotentialDamage ?? 0) ?? 0
 			);
 
 
 
-			private class ComparisonComparer<T>(Comparison<T?> Comparison) : IComparer<T> where T : notnull {
-				public int Compare(T? x, T? y) {
+			private class ComparisonComparer(Comparison<IAttackInfo?> Comparison) : IComparer<IAttackInfo> {
+				public int Compare(IAttackInfo? x, IAttackInfo? y) {
 					return Comparison(x, y);
 				}
 			}
 		}
+	}
+	
+
+	[Flags]
+	public enum AttackType : byte {
+		Melee = 1 << 0,
+		Projectile = 1 << 1,
+		Hitscan = 1 << 2,
+		Parry = 1 << 3,
 	}
 }

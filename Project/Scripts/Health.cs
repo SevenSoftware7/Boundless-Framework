@@ -24,12 +24,9 @@ public partial class Health : Node {
 	}
 
 	[Export] public float Amount {
-		get {
-			_amount = Mathf.Clamp(_amount, 0f, _maxAmount);
-			return _amount;
-		}
+		get => _amount;
 		set {
-			_amount = value;
+			_amount = Mathf.Clamp(value, 0f, _maxAmount);
 
 			const ulong damagedHealthDuration = (ulong)(1.25 * 1000);
 			_damagedHealthTimer.SetDurationMSec(damagedHealthDuration);
@@ -40,7 +37,7 @@ public partial class Health : Node {
 
 	[Export] public float DamagedHealth {
 		get => _damagedHealth;
-		private set => _damagedHealth = value;
+		private set {}
 	}
 
 

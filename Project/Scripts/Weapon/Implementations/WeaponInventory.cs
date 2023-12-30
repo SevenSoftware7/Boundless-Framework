@@ -14,12 +14,17 @@ public sealed partial class WeaponInventory : Weapon, IUIObject {
 	private Entity? _entity;
 	private List<Weapon> _weapons = [];
 	private int _currentIndex = 0;
-	
-	
+
+
 
 	[Export] private Array<Weapon> Weapons {
 		get => [.. _weapons];
 		set {
+			if (value is null) {
+				_weapons = [];
+				return;
+			}
+
 			_weapons = [.. value];
 #if TOOLS
 			if ( this.IsEditorGetSetter() ) return;
@@ -41,11 +46,20 @@ public sealed partial class WeaponInventory : Weapon, IUIObject {
 		}
 	}
 
+
+	[ExportGroup("Dependencies")]
+	[Export] public Entity? Entity {
+		get => _entity;
+		set => Inject(value);
+	}
+
+
+
 	public Weapon? CurrentWeapon {
 		get => IndexInBounds(CurrentIndex) ? _weapons[CurrentIndex] : null;
 		private set {
 			if (value is not null) {
-				int index = _weapons.IndexOf(value);
+				int index = _weapons.IndexOf(value); 
 				CurrentIndex = index;
 			}
 		}
@@ -68,24 +82,20 @@ public sealed partial class WeaponInventory : Weapon, IUIObject {
 		}
 	}
 
+
 	public override IWeapon.Handedness WeaponHandedness {
 		get {
-			if ( ! IndexInBounds(CurrentIndex) || _weapons[CurrentIndex] is not Weapon weapon ) return IWeapon.Handedness.Right;
+			if ( CurrentWeapon is not Weapon weapon ) {
+				return IWeapon.Handedness.Right;
+			}
 
 			return weapon.WeaponHandedness;
 		}
 		set {
-			if (CurrentWeapon is not null) {
+			if ( CurrentWeapon is not null ) {
 				CurrentWeapon.WeaponHandedness = value;
 			}
 		}
-	}
-
-
-	[ExportGroup("Dependencies")]
-	[Export] public Entity? Entity {
-		get => _entity;
-		set => Inject(value);
 	}
 
 	public string DisplayName => "Inventory";
@@ -100,78 +110,67 @@ public sealed partial class WeaponInventory : Weapon, IUIObject {
 
 
 
-	private bool IndexInBounds(int index) {
-		return index < _weapons.Count;
+	private bool IndexInBounds(int index) => index < _weapons.Count && index >= 0;
+	private void UpdateCurrent() {
+		if ( ! IndexInBounds(_currentIndex) ) {
+			_currentIndex = 0;
+		}
+		_weapons.ForEach((w) => w?.Disable());
+		CurrentWeapon?.Enable();
 	}
 
 	public void SwitchTo(Weapon? weapon) {
-		if ( this.IsEditorGetSetter() ) return;
-		if ( _weapons is null || _weapons.Count == 0 ) {
-			_currentIndex = 0;
-			return;
-		}
+		// if ( this.IsEditorGetSetter() ) return;
+		if ( weapon is null ) return;
 
-		if (weapon is null) return;
-		int index = _weapons.IndexOf(weapon);
-		if (index == -1) return;
+		int index = _weapons?.IndexOf(weapon) ?? -1;
 
 		SwitchTo(index);
 	}
 
 	public void SwitchTo(int index) {
-		if ( this.IsEditorGetSetter() ) return;
-		if ( _weapons is null || _weapons.Count == 0 ) {
-			_currentIndex = 0;
-			return;
-		}
+		// if ( this.IsEditorGetSetter() ) return;
+		if ( ! IndexInBounds(index) ) return;
 
-		int maxCount = _weapons.Count - 1;
-		_currentIndex = index > maxCount ? maxCount : index;
+		_currentIndex = index;
 
-		for (int i = 0; i < _weapons.Count; i++) {
-			_weapons[i]?.Disable();
-		}
-
-		_weapons[_currentIndex]?.Enable();
+		UpdateCurrent();
 	}
 
 
 	public void AddWeapon(WeaponData? data, WeaponCostume? costume = null) {
-		if ( this.IsEditorGetSetter() ) return;
-		int index = _weapons.Count;
+		// if ( this.IsEditorGetSetter() ) return;
 
 		_weapons.Add(null!);
 #if TOOLS
 		_weaponDatas.Add(null!);
 #endif
 
-		SetWeapon(index, data, costume);
+		SetWeapon(_weapons.Count, data, costume);
+		UpdateCurrent();
 	}
 
 	public void SetWeapon(int index, WeaponData? data, WeaponCostume? costume = null) {
-		if ( this.IsEditorGetSetter() ) return;
-		if (index >= _weapons.Count) return;
+		// if ( this.IsEditorGetSetter() ) return;
+		if ( ! IndexInBounds(index) ) return;
 
 		Weapon? weapon = _weapons[index];
-		if ( data is not null && weapon?.Data == data ) return;
+		if ( data is not null && data == weapon?.Data ) return;
 
 		LoadableExtensions.UpdateLoadable(ref weapon!)
-			.WithConstructor(() => {
-				Weapon? weapon = data?.Instantiate(this, costume);
-				_weapons[index] = weapon!;
-				return weapon;
-			})
+			.WithConstructor(() => data?.Instantiate(this, costume))
 			.BeforeLoad(() => weapon?.Inject(Entity))
 			.Execute();
 
+		_weapons[index] = weapon!;
 #if TOOLS
 		_weaponDatas[index] = data!;
 #endif
 	}
 
 	public void RemoveWeapon(int index) {
-		if ( this.IsEditorGetSetter() ) return;
-		if (index >= _weapons.Count) return;
+		// if ( this.IsEditorGetSetter() ) return;
+		if ( ! IndexInBounds(index) ) return;
 
 		Weapon? weapon = _weapons[index];
 		LoadableExtensions.DestroyLoadable(ref weapon)
@@ -184,21 +183,25 @@ public sealed partial class WeaponInventory : Weapon, IUIObject {
 	}
 
 	public void SetCostume(int index, WeaponCostume? costume) {
-		if (index >= _weapons.Count) return;
+		if ( ! IndexInBounds(index) ) return;
 
 		_weapons[index]?.SetCostume(costume);
 	}
 
-	public override void SetCostume(WeaponCostume? costume) =>
+	public override void SetCostume(WeaponCostume? costume) {
 		CurrentWeapon?.SetCostume(costume);
+	}
 
-	public override IEnumerable<AttackAction.Info> GetAttacks(Entity target) =>
+
+	public override IEnumerable<AttackAction.IAttackInfo> GetAttacks(Entity target) =>
 		_weapons
 			.SelectMany( (w) => w.GetAttacks(target) )
 			.Select( a => {
 				Weapon? currentWeapon = CurrentWeapon;
-				a.BeforeExecute += () => SwitchTo(a.Weapon);
-				a.AfterExecute += () => SwitchTo(currentWeapon);
+				if (a.Weapon != currentWeapon) {
+					a.BeforeExecute += () => SwitchTo(a.Weapon);
+					a.AfterExecute += () => SwitchTo(currentWeapon);
+				}
 				return a;
 			});
 
@@ -213,7 +216,6 @@ public sealed partial class WeaponInventory : Weapon, IUIObject {
 		CurrentWeapon?.HandleInput(inputInfo);
 	}
 
-
 	public override void Enable() =>
 		CurrentWeapon?.Enable();
 	public override void Disable() =>
@@ -222,7 +224,6 @@ public sealed partial class WeaponInventory : Weapon, IUIObject {
 		_weapons?.ForEach(w => w?.Destroy());
 	public override void ReloadModel(bool forceLoad = false) =>
 		_weapons?.ForEach(w => w?.ReloadModel(forceLoad));
-
 
 	protected override bool LoadModelImmediate() {
 		_weapons?.ForEach(w => w?.LoadModel());

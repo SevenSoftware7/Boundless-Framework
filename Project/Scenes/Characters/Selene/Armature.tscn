@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://dy6781obdw22b"]
 
 [node name="GeneralSkeleton" type="Skeleton3D"]
-unique_name_in_owner = true
 bones/0/name = "Hips"
 bones/0/parent = -1
 bones/0/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.00468e-07, 1.71894, 0.161414)

@@ -6,5 +6,3 @@ height = 3.1
 [node name="CollisionShape3D" type="CollisionShape3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
 shape = SubResource("CapsuleShape3D_4ykub")
-
-[node name="Node3D" type="Node3D" parent="."]

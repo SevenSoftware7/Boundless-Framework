@@ -4,13 +4,13 @@ using System.Collections.Generic;
 
 namespace LandlessSkies.Core;
 
-public interface IWeapon : IDataContainer<WeaponData>, ICostumable<WeaponCostume> {
+public interface IWeapon : IInputReader, ICustomizable, IDataContainer<WeaponData>, ICostumable<WeaponCostume> {
 	Type WeaponType { get; }
 	Handedness WeaponHandedness { get; }
 
 
 
-	IEnumerable<AttackAction.Info> GetAttacks(Entity target);
+	IEnumerable<AttackAction.IAttackInfo> GetAttacks(Entity target);
 
 
 

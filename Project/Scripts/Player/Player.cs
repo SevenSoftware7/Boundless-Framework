@@ -89,8 +89,9 @@ public sealed partial class Player : Node {
 		base._Process(delta);
 
 		if ( Engine.IsEditorHint() ) return;
-		if ( Entity is not null) CameraController?.SetEntityAsSubject(Entity);
-		if ( ControlDevice is not null) CameraController?.HandleCamera(ControlDevice);
+
+		if ( Entity is not null ) CameraController?.SetEntityAsSubject(Entity);
+		if ( ControlDevice is not null ) CameraController?.HandleCamera(ControlDevice);
 
 		if ( Entity is null || CameraController is null || ControlDevice is null ) return;
 
