@@ -95,6 +95,30 @@ public static class EngineUtils {
 		return false;
 	}
 
+
+	public static void PackWithSubnodes(this PackedScene scene, Node path) {
+		ReownChildren(path);
+		void ReownChildren(Node node, uint layer = 0) {
+			foreach (Node item in node.GetChildren()) {
+				Node currentOwner = item.Owner;
+				Callable.From(() => item.Owner = currentOwner).CallDeferred();
+
+				item.Owner = path;
+				ReownChildren(item, layer + 1);
+			}
+		}
+
+		scene.Pack(path);
+	}
+
+	public static void MakeLocal(this Node node, Node owner) {
+		node.SceneFilePath = string.Empty;
+		node.Owner = owner;
+		foreach(Node childNode in node.GetChildren()) {
+			MakeLocal(childNode, owner);
+		}
+	}
+
 	
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static void CallDeferred(this Action action) =>

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Godot.Collections;
 
 
 namespace LandlessSkies.Core;
@@ -132,6 +133,7 @@ public partial class SimpleWeapon : Weapon {
 	}
 
 
+
 	public override void _Ready() {
 		base._Ready();
 
@@ -143,5 +145,15 @@ public partial class SimpleWeapon : Weapon {
 		DisconnectEvents();
 
 		WeaponModel?.Inject(null);
+	}
+
+	public override void _ValidateProperty(Dictionary property) {
+		base._ValidateProperty(property);
+		
+		switch (property["name"].AsStringName()) {
+			case nameof(WeaponModel):
+				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
+				break;
+		}
 	}
 }

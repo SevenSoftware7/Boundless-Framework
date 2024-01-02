@@ -1,4 +1,5 @@
 using Godot;
+using Godot.Collections;
 
 
 namespace LandlessSkies.Core;
@@ -47,6 +48,18 @@ public sealed partial class MeshCharacterModel : CharacterModel {
 
 		if ( Skeleton is not null ) {
 			Transform = new(Skeleton.Transform.Basis, Skeleton.Transform.Origin);
+		}
+	}
+
+
+
+	public override void _ValidateProperty(Dictionary property) {
+		base._ValidateProperty(property);
+		
+		switch (property["name"].AsStringName()) {
+			case nameof(Model):
+				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
+				break;
 		}
 	}
 }

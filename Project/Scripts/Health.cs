@@ -1,4 +1,5 @@
 using Godot;
+using Godot.Collections;
 using SevenGame.Utility;
 
 namespace LandlessSkies.Core;
@@ -65,6 +66,16 @@ public partial class Health : Node {
 			_damagedHealth = MathUtility.SmoothDamp(_damagedHealth, _amount, ref _damagedHealthVelocity, 0.2f, Mathf.Inf, (float)delta);
 		} else {
 			_damagedHealthVelocity = 0f;
+		}
+	}
+
+	public override void _ValidateProperty(Dictionary property) {
+		base._ValidateProperty(property);
+		
+		switch (property["name"].AsStringName()) {
+			case nameof(DamagedHealth):
+				property["usage"] = (int)(PropertyUsageFlags.Editor | PropertyUsageFlags.ReadOnly);
+				break;
 		}
 	}
 }

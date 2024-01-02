@@ -19,7 +19,7 @@ public sealed partial class Player : Node {
 
 
 
-	public byte PlayerId {
+	[Export] public byte PlayerId {
 		get => _playerId;
 		private set => SetPlayerId(value);
 	}

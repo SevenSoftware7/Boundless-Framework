@@ -3,19 +3,13 @@ using Godot;
 namespace SevenGame.Utility;
 
 public interface ISingleton<T> where T : Node {
-	public static T? Instance;
-}
+	public static T? Instance { get; private set; }
 
 
-public static class SingletonHelper {
-	public static T? GetInstance<T>() where T : Node {
-		return ISingleton<T>.Instance;
-	}
-
-	public static void SetInstance<T>(T newInstance) where T : Node {
-		if (ISingleton<T>.Instance is not null && ISingleton<T>.Instance != newInstance) {
+	public static void SetInstance(T newInstance) {
+		if (Instance is not null && Instance != newInstance) {
 			newInstance.QueueFree();
 		}
-		ISingleton<T>.Instance = newInstance;
+		Instance = newInstance;
 	}
 }

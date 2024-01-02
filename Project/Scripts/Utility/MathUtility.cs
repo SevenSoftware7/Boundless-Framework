@@ -149,16 +149,17 @@ public static class MathUtility {
 		parameters.CollideWithAreas = collideWithAreas;
 		parameters.HitFromInside = hitFromInside;
 		parameters.HitBackFaces = hitBackFaces;
+		
 		Dictionary intersect = spaceState.IntersectRay(parameters);
 		if ( intersect.Count > 0 ) {
 			result = new RayCast3DResult() {
 				HasHit = true,
-				Point = (Vector3)intersect["position"],
-				Normal = (Vector3)intersect["normal"],
-				Collider = (GodotObject)intersect["collider"],
-				Id = (ulong)intersect["collider_id"],
-				Rid = (Rid)intersect["rid"],
-				Shape = (int)intersect["shape"],
+				Point = intersect["position"].AsVector3(),
+				Normal = intersect["normal"].AsVector3(),
+				Collider = intersect["collider"].AsGodotObject(),
+				Id = intersect["collider_id"].AsUInt64(),
+				Rid = intersect["rid"].AsRid(),
+				Shape = intersect["shape"].AsInt32(),
 				// Metadata = intersect["metadata"] // Can't seem to get this to work
 			};
 			return true;

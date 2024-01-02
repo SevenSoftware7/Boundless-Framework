@@ -1,4 +1,5 @@
 using Godot;
+using Godot.Collections;
 
 
 namespace LandlessSkies.Core;
@@ -59,6 +60,18 @@ public sealed partial class MeshWeaponModel : WeaponModel {
 
 		if ( Skeleton is not null && Skeleton.TryGetBoneTransform(boneName, out Transform3D handTransform) ) {
 			GlobalTransform = handTransform;
+		}
+	}
+	
+
+
+	public override void _ValidateProperty(Dictionary property) {
+		base._ValidateProperty(property);
+		
+		switch (property["name"].AsStringName()) {
+			case nameof(Model):
+				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
+				break;
 		}
 	}
 }

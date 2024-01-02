@@ -147,7 +147,6 @@ public sealed partial class WeaponInventory : Weapon, IUIObject {
 #endif
 
 		SetWeapon(_weapons.Count, data, costume);
-		UpdateCurrent();
 	}
 
 	public void SetWeapon(int index, WeaponData? data, WeaponCostume? costume = null) {
@@ -166,6 +165,7 @@ public sealed partial class WeaponInventory : Weapon, IUIObject {
 #if TOOLS
 		_weaponDatas[index] = data!;
 #endif
+		UpdateCurrent();
 	}
 
 	public void RemoveWeapon(int index) {
@@ -180,6 +180,7 @@ public sealed partial class WeaponInventory : Weapon, IUIObject {
 #if TOOLS
 		_weaponDatas.RemoveAt(index);
 #endif
+		UpdateCurrent();
 	}
 
 	public void SetCostume(int index, WeaponCostume? costume) {
@@ -232,5 +233,17 @@ public sealed partial class WeaponInventory : Weapon, IUIObject {
 	protected override bool UnloadModelImmediate() {
 		_weapons?.ForEach(w => w?.UnloadModel());
 		return true;
+	}
+
+
+	public override void _ValidateProperty(Dictionary property) {
+		base._ValidateProperty(property);
+		
+		switch (property["name"].AsStringName()) {
+			case nameof(Costume):
+			case nameof(Data):
+				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
+				break;
+		}
 	}
 }

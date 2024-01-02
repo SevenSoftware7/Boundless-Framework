@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SourceGenerators\NodeInterfaces\NodeInterfaces.csproj" PrivateAssets="all" OutputItemType="analyzer" />
-    <ProjectReference Include="..\SourceGenerators\NodeInterfaces.types\NodeInterfaces.types.csproj" />
+    <ProjectReference Include="..\SourceGenerators\SourceGenerator\SourceGenerator.csproj" PrivateAssets="all" OutputItemType="analyzer" />
+    <ProjectReference Include="..\SourceGenerators\SourceGenerator.types\SourceGenerator.types.csproj" />
   </ItemGroup>
 </Project>

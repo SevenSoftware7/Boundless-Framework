@@ -3,10 +3,20 @@
 using Godot;
 using Godot.Collections;
 
+using LandlessSkies.Generators;
+
 
 namespace LandlessSkies.Core;
 
 public partial class Player {
+	// [ExportPropertyUsage(PropertyUsageFlags.Editor | PropertyUsageFlags.ReadOnly)]
+    [Export] public Array<Player?> PlayersList {
+        get => [.. Players];
+        private set {;}
+    }
+
+
+
     public override string[] _GetConfigurationWarnings() {
         string[] warnings = base._GetConfigurationWarnings();
 
@@ -20,52 +30,25 @@ public partial class Player {
         return warnings;
     }
 
-    // TODO: wait for Godot to Implement a PropertyUsageFlags attribute to simplify this
-    // example:
-    // [Export] [PropertyUsageFlags((int)PropertyUsageFlags.Editor)] public Array<Player> PlayersList {
-    //     get => new (Players);
-    //     private set {;}
-    // }
-    public override Array<Dictionary> _GetPropertyList() {
-        Array<Dictionary> defaultValue = base._GetPropertyList() ?? [];
-
-        defaultValue.Add(
-            new Dictionary() {
-                { "name", "PlayersList" },
-                { "type", (int)Variant.Type.Array },
-                { "hint", (int)PropertyHint.None },
-                { "hint_string", $"{Variant.Type.Object:D}/{PropertyHint.NodeType:D}:Player" },
-                { "usage", (int)PropertyUsageFlags.Editor },
-            }
-        );
-
-        defaultValue.Add(
-            new Dictionary() {
-                { "name", PropertyName.PlayerId },
-                { "type", (int)Variant.Type.Int },
-                { "hint", (int)PropertyHint.Range },
-                { "hint_string", $"0,{MaxPlayers - 1}," },
-                { "usage", (int)PropertyUsageFlags.Default },
-            }
-        );
-
-        return defaultValue;
-    }
-    public override Variant _Get(StringName property) {
-        if ( property == "PlayersList" ) {
-            return new Array(Players);
-        }
-        if ( property == PropertyName.PlayerId ) {
-            return PlayerId;
-        }
-        return base._Get(property);
-    }
-
     public override bool _Set(StringName property, Variant value) {
         if ( property == PropertyName.PlayerId && value.VariantType == Variant.Type.Int ) {
             PlayerId = value.AsByte();
         }
         return base._Set(property, value);
     }
+
+	public override void _ValidateProperty(Dictionary property) {
+		base._ValidateProperty(property);
+		
+		switch (property["name"].AsStringName()) {
+			case nameof(PlayerId):
+				property["hint"] = (int)PropertyHint.Range;
+				property["hint_string"] = $"0,{MaxPlayers - 1},";
+				break;
+			case nameof(PlayersList):
+				property["usage"] = (int)(PropertyUsageFlags.Editor | PropertyUsageFlags.ReadOnly);
+				break;
+		}
+	}
 }
 #endif

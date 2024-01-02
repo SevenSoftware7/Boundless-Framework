@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using Godot.Collections;
 using SevenGame.Utility;
 
 
@@ -170,6 +171,7 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	}
 
 
+
 	public override void _Process(double delta) {
 		base._Process(delta);
 
@@ -199,7 +201,6 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 			BehaviourManager ??= new(this);
 			BehaviourManager?.SetBehaviour<TestBehaviour>( () => new(this) );
 		}
-
 	}
 
 
@@ -213,6 +214,16 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 		base._Notification(what);
 		if (what == NotificationUnparented) { // TODO: Wait for NotificationPredelete to be fixed (never lol)
 			Callable.From(() => _weapon?.Inject(null)).CallDeferred();
+		}
+	}
+
+	public override void _ValidateProperty(Dictionary property) {
+		base._ValidateProperty(property);
+		
+		switch (property["name"].AsStringName()) {
+			case nameof(Character):
+				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
+				break;
 		}
 	}
 }

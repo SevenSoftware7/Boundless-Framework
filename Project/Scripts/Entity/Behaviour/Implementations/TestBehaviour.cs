@@ -13,7 +13,8 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 	private float _moveSpeed;
 	private MovementSpeed _movementSpeed;
 
-	private TimeInterval jumpBuffer;
+	private TimeLimit jumpBuffer;
+	private TimeLimit jumpCooldown;
 
 
 	public override bool FreeOnStop => false;
@@ -77,7 +78,8 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 		jumpBuffer.SetDurationMSec(125);
 		return true;
 	}
-	
+
+
 
 	public override void _Process(double delta) {
 		base._Process(delta);
@@ -154,9 +156,10 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 
 
 		// ----- Jump Instruction -----
-		if ( ! jumpBuffer.IsDone && Entity.IsOnFloor() ) {
+		if ( ! jumpBuffer.IsDone && jumpCooldown.IsDone && Entity.IsOnFloor() ) {
 			Entity.Inertia = Entity.Inertia.FlattenInDirection(-Entity.UpDirection) + Entity.UpDirection * 17.5f;
 			jumpBuffer.End();
+			jumpCooldown.SetDurationMSec(500);
 		}
 	}
 }

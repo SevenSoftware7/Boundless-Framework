@@ -1,4 +1,5 @@
 using Godot;
+using Godot.Collections;
 using System;
 
 
@@ -31,4 +32,16 @@ public abstract partial class CharacterModel : Loadable3D, IInjectable<Skeleton3
 	
 	
 	public virtual void Inject(Skeleton3D? value) {}
+
+	
+	
+	public override void _ValidateProperty(Dictionary property) {
+		base._ValidateProperty(property);
+		
+		switch (property["name"].AsStringName()) {
+			case nameof(Costume) when Costume is not null:
+				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
+				break;
+		}
+	}
 }
