@@ -70,6 +70,11 @@ public static class EngineUtils {
 		parent.AddChildAndSetOwner(child);
 		return child;
 	}
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static TNode Unparent<TNode>(this TNode child) where TNode : Node {
+		child.GetParent()?.RemoveChild(child);
+		return child;
+	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static void UnparentAndQueueFree(this Node obj) {

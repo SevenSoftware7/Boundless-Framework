@@ -22,7 +22,6 @@ public partial class WeaponData : Resource, IUIObject {
 
 
 	public virtual Weapon Instantiate(Node3D root, WeaponCostume? costume = null) {
-		return new SimpleWeapon(this, costume ?? BaseCostume, root);
+		return new SingleWeapon(this, costume ?? BaseCostume, root);
 	}
-
 }

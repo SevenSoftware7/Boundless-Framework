@@ -219,8 +219,12 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 
 	public override void _ValidateProperty(Dictionary property) {
 		base._ValidateProperty(property);
-		
+
 		switch (property["name"].AsStringName()) {
+			case nameof(CharacterCostume):
+			case nameof(CharacterData):
+				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
+				break;
 			case nameof(Character):
 				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
 				break;

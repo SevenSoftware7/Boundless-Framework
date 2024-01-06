@@ -74,7 +74,7 @@ public partial class Health : Node {
 		
 		switch (property["name"].AsStringName()) {
 			case nameof(DamagedHealth):
-				property["usage"] = (int)(PropertyUsageFlags.Editor | PropertyUsageFlags.ReadOnly);
+				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage | PropertyUsageFlags.ReadOnly);
 				break;
 		}
 	}

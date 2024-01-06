@@ -37,7 +37,7 @@ public partial class Player {
 				property["hint_string"] = $"0,{MaxPlayers - 1},";
 				break;
 			case nameof(PlayersList):
-				property["usage"] = (int)(PropertyUsageFlags.Editor | PropertyUsageFlags.ReadOnly);
+				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage | PropertyUsageFlags.ReadOnly);
 				break;
 		}
 	}

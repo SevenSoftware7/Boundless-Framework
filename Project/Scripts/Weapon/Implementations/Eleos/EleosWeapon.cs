@@ -6,7 +6,7 @@ namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
-public partial class EleosWeapon : SimpleWeapon {
+public partial class EleosWeapon : SingleWeapon {
 	private Attacks attacks;
 
 

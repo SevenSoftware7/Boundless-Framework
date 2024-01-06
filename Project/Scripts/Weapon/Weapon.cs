@@ -9,11 +9,10 @@ namespace LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public abstract partial class Weapon : Loadable3D, IWeapon, IInjectable<Entity?> {
-	[Export] public abstract WeaponData Data { get; protected set; }
-
+	public abstract WeaponData Data { get; protected set; }
 
 	[ExportGroup("Costume")]
-	[Export] public abstract WeaponCostume? Costume { get; set; }
+	public abstract WeaponCostume? Costume { get; set; }
 
 
 
@@ -47,16 +46,4 @@ public abstract partial class Weapon : Loadable3D, IWeapon, IInjectable<Entity?>
 
 
 	public virtual void HandleInput(Player.InputInfo inputInfo) {}
-	
-
-
-	public override void _ValidateProperty(Dictionary property) {
-		base._ValidateProperty(property);
-
-		switch (property["name"].AsStringName()) {
-			case nameof(Data) when Data is not null:
-				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
-				break;
-		}
-	}
 }

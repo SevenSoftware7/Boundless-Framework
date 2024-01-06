@@ -131,13 +131,18 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 
 	public override void _ValidateProperty(Dictionary property) {
 		base._ValidateProperty(property);
+
+		PropertyUsageFlags current = property["usage"].As<PropertyUsageFlags>();
 		
 		switch (property["name"].AsStringName()) {
 			case nameof(Collisions)		 :
 			case nameof(Armature)		 :
 			case nameof(CharacterModel)  :
 			case nameof(Data) 			 when Data is not null:
-				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
+				property["usage"] = (int)(current | PropertyUsageFlags.ReadOnly);
+				break;
+			case nameof(Costume)         :
+				property["usage"] = (int)(current & ~PropertyUsageFlags.Storage);
 				break;
 		}
 	}
