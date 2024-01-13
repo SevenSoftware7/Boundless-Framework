@@ -1,12 +1,13 @@
 using System;
+using Godot;
 
 namespace LandlessSkies.Core;
 
 public ref struct LoadableDestructor<TLoadable> where TLoadable : ILoadable {
 	private ref TLoadable? loadable;
 	private Loadable3D.LoadedUnloadedEventHandler? onLoadUnload;
-	private Action? onBeforeUnload;
-	private Action? onAfterUnload;
+	private Action<TLoadable>? onBeforeUnload;
+	private Action<TLoadable>? onAfterUnload;
 
 
 
@@ -19,22 +20,22 @@ public ref struct LoadableDestructor<TLoadable> where TLoadable : ILoadable {
 	public LoadableDestructor<TLoadable> OnLoadUnload(Loadable3D.LoadedUnloadedEventHandler onLoadUnload) =>
 		this with {onLoadUnload = this.onLoadUnload + onLoadUnload};
 
-	public LoadableDestructor<TLoadable> BeforeUnload(Action onBeforeUnload) =>
+	public LoadableDestructor<TLoadable> BeforeUnload(Action<TLoadable> onBeforeUnload) =>
 		this with {onBeforeUnload = this.onBeforeUnload + onBeforeUnload};
 
-	public LoadableDestructor<TLoadable> AfterUnload(Action onAfterUnload) =>
+	public LoadableDestructor<TLoadable> AfterUnload(Action<TLoadable> onAfterUnload) =>
 		this with {onAfterUnload = this.onAfterUnload + onAfterUnload};
 
 
 	public readonly void Execute() {
 		if ( loadable is null ) return;
 
-		onBeforeUnload?.Invoke();
+		onBeforeUnload?.Invoke(loadable);
 
 		loadable.LoadUnloadEvent -= onLoadUnload;
 		loadable.UnloadModel();
 
-		onAfterUnload?.Invoke();
+		onAfterUnload?.Invoke(loadable);
 
 		loadable.Destroy();
 		loadable = default;
@@ -44,16 +45,17 @@ public ref struct LoadableDestructor<TLoadable> where TLoadable : ILoadable {
 
 public ref struct LoadableUpdater<TLoadable> where TLoadable : ILoadable {
 	private ref TLoadable? loadable;
-	private Func<TLoadable?>? instantiator;
+	private readonly Func<TLoadable?>? instantiator;
 	private Loadable3D.LoadedUnloadedEventHandler? onLoadUnload;
-	private Action? onBeforeLoad;
-	private Action? onAfterLoad;
+	private Action<TLoadable>? onBeforeLoad;
+	private Action<TLoadable>? onAfterLoad;
 	private LoadableDestructor<TLoadable> destructor;
 
 
 
-	internal LoadableUpdater(ref TLoadable? loadable) {
+	internal LoadableUpdater(ref TLoadable? loadable, Func<TLoadable?> instantiator) {
 		this.loadable = ref loadable;
+		this.instantiator = instantiator;
 		destructor = new(ref loadable);
 	}
 
@@ -62,19 +64,16 @@ public ref struct LoadableUpdater<TLoadable> where TLoadable : ILoadable {
 	public LoadableUpdater<TLoadable> OnLoadUnloadEvent(Loadable3D.LoadedUnloadedEventHandler onLoadUnload) =>
 		this with {onLoadUnload = this.onLoadUnload + onLoadUnload, destructor = destructor.OnLoadUnload(onLoadUnload)};
 
-	public LoadableUpdater<TLoadable> BeforeUnload(Action onBeforeUnload) =>
+	public LoadableUpdater<TLoadable> BeforeUnload(Action<TLoadable> onBeforeUnload) =>
 		this with {destructor = destructor.BeforeUnload(onBeforeUnload)};
 
-	public LoadableUpdater<TLoadable> AfterUnload(Action onAfterUnload) =>
+	public LoadableUpdater<TLoadable> AfterUnload(Action<TLoadable> onAfterUnload) =>
 		this with {destructor = destructor.AfterUnload(onAfterUnload)};
 
-	public LoadableUpdater<TLoadable> WithConstructor(Func<TLoadable?> instantiator) =>
-		this with {instantiator = instantiator};
-
-	public LoadableUpdater<TLoadable> BeforeLoad(Action onBeforeLoad) =>
+	public LoadableUpdater<TLoadable> BeforeLoad(Action<TLoadable> onBeforeLoad) =>
 		this with {onBeforeLoad = this.onBeforeLoad + onBeforeLoad};
 
-	public LoadableUpdater<TLoadable> AfterLoad(Action onAfterLoad) =>
+	public LoadableUpdater<TLoadable> AfterLoad(Action<TLoadable> onAfterLoad) =>
 		this with {onAfterLoad = this.onAfterLoad + onAfterLoad};
 
 
@@ -85,20 +84,11 @@ public ref struct LoadableUpdater<TLoadable> where TLoadable : ILoadable {
 
 		loadable = instantiated;
 
-		onBeforeLoad?.Invoke();
+		onBeforeLoad?.Invoke(loadable);
 
 		loadable.LoadModel();
 		loadable.LoadUnloadEvent += onLoadUnload;
 
-		onAfterLoad?.Invoke();
+		onAfterLoad?.Invoke(loadable);
 	}
-}
-
-public static class LoadableExtensions {
-	public static LoadableDestructor<TLoadable> DestroyLoadable<TLoadable>(ref TLoadable? loadable) where TLoadable : ILoadable =>
-		new(ref loadable);
-
-	public static LoadableUpdater<TLoadable> UpdateLoadable<TLoadable>(ref TLoadable? loadable) where TLoadable : ILoadable =>
-		new(ref loadable);
-
 }

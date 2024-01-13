@@ -10,7 +10,7 @@ public interface IWeapon : IInputReader, ICustomizable, IDataContainer<WeaponDat
 
 
 
-	IEnumerable<AttackAction.IAttackInfo> GetAttacks(Entity target);
+	IEnumerable<AttackAction.IInfo> GetAttacks(Entity target);
 
 
 

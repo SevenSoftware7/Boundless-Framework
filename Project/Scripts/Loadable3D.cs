@@ -3,7 +3,7 @@ using Godot;
 namespace LandlessSkies.Core;
 
 [Tool]
-public abstract partial class Loadable3D : Node3D, ILoadable {
+public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
 	private bool _isLoaded = false;
 
 
@@ -44,21 +44,23 @@ public abstract partial class Loadable3D : Node3D, ILoadable {
 
 
 
-	public void LoadModel() {
-		if ( IsLoaded ) return;
+	public bool LoadModel() {
+		if ( IsLoaded ) return false;
 
-		if ( ! LoadModelImmediate() ) return;
+		if ( ! LoadModelImmediate() ) return false;
 
 		_isLoaded = true;
 		EmitSignal(SignalName.LoadedUnloaded, true);
+		return true;
 	}
-	public void UnloadModel() {
-		if ( ! IsLoaded ) return;
+	public bool UnloadModel() {
+		if ( ! IsLoaded ) return false;
 
-		if ( ! UnloadModelImmediate() ) return;
+		if ( ! UnloadModelImmediate() ) return false;
 
 		_isLoaded = false;
 		EmitSignal(SignalName.LoadedUnloaded, false);
+		return true;
 	}
 	public virtual void ReloadModel(bool forceLoad = false) {
 		bool wasLoaded = IsLoaded;
@@ -98,18 +100,14 @@ public abstract partial class Loadable3D : Node3D, ILoadable {
 	}
 
 
-	public override void _Notification(int what) {
-		base._Notification(what);
-		switch((long)what) {
-			case NotificationUnparented:
-				Callable.From(UnloadModel).CallDeferred();
-				break;
-			case NotificationParented:
-				Callable.From(LoadModel).CallDeferred();
-				break;
-		}
-		// if (what == NotificationUnparented) { // TODO: Wait for NotificationPredelete to be fixed (never lol)
-		// 	Callable.From(UnloadModel).CallDeferred();
-		// }
+
+	public override void _Ready() {
+		base._Ready();
+		LoadModel();
+	}
+
+	public override void _ExitTree() {
+		base._ExitTree();
+		UnloadModel();
 	}
 }

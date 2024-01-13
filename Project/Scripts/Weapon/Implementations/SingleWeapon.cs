@@ -22,6 +22,7 @@ public partial class SingleWeapon : Weapon {
 			if (_data is not null) return;
 			_data = value;
 
+			if ( this.IsEditorGetSetter() ) return;
 			if (Costume is not null) return;
 			SetCostume(_data?.BaseCostume);
 		}
@@ -30,7 +31,10 @@ public partial class SingleWeapon : Weapon {
 	[ExportGroup("Costume")]
 	[Export] public override WeaponCostume? Costume {
 		get => WeaponModel?.Costume;
-		set => SetCostume(value);
+		set {
+			if ( this.IsEditorGetSetter() ) return;
+			SetCostume(value);
+		}
 	}
 	[Export] private WeaponModel? WeaponModel;
 
@@ -38,7 +42,13 @@ public partial class SingleWeapon : Weapon {
 	[ExportGroup("Dependencies")]
 	[Export] public Entity? Entity {
 		get => _entity;
-		private set => Inject(value);
+		private set {
+			if ( this.IsEditorGetSetter() ) {
+				_entity = value;
+				return;
+			}
+			Inject(value);
+		}
 	}
 
 
@@ -56,11 +66,13 @@ public partial class SingleWeapon : Weapon {
 
 	protected SingleWeapon() : base() {
 		InitializeAttacks();
-
-		// Reconnect events on build
-		if ( this.JustBuilt() ) Callable.From(ConnectEvents).CallDeferred();
+		
+		if (this.JustBuilt()) Callable.From(() => {
+			DisconnectEvents();
+			ConnectEvents();
+		}).CallDeferred();
 	}
-	public SingleWeapon(WeaponData data, WeaponCostume? costume, Node3D root) : base(data, costume, root) {
+	public SingleWeapon(WeaponData data, WeaponCostume? costume) : base(data, costume) {
 		InitializeAttacks();
 	}
 
@@ -70,16 +82,13 @@ public partial class SingleWeapon : Weapon {
 
 
 	public override void SetCostume(WeaponCostume? costume) {
-		if ( this.IsEditorGetSetter() ) return;
-
 		WeaponCostume? oldCostume = Costume;
 		if ( costume == oldCostume ) return;
 
-		LoadableExtensions.UpdateLoadable(ref WeaponModel)
-			.WithConstructor(() => costume?.Instantiate(this))
-			.BeforeLoad(() => {
-				WeaponModel!.Inject(Entity?.Armature);
-				WeaponModel!.Inject(WeaponHandedness);
+		new LoadableUpdater<WeaponModel>(ref WeaponModel, () => costume?.Instantiate(this))
+			.BeforeLoad(m => {
+				m.Inject(Entity?.Armature);
+				m.Inject(WeaponHandedness);
 			})
 			.Execute();
 
@@ -89,13 +98,11 @@ public partial class SingleWeapon : Weapon {
 	public override void Inject(Entity? entity) {
 		DisconnectEvents();
 		_entity = entity;
-		if ( this.IsEditorGetSetter() ) {
-			return;
-		}
-		ConnectEvents();
 
 		WeaponModel?.Inject(entity?.Armature);
-		ReloadModel();
+		
+		if ( entity is null ) return;
+		ConnectEvents();
 	}
 
 
@@ -116,22 +123,16 @@ public partial class SingleWeapon : Weapon {
 	}
 
 
-	public override IEnumerable<AttackAction.IAttackInfo> GetAttacks(Entity target) {
+	public override IEnumerable<AttackAction.IInfo> GetAttacks(Entity target) {
 		return [];
 	}
 
-
 	protected override bool LoadModelImmediate() {
-		WeaponModel?.LoadModel();
-
-		return true;
+		return WeaponModel?.LoadModel() ?? false;
 	}
 	protected override bool UnloadModelImmediate() {
-		WeaponModel?.UnloadModel();
-
-		return true;
+		return WeaponModel?.UnloadModel() ?? false;
 	}
-
 
 
 	public override void _Ready() {
@@ -143,22 +144,25 @@ public partial class SingleWeapon : Weapon {
 		base._ExitTree();
 
 		DisconnectEvents();
+	}
 
-		WeaponModel?.Inject(null);
+	public override void _Predelete() {
+		base._Predelete();
+
+		UnloadModel();
+		WeaponModel?.QueueFree();
 	}
 
 	public override void _ValidateProperty(Dictionary property) {
 		base._ValidateProperty(property);
-
-		PropertyUsageFlags current = property["usage"].As<PropertyUsageFlags>();
 		
 		switch (property["name"].AsStringName()) {
 			case nameof(Data) when Data is not null:
 			case nameof(WeaponModel):
-				property["usage"] = (int)(current | PropertyUsageFlags.ReadOnly);
+				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
 				break;
 			case nameof(Costume):
-				property["usage"] = (int)(current & ~PropertyUsageFlags.Storage);
+				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
 				break;
 		}
 	}

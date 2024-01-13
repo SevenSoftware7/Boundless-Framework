@@ -16,8 +16,8 @@ public sealed class SlashAttack : AttackAction {
 
 
 
-	public record struct Info(Weapon Weapon) : IAttackInfo {
-		public Weapon Weapon { get; init; } = Weapon;
+	public record struct Info(SingleWeapon Weapon) : IInfo {
+		public SingleWeapon Weapon { get; } = Weapon;
 		public readonly float PotentialDamage => 2f;
 		public readonly AttackType Type => AttackType.Melee | AttackType.Parry;
 
@@ -26,9 +26,7 @@ public sealed class SlashAttack : AttackAction {
 
 
 
-		public readonly AttackAction Build() {
-			return new SlashAttack();
-		}
-
+		public readonly AttackAction Build() =>
+			new SlashAttack();
 	}
 }

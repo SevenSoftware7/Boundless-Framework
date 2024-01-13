@@ -23,9 +23,12 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 		get => _data;
 		private set {
 			if (_data is not null) return;
+			
 			_data = value;
 
+			if ( this.IsEditorGetSetter() ) return;
 			if (Costume is not null) return;
+
 			SetCostume(_data.BaseCostume);
 		}
 	}
@@ -35,7 +38,10 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 
 	[Export] public CharacterCostume? Costume {
 		get => CharacterModel?.Costume;
-		set => SetCostume(value);
+		set {
+			if ( this.IsEditorGetSetter() ) return;
+			SetCostume(value);
+		}
 	}
 
 
@@ -49,7 +55,7 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 
 
 	public Character() : base() {}
-	public Character(CharacterData data, CharacterCostume? costume, Node3D root) : base(root) {
+	public Character(CharacterData data, CharacterCostume? costume) : this() {
 		ArgumentNullException.ThrowIfNull(data);
 
 		_data = data;
@@ -59,14 +65,13 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 
 
 	public void SetCostume(CharacterCostume? costume, bool forceLoad = false) {
-		if ( this.IsEditorGetSetter() ) return;
-
 		CharacterCostume? oldCostume = Costume;
 		if ( costume == oldCostume ) return;
 
-		LoadableExtensions.UpdateLoadable(ref CharacterModel)
-			.WithConstructor(() => costume?.Instantiate(this))
-			.BeforeLoad(() => CharacterModel!.Inject(Armature))
+		new LoadableUpdater<CharacterModel>(ref CharacterModel, () => costume?.Instantiate(this))
+			.BeforeLoad(m => {
+				m.Inject(Armature);
+			})
 			.Execute();
 
 		EmitSignal(SignalName.CostumeChanged, costume!, oldCostume!);
@@ -74,8 +79,7 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 
 
 	protected override bool LoadModelImmediate() {
-		Node? parent = GetParent();
-		if ( parent is null || Owner is null) return false;
+		if ( GetParent() is not Node parent || Owner is null) return false;
 		if ( Data is null ) return false;
 
 		Collisions = Data.CollisionScene?.Instantiate() as Node3D;
@@ -103,8 +107,8 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 
 		Armature?.UnparentAndQueueFree();
 		Armature = null;
-
 		CharacterModel?.Inject(null);
+
 		CharacterModel?.UnloadModel();
 
 		return true;

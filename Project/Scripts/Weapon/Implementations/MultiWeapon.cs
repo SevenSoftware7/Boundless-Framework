@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Godot;
 using Godot.Collections;
@@ -12,25 +13,19 @@ namespace LandlessSkies.Core;
 [GlobalClass]
 public sealed partial class MultiWeapon : Weapon, IUIObject {
 	private Entity? _entity;
-	private List<Weapon?> _weapons = [];
+	private List<SingleWeapon?> _weapons = [];
 	private int _currentIndex = 0;
 
 
 
-	[Export] private Array<Weapon?> Weapons {
+	[Export] private Array<SingleWeapon?> Weapons {
 		get => [.. _weapons];
 		set {
-			value ??= [];
 			_weapons = [.. value];
 			
 			if ( this.IsEditorGetSetter() ) return;
 
-			_weapons.ForEach(w => {
-				if (w is not null && w.GetParent() != this) {
-					w.Unparent();
-					w.SetOwnerAndParentTo(this);
-				}
-			});
+			_weapons.ForEach( w => w?.SafeReparentRecursive(this) );
 		}
 	}
 
@@ -51,12 +46,18 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 	[ExportGroup("Dependencies")]
 	[Export] public Entity? Entity {
 		get => _entity;
-		set => Inject(value);
+		set {
+			if ( this.IsEditorGetSetter() ) {
+				_entity = value;
+				return;
+			}
+			Inject(value);
+		}
 	}
 
 
 
-	public Weapon? CurrentWeapon {
+	public SingleWeapon? CurrentWeapon {
 		get => IndexInBounds(CurrentIndex) ? _weapons[CurrentIndex] : null;
 		private set {
 			if (value is not null) {
@@ -68,7 +69,10 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 
 	public override WeaponData Data {
 		get => CurrentWeapon?.Data!;
-		protected set => SetWeapon(_currentIndex, value);
+		protected set {
+			if ( this.IsEditorGetSetter() ) return;
+			SetWeapon(_currentIndex, value);
+		}
 	}
 	public override WeaponCostume? Costume {
 		get => CurrentWeapon?.Costume;
@@ -78,7 +82,7 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 
 	public override IWeapon.Handedness WeaponHandedness {
 		get {
-			if ( CurrentWeapon is not Weapon weapon ) {
+			if ( CurrentWeapon is not SingleWeapon weapon ) {
 				return IWeapon.Handedness.Right;
 			}
 
@@ -100,8 +104,13 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 
 
 	private MultiWeapon() : base() {}
-	public MultiWeapon(IEnumerable<Weapon> weapons) : this() {
+	public MultiWeapon(IEnumerable<SingleWeapon> weapons) : this() {
 		Weapons = [.. weapons];
+	}
+	public MultiWeapon(ImmutableArray<KeyValuePair<WeaponData, WeaponCostume?>> weaponsInfo) : this() {
+		foreach (KeyValuePair<WeaponData, WeaponCostume?> data in weaponsInfo) {
+			AddWeapon(data.Key, data.Value);
+		}
 	}
 
 
@@ -115,17 +124,10 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 		CurrentWeapon?.Enable();
 	}
 
-	public void SwitchTo(Weapon? weapon) {
-		if ( this.IsEditorGetSetter() ) return;
-		if ( weapon is null ) return;
-
-		int index = _weapons?.IndexOf(weapon) ?? -1;
-
-		SwitchTo(index);
-	}
+	public void SwitchTo(SingleWeapon? weapon) =>
+		SwitchTo(_weapons.IndexOf(weapon));
 
 	public void SwitchTo(int index) {
-		if ( this.IsEditorGetSetter() ) return;
 		if ( ! IndexInBounds(index) ) return;
 
 		_currentIndex = index;
@@ -135,23 +137,22 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 
 
 	public void AddWeapon(WeaponData? data, WeaponCostume? costume = null) {
-		if ( this.IsEditorGetSetter() ) return;
-
 		_weapons.Add(null!);
 
-		SetWeapon(_weapons.Count, data, costume);
+		SetWeapon(_weapons.Count - 1, data, costume);
 	}
 
 	public void SetWeapon(int index, WeaponData? data, WeaponCostume? costume = null) {
-		if ( this.IsEditorGetSetter() ) return;
 		if ( ! IndexInBounds(index) ) return;
 
-		Weapon? weapon = _weapons[index];
+		SingleWeapon? weapon = _weapons[index];
 		if ( data is not null && data == weapon?.Data ) return;
 
-		LoadableExtensions.UpdateLoadable(ref weapon!)
-			.WithConstructor(() => data?.Instantiate(this, costume))
-			.BeforeLoad(() => weapon?.Inject(Entity))
+		new LoadableUpdater<SingleWeapon>(ref weapon, () => data?.Instantiate(costume))
+			.BeforeLoad(w => {
+				w.SafeReparentRecursive(this);
+				w.Inject(Entity);
+			})
 			.Execute();
 
 		_weapons[index] = weapon!;
@@ -159,11 +160,10 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 	}
 
 	public void RemoveWeapon(int index) {
-		if ( this.IsEditorGetSetter() ) return;
 		if ( ! IndexInBounds(index) ) return;
 
 		Weapon? weapon = _weapons[index];
-		LoadableExtensions.DestroyLoadable(ref weapon)
+		new LoadableDestructor<Weapon>(ref weapon)
 			.Execute();
 
 		_weapons.RemoveAt(index);
@@ -181,11 +181,11 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 	}
 
 
-	public override IEnumerable<AttackAction.IAttackInfo> GetAttacks(Entity target) =>
+	public override IEnumerable<AttackAction.IInfo> GetAttacks(Entity target) =>
 		_weapons
 			.SelectMany( (w) => w?.GetAttacks(target) ?? [] )
 			.Select( a => {
-				Weapon? currentWeapon = CurrentWeapon;
+				SingleWeapon? currentWeapon = CurrentWeapon;
 				if (a.Weapon != currentWeapon) {
 					a.BeforeExecute += () => SwitchTo(a.Weapon);
 					a.AfterExecute += () => SwitchTo(currentWeapon);
@@ -196,7 +196,9 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 	public override void Inject(Entity? entity) {
 		_entity = entity;
 
-		_weapons?.ForEach( w => w?.Inject(entity) );
+		this.SafeReparentRecursive(entity);
+
+		_weapons.ForEach( w => w?.Inject(entity));
 	}
 
 
@@ -205,21 +207,17 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 		CurrentWeapon?.HandleInput(inputInfo);
 	}
 
-	public override void Enable() =>
-		CurrentWeapon?.Enable();
-	public override void Disable() =>
-		_weapons?.ForEach(w => w?.Disable());
-	public override void Destroy() =>
-		_weapons?.ForEach(w => w?.Destroy());
-	public override void ReloadModel(bool forceLoad = false) =>
-		_weapons?.ForEach(w => w?.ReloadModel(forceLoad));
+	public override void Enable() => CurrentWeapon?.Enable();
+	public override void Disable() => _weapons.ForEach(w => w?.Disable());
+	public override void Destroy() => _weapons.ForEach(w => w?.Destroy());
+	public override void ReloadModel(bool forceLoad = false) => _weapons.ForEach(w => w?.ReloadModel(forceLoad));
 
 	protected override bool LoadModelImmediate() {
-		_weapons?.ForEach(w => w?.LoadModel());
+		_weapons.ForEach(w => w?.LoadModel());
 		return true;
 	}
 	protected override bool UnloadModelImmediate() {
-		_weapons?.ForEach(w => w?.UnloadModel());
+		_weapons.ForEach(w => w?.UnloadModel());
 		return true;
 	}
 }

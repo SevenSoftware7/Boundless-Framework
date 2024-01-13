@@ -22,13 +22,11 @@ public sealed partial class MeshWeaponModel : WeaponModel {
 	protected override bool LoadModelImmediate() {
 		if ( Costume is not MeshWeaponCostume meshCostume ) return false;
 		if ( GetParent() is null || Owner is null ) return false;
-		if ( Skeleton is null ) return false;
 
 		if ( meshCostume.ModelScene?.Instantiate() is not MeshInstance3D model ) return false;
 
 		Model = model.SetOwnerAndParentTo(this);
-		Model.Name = nameof(WeaponModel);
-		Model.Skeleton = Model.GetPathTo(Skeleton);
+		UpdateModelSkeleton();
 
 		return true;
 	}
@@ -41,14 +39,31 @@ public sealed partial class MeshWeaponModel : WeaponModel {
 
 	public override void Inject(Skeleton3D? skeleton) {
 		Skeleton = skeleton;
-		if ( Model is null ) return;
-		
-		Model.Skeleton = Model.GetPathTo(Skeleton);
+		ReloadModel(true);
+
+		UpdateModelSkeleton();
 	}
 	public override void Inject(IWeapon.Handedness handedness) {
 		Handedness = handedness;
 	}
 
+	private void UpdateModelSkeleton() {
+		if ( Model is not null && Model.Owner == Skeleton?.Owner ) {
+			Model.Skeleton = Model.GetPathTo(Skeleton ?? default);
+		}
+	}
+
+	public override void _Parented() {
+		base._Parented();
+
+		UpdateModelSkeleton();
+	}
+
+	public override void _PathRenamed() {
+		base._PathRenamed();
+
+		UpdateModelSkeleton();
+	}
 
 	public override void _Process(double delta) {
 		base._Process(delta);
@@ -60,10 +75,10 @@ public sealed partial class MeshWeaponModel : WeaponModel {
 
 		if ( Skeleton is not null && Skeleton.TryGetBoneTransform(boneName, out Transform3D handTransform) ) {
 			GlobalTransform = handTransform;
+		} else {
+			Transform = Transform3D.Identity;
 		}
 	}
-	
-
 
 	public override void _ValidateProperty(Dictionary property) {
 		base._ValidateProperty(property);

@@ -1,5 +1,6 @@
 
 
+using System;
 using Godot;
 
 namespace LandlessSkies.Core;
@@ -8,7 +9,7 @@ namespace LandlessSkies.Core;
 [GlobalClass]
 public partial class WeaponData : Resource, IUIObject {
 	
-	[Export] public string DisplayName { get; private set; } = "";
+	[Export] public string DisplayName { get; private set; } = string.Empty;
 	public Texture2D? DisplayPortrait => BaseCostume?.DisplayPortrait;
 
 	[Export] public WeaponCostume? BaseCostume { get; private set; }
@@ -21,7 +22,6 @@ public partial class WeaponData : Resource, IUIObject {
 
 
 
-	public virtual Weapon Instantiate(Node3D root, WeaponCostume? costume = null) {
-		return new SingleWeapon(this, costume ?? BaseCostume, root);
-	}
+	public virtual SingleWeapon Instantiate(WeaponCostume? costume = null) =>
+		new(this, costume);
 }

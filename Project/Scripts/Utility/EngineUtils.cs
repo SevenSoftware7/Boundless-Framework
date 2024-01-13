@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Godot;
 
@@ -54,6 +55,32 @@ public static class EngineUtils {
 
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static void SafeReparentRecursive(this Node child, Node? newParent, bool keepGlobalTransform = true) {
+		child.SafeReparent(newParent, keepGlobalTransform);
+		if (child.Owner == newParent?.Owner) return;
+
+		Reown(child, newParent?.Owner);
+
+		static void Reown(Node childNode, Node? newOwner) {
+			childNode.Owner = newOwner;
+			foreach (Node child in childNode.GetChildren()) {
+				Reown(child, newOwner);
+			}
+		}
+	}
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static void SafeReparent(this Node child, Node? newParent, bool keepGlobalTransform = true) {
+		if (child.GetParent() is not Node parent) {
+			newParent?.AddChild(child);
+			return;
+		}
+		if (parent == newParent) return;
+
+		if (newParent is not null) {
+			child.Reparent(newParent, keepGlobalTransform);
+		}
+	}
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static void AddChildAndSetOwner(this Node obj, Node child, bool forceReadableName = false) {
 		obj.AddChild(child, forceReadableName);
 		child.Owner = obj.Owner;
@@ -102,11 +129,12 @@ public static class EngineUtils {
 
 
 	public static void PackWithSubnodes(this PackedScene scene, Node path) {
+		Dictionary<Node, Node> originalOwners = [];
 		ReownChildren(path);
+
 		void ReownChildren(Node node, uint layer = 0) {
 			foreach (Node item in node.GetChildren()) {
-				Node currentOwner = item.Owner;
-				Callable.From(() => item.Owner = currentOwner).CallDeferred();
+				originalOwners[item] = item.Owner;
 
 				item.Owner = path;
 				ReownChildren(item, layer + 1);
@@ -114,6 +142,9 @@ public static class EngineUtils {
 		}
 
 		scene.Pack(path);
+		foreach (KeyValuePair<Node, Node> original in originalOwners) {
+			original.Key.Owner = original.Value;
+		}
 	}
 
 	public static void MakeLocal(this Node node, Node owner) {

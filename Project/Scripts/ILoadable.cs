@@ -11,9 +11,9 @@ public interface ILoadable : IDestroyable, IEnablable {
 	event Loadable3D.LoadedUnloadedEventHandler LoadUnloadEvent;
 
 
-	void LoadModel();
+	bool LoadModel();
 
-	void UnloadModel();
+	bool UnloadModel();
 
 	void ReloadModel(bool forceLoad = false);
 }

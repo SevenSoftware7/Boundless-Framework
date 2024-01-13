@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Godot;
-using Godot.Collections;
-
 
 namespace LandlessSkies.Core;
 
@@ -29,7 +27,7 @@ public abstract partial class Weapon : Loadable3D, IWeapon, IInjectable<Entity?>
 
 
 	protected Weapon() : base() {}
-	public Weapon(WeaponData data, WeaponCostume? costume, Node3D root) : base(root) {
+	public Weapon(WeaponData data, WeaponCostume? costume) : base() {
 		ArgumentNullException.ThrowIfNull(data);
 
 		Data = data;
@@ -41,7 +39,7 @@ public abstract partial class Weapon : Loadable3D, IWeapon, IInjectable<Entity?>
 	public abstract void SetCostume(WeaponCostume? costume);
 
 
-	public abstract IEnumerable<AttackAction.IAttackInfo> GetAttacks(Entity target);
+	public abstract IEnumerable<AttackAction.IInfo> GetAttacks(Entity target);
 	public virtual void Inject(Entity? owner) {}
 
 

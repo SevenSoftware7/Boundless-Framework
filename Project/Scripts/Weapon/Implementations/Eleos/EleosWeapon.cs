@@ -12,7 +12,7 @@ public partial class EleosWeapon : SingleWeapon {
 
 
 	protected EleosWeapon() : base() {}
-	public EleosWeapon(EleosWeaponData data, WeaponCostume? costume, Node3D root) : base(data, costume, root) {}
+	public EleosWeapon(EleosWeaponData data, WeaponCostume? costume) : base(data, costume) {}
 
 
 
@@ -21,7 +21,7 @@ public partial class EleosWeapon : SingleWeapon {
 		attacks = new(this);
 	}
 
-	public override IEnumerable<AttackAction.IAttackInfo> GetAttacks(Entity target) {
+	public override IEnumerable<AttackAction.IInfo> GetAttacks(Entity target) {
 		return [
 			attacks.slashAttack,
 		];

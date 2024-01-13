@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using Godot;
 using Godot.Collections;
 using SevenGame.Utility;
@@ -26,12 +28,18 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 
 	[Export] public CharacterData? CharacterData {
 		get => Character?.Data;
-		private set => SetCharacter(value);
+		private set {
+			if ( this.IsEditorGetSetter() ) return;
+			SetCharacter(value);
+		}
 	}
 
 	[Export] public CharacterCostume? CharacterCostume {
 		get => Character?.Costume;
-		private set => SetCostume(value);
+		private set {
+			if ( this.IsEditorGetSetter() ) return;
+			SetCostume(value);
+		}
 	}
 
 
@@ -41,6 +49,10 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	[Export] public Weapon? Weapon {
 		get => _weapon;
 		set {
+			if ( this.IsEditorGetSetter() ) {
+				_weapon = value;
+				return;
+			}
 			_weapon?.Inject(null);
 
 			_weapon = value;
@@ -97,19 +109,22 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	public Entity() : base() {
 		CollisionLayer = 1 << 1;
 
-		if ( this.JustBuilt() ) Callable.From(ConnectEvents).CallDeferred();
+		if (this.JustBuilt()) Callable.From(() => {
+			DisconnectEvents();
+			ConnectEvents();
+		}).CallDeferred();
 	}
 
 
 
 	public void SetCharacter(CharacterData? data, CharacterCostume? costume = null) {
-		if ( this.IsEditorGetSetter() ) return;
-
 		CharacterData? oldData = CharacterData;
 		if ( data == oldData ) return;
 
-		LoadableExtensions.UpdateLoadable(ref _character)
-			.WithConstructor(() => data?.Instantiate(this, costume))
+		new LoadableUpdater<Character>(ref _character, () => data?.Instantiate(costume))
+			.BeforeLoad(c => {
+				c.SafeReparentRecursive(this);
+			})
 			.OnLoadUnloadEvent(OnCharacterLoadedUnloaded)
 			.Execute();
 
@@ -212,8 +227,8 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 
 	public override void _Notification(int what) {
 		base._Notification(what);
-		if (what == NotificationUnparented) { // TODO: Wait for NotificationPredelete to be fixed (never lol)
-			Callable.From(() => _weapon?.Inject(null)).CallDeferred();
+		if (what == NotificationPredelete) {
+			/* Callable.From(() =>  */_weapon?.Inject(null)/* ).CallDeferred() */;
 		}
 	}
 

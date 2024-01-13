@@ -36,7 +36,6 @@ public partial class CharacterData : Resource, IUIObject {
 	[Export] public float slowSpeed = DEFAULT_SLOW_SPEED;
 
 
-	public virtual Character Instantiate(Node3D root, CharacterCostume? costume = null) {
-		return new Character(this, costume ?? BaseCostume, root);
-	}
+	public virtual Character Instantiate(CharacterCostume? costume = null) =>
+		new(this, costume ?? BaseCostume);
 }
