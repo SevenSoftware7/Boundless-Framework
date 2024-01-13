@@ -96,6 +96,7 @@ public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
 		Visible = false;
 	}
 	public virtual void Destroy() {
+		UnloadModel();
 		this.UnparentAndQueueFree();
 	}
 
@@ -106,8 +107,8 @@ public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
 		LoadModel();
 	}
 
-	public override void _ExitTree() {
-		base._ExitTree();
-		UnloadModel();
-	}
+	// public override void _ExitTree() {
+	// 	base._ExitTree();
+	// 	UnloadModel();
+	// }
 }
