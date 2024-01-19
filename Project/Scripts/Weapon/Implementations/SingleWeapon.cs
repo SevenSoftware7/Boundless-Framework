@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
@@ -8,7 +9,8 @@ namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
-public partial class SingleWeapon : Weapon {
+public abstract partial class SingleWeapon : Weapon {
+	private int _style;
 	private Entity? _entity;
 	private WeaponData _data = null!;
 	private IWeapon.Handedness _weaponHandedness = IWeapon.Handedness.Right;
@@ -22,7 +24,7 @@ public partial class SingleWeapon : Weapon {
 			if (_data is not null) return;
 			_data = value;
 
-			if ( this.IsEditorGetSetter() ) return;
+			if ( this.IsInitializationSetterCall() ) return;
 			if (Costume is not null) return;
 			SetCostume(_data?.BaseCostume);
 		}
@@ -32,7 +34,7 @@ public partial class SingleWeapon : Weapon {
 	[Export] public override WeaponCostume? Costume {
 		get => WeaponModel?.Costume;
 		set {
-			if ( this.IsEditorGetSetter() ) return;
+			if ( this.IsInitializationSetterCall() ) return;
 			SetCostume(value);
 		}
 	}
@@ -43,7 +45,7 @@ public partial class SingleWeapon : Weapon {
 	[Export] public Entity? Entity {
 		get => _entity;
 		private set {
-			if ( this.IsEditorGetSetter() ) {
+			if ( this.IsInitializationSetterCall() ) {
 				_entity = value;
 				return;
 			}
@@ -51,6 +53,11 @@ public partial class SingleWeapon : Weapon {
 		}
 	}
 
+	protected virtual uint StyleMax { get; } = 0;
+	public override int Style { 
+		get => _style;
+		set => _style = value % ((int)StyleMax + 1);
+	}
 
 	public override IWeapon.Handedness WeaponHandedness {
 		get => _weaponHandedness;
@@ -64,21 +71,8 @@ public partial class SingleWeapon : Weapon {
 
 
 
-	protected SingleWeapon() : base() {
-		InitializeAttacks();
-		
-		if (this.JustBuilt()) Callable.From(() => {
-			DisconnectEvents();
-			ConnectEvents();
-		}).CallDeferred();
-	}
-	public SingleWeapon(WeaponData data, WeaponCostume? costume) : base(data, costume) {
-		InitializeAttacks();
-	}
-
-
-
-	protected virtual void InitializeAttacks() {}
+	protected SingleWeapon() : base() {}
+	public SingleWeapon(WeaponData data, WeaponCostume? costume) : base(data, costume) {}
 
 
 	public override void SetCostume(WeaponCostume? costume) {
@@ -87,7 +81,7 @@ public partial class SingleWeapon : Weapon {
 
 		new LoadableUpdater<WeaponModel>(ref WeaponModel, () => costume?.Instantiate(this))
 			.BeforeLoad(m => {
-				m.Inject(Entity?.Armature);
+				m.Inject(Entity?.Skeleton);
 				m.Inject(WeaponHandedness);
 			})
 			.Execute();
@@ -96,55 +90,31 @@ public partial class SingleWeapon : Weapon {
 	}
 
 	public override void Inject(Entity? entity) {
-		DisconnectEvents();
+		if (entity == _entity) return;
+
+		Callable callableLoadUnloadEvent = new(this, MethodName.OnCharacterLoadedUnloaded);
+		_entity?.Disconnect(Entity.SignalName.CharacterLoadedUnloaded, callableLoadUnloadEvent);
+
 		_entity = entity;
 
-		WeaponModel?.Inject(entity?.Armature);
-		
-		if ( entity is null ) return;
-		ConnectEvents();
+		WeaponModel?.Inject(entity?.Skeleton);
+		entity?.Connect(Entity.SignalName.CharacterLoadedUnloaded, callableLoadUnloadEvent, (uint)ConnectFlags.Persist);
 	}
 
 
 	private void OnCharacterLoadedUnloaded(bool isLoaded) {
-		WeaponModel?.Inject(Entity?.Armature);
+		WeaponModel?.Inject(Entity?.Skeleton);
 	}
 
-
-	private void ConnectEvents() {
-		if (_entity is not null) {
-			_entity.CharacterLoadedUnloaded += OnCharacterLoadedUnloaded;
-		}
-	}
-	private void DisconnectEvents() {
-		if (_entity is not null) {
-			_entity.CharacterLoadedUnloaded -= OnCharacterLoadedUnloaded;
-		}
-	}
-
-
-	public override IEnumerable<AttackAction.IInfo> GetAttacks(Entity target) {
-		return [];
-	}
 
 	protected override bool LoadModelImmediate() {
-		return WeaponModel?.LoadModel() ?? false;
+		return WeaponModel is WeaponModel model && (model.IsLoaded || (model?.LoadModel() ?? false));
 	}
 	protected override bool UnloadModelImmediate() {
-		return WeaponModel?.UnloadModel() ?? false;
+		return WeaponModel is WeaponModel model && (! model.IsLoaded || (model?.UnloadModel() ?? false));
 	}
 
 
-	public override void _Ready() {
-		base._Ready();
-
-		ConnectEvents();
-	}
-	public override void _ExitTree() {
-		base._ExitTree();
-
-		DisconnectEvents();
-	}
 
 	public override void _Predelete() {
 		base._Predelete();
@@ -153,17 +123,34 @@ public partial class SingleWeapon : Weapon {
 		WeaponModel?.QueueFree();
 	}
 
+	public override bool _PropertyCanRevert(StringName property) {
+		if (property == PropertyName.Costume) {
+			return Costume != Data?.BaseCostume;
+		}
+		return base._PropertyCanRevert(property);
+	}
+	public override Variant _PropertyGetRevert(StringName property) {
+		if (property == PropertyName.Costume) {
+			return Data?.BaseCostume!;
+		}
+		return base._PropertyGetRevert(property);
+	}
+
 	public override void _ValidateProperty(Dictionary property) {
 		base._ValidateProperty(property);
 		
-		switch (property["name"].AsStringName()) {
-			case nameof(Data) when Data is not null:
-			case nameof(WeaponModel):
-				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
-				break;
-			case nameof(Costume):
-				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
-				break;
+		StringName name = property["name"].AsStringName();
+		
+		if (
+			name == PropertyName.WeaponModel ||
+			(name == PropertyName.Data && Data is not null)
+		) {
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
+		
+		} else if (
+			name == PropertyName.Costume
+		) {
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
 		}
 	}
 }

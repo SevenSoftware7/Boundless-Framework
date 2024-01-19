@@ -53,17 +53,17 @@ public sealed partial class MeshWeaponModel : WeaponModel {
 		}
 	}
 
-	public override void _Parented() {
-		base._Parented();
+	// public override void _Parented() {
+	// 	base._Parented();
 
-		UpdateModelSkeleton();
-	}
+	// 	UpdateModelSkeleton();
+	// }
 
-	public override void _PathRenamed() {
-		base._PathRenamed();
+	// public override void _PathRenamed() {
+	// 	base._PathRenamed();
 
-		UpdateModelSkeleton();
-	}
+	// 	UpdateModelSkeleton();
+	// }
 
 	public override void _Process(double delta) {
 		base._Process(delta);
@@ -83,10 +83,12 @@ public sealed partial class MeshWeaponModel : WeaponModel {
 	public override void _ValidateProperty(Dictionary property) {
 		base._ValidateProperty(property);
 		
-		switch (property["name"].AsStringName()) {
-			case nameof(Model):
-				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
-				break;
+		StringName name = property["name"].AsStringName();
+		
+		if (
+			name == PropertyName.Model
+		) {
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
 		}
 	}
 }

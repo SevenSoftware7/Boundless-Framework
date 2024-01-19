@@ -11,25 +11,85 @@ namespace LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public sealed partial class Entity : CharacterBody3D, IInputReader {
+	private AnimationPlayer? _animationPlayer;
 	private Character? _character;
 	private Weapon? _weapon;
 	private Vector3 _absoluteForward;
 	private Vector3 _relativeForward;
 
 	public EntityAction? CurrentAction { get; private set; }
-	public EntityBehaviourManager? BehaviourManager;
+	public EntityBehaviourManager? BehaviourManager { get; private set; }
 
 
+	// [Export] public bool tte {
+	// 	get => false;
+	// 	set {
+	// 		if ( this.IsEditorGetSetter() ) return;
+
+	// 		if ( AnimationPlayer is null ) return;
+	// 		AnimationLibrary library = AnimationPlayer.GetAnimationLibrary("Selene");
+	// 		Animation anim = library.GetAnimation("Idle");
+
+	// 		foreach (AnimationTrack track in anim.GetTracks()) {
+	// 			string path = track.GetPath();
+	// 			Node root = GetTree().EditedSceneRoot;
+
+	// 			// track.SetPath/* GD.Print */(
+	// 			// 	path switch {
+	// 			// 		_ when path.Equals("{Entity}") => root.GetPathTo(this),
+	// 			// 		_ when path.Equals("{Weapon}") => root.GetPathTo(Weapon),
+	// 			// 		_ => path,
+	// 			// 	}
+	// 			// );
+	// 		}
+	// 	}
+	// }
+	[Export] public bool GenerateScene {
+		get => false;
+		set {
+			if ( this.IsInitializationSetterCall() ) return;
+
+			using PackedScene scene = new();
+			scene.PackWithSubnodes(this);
+			Dictionary dict = scene._Bundled;
+
+
+			using PackedScene duplicate = new();
+			duplicate._Bundled = dict;
+
+			Node resulting = duplicate.Instantiate();
+			resulting.ParentTo(GetParent());
+			resulting.MakeLocal(Owner);
+		}
+	}
+
+
+	[Export] public AnimationPlayer? AnimationPlayer {
+		get => _animationPlayer;
+		private set {
+			if (value is null) return;
+			_animationPlayer = value;
+
+			if ( this.IsInitializationSetterCall() ) return;
+			_animationPlayer.RootNode = GetTree().EditedSceneRoot.GetPathTo(this);
+		}
+	}
 
 	[Export] public Character? Character {
 		get => _character;
-		private set => _character ??= value;
+		private set {
+			if (value is null) return;
+			_character = value;
+
+			if ( this.IsInitializationSetterCall() ) return;
+			_character.Name = PropertyName.Character;
+		}
 	}
 
 	[Export] public CharacterData? CharacterData {
 		get => Character?.Data;
 		private set {
-			if ( this.IsEditorGetSetter() ) return;
+			if ( this.IsInitializationSetterCall() ) return;
 			SetCharacter(value);
 		}
 	}
@@ -37,7 +97,7 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	[Export] public CharacterCostume? CharacterCostume {
 		get => Character?.Costume;
 		private set {
-			if ( this.IsEditorGetSetter() ) return;
+			if ( this.IsInitializationSetterCall() ) return;
 			SetCostume(value);
 		}
 	}
@@ -49,14 +109,17 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	[Export] public Weapon? Weapon {
 		get => _weapon;
 		set {
-			if ( this.IsEditorGetSetter() ) {
-				_weapon = value;
-				return;
+			bool isInitialization = this.IsInitializationSetterCall();
+			if ( ! isInitialization ) {
+				_weapon?.Inject(null);
 			}
-			_weapon?.Inject(null);
 
 			_weapon = value;
-			_weapon?.Inject(this);
+
+			if ( ! isInitialization && _weapon is not null) {
+				_weapon.Inject(this);
+				_weapon.Name = PropertyName.Weapon;
+			}
 		}
 	}
 
@@ -98,7 +161,7 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	[ExportGroup("")]
 
 
-	public Skeleton3D? Armature => Character?.Armature;
+	public Skeleton3D? Skeleton => Character?.Skeleton;
 
 
 	[Signal] public delegate void CharacterChangedEventHandler(CharacterData? newCharacter, CharacterData? oldCharacter);
@@ -108,11 +171,6 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 
 	public Entity() : base() {
 		CollisionLayer = 1 << 1;
-
-		if (this.JustBuilt()) Callable.From(() => {
-			DisconnectEvents();
-			ConnectEvents();
-		}).CallDeferred();
 	}
 
 
@@ -123,9 +181,10 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 
 		new LoadableUpdater<Character>(ref _character, () => data?.Instantiate(costume))
 			.BeforeLoad(c => {
-				c.SafeReparentRecursive(this);
+				c.Name = PropertyName.Character;
+				c.SafeReparentEditor(this);
+				c.Connect(Character.SignalName.LoadedUnloaded, new Callable(this, MethodName.OnCharacterLoadedUnloaded), (uint)ConnectFlags.Persist);
 			})
-			.OnLoadUnloadEvent(OnCharacterLoadedUnloaded)
 			.Execute();
 
 		EmitSignal(SignalName.CharacterChanged, data!, oldData!);
@@ -163,26 +222,11 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 
 
 	private void OnCharacterLoadedUnloaded(bool isLoaded) {
-		EmitSignal(SignalName.CharacterLoadedUnloaded, Armature!);
+		EmitSignal(SignalName.CharacterLoadedUnloaded, isLoaded);
 	}
 
 	private void OnCharacterChanged(CharacterData? newCharacter, CharacterData? oldCharacter) {
 		OnCharacterLoadedUnloaded(Character?.IsLoaded ?? false);
-	}
-
-
-	private void ConnectEvents() {
-		CharacterChanged += OnCharacterChanged;
-		if (Character is not null) {
-			Character.LoadedUnloaded += OnCharacterLoadedUnloaded;
-		}
-	}
-
-	private void DisconnectEvents() {
-		CharacterChanged -= OnCharacterChanged;
-		if (Character is not null) {
-			Character.LoadedUnloaded -= OnCharacterLoadedUnloaded;
-		}
 	}
 
 
@@ -210,8 +254,6 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	public override void _Ready() {
 		base._Ready();
 
-		ConnectEvents();
-
 		if ( ! Engine.IsEditorHint() ) {
 			BehaviourManager ??= new(this);
 			BehaviourManager?.SetBehaviour<TestBehaviour>( () => new(this) );
@@ -219,30 +261,28 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	}
 
 
-	public override void _ExitTree() {
-		base._ExitTree();
-
-		DisconnectEvents();
-	}
-
 	public override void _Notification(int what) {
 		base._Notification(what);
 		if (what == NotificationPredelete) {
-			/* Callable.From(() =>  */_weapon?.Inject(null)/* ).CallDeferred() */;
+			Callable.From(() => _weapon?.Inject(null)).CallDeferred();
 		}
 	}
 
 	public override void _ValidateProperty(Dictionary property) {
 		base._ValidateProperty(property);
 
-		switch (property["name"].AsStringName()) {
-			case nameof(CharacterCostume):
-			case nameof(CharacterData):
-				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
-				break;
-			case nameof(Character):
-				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
-				break;
+		StringName name = property["name"].AsStringName();
+		
+		if (
+			name == PropertyName.Character
+		) {
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
+		
+		} else if (
+			name == PropertyName.CharacterCostume ||
+			name == PropertyName.CharacterData
+		) {
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
 		}
 	}
 }

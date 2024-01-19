@@ -3,7 +3,7 @@
 [ext_resource type="Resource" uid="uid://dac6uk4hxqsef" path="res://Resources/Costumes/chrcos_Selene_base.tres" id="1_p1xyo"]
 [ext_resource type="Script" path="res://Scripts/Character/CharacterData.cs" id="1_y8awl"]
 [ext_resource type="PackedScene" uid="uid://b7njxt2tckv16" path="res://Scenes/Characters/Selene/Collisions.tscn" id="2_676ce"]
-[ext_resource type="PackedScene" uid="uid://dy6781obdw22b" path="res://Scenes/Characters/Selene/Armature.tscn" id="3_djvff"]
+[ext_resource type="PackedScene" uid="uid://dy6781obdw22b" path="res://Scenes/Characters/Selene/Skeleton.tscn" id="3_djvff"]
 
 [resource]
 script = ExtResource("1_y8awl")

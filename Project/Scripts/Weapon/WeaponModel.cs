@@ -22,8 +22,9 @@ public abstract partial class WeaponModel : Loadable3D, IInjectable<Skeleton3D?>
 
 
 	protected WeaponModel() : base() {}
-	public WeaponModel(WeaponCostume costume, Node3D root) : base(root) {
+	public WeaponModel(WeaponCostume costume, Node3D root) : this() {
 		ArgumentNullException.ThrowIfNull(costume);
+		root.AddChildAndSetOwner(this);
 
 		_costume = costume;
 	}

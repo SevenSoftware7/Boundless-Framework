@@ -11,12 +11,12 @@ public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
 	[Export] public bool IsLoaded {
 		get => _isLoaded;
 		set {
-			if ( this.IsEditorGetSetter() ) {
+			if ( this.IsInitializationSetterCall() ) {
 				_isLoaded = value;
 				return;
 			}
 
-			if ( value ) {
+			if ( value is true ) {
 				LoadModel();
 			} else {
 				UnloadModel();
@@ -24,23 +24,11 @@ public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
 		}
 	}
 
-	public event LoadedUnloadedEventHandler LoadUnloadEvent {
-		add => LoadedUnloaded += value;
-		remove => LoadedUnloaded -= value;
-	}
-
-
-
 	[Signal] public delegate void LoadedUnloadedEventHandler(bool isLoaded);
 
 
 
-	protected Loadable3D() : base() {
-		Name = GetType().Name;
-	}
-	public Loadable3D(Node3D root) : this() {
-		root.AddChildAndSetOwner(this, Engine.IsEditorHint());
-	}
+	protected Loadable3D() : base() {}
 
 
 

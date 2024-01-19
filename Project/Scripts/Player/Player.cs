@@ -43,7 +43,7 @@ public sealed partial class Player : Node {
 
 
 	private void SetPlayerId(byte value) {
-		if ( this.IsEditorGetSetter() ) {
+		if ( this.IsInitializationSetterCall() ) {
 			_playerId = value;
 			return;
 		}

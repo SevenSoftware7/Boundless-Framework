@@ -11,6 +11,7 @@ public abstract partial class Weapon : Loadable3D, IWeapon, IInjectable<Entity?>
 
 	[ExportGroup("Costume")]
 	public abstract WeaponCostume? Costume { get; set; }
+	public abstract int Style { get; set; }
 
 
 

@@ -8,7 +8,6 @@ public interface ILoadable : IDestroyable, IEnablable {
 
 	bool IsLoaded { get; set; }
 
-	event Loadable3D.LoadedUnloadedEventHandler LoadUnloadEvent;
 
 
 	bool LoadModel();

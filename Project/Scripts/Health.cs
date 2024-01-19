@@ -72,10 +72,12 @@ public partial class Health : Node {
 	public override void _ValidateProperty(Dictionary property) {
 		base._ValidateProperty(property);
 		
-		switch (property["name"].AsStringName()) {
-			case nameof(DamagedHealth):
-				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage | PropertyUsageFlags.ReadOnly);
-				break;
+		StringName name = property["name"].AsStringName();
+		
+		if (
+			name == PropertyName.DamagedHealth
+		) {
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage | PropertyUsageFlags.ReadOnly);
 		}
 	}
 }

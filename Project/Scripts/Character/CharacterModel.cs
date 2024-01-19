@@ -23,8 +23,9 @@ public abstract partial class CharacterModel : Loadable3D, IInjectable<Skeleton3
 
 
 	protected CharacterModel() : base() {}
-	public CharacterModel(CharacterCostume costume, Node3D root) : base(root) {
+	public CharacterModel(CharacterCostume costume, Node3D root) : this() {
 		ArgumentNullException.ThrowIfNull(costume);
+		root.AddChildAndSetOwner(this);
 		
 		_costume = costume;
 	}
@@ -38,10 +39,10 @@ public abstract partial class CharacterModel : Loadable3D, IInjectable<Skeleton3
 	public override void _ValidateProperty(Dictionary property) {
 		base._ValidateProperty(property);
 		
-		switch (property["name"].AsStringName()) {
-			case nameof(Costume) when Costume is not null:
-				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
-				break;
+		StringName name = property["name"].AsStringName();
+		
+		if ( name == PropertyName.Costume && Costume is not null ) {
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
 		}
 	}
 }

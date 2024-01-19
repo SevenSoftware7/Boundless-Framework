@@ -17,7 +17,7 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 
 
 	[Export] public Node3D? Collisions { get; private set; }
-	[Export] public Skeleton3D? Armature { get; private set; }
+	[Export] public Skeleton3D? Skeleton { get; private set; }
 
 	[Export] public CharacterData Data {
 		get => _data;
@@ -26,7 +26,7 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 			
 			_data = value;
 
-			if ( this.IsEditorGetSetter() ) return;
+			if ( this.IsInitializationSetterCall() ) return;
 			if (Costume is not null) return;
 
 			SetCostume(_data.BaseCostume);
@@ -39,7 +39,7 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 	[Export] public CharacterCostume? Costume {
 		get => CharacterModel?.Costume;
 		set {
-			if ( this.IsEditorGetSetter() ) return;
+			if ( this.IsInitializationSetterCall() ) return;
 			SetCostume(value);
 		}
 	}
@@ -70,7 +70,7 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 
 		new LoadableUpdater<CharacterModel>(ref CharacterModel, () => costume?.Instantiate(this))
 			.BeforeLoad(m => {
-				m.Inject(Armature);
+				m.Inject(Skeleton);
 			})
 			.Execute();
 
@@ -84,17 +84,17 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 
 		Collisions = Data.CollisionScene?.Instantiate() as Node3D;
 		if ( Collisions is not null ) {
-			Collisions.Name = nameof(Collisions);
+			Collisions.Name = PropertyName.Collisions;
 			Collisions.SetOwnerAndParentTo(parent);
 		}
 
-		Armature = Data.SkeletonScene?.Instantiate() as Skeleton3D;
-		if ( Armature is not null ) {
-			Armature.Name = nameof(Armature);
-			Armature.SetOwnerAndParentTo(this);
+		Skeleton = Data.SkeletonScene?.Instantiate() as Skeleton3D;
+		if ( Skeleton is not null ) {
+			Skeleton.Name = PropertyName.Skeleton;
+			Skeleton.SetOwnerAndParentTo(this);
 		}
 
-		CharacterModel?.Inject(Armature);
+		CharacterModel?.Inject(Skeleton);
 		CharacterModel?.LoadModel();
 
 		RefreshRotation();
@@ -105,8 +105,8 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 		Collisions?.UnparentAndQueueFree();
 		Collisions = null;
 
-		Armature?.UnparentAndQueueFree();
-		Armature = null;
+		Skeleton?.UnparentAndQueueFree();
+		Skeleton = null;
 		CharacterModel?.Inject(null);
 
 		CharacterModel?.UnloadModel();
@@ -132,22 +132,36 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 	public virtual void HandleInput(Player.InputInfo inputInfo) {}
 
 
+	public override bool _PropertyCanRevert(StringName property) {
+		if (property == PropertyName.Costume) {
+			return Costume != Data?.BaseCostume;
+		}
+		return base._PropertyCanRevert(property);
+	}
+	public override Variant _PropertyGetRevert(StringName property) {
+		if (property == PropertyName.Costume) {
+			return Data?.BaseCostume!;
+		}
+		return base._PropertyGetRevert(property);
+	}
 
 	public override void _ValidateProperty(Dictionary property) {
 		base._ValidateProperty(property);
 
-		PropertyUsageFlags current = property["usage"].As<PropertyUsageFlags>();
+		StringName name = property["name"].AsStringName();
 		
-		switch (property["name"].AsStringName()) {
-			case nameof(Collisions)		 :
-			case nameof(Armature)		 :
-			case nameof(CharacterModel)  :
-			case nameof(Data) 			 when Data is not null:
-				property["usage"] = (int)(current | PropertyUsageFlags.ReadOnly);
-				break;
-			case nameof(Costume)         :
-				property["usage"] = (int)(current & ~PropertyUsageFlags.Storage);
-				break;
+		if (
+			name == PropertyName.Collisions ||
+			name == PropertyName.Skeleton ||
+			name == PropertyName.CharacterModel ||
+			(name == PropertyName.Data && Data is not null)
+		) {
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
+		
+		} else if (
+			name == PropertyName.Costume
+		) {
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
 		}
 	}
 }

@@ -5,7 +5,6 @@ namespace LandlessSkies.Core;
 
 public ref struct LoadableDestructor<TLoadable> where TLoadable : ILoadable {
 	private ref TLoadable? loadable;
-	private Loadable3D.LoadedUnloadedEventHandler? onLoadUnload;
 	private Action<TLoadable>? onBeforeUnload;
 	private Action<TLoadable>? onAfterUnload;
 
@@ -16,9 +15,6 @@ public ref struct LoadableDestructor<TLoadable> where TLoadable : ILoadable {
 	}
 
 
-
-	public LoadableDestructor<TLoadable> OnLoadUnload(Loadable3D.LoadedUnloadedEventHandler onLoadUnload) =>
-		this with {onLoadUnload = this.onLoadUnload + onLoadUnload};
 
 	public LoadableDestructor<TLoadable> BeforeUnload(Action<TLoadable> onBeforeUnload) =>
 		this with {onBeforeUnload = this.onBeforeUnload + onBeforeUnload};
@@ -32,7 +28,6 @@ public ref struct LoadableDestructor<TLoadable> where TLoadable : ILoadable {
 
 		onBeforeUnload?.Invoke(loadable);
 
-		loadable.LoadUnloadEvent -= onLoadUnload;
 		loadable.UnloadModel();
 
 		onAfterUnload?.Invoke(loadable);
@@ -46,7 +41,6 @@ public ref struct LoadableDestructor<TLoadable> where TLoadable : ILoadable {
 public ref struct LoadableUpdater<TLoadable> where TLoadable : ILoadable {
 	private ref TLoadable? loadable;
 	private readonly Func<TLoadable?>? instantiator;
-	private Loadable3D.LoadedUnloadedEventHandler? onLoadUnload;
 	private Action<TLoadable>? onBeforeLoad;
 	private Action<TLoadable>? onAfterLoad;
 	private LoadableDestructor<TLoadable> destructor;
@@ -60,9 +54,6 @@ public ref struct LoadableUpdater<TLoadable> where TLoadable : ILoadable {
 	}
 
 
-
-	public LoadableUpdater<TLoadable> OnLoadUnloadEvent(Loadable3D.LoadedUnloadedEventHandler onLoadUnload) =>
-		this with {onLoadUnload = this.onLoadUnload + onLoadUnload, destructor = destructor.OnLoadUnload(onLoadUnload)};
 
 	public LoadableUpdater<TLoadable> BeforeUnload(Action<TLoadable> onBeforeUnload) =>
 		this with {destructor = destructor.BeforeUnload(onBeforeUnload)};
@@ -87,7 +78,6 @@ public ref struct LoadableUpdater<TLoadable> where TLoadable : ILoadable {
 		onBeforeLoad?.Invoke(loadable);
 
 		loadable.LoadModel();
-		loadable.LoadUnloadEvent += onLoadUnload;
 
 		onAfterLoad?.Invoke(loadable);
 	}

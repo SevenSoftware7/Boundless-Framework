@@ -29,7 +29,7 @@ public static class EngineUtils {
 #endif
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static bool IsEditorGetSetter(this Node node) =>
+	public static bool IsInitializationSetterCall(this Node node) =>
 #if TOOLS
 		!node.IsNodeReady() || Engine.GetProcessFrames() == buildFrame;
 #else
@@ -55,8 +55,10 @@ public static class EngineUtils {
 
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static void SafeReparentRecursive(this Node child, Node? newParent, bool keepGlobalTransform = true) {
+	public static void SafeReparentEditor(this Node child, Node? newParent, bool keepGlobalTransform = true) {
 		child.SafeReparent(newParent, keepGlobalTransform);
+
+		if ( ! Engine.IsEditorHint() ) return;
 		if (child.Owner == newParent?.Owner) return;
 
 		Reown(child, newParent?.Owner);

@@ -14,7 +14,7 @@ public partial class MultiWeapon {
 	[Export] private Array<WeaponData> WeaponDatas {
 		get => [.. _weapons.Select(weapon => weapon?.Data!)];
 		set {
-			if ( this.IsEditorGetSetter() ) {
+			if ( this.IsInitializationSetterCall() ) {
 				return;
 			}
 			
@@ -44,10 +44,12 @@ public partial class MultiWeapon {
 	public override void _ValidateProperty(Dictionary property) {
 		base._ValidateProperty(property);
 		
-		switch (property["name"].AsStringName()) {
-			case nameof(WeaponDatas):
-				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
-				break;
+		StringName name = property["name"].AsStringName();
+		
+		if (
+			name == PropertyName.WeaponDatas
+		) {
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
 		}
 	}
 }

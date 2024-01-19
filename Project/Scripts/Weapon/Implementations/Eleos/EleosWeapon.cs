@@ -1,29 +1,27 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using SevenGame.Utility;
 
 namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
 public partial class EleosWeapon : SingleWeapon {
-	private Attacks attacks;
+	public SlashAttack.Info SlashAttack { get; init; }
 
 
 
-	protected EleosWeapon() : base() {}
-	public EleosWeapon(EleosWeaponData data, WeaponCostume? costume) : base(data, costume) {}
-
-
-
-	protected override void InitializeAttacks() {
-		base.InitializeAttacks();
-		attacks = new(this);
+	protected EleosWeapon() : this(ResourceManager.GetRegisteredWeapon<EleosWeaponData>()!, null) {}
+	public EleosWeapon(EleosWeaponData data, WeaponCostume? costume) : base(data, costume) {
+		SlashAttack = new(this);
 	}
+
+
 
 	public override IEnumerable<AttackAction.IInfo> GetAttacks(Entity target) {
 		return [
-			attacks.slashAttack,
+			SlashAttack,
 		];
 	}
 
@@ -35,14 +33,8 @@ public partial class EleosWeapon : SingleWeapon {
 		if ( Entity.CurrentAction is EntityAction action && action.IsCancellable ) return;
 
 		if ( inputInfo.ControlDevice.IsInputJustPressed(ControlDevice.InputType.LightAttack) ) {
-			Entity.ExecuteAction(attacks.slashAttack);
+			Entity.ExecuteAction(SlashAttack);
 		}
 	}
 
-
-
-	private readonly struct Attacks(EleosWeapon weapon) {
-		public readonly SlashAttack.Info slashAttack = new(weapon);
-
-	}
 }

@@ -23,9 +23,21 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 		set {
 			_weapons = [.. value];
 			
-			if ( this.IsEditorGetSetter() ) return;
+			if ( this.IsInitializationSetterCall() ) return;
 
 			_weapons.ForEach( w => w?.SafeReparentRecursive(this) );
+		}
+	}
+
+	public override int Style {
+		get => _currentIndex;
+		set {
+			if (value == _currentIndex && CurrentWeapon is SingleWeapon currentWeapon) {
+				currentWeapon.Style++;
+				return;
+			}
+
+			SwitchTo(value);
 		}
 	}
 
@@ -33,7 +45,7 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 	[Export] private int CurrentIndex {
 		get => _currentIndex;
 		set {
-			if ( this.IsEditorGetSetter() ) {
+			if ( this.IsInitializationSetterCall() ) {
 				_currentIndex = value;
 				return;
 			}
@@ -47,7 +59,7 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 	[Export] public Entity? Entity {
 		get => _entity;
 		set {
-			if ( this.IsEditorGetSetter() ) {
+			if ( this.IsInitializationSetterCall() ) {
 				_entity = value;
 				return;
 			}
@@ -70,13 +82,13 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 	public override WeaponData Data {
 		get => CurrentWeapon?.Data!;
 		protected set {
-			if ( this.IsEditorGetSetter() ) return;
+			if ( this.IsInitializationSetterCall() ) return;
 			SetWeapon(_currentIndex, value);
 		}
 	}
 	public override WeaponCostume? Costume {
 		get => CurrentWeapon?.Costume;
-		set => CurrentWeapon?.SetCostume(value);
+		set { if (CurrentWeapon is SingleWeapon currentWeapon) currentWeapon.Costume = value; }
 	}
 
 
@@ -128,9 +140,7 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 		SwitchTo(_weapons.IndexOf(weapon));
 
 	public void SwitchTo(int index) {
-		if ( ! IndexInBounds(index) ) return;
-
-		_currentIndex = index;
+		_currentIndex = index % Math.Max(_weapons.Count, 1);
 
 		UpdateCurrent();
 	}
@@ -181,17 +191,18 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 	}
 
 
-	public override IEnumerable<AttackAction.IInfo> GetAttacks(Entity target) =>
-		_weapons
+	public override IEnumerable<AttackAction.IInfo> GetAttacks(Entity target) {
+		SingleWeapon? currentWeapon = CurrentWeapon;
+		return _weapons
 			.SelectMany( (w) => w?.GetAttacks(target) ?? [] )
 			.Select( a => {
-				SingleWeapon? currentWeapon = CurrentWeapon;
 				if (a.Weapon != currentWeapon) {
 					a.BeforeExecute += () => SwitchTo(a.Weapon);
 					a.AfterExecute += () => SwitchTo(currentWeapon);
 				}
 				return a;
 			});
+	}
 
 	public override void Inject(Entity? entity) {
 		_entity = entity;
@@ -200,7 +211,6 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 
 		_weapons.ForEach( w => w?.Inject(entity));
 	}
-
 
 	public override void HandleInput(Player.InputInfo inputInfo) {
 		base.HandleInput(inputInfo);

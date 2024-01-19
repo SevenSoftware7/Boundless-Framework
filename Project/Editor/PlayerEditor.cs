@@ -31,14 +31,18 @@ public partial class Player {
 	public override void _ValidateProperty(Dictionary property) {
 		base._ValidateProperty(property);
 		
-		switch (property["name"].AsStringName()) {
-			case nameof(PlayerId):
-				property["hint"] = (int)PropertyHint.Range;
-				property["hint_string"] = $"0,{MaxPlayers - 1},";
-				break;
-			case nameof(PlayersList):
-				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage | PropertyUsageFlags.ReadOnly);
-				break;
+		StringName name = property["name"].AsStringName();
+		
+		if (
+			name == PropertyName.PlayersList
+		) {
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage | PropertyUsageFlags.ReadOnly);
+		
+		} else if (
+			name == PropertyName.PlayerId
+		) {
+			property["hint"] = (int)PropertyHint.Range;
+			property["hint_string"] = $"0,{MaxPlayers - 1},";
 		}
 	}
 }

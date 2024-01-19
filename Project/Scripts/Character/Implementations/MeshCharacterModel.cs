@@ -24,7 +24,7 @@ public sealed partial class MeshCharacterModel : CharacterModel {
 
 	protected override bool LoadModelImmediate() {
 		if ( Costume is not MeshCharacterCostume meshCostume ) return false;
-		if ( GetParent() is null || Owner is null ) return false;
+		if ( ! IsInsideTree() || GetParent() is null || Owner is null ) return false;
 		if ( Skeleton is null ) return false;
 
 		if ( meshCostume.ModelScene?.Instantiate() is not MeshInstance3D model ) return false;
@@ -56,10 +56,12 @@ public sealed partial class MeshCharacterModel : CharacterModel {
 	public override void _ValidateProperty(Dictionary property) {
 		base._ValidateProperty(property);
 		
-		switch (property["name"].AsStringName()) {
-			case nameof(Model):
-				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
-				break;
+		StringName name = property["name"].AsStringName();
+		
+		if (
+			name == PropertyName.Model
+		) {
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
 		}
 	}
 }

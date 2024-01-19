@@ -42,8 +42,8 @@ public partial class CameraController3D : Camera3D {
 
 	public void SetEntityAsSubject(Entity entity) {
 		Subject = entity.Transform.Origin;
-		if ( entity.Armature is not null ) {
-			Subject = entity.Armature.GetBonePositionOrDefault("Head", Subject);
+		if ( entity.Skeleton is not null ) {
+			Subject = entity.Skeleton.GetBonePositionOrDefault("Head", Subject);
 		}
 
 		SubjectBasis = entity.Transform.Basis;
