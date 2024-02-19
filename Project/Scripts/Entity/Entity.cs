@@ -206,26 +206,71 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 		OnCharacterLoadedUnloaded(Character?.IsLoaded ?? false);
 	}
 
+	private bool MoveGrounded(double delta) {
+		// if ( GravityMultiplier != 0f & Weight != 0f ) {
+		SplitInertia(out Vector3 verticalInertia, out Vector3 horizontalInertia);
+
+		if ( IsOnFloor() ) verticalInertia = verticalInertia.FlattenInDirection( -UpDirection );
+		if ( IsOnCeiling() ) verticalInertia = verticalInertia.FlattenInDirection( UpDirection );
+
+		Inertia = horizontalInertia + verticalInertia;
+		// }
+
+		if ( Mathf.IsZeroApprox(Movement.LengthSquared()) || ! IsOnFloor() ) return false;
+
+		Vector3 movement = Movement * (float)delta;
+
+		KinematicCollision3D? stepObstacleCollision = MoveAndCollide(movement, true);
+		
+		Vector3 motion = (CharacterStepHeight + Mathf.Epsilon) * -UpDirection;
+		Vector3 destination = GlobalTransform.Origin + movement;
+
+		Vector3 start = destination;
+		if (stepObstacleCollision is not null) start -= motion;
+
+
+		PhysicsTestMotionResult3D result = new();
+		bool findStep = PhysicsServer3D.BodyTestMotion(
+			GetRid(),
+			new() {
+				From = GlobalTransform with { Origin = start },
+				Motion = motion,
+			},
+			result
+		);
+
+		if ( ! findStep ) return false;
+
+		Vector3 point = result.GetCollisionPoint();
+
+		Vector3 destinationHeight = destination.Project(UpDirection);
+		Vector3 pointHeight = point.Project(UpDirection);
+
+		if ( destinationHeight.DistanceSquaredTo(pointHeight) >= motion.LengthSquared() ) return false;
+
+		GlobalTransform = GlobalTransform with { Origin = destination - destinationHeight + pointHeight };
+		return true;
+	}
+
+	private void Move(double delta) {
+		if ( MotionMode == MotionModeEnum.Grounded ) {
+			if ( MoveGrounded(delta) ) {
+				GD.Print("Step found");
+				Movement = Vector3.Zero;
+			}
+		}
+
+		Velocity = Inertia + Movement;
+		MoveAndSlide();
+	}
+
 
 
 	public override void _Process(double delta) {
 		base._Process(delta);
 
 		if ( Engine.IsEditorHint() ) return;
-
-		// if ( GravityMultiplier != 0f & Weight != 0f ) {
-			SplitInertia(out Vector3 verticalInertia, out Vector3 horizontalInertia);
-			
-			if ( MotionMode == MotionModeEnum.Grounded ) {
-				if ( IsOnFloor() ) verticalInertia = verticalInertia.FlattenInDirection( -UpDirection );
-				if ( IsOnCeiling() ) verticalInertia = verticalInertia.FlattenInDirection( UpDirection );
-			}
-			
-			Inertia = horizontalInertia + verticalInertia;
-		// }
-
-		Velocity = Movement + Inertia;
-		MoveAndSlide();
+		Move(delta);
 	}
 
 	public override void _Ready() {
