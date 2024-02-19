@@ -6,8 +6,8 @@ public struct Vector2Info {
 	public Vector2 currentValue = Vector2.Zero;
 	public Vector2 lastValue = Vector2.Zero;
 
-	public TimeDuration zeroTimer = new();
-	public TimeDuration nonZeroTimer = new();
+	public Timer zeroTimer = new();
+	public Timer nonZeroTimer = new();
 
 	public readonly float X => currentValue.X;
 	public readonly float Y => currentValue.Y;

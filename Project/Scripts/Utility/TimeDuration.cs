@@ -1,22 +1,22 @@
 using Godot;
 
-
 namespace SevenGame.Utility;
 
-public struct TimeDuration {
-	public float startTime = 0;
-	public readonly float Duration => Time.GetTicksMsec() - startTime;
+public struct TimeDuration(ulong durationMsec) {
+	public ulong stopTime = 0;
+
+	public readonly bool IsDone => Time.GetTicksMsec() >= stopTime;
+	public readonly ulong RemainingDuration => IsDone ? 0 : stopTime - Time.GetTicksMsec();
 
 
 
-	public TimeDuration() {;}
-
-
-
-	public void Start(){
-		startTime = Time.GetTicksMsec();
+	public void End() {
+		stopTime = Time.GetTicksMsec();
+	}
+	public void Start() {
+		stopTime = Time.GetTicksMsec() + durationMsec;
 	}
 
 
-	public static implicit operator float(TimeDuration timer) => timer.Duration;
+	public static implicit operator float(TimeDuration timeUntil) => timeUntil.RemainingDuration;
 }

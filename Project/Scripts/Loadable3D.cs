@@ -4,7 +4,6 @@ namespace LandlessSkies.Core;
 
 [Tool]
 public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
-	private bool _isLoaded = false;
 
 
 
@@ -23,6 +22,7 @@ public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
 			}
 		}
 	}
+	private bool _isLoaded = false;
 
 	[Signal] public delegate void LoadedUnloadedEventHandler(bool isLoaded);
 

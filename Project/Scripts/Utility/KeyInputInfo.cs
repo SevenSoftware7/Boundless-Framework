@@ -8,8 +8,8 @@ public struct KeyInputInfo {
 	public bool currentValue = false;
 	public bool lastValue = false;
 
-	public TimeDuration trueTimer = new();
-	public TimeDuration falseTimer = new();
+	public Timer trueTimer = new();
+	public Timer falseTimer = new();
 
 	public readonly bool Started => currentValue && !lastValue;
 	public readonly bool Stopped => !currentValue && lastValue;

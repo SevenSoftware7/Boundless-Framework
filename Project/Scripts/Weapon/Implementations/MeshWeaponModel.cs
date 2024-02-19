@@ -5,8 +5,8 @@ using Godot.Collections;
 namespace LandlessSkies.Core;
 
 [Tool]
-public sealed partial class MeshWeaponModel : WeaponModel {
-	[Export] private MeshInstance3D? Model;
+public partial class MeshWeaponModel : WeaponModel {
+	[Export] protected Node3D Model { get; private set; } = null!;
 
 	[ExportGroup("Dependencies")]
 	[Export] public Skeleton3D? Skeleton { get; private set; }
@@ -14,7 +14,7 @@ public sealed partial class MeshWeaponModel : WeaponModel {
 
 
 
-	private MeshWeaponModel() : base() {}
+	protected MeshWeaponModel() : base() {}
 	public MeshWeaponModel(MeshWeaponCostume costume, Node3D root) : base(costume, root) {}
 
 
@@ -22,51 +22,33 @@ public sealed partial class MeshWeaponModel : WeaponModel {
 	protected override bool LoadModelImmediate() {
 		if ( Costume is not MeshWeaponCostume meshCostume ) return false;
 		if ( GetParent() is null || Owner is null ) return false;
+		if ( Skeleton is null ) return false;
 
-		if ( meshCostume.ModelScene?.Instantiate() is not MeshInstance3D model ) return false;
+		if ( meshCostume.ModelScene?.Instantiate() is not Node3D model ) return false;
 
-		Model = model.SetOwnerAndParentTo(this);
-		UpdateModelSkeleton();
+		Model = model.SetOwnerAndParentTo(Skeleton);
 
 		return true;
 	}
 	protected override bool UnloadModelImmediate() {
 		Model?.UnparentAndQueueFree();
-		Model = null;
+		Model = null!;
 
 		return true;
 	}
 
 	public override void Inject(Skeleton3D? skeleton) {
 		Skeleton = skeleton;
-		ReloadModel(true);
-
-		UpdateModelSkeleton();
+		Model?.SafeReparentEditor(Skeleton);
 	}
 	public override void Inject(IWeapon.Handedness handedness) {
 		Handedness = handedness;
 	}
 
-	private void UpdateModelSkeleton() {
-		if ( Model is not null && Model.Owner == Skeleton?.Owner ) {
-			Model.Skeleton = Model.GetPathTo(Skeleton ?? default);
-		}
-	}
-
-	// public override void _Parented() {
-	// 	base._Parented();
-
-	// 	UpdateModelSkeleton();
-	// }
-
-	// public override void _PathRenamed() {
-	// 	base._PathRenamed();
-
-	// 	UpdateModelSkeleton();
-	// }
-
 	public override void _Process(double delta) {
 		base._Process(delta);
+
+		if ( Model is null ) return;
 
 		string boneName = Handedness switch {
 			IWeapon.Handedness.Left         => "LeftHand",
@@ -74,9 +56,9 @@ public sealed partial class MeshWeaponModel : WeaponModel {
 		};
 
 		if ( Skeleton is not null && Skeleton.TryGetBoneTransform(boneName, out Transform3D handTransform) ) {
-			GlobalTransform = handTransform;
+			Model.GlobalTransform = handTransform;
 		} else {
-			Transform = Transform3D.Identity;
+			Model.Transform = Transform3D.Identity;
 		}
 	}
 
@@ -85,10 +67,9 @@ public sealed partial class MeshWeaponModel : WeaponModel {
 		
 		StringName name = property["name"].AsStringName();
 		
-		if (
-			name == PropertyName.Model
-		) {
+		if (name == PropertyName.Model) {
 			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
+			
 		}
 	}
 }

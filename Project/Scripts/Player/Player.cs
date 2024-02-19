@@ -10,8 +10,6 @@ namespace LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public sealed partial class Player : Node {
-	private byte _playerId;
-	private CameraController3D? _cameraController;
 
 
 	public const byte MaxPlayers = 10;
@@ -23,22 +21,18 @@ public sealed partial class Player : Node {
 		get => _playerId;
 		private set => SetPlayerId(value);
 	}
+	private byte _playerId;
 
 
-	[Export] public CameraController3D? CameraController {
-		get => _cameraController ??= GetNodeOrNull<CameraController3D>(nameof(CameraController));
-		private set => _cameraController = value;
-	}
+	[Export] public CameraController3D CameraController { get; private set; } = null!;
 
-	[Export] public Entity? Entity { get; private set; }
+	[Export] public Entity Entity { get; private set; } = null!;
 
-	[Export] public ControlDevice? ControlDevice { get; private set; }
+	[Export] public ControlDevice ControlDevice { get; private set; } = null!;
 
 
 
-	public Player() : base() {
-		Name = nameof(Player);
-	}
+	public Player() : base() {}
 
 
 
@@ -62,21 +56,8 @@ public sealed partial class Player : Node {
 		// PlayerId is already set to 0 (default) or the PlayerId is already set to this Player.
 		if ( _playerId != 0 || Players[0] == this ) return;
 
-		byte emptySpot = 0;
-		bool found = false;
-		for (byte i = 0; i < Players.Length; i++) {
-			if ( Players[i] == null ) {
-				emptySpot = i;
-				found = true;
-				break;
-			}
-		}
-		if ( ! found ) {
-			GD.PrintErr("No free PlayerId found.");
-			return;
-		}
-
-		SetPlayerId(emptySpot);
+        byte index = (byte)System.Array.FindIndex(Players, p => p is null);
+		SetPlayerId(index);
 	}
 
 	private void UnsetPlayerId() {
@@ -130,7 +111,7 @@ public sealed partial class Player : Node {
 
 		public readonly void RawInputToGroundedMovement(out Basis camRotation, out Vector3 groundedMovement){
 			Vector3 camRight = CameraController.AbsoluteRotation.X;
-			Vector3 camUp = Entity.Transform.Basis.Y;
+			Vector3 camUp = Entity.Transform.Basis.Y * ((Mathf.Ceil(Entity.Transform.Basis.Y.Dot(CameraController.LocalRotation.Y)) - 0.5f) * 2f);
 			Vector3 camForward = camUp.Cross(camRight).Normalized();
 			camRotation = Basis.LookingAt(camForward, camUp);
 

@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using Godot.Collections;
+using Microsoft.VisualBasic;
 
 namespace SevenGame.Utility;
 
@@ -142,8 +145,8 @@ public static class MathUtility {
 		return vector3_5;
 	}
 
-	public static bool RayCast3D(this Node3D node, Vector3 from, Vector3 to, out RayCast3DResult result, uint collisionMask = uint.MaxValue, Array<Rid>? exclude = null, bool collideWithBodies = true, bool collideWithAreas = true, bool hitFromInside = false, bool hitBackFaces = false) {
-		PhysicsDirectSpaceState3D spaceState = node.GetWorld3D().DirectSpaceState;
+	public static bool RayCast3D(this World3D world, Vector3 from, Vector3 to, out RayCast3DResult result, uint collisionMask = uint.MaxValue, Array<Rid>? exclude = null, bool collideWithBodies = true, bool collideWithAreas = true, bool hitFromInside = false, bool hitBackFaces = false) {
+		PhysicsDirectSpaceState3D spaceState = world.DirectSpaceState;
 		PhysicsRayQueryParameters3D parameters = PhysicsRayQueryParameters3D.Create(from, to, collisionMask, exclude);
 		parameters.CollideWithBodies = collideWithBodies;
 		parameters.CollideWithAreas = collideWithAreas;
@@ -151,35 +154,105 @@ public static class MathUtility {
 		parameters.HitBackFaces = hitBackFaces;
 		
 		Dictionary intersect = spaceState.IntersectRay(parameters);
-		if ( intersect.Count > 0 ) {
-			result = new RayCast3DResult() {
-				HasHit = true,
-				Point = intersect["position"].AsVector3(),
-				Normal = intersect["normal"].AsVector3(),
-				Collider = intersect["collider"].AsGodotObject(),
-				Id = intersect["collider_id"].AsUInt64(),
-				Rid = intersect["rid"].AsRid(),
-				Shape = intersect["shape"].AsInt32(),
-				// Metadata = intersect["metadata"] // Can't seem to get this to work
-			};
-			return true;
+		if ( intersect.Count == 0 ) {
+			result = new();
+			return false;
 		}
 
-		result = new() {
-			HasHit = false
+		Vector3 normal = intersect["normal"].AsVector3();
+		result = new RayCast3DResult() {
+			Point = intersect["position"].AsVector3(),
+			Normal = normal,
+			Collider = intersect["collider"].AsGodotObject(),
+			Id = intersect["collider_id"].AsUInt64(),
+			Rid = intersect["rid"].AsRid(),
+			Shape = intersect["shape"].AsInt32(),
+			FaceIndex = intersect["face_index"].AsInt32(),
+			HitFromInside = normal == Vector3.Zero,
 		};
-		return false;
+		
+		return true;
+	}
+
+	public static bool PointCast3D(this World3D world, Vector3 position, out ShapeCast3DResult[] results, uint collisionMask = uint.MaxValue, Array<Rid>? exclude = null, bool collideWithBodies = true, bool collideWithAreas = true, int maxResults = 32) {
+		PhysicsDirectSpaceState3D spaceState = world.DirectSpaceState;
+        PhysicsPointQueryParameters3D parameters = new()
+        {
+			Position = position,
+			Exclude = exclude,
+			CollisionMask = collisionMask,
+            CollideWithBodies = collideWithBodies,
+            CollideWithAreas = collideWithAreas,
+        };
+
+        Array<Dictionary> intersections = spaceState.IntersectPoint(parameters, maxResults);
+		if (intersections.Count > 0) {
+			results = [];
+			return false;
+		}
+
+
+		results = intersections.Select(intersection => {
+			Vector3 normal = intersection["normal"].AsVector3();
+			return new ShapeCast3DResult() {
+				Collider = intersection["collider"].AsGodotObject(),
+				Id = intersection["collider_id"].AsUInt64(),
+				Rid = intersection["rid"].AsRid(),
+				Shape = intersection["shape"].AsInt32()
+			};
+		}).ToArray();
+
+		return true;
+	}
+
+	public static bool ShapeCast3D(this World3D world, Transform3D origin, Vector3 motion, out ShapeCast3DResult[] results, uint collisionMask = uint.MaxValue, Array<Rid>? exclude = null, bool collideWithBodies = true, bool collideWithAreas = true, int maxResults = 32) {
+		PhysicsDirectSpaceState3D spaceState = world.DirectSpaceState;
+        PhysicsShapeQueryParameters3D parameters = new()
+        {
+			Transform = origin,
+			Motion = motion,
+			Exclude = exclude,
+			CollisionMask = collisionMask,
+            CollideWithBodies = collideWithBodies,
+            CollideWithAreas = collideWithAreas,
+        };
+
+        Array<Dictionary> intersections = spaceState.IntersectShape(parameters, maxResults);
+		if (intersections.Count > 0) {
+			results = [];
+			return false;
+		}
+
+
+		results = intersections.Select(intersection => {
+			Vector3 normal = intersection["normal"].AsVector3();
+			return new ShapeCast3DResult() {
+				Collider = intersection["collider"].AsGodotObject(),
+				Id = intersection["collider_id"].AsUInt64(),
+				Rid = intersection["rid"].AsRid(),
+				Shape = intersection["shape"].AsInt32()
+			};
+		}).ToArray();
+
+		return true;
 	}
 
 	public struct RayCast3DResult {
-		public bool HasHit;
 		public Vector3 Point;
 		public Vector3 Normal;
 		public GodotObject Collider;
 		public ulong Id;
 		public Rid Rid;
 		public int Shape;
-		// public Variant Metadata;
+		public int FaceIndex;
+		public bool HitFromInside;
+	}
+
+	public struct ShapeCast3DResult {
+		public GodotObject Collider;
+		public ulong Id;
+		public Rid Rid;
+		public int Shape;
 	}
 
 

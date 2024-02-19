@@ -9,12 +9,6 @@ namespace LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICostumable<CharacterCostume>, IInputReader, ICustomizable {
-	private CharacterData _data = null!;
-	
-	
-
-	public Basis CharacterRotation { get; private set; } = Basis.Identity;
-
 
 	[Export] public Node3D? Collisions { get; private set; }
 	[Export] public Skeleton3D? Skeleton { get; private set; }
@@ -32,10 +26,10 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 			SetCostume(_data.BaseCostume);
 		}
 	}
+	private CharacterData _data = null!;
 
 	[ExportGroup("Costume")]
 	[Export] private CharacterModel? CharacterModel;
-
 	[Export] public CharacterCostume? Costume {
 		get => CharacterModel?.Costume;
 		set {
@@ -44,9 +38,11 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 		}
 	}
 
+	public Basis CharacterRotation { get; private set; } = Basis.Identity;
+
 
 	public virtual IUIObject UIObject => Data;
-	public virtual ICustomizable[] Children => [CharacterModel!];
+	public virtual ICustomizable[] Children => CharacterModel is CharacterModel model ? [model] : [];
 	public virtual ICustomizationParameter[] Customizations => [];
 
 
@@ -115,18 +111,22 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 	}
 
 
-	public void RotateTowards(Basis target, double delta, float speed = 12f) {
+	public void RotateTowards(Basis target, double delta, float speed = 16f) {
 		CharacterRotation = CharacterRotation.SafeSlerp(target, (float)delta * speed);
 
 		RefreshRotation();
 	}
 
 	protected virtual void RefreshRotation() {
-		Transform = new(CharacterRotation, Transform.Origin);
+		Transform = Transform with {
+			Basis = CharacterRotation,
+		};
 
 		if ( Collisions is null ) return;
 
-		Collisions.Transform = new(CharacterRotation, Collisions.Transform.Origin);
+		Collisions.Transform = Collisions.Transform with {
+			Basis = CharacterRotation,
+		};
 	}
 
 	public virtual void HandleInput(Player.InputInfo inputInfo) {}
@@ -158,10 +158,9 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 		) {
 			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
 		
-		} else if (
-			name == PropertyName.Costume
-		) {
+		} else if (name == PropertyName.Costume) {
 			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
+
 		}
 	}
 }

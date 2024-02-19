@@ -6,12 +6,9 @@ namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
-public partial class Health : Node {
-	private float _maxAmount = 100f;
-	private float _amount;
+public partial class Health() : Node() {
 	
-	private float _damagedHealth;
-	private TimeInterval _damagedHealthTimer = new();
+	private TimeDuration _damagedHealthTimer = new(1000);
 	private float _damagedHealthVelocity = 0f;
 
 
@@ -20,34 +17,33 @@ public partial class Health : Node {
 		get => _maxAmount;
 		set {
 			_maxAmount = Mathf.Max(value, 1f);
-			_damagedHealth = Mathf.Min(_damagedHealth, _maxAmount);
+			Amount = Mathf.Min(Amount, _maxAmount);
+
+			NotifyPropertyListChanged();
 		}
 	}
+	private float _maxAmount = 100f;
 
 	[Export] public float Amount {
 		get => _amount;
 		set {
 			_amount = Mathf.Clamp(value, 0f, _maxAmount);
 
-			const ulong damagedHealthDuration = (ulong)(1.25 * 1000);
-			_damagedHealthTimer.SetDurationMSec(damagedHealthDuration);
-
+			_damagedHealthTimer.Start();
 			EmitSignal(SignalName.HealthChange, Amount);
 		}
 	}
+	private float _amount;
 
-	[Export] public float DamagedHealth {
-		get => _damagedHealth;
-		private set {}
-	}
+	[Export] public float DamagedHealth { get; private set; }
 
 
 	[Signal] public delegate void HealthChangeEventHandler(float amount);
 
 
 
-	public Health() : base() {
-		Name = nameof(Health);
+	public Health(float max) : this() {
+		_maxAmount = max;
 	}
 
 
@@ -56,17 +52,23 @@ public partial class Health : Node {
 		base._Ready();
 
 		_amount = _maxAmount;
-		_damagedHealth = _amount;
+		DamagedHealth = _amount;
 	}
 
 	public override void _Process(double delta) {
 		base._Process(delta);
 
-		if ( _damagedHealthTimer.IsDone ) {
-			_damagedHealth = MathUtility.SmoothDamp(_damagedHealth, _amount, ref _damagedHealthVelocity, 0.2f, Mathf.Inf, (float)delta);
-		} else {
-			_damagedHealthVelocity = 0f;
+		if ( DamagedHealth < Amount ) {
+			DamagedHealth = Amount;
+			return;
 		}
+
+		if ( ! _damagedHealthTimer.IsDone ) {
+			_damagedHealthVelocity = 0f;
+			return;
+		}
+
+		DamagedHealth = MathUtility.SmoothDamp(DamagedHealth, _amount, ref _damagedHealthVelocity, 0.15f, Mathf.Inf, (float)delta);
 	}
 
 	public override void _ValidateProperty(Dictionary property) {
@@ -74,10 +76,16 @@ public partial class Health : Node {
 		
 		StringName name = property["name"].AsStringName();
 		
+		if (name == PropertyName.DamagedHealth) {
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage | PropertyUsageFlags.ReadOnly);
+		}
+		
 		if (
+			name == PropertyName.Amount ||
 			name == PropertyName.DamagedHealth
 		) {
-			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage | PropertyUsageFlags.ReadOnly);
+			property["hint"] = (int)PropertyHint.Range;
+			property["hint_string"] = $"0,{MaxAmount},";
 		}
 	}
 }

@@ -12,7 +12,10 @@ public partial class EleosWeapon : SingleWeapon {
 
 
 
-	protected EleosWeapon() : this(ResourceManager.GetRegisteredWeapon<EleosWeaponData>()!, null) {}
+	protected EleosWeapon() : base() {
+		SlashAttack = new(this);
+		Data ??= ResourceManager.GetRegisteredWeapon<EleosWeaponData>()!;
+	}
 	public EleosWeapon(EleosWeaponData data, WeaponCostume? costume) : base(data, costume) {
 		SlashAttack = new(this);
 	}

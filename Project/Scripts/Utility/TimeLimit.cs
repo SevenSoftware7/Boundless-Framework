@@ -17,10 +17,10 @@ public struct TimeLimit {
 	public void End() {
 		stopTime = Time.GetTicksMsec();
 	}
-	public void SetTime(ulong timeMsec){
+	public void SetTime(ulong timeMsec) {
 		stopTime = timeMsec;
 	}
-	public void SetDurationMSec(ulong durationMsec){
+	public void SetDurationMSec(ulong durationMsec) {
 		stopTime = Time.GetTicksMsec() + durationMsec;
 	}
 

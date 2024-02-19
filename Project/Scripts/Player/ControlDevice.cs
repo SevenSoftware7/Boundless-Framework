@@ -76,13 +76,12 @@ public abstract partial class ControlDevice : Node, IDisposable {
 		Look,
 		Move
 	}
-	
-	[Flags]
+
 	public enum MotionDirection : byte {
-		Up = 1 << 0,
-		Down = 1 << 1,
-		Left = 1 << 2,
-		Right = 1 << 3,
+		Up = 1,
+		Down = 2,
+		Left = 3,
+		Right = 4,
 
 		 // Godot's inverted Z situation makes this confusing
 		Forward = Down,

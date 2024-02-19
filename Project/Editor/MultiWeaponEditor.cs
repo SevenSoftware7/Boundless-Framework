@@ -12,7 +12,7 @@ public partial class MultiWeapon {
 
 
 	[Export] private Array<WeaponData> WeaponDatas {
-		get => [.. _weapons.Select(weapon => weapon?.Data!)];
+		get => [.. _weapons.Select(weapon => weapon?.Data)];
 		set {
 			if ( this.IsInitializationSetterCall() ) {
 				return;
@@ -46,9 +46,7 @@ public partial class MultiWeapon {
 		
 		StringName name = property["name"].AsStringName();
 		
-		if (
-			name == PropertyName.WeaponDatas
-		) {
+		if (name == PropertyName.WeaponDatas) {
 			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
 		}
 	}

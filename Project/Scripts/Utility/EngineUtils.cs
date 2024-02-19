@@ -55,11 +55,11 @@ public static class EngineUtils {
 
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static void SafeReparentEditor(this Node child, Node? newParent, bool keepGlobalTransform = true) {
+	public static T SafeReparentEditor<T>(this T child, Node? newParent, bool keepGlobalTransform = true) where T : Node {
 		child.SafeReparent(newParent, keepGlobalTransform);
 
-		if ( ! Engine.IsEditorHint() ) return;
-		if (child.Owner == newParent?.Owner) return;
+		if ( ! Engine.IsEditorHint() ) return child;
+		if (child.Owner == newParent?.Owner) return child;
 
 		Reown(child, newParent?.Owner);
 
@@ -69,23 +69,28 @@ public static class EngineUtils {
 				Reown(child, newOwner);
 			}
 		}
+
+		return child;
 	}
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static void SafeReparent(this Node child, Node? newParent, bool keepGlobalTransform = true) {
+	public static T SafeReparent<T>(this T child, Node? newParent, bool keepGlobalTransform = true) where T : Node {
 		if (child.GetParent() is not Node parent) {
 			newParent?.AddChild(child);
-			return;
+			return child;
 		}
-		if (parent == newParent) return;
+		if (parent == newParent) return child;
 
 		if (newParent is not null) {
 			child.Reparent(newParent, keepGlobalTransform);
 		}
+		return child;
 	}
+	
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static void AddChildAndSetOwner(this Node obj, Node child, bool forceReadableName = false) {
+	public static T AddChildAndSetOwner<T>(this T obj, Node child, bool forceReadableName = false) where T : Node {
 		obj.AddChild(child, forceReadableName);
 		child.Owner = obj.Owner;
+		return obj;
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]

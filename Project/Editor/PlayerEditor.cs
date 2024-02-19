@@ -33,16 +33,13 @@ public partial class Player {
 		
 		StringName name = property["name"].AsStringName();
 		
-		if (
-			name == PropertyName.PlayersList
-		) {
+		if (name == PropertyName.PlayersList) {
 			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage | PropertyUsageFlags.ReadOnly);
 		
-		} else if (
-			name == PropertyName.PlayerId
-		) {
+		} else if (name == PropertyName.PlayerId) {
 			property["hint"] = (int)PropertyHint.Range;
 			property["hint_string"] = $"0,{MaxPlayers - 1},";
+			
 		}
 	}
 }

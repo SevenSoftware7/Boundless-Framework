@@ -9,15 +9,12 @@ namespace LandlessSkies.Core;
 
 public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 	private Vector3 _moveDirection;
-	private Vector3 _rotationForward = Vector3.Forward;
 	private float _moveSpeed;
 	private MovementSpeed _movementSpeed;
 
-	private TimeLimit jumpBuffer;
-	private TimeLimit jumpCooldown;
-
-
-	public override bool FreeOnStop => false;
+	private TimeDuration jumpBuffer = new(125);
+	private TimeDuration coyoteTimer = new(150);
+	private TimeDuration jumpCooldown = new(500);
 
 
 
@@ -25,7 +22,6 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 		base.Start(previousBehaviour);
 
 		Entity.MotionMode = CharacterBody3D.MotionModeEnum.Grounded;
-		_rotationForward = Entity.Transform.Basis.Z;
 	}
 	
 
@@ -55,13 +51,13 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 		if ( ! base.SetSpeed(speed) ) return false;
 		if ( speed == _movementSpeed ) return false;
 
-		if (Entity.IsOnFloor() && Entity.CurrentAction is not EvadeAction) {
-			if ( speed == MovementSpeed.Idle ) {
-				// MovementStopAnimation();
-			} else if ( (int)speed > (int)_movementSpeed ) {
-				// MovementStartAnimation(speed);
-			}
-		}
+		// if (Entity.IsOnFloor() && Entity.CurrentAction is not EvadeAction) {
+		// 	if ( speed == MovementSpeed.Idle ) {
+		// 		MovementStopAnimation();
+		// 	} else if ( (int)speed > (int)_movementSpeed ) {
+		// 		MovementStartAnimation(speed);
+		// 	}
+		// }
 
 		_movementSpeed = speed;
 		return true;
@@ -75,7 +71,7 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 	public override bool Jump(Vector3? target = null) {
 		if ( ! base.Jump(target) ) return false;
 
-		jumpBuffer.SetDurationMSec(125);
+		jumpBuffer.Start();
 		return true;
 	}
 
@@ -91,19 +87,21 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 		Entity.SplitInertia(out Vector3 verticalInertia, out Vector3 horizontalInertia);
 
 		if ( Entity.IsOnFloor() ) {
+			coyoteTimer.Start();
 			horizontalInertia = horizontalInertia.MoveToward( Vector3.Zero, 0.25f * floatDelta );
 		} else {
-			float targetInertia = Entity.CharacterWeight * 2f;
-
-
+			const float fallInertia = 32f;
+			float targetInertia = fallInertia;
 			float fallVelocity = verticalInertia.Dot(-Entity.UpDirection);
 
 			// Float more if player is holding jump key & rising
 			float isFloating = jumpBuffer.IsDone ? 0f : 1f;
-			float floatFactor = Mathf.Lerp( 1f, 0.75f, isFloating * Mathf.Clamp( 1f - fallVelocity, 0f, 1f ));
+			const float floatReductionFactor = 0.85f;
+			float floatFactor = Mathf.Lerp( 1f, floatReductionFactor, isFloating * Mathf.Clamp( 1f - fallVelocity, 0f, 1f ));
 
 			// Slightly ramp up inertia when falling
-			float inertiaRampFactor = Mathf.Lerp(1f, 1.5f, Mathf.Clamp( (1f + fallVelocity) * 0.5f, 0f, 1f ));
+			const float fallIncreaseFactor = 1.75f;
+			float inertiaRampFactor = Mathf.Lerp(1f, fallIncreaseFactor, Mathf.Clamp( (1f + fallVelocity) * 0.5f, 0f, 1f ));
 
 
 			verticalInertia = verticalInertia.MoveToward(-Entity.UpDirection * Mathf.Max(targetInertia, fallVelocity), 45f * floatFactor * inertiaRampFactor * floatDelta);
@@ -115,15 +113,13 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 
 		float newSpeed = 0f;
 		if ( ! _moveDirection.IsZeroApprox() ) {
-
 			// ----- Rotation -----
 			float directionLength = _moveDirection.Length();
-			Vector3 normalizedDirection = _moveDirection / directionLength;
+			Vector3 normalizedDirection = Entity.Transform.Basis.Inverse() * _moveDirection / directionLength;
 
-			Entity.AbsoluteForward = Entity.AbsoluteForward.SafeSlerp( normalizedDirection, Entity.CharacterRotationSpeed * floatDelta);
+			Entity.RelativeForward = Entity.RelativeForward.SafeSlerp( normalizedDirection, Entity.CharacterRotationSpeed * floatDelta );
 
-			_rotationForward = normalizedDirection;
-			Entity.Character?.RotateTowards(Basis.LookingAt(_rotationForward, Entity.UpDirection), delta);
+			Entity.Character?.RotateTowards(Basis.LookingAt(normalizedDirection, Vector3.Up), delta);
 
 			// Vector3 groundedMovement = _moveDirection;
 			// if (Entity.IsOnFloor()) {
@@ -139,7 +135,6 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 				MovementSpeed.Sprint             => Entity.Character.Data.sprintSpeed,
 				_                                => newSpeed
 			};
-
 		}
 
 		// ---- Speed Calculation ----
@@ -156,10 +151,10 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 
 
 		// ----- Jump Instruction -----
-		if ( ! jumpBuffer.IsDone && jumpCooldown.IsDone && Entity.IsOnFloor() ) {
+		if ( ! jumpBuffer.IsDone && jumpCooldown.IsDone && ! coyoteTimer.IsDone ) {
 			Entity.Inertia = Entity.Inertia.FlattenInDirection(-Entity.UpDirection) + Entity.UpDirection * 17.5f;
 			jumpBuffer.End();
-			jumpCooldown.SetDurationMSec(500);
+			jumpCooldown.Start();
 		}
 	}
 }

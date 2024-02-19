@@ -7,14 +7,8 @@ namespace LandlessSkies.Core;
 
 [Tool]
 public abstract partial class CharacterModel : Loadable3D, IInjectable<Skeleton3D?>, ICustomizable {
-	private CharacterCostume _costume = null!;
-
-
 	
-	[Export] public CharacterCostume Costume { 
-		get => _costume;
-		private set => _costume ??= value;
-	}
+	[Export] public CharacterCostume Costume { get; private set; } = null!;
 
 	public virtual IUIObject UIObject => Costume;
 	public virtual ICustomizable[] Children => [];
@@ -27,7 +21,7 @@ public abstract partial class CharacterModel : Loadable3D, IInjectable<Skeleton3
 		ArgumentNullException.ThrowIfNull(costume);
 		root.AddChildAndSetOwner(this);
 		
-		_costume = costume;
+		Costume = costume;
 	}
 	
 	
@@ -41,7 +35,7 @@ public abstract partial class CharacterModel : Loadable3D, IInjectable<Skeleton3
 		
 		StringName name = property["name"].AsStringName();
 		
-		if ( name == PropertyName.Costume && Costume is not null ) {
+		if (name == PropertyName.Costume && Costume is not null) {
 			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
 		}
 	}

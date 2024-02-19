@@ -12,9 +12,6 @@ namespace LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public sealed partial class MultiWeapon : Weapon, IUIObject {
-	private Entity? _entity;
-	private List<SingleWeapon?> _weapons = [];
-	private int _currentIndex = 0;
 
 
 
@@ -25,9 +22,10 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 			
 			if ( this.IsInitializationSetterCall() ) return;
 
-			_weapons.ForEach( w => w?.SafeReparentRecursive(this) );
+			_weapons.ForEach( w => w?.SafeReparentEditor(this) );
 		}
 	}
+	private List<SingleWeapon?> _weapons = [];
 
 	public override int Style {
 		get => _currentIndex;
@@ -53,6 +51,7 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 			SwitchTo(value);
 		}
 	}
+	private int _currentIndex = 0;
 
 
 	[ExportGroup("Dependencies")]
@@ -66,6 +65,7 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 			Inject(value);
 		}
 	}
+	private Entity? _entity;
 
 
 
@@ -160,7 +160,7 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 
 		new LoadableUpdater<SingleWeapon>(ref weapon, () => data?.Instantiate(costume))
 			.BeforeLoad(w => {
-				w.SafeReparentRecursive(this);
+				w.SafeReparentEditor(this);
 				w.Inject(Entity);
 			})
 			.Execute();
@@ -207,7 +207,7 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 	public override void Inject(Entity? entity) {
 		_entity = entity;
 
-		this.SafeReparentRecursive(entity);
+		this.SafeReparentEditor(entity);
 
 		_weapons.ForEach( w => w?.Inject(entity));
 	}

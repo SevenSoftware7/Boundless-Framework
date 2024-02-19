@@ -11,39 +11,11 @@ namespace LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public sealed partial class Entity : CharacterBody3D, IInputReader {
-	private AnimationPlayer? _animationPlayer;
-	private Character? _character;
-	private Weapon? _weapon;
-	private Vector3 _absoluteForward;
-	private Vector3 _relativeForward;
 
 	public EntityAction? CurrentAction { get; private set; }
 	public EntityBehaviourManager? BehaviourManager { get; private set; }
 
 
-	// [Export] public bool tte {
-	// 	get => false;
-	// 	set {
-	// 		if ( this.IsEditorGetSetter() ) return;
-
-	// 		if ( AnimationPlayer is null ) return;
-	// 		AnimationLibrary library = AnimationPlayer.GetAnimationLibrary("Selene");
-	// 		Animation anim = library.GetAnimation("Idle");
-
-	// 		foreach (AnimationTrack track in anim.GetTracks()) {
-	// 			string path = track.GetPath();
-	// 			Node root = GetTree().EditedSceneRoot;
-
-	// 			// track.SetPath/* GD.Print */(
-	// 			// 	path switch {
-	// 			// 		_ when path.Equals("{Entity}") => root.GetPathTo(this),
-	// 			// 		_ when path.Equals("{Weapon}") => root.GetPathTo(Weapon),
-	// 			// 		_ => path,
-	// 			// 	}
-	// 			// );
-	// 		}
-	// 	}
-	// }
 	[Export] public bool GenerateScene {
 		get => false;
 		set {
@@ -74,6 +46,7 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 			_animationPlayer.RootNode = GetTree().EditedSceneRoot.GetPathTo(this);
 		}
 	}
+	private AnimationPlayer? _animationPlayer;
 
 	[Export] public Character? Character {
 		get => _character;
@@ -85,6 +58,7 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 			_character.Name = PropertyName.Character;
 		}
 	}
+	private Character? _character;
 
 	[Export] public CharacterData? CharacterData {
 		get => Character?.Data;
@@ -122,6 +96,7 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 			}
 		}
 	}
+	private Weapon? _weapon;
 
 
 
@@ -143,6 +118,7 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 			_relativeForward = Transform.Basis.Inverse() * _absoluteForward;
 		}
 	}
+	private Vector3 _absoluteForward;
 
 
 	/// <summary>
@@ -158,6 +134,7 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 			_absoluteForward = Transform.Basis * _relativeForward;
 		}
 	}
+	private Vector3 _relativeForward;
 	[ExportGroup("")]
 
 
@@ -256,7 +233,7 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 
 		if ( ! Engine.IsEditorHint() ) {
 			BehaviourManager ??= new(this);
-			BehaviourManager?.SetBehaviour<TestBehaviour>( () => new(this) );
+			BehaviourManager?.SetBehaviour( new TestBehaviour(this) );
 		}
 	}
 
@@ -273,9 +250,7 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 
 		StringName name = property["name"].AsStringName();
 		
-		if (
-			name == PropertyName.Character
-		) {
+		if (name == PropertyName.Character) {
 			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
 		
 		} else if (
@@ -283,6 +258,7 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 			name == PropertyName.CharacterData
 		) {
 			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
+
 		}
 	}
 }

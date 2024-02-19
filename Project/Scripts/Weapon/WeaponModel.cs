@@ -7,13 +7,7 @@ namespace LandlessSkies.Core;
 
 [Tool]
 public abstract partial class WeaponModel : Loadable3D, IInjectable<Skeleton3D?>, IInjectable<IWeapon.Handedness>, ICustomizable {
-	private WeaponCostume _costume = null!;
-
-
-	[Export] public WeaponCostume Costume {
-		get => _costume;
-		private set => _costume ??= value;
-	}
+	[Export] public WeaponCostume Costume { get; private set; } = null!;
 
 	public virtual IUIObject UIObject => Costume;
 	public virtual ICustomizable[] Children => [];
@@ -26,7 +20,7 @@ public abstract partial class WeaponModel : Loadable3D, IInjectable<Skeleton3D?>
 		ArgumentNullException.ThrowIfNull(costume);
 		root.AddChildAndSetOwner(this);
 
-		_costume = costume;
+		Costume = costume;
 	}
 	
 	
@@ -38,11 +32,12 @@ public abstract partial class WeaponModel : Loadable3D, IInjectable<Skeleton3D?>
 	
 	public override void _ValidateProperty(Dictionary property) {
 		base._ValidateProperty(property);
+
+		StringName name = property["name"].AsStringName();
 		
-		switch (property["name"].AsStringName()) {
-			case nameof(Costume) when Costume is not null:
-				property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
-				break;
+		if (name == PropertyName.Costume && Costume is not null) {
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
+		
 		}
 	}
 }

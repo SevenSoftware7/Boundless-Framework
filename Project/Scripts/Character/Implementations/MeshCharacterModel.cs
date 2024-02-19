@@ -5,21 +5,24 @@ using Godot.Collections;
 namespace LandlessSkies.Core;
 
 [Tool]
-public sealed partial class MeshCharacterModel : CharacterModel {
-	[Export] private MeshInstance3D? Model;
+public partial class MeshCharacterModel : CharacterModel {
 
 	[ExportGroup("Dependencies")]
 	[Export] public Skeleton3D? Skeleton;
+	[ExportGroup("")]
+
+	[Export] protected Node3D Model { get; private set; } = null!;
 
 
 
-	private MeshCharacterModel() : base() {}
+	protected MeshCharacterModel() : base() {}
 	public MeshCharacterModel(MeshCharacterCostume costume, Node3D root) : base(costume, root) {}
 
 
 
 	public override void Inject(Skeleton3D? skeleton) {
 		Skeleton = skeleton;
+		Model?.SafeReparentEditor(Skeleton);
 	}
 
 	protected override bool LoadModelImmediate() {
@@ -27,28 +30,18 @@ public sealed partial class MeshCharacterModel : CharacterModel {
 		if ( ! IsInsideTree() || GetParent() is null || Owner is null ) return false;
 		if ( Skeleton is null ) return false;
 
-		if ( meshCostume.ModelScene?.Instantiate() is not MeshInstance3D model ) return false;
+		if ( meshCostume.ModelScene?.Instantiate() is not Node3D model ) return false;
 
-		Model = model.SetOwnerAndParentTo(this);
+		Model = model.SafeReparentEditor(Skeleton);
 		Model.Name = nameof(CharacterModel);
-		Model.Skeleton = Model.GetPathTo(Skeleton);
 
 		return true;
 	}
 	protected override bool UnloadModelImmediate() {
 		Model?.QueueFree();
-		Model = null;
+		Model = null!;
 
 		return true;
-	}
-
-
-	public override void _Process(double delta) {
-		base._Process(delta);
-
-		if ( Skeleton is not null ) {
-			Transform = new(Skeleton.Transform.Basis, Skeleton.Transform.Origin);
-		}
 	}
 
 
@@ -58,9 +51,7 @@ public sealed partial class MeshCharacterModel : CharacterModel {
 		
 		StringName name = property["name"].AsStringName();
 		
-		if (
-			name == PropertyName.Model
-		) {
+		if ( name == PropertyName.Model ) {
 			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
 		}
 	}

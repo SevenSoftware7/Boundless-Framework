@@ -9,12 +9,10 @@ namespace LandlessSkies.Core;
 public abstract partial class EntityBehaviour : Node, IInputReader {
 	[Export] public Entity Entity = null!;
 
-	public abstract bool FreeOnStop { get; }
-
 
 
 	public EntityBehaviour() : base() {}
-	public EntityBehaviour([MaybeNull] Entity entity) : base() {
+	public EntityBehaviour(Entity entity) : base() {
 		ArgumentNullException.ThrowIfNull(entity);
 
 		Entity = entity;
@@ -29,7 +27,12 @@ public abstract partial class EntityBehaviour : Node, IInputReader {
 	public virtual bool Move(Vector3 direction) => true;
 	public virtual bool Jump(Vector3? target = null) => true;
 
-	public virtual void Start(EntityBehaviour? previousBehaviour) {}
+	public virtual void Start(EntityBehaviour? previousBehaviour) {
+		SetProcess(true);
+	}
+	public virtual void Stop() {
+		SetProcess(false);
+	}
 
 
 

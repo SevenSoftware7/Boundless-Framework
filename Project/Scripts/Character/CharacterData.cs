@@ -17,13 +17,13 @@ public partial class CharacterData : Resource, IUIObject {
 	public const float DEFAULT_SLOW_SPEED = 5f;
 	
 	
-	
-	[Export] public string DisplayName { get; private set; } = "";
-	public Texture2D? DisplayPortrait => BaseCostume?.DisplayPortrait;
 
 	[Export] public CharacterCostume? BaseCostume { get; private set; }
 	[Export] public PackedScene? CollisionScene { get; private set; }
 	[Export] public PackedScene? SkeletonScene { get; private set; }
+	
+	[Export] public string DisplayName { get; private set; } = "";
+	public Texture2D? DisplayPortrait => BaseCostume?.DisplayPortrait;
 	
 	[Export] public float maxHealth = DEFAULT_MAX_HEALTH;
 	[Export] public float stepHeight = DEFAULT_STEP_HEIGHT;

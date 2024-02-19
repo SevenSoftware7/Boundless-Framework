@@ -7,6 +7,23 @@ namespace LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public partial class CameraController3D : Camera3D {
+
+	[ExportGroup("Options")]
+	[Export] private Vector3 cameraOriginPosition;
+	// [Export] private float distanceToPlayer = 1f;
+	[Export] private float horizontalSmoothTime = 0.02f;
+	[Export] private float verticalSmoothTime = 0.04f;
+	[Export(PropertyHint.Layers3DPhysics)] private uint CollisionMask = uint.MaxValue;
+	[ExportGroup("")]
+
+
+	[Export] public CameraStyle Style = CameraStyle.ThirdPersonGrounded;
+	[Export] public Basis SubjectBasis = Basis.Identity;
+	[Export] public Vector3 Subject;
+
+	[Export] public Basis LocalRotation { get; private set; } = Basis.Identity;
+
+
 	private float distanceToSubject = -1f;
 
 	private Vector3 smoothHorizontalPosition = Vector3.Zero;
@@ -19,49 +36,37 @@ public partial class CameraController3D : Camera3D {
 	private float verticalTime = 0f;
 
 
-
-	[ExportGroup("Options")]
-	[Export] private Vector3 cameraOriginPosition;
-	// [Export] private float distanceToPlayer = 1f;
-	[Export] private float horizontalSmoothTime = 0.02f;
-	[Export] private float verticalSmoothTime = 0.04f;
-	[Export(PropertyHint.Layers3DPhysics)] private uint CollisionMask = uint.MaxValue;
-	[ExportGroup("")]
-
-
-	[Export] public CameraStyle CurrentStyle = CameraStyle.ThirdPersonGrounded;
-	[Export] public Basis SubjectBasis = Basis.Identity;
-	[Export] public Vector3 Subject;
-
-	[Export] public Basis LocalRotation { get; private set; } = Basis.Identity;
-
-
 	public Basis AbsoluteRotation => SubjectBasis * LocalRotation;
 
 
 
 	public void SetEntityAsSubject(Entity entity) {
-		Subject = entity.Transform.Origin;
-		if ( entity.Skeleton is not null ) {
-			Subject = entity.Skeleton.GetBonePositionOrDefault("Head", Subject);
-		}
+		Subject = entity.Skeleton?.GetBonePositionOrDefault("Head", Subject) ?? entity.Transform.Origin;
 
 		SubjectBasis = entity.Transform.Basis;
 	}
 
 	public void HandleCamera(ControlDevice controlDevice) {
-		HandleCameraInput(controlDevice.GetVector(ControlDevice.MotionType.Look) * 0.005f); // TODO : Proper sensitivity adjustments
+		HandleCameraInput(controlDevice.GetVector(ControlDevice.MotionType.Look) * 0.00325f); // TODO : Proper sensitivity adjustments
 	}
 
 	public void HandleCameraInput(Vector2 cameraInput) {
 		Input.MouseMode = Input.MouseModeEnum.Captured;
-		Vector3 eulerAngles = LocalRotation.GetEuler();
-		float maxAngle = Mathf.Pi / 2f - Mathf.Epsilon;
-		LocalRotation = Basis.FromEuler(new(
-			Mathf.Clamp(eulerAngles.X + cameraInput.Y, -maxAngle, maxAngle),
-			eulerAngles.Y - cameraInput.X,
-			0
-		));
+
+		if (Style == CameraStyle.ThirdPersonGrounded) {
+			float maxAngle = Mathf.Pi / 2f - Mathf.Epsilon;
+			
+			Vector3 eulerAngles = LocalRotation.GetEuler();
+			LocalRotation = Basis.FromEuler(new(
+				Mathf.Clamp(eulerAngles.X + cameraInput.Y, -maxAngle, maxAngle),
+				eulerAngles.Y - cameraInput.X,
+				0
+			));
+		} else if (Style == CameraStyle.ThirdPerson) {
+			LocalRotation *= 
+				new Basis(LocalRotation.Inverse().Y, -cameraInput.X) * 
+				new Basis(Vector3.Right, cameraInput.Y);
+		}
 	}
 
 	private void ComputeCamera(double delta) {
@@ -89,7 +94,7 @@ public partial class CameraController3D : Camera3D {
 		Vector3 verticalPos = Subject.Project(SubjectBasis.Y);
 
 		if ( ! smoothVerticalPosition.IsEqualApprox(verticalPos) ) {
-			if (CurrentStyle == CameraStyle.ThirdPersonGrounded) {
+			if (Style == CameraStyle.ThirdPersonGrounded) {
 				// The camera's new vertical speed is based on the camera's current vertical velocity
 				// The camera's vertical movement gets faster as the player keeps moving vertically
 				float targetVerticalTime = Mathf.Lerp(verticalSmoothTime, horizontalSmoothTime, Mathf.Clamp(verticalVelocity.LengthSquared(), 0f, 1f));
@@ -119,7 +124,7 @@ public partial class CameraController3D : Camera3D {
 		// Check for collision with the camera
 		const float CAM_MIN_DISTANCE_TO_WALL = 0.4f;
 
-		bool rayCastHit = this.RayCast3D(origin, origin + direction * (distance + CAM_MIN_DISTANCE_TO_WALL), out MathUtility.RayCast3DResult result, CollisionMask);
+		bool rayCastHit = GetWorld3D().RayCast3D(origin, origin + direction * (distance + CAM_MIN_DISTANCE_TO_WALL), out MathUtility.RayCast3DResult result, CollisionMask);
 		if ( ! rayCastHit ) {
 			if ( ! Mathf.IsEqualApprox(cameraDistance, distance) ) {
 				cameraDistance = cameraDistance.SmoothDamp(distance, ref distanceVelocity, 0.2f, Mathf.Inf, floatDelta);
@@ -157,11 +162,6 @@ public partial class CameraController3D : Camera3D {
 		cameraDistance = collisionDistance - camMargin;
 	}
 
-	public override void _EnterTree() {
-		base._EnterTree();
-		distanceToSubject = cameraOriginPosition.Length();
-		verticalTime = horizontalSmoothTime;
-	}
 
 
 	public override void _Process(double delta) {
@@ -170,6 +170,12 @@ public partial class CameraController3D : Camera3D {
 		if ( Engine.IsEditorHint() ) return;
 
 		ComputeCamera(delta);
+	}
+
+	public override void _EnterTree() {
+		base._EnterTree();
+		distanceToSubject = cameraOriginPosition.Length();
+		verticalTime = horizontalSmoothTime;
 	}
 
 
