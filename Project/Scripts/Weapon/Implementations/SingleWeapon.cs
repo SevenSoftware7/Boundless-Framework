@@ -103,15 +103,16 @@ public abstract partial class SingleWeapon : Weapon {
 
 
 	private void OnCharacterLoadedUnloaded(bool isLoaded) {
-		WeaponModel?.Inject(Entity?.Skeleton);
+		Skeleton3D? result = isLoaded ? Entity?.Skeleton : null;
+		WeaponModel?.Inject(result);
 	}
 
 
 	protected override bool LoadModelImmediate() {
-		return WeaponModel is WeaponModel model && (model.IsLoaded || (model?.LoadModel() ?? false));
+		return WeaponModel?.LoadModel() ?? false;
 	}
-	protected override bool UnloadModelImmediate() {
-		return WeaponModel is WeaponModel model && (! model.IsLoaded || (model?.UnloadModel() ?? false));
+	protected override void UnloadModelImmediate() {
+		WeaponModel?.UnloadModel();
 	}
 
 

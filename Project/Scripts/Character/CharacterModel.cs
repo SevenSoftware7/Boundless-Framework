@@ -22,6 +22,7 @@ public abstract partial class CharacterModel : Loadable3D, IInjectable<Skeleton3
 		root.AddChildAndSetOwner(this);
 		
 		Costume = costume;
+		Name = $"{nameof(CharacterModel)} - {Costume.DisplayName}";
 	}
 	
 	

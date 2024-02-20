@@ -226,8 +226,7 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 		_weapons.ForEach(w => w?.LoadModel());
 		return true;
 	}
-	protected override bool UnloadModelImmediate() {
+	protected override void UnloadModelImmediate() {
 		_weapons.ForEach(w => w?.UnloadModel());
-		return true;
 	}
 }

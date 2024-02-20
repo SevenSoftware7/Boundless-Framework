@@ -36,18 +36,18 @@ public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
 		if ( IsLoaded ) return false;
 
 		if ( ! LoadModelImmediate() ) return false;
+		EmitSignal(SignalName.LoadedUnloaded, true);
 
 		_isLoaded = true;
-		EmitSignal(SignalName.LoadedUnloaded, true);
 		return true;
 	}
 	public bool UnloadModel() {
 		if ( ! IsLoaded ) return false;
 
-		if ( ! UnloadModelImmediate() ) return false;
+		EmitSignal(SignalName.LoadedUnloaded, false);
+		UnloadModelImmediate();
 
 		_isLoaded = false;
-		EmitSignal(SignalName.LoadedUnloaded, false);
 		return true;
 	}
 	public virtual void ReloadModel(bool forceLoad = false) {
@@ -70,10 +70,7 @@ public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
 	/// <summary>
 	/// Unloads the model immediately, without checking if it's already unloaded.
 	/// </summary>
-	/// <returns>
-	/// Returns true if the model was unloaded, false if it wasn't.
-	/// </returns>
-	protected abstract bool UnloadModelImmediate();
+	protected abstract void UnloadModelImmediate();
 
 	public virtual void Enable() {
 		SetProcess(true);

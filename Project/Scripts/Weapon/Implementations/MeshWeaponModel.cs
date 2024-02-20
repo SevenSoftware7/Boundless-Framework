@@ -6,11 +6,13 @@ namespace LandlessSkies.Core;
 
 [Tool]
 public partial class MeshWeaponModel : WeaponModel {
-	[Export] protected Node3D Model { get; private set; } = null!;
 
 	[ExportGroup("Dependencies")]
 	[Export] public Skeleton3D? Skeleton { get; private set; }
 	public IWeapon.Handedness Handedness { get; private set; }
+	[ExportGroup("")]
+
+	[Export] protected Node3D Model { get; private set; } = null!;
 
 
 
@@ -22,28 +24,41 @@ public partial class MeshWeaponModel : WeaponModel {
 	protected override bool LoadModelImmediate() {
 		if ( Costume is not MeshWeaponCostume meshCostume ) return false;
 		if ( GetParent() is null || Owner is null ) return false;
-		if ( Skeleton is null ) return false;
 
 		if ( meshCostume.ModelScene?.Instantiate() is not Node3D model ) return false;
 
-		Model = model.SetOwnerAndParentTo(Skeleton);
+		Model = model;
+		ParentToSkeleton();
+		Model.Name = $"{nameof(WeaponCostume)} - {meshCostume.DisplayName}";
 
 		return true;
 	}
-	protected override bool UnloadModelImmediate() {
+	protected override void UnloadModelImmediate() {
 		Model?.UnparentAndQueueFree();
 		Model = null!;
+	}
 
-		return true;
+
+	private void ParentToSkeleton() {
+		if ( Model is null ) return;
+
+		if (Skeleton is null) {
+			Model.SafeReparentAndSetOwner(this);
+			return;
+		}
+
+		Model.SafeReparentAndSetOwner(Skeleton);
 	}
 
 	public override void Inject(Skeleton3D? skeleton) {
 		Skeleton = skeleton;
-		Model?.SafeReparentEditor(Skeleton);
+		ParentToSkeleton();
 	}
 	public override void Inject(IWeapon.Handedness handedness) {
 		Handedness = handedness;
 	}
+
+
 
 	public override void _Process(double delta) {
 		base._Process(delta);

@@ -21,6 +21,7 @@ public abstract partial class WeaponModel : Loadable3D, IInjectable<Skeleton3D?>
 		root.AddChildAndSetOwner(this);
 
 		Costume = costume;
+		Name = $"{nameof(WeaponModel)} - {Costume.DisplayName}";
 	}
 	
 	

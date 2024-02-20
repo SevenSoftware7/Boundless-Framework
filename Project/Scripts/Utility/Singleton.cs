@@ -10,8 +10,8 @@ public interface ISingleton<T> where T : Node, new() {
 	public static T? GetInstance() =>
 		Instance;
 
-	public static T GetInstance(Node root) =>
-		Instance ??= new T().SetOwnerAndParentTo(root);
+	public static T GetOrCreateInstance(Node parent) =>
+		Instance ??= new T().SetOwnerAndParent(parent);
 
 	public static void SetInstance(T newInstance) {
 		if (Instance is not null && Instance != newInstance) {

@@ -56,6 +56,7 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 
 		_data = data;
 		SetCostume(costume ?? data.BaseCostume);
+		Name = $"{nameof(Character)} - {Data.DisplayName}";
 	}
 
 
@@ -81,33 +82,31 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 		Collisions = Data.CollisionScene?.Instantiate() as Node3D;
 		if ( Collisions is not null ) {
 			Collisions.Name = PropertyName.Collisions;
-			Collisions.SetOwnerAndParentTo(parent);
+			Collisions.SetOwnerAndParent(parent);
 		}
 
 		Skeleton = Data.SkeletonScene?.Instantiate() as Skeleton3D;
 		if ( Skeleton is not null ) {
 			Skeleton.Name = PropertyName.Skeleton;
-			Skeleton.SetOwnerAndParentTo(this);
+			Skeleton.SetOwnerAndParent(this);
 		}
-
 		CharacterModel?.Inject(Skeleton);
+
 		CharacterModel?.LoadModel();
 
 		RefreshRotation();
 
 		return true;
 	}
-	protected override bool UnloadModelImmediate() {
+	protected override void UnloadModelImmediate() {
 		Collisions?.UnparentAndQueueFree();
 		Collisions = null;
 
+		CharacterModel?.Inject(null);
 		Skeleton?.UnparentAndQueueFree();
 		Skeleton = null;
-		CharacterModel?.Inject(null);
 
 		CharacterModel?.UnloadModel();
-
-		return true;
 	}
 
 

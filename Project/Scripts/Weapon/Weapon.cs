@@ -33,6 +33,7 @@ public abstract partial class Weapon : Loadable3D, IWeapon, IInjectable<Entity?>
 
 		Data = data;
 		SetCostume(costume ?? data.BaseCostume);
+		Name = $"{nameof(Weapon)} - {Data.DisplayName}";
 	}
 
 

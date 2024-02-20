@@ -22,26 +22,37 @@ public partial class MeshCharacterModel : CharacterModel {
 
 	public override void Inject(Skeleton3D? skeleton) {
 		Skeleton = skeleton;
-		Model?.SafeReparentEditor(Skeleton);
+		ParentToSkeleton();
 	}
+
+	private void ParentToSkeleton() {
+		if ( Model is null ) return;
+
+		if (Skeleton is null) {
+			Model.SafeReparentAndSetOwner(this);
+			return;
+		}
+
+		Model.SafeReparentAndSetOwner(Skeleton);
+	}
+
+
 
 	protected override bool LoadModelImmediate() {
 		if ( Costume is not MeshCharacterCostume meshCostume ) return false;
 		if ( ! IsInsideTree() || GetParent() is null || Owner is null ) return false;
-		if ( Skeleton is null ) return false;
 
 		if ( meshCostume.ModelScene?.Instantiate() is not Node3D model ) return false;
 
-		Model = model.SafeReparentEditor(Skeleton);
-		Model.Name = nameof(CharacterModel);
+		Model = model;
+		ParentToSkeleton();
+		Model.Name = $"{nameof(CharacterCostume)} - {meshCostume.DisplayName}";
 
 		return true;
 	}
-	protected override bool UnloadModelImmediate() {
-		Model?.QueueFree();
+	protected override void UnloadModelImmediate() {
+		Model?.UnparentAndQueueFree();
 		Model = null!;
-
-		return true;
 	}
 
 

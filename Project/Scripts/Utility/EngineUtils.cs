@@ -73,6 +73,13 @@ public static class EngineUtils {
 		return child;
 	}
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static T SafeReparentAndSetOwner<T>(this T child, Node? newParent, bool keepGlobalTransform = true) where T : Node {
+		child.SafeReparent(newParent, keepGlobalTransform);
+		child.Owner = newParent?.Owner;
+		return child;
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static T SafeReparent<T>(this T child, Node? newParent, bool keepGlobalTransform = true) where T : Node {
 		if (child.GetParent() is not Node parent) {
 			newParent?.AddChild(child);
@@ -100,7 +107,7 @@ public static class EngineUtils {
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static TNode SetOwnerAndParentTo<TNode>(this TNode child, Node parent) where TNode : Node {
+	public static TNode SetOwnerAndParent<TNode>(this TNode child, Node parent) where TNode : Node {
 		parent.AddChildAndSetOwner(child);
 		return child;
 	}
