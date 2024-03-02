@@ -14,16 +14,27 @@ public partial class MeshWeaponModel : WeaponModel {
 
 	[Export] protected Node3D Model { get; private set; } = null!;
 
+	private bool _isLoaded = false;
+    public override bool IsLoaded {
+		get => _isLoaded;
+		set {
+			if ( this.IsInitializationSetterCall() ) {
+				_isLoaded = value;
+				return;
+			}
 
+			AsILoadable().SetLoaded(value);
+		}
+	}
 
 	protected MeshWeaponModel() : base() {}
 	public MeshWeaponModel(MeshWeaponCostume costume, Node3D root) : base(costume, root) {}
 
 
 
-	protected override bool LoadModelImmediate() {
+	protected override bool LoadModelBehaviour() {
+		if ( ! base.LoadModelBehaviour() ) return false;
 		if ( Costume is not MeshWeaponCostume meshCostume ) return false;
-		if ( GetParent() is null || Owner is null ) return false;
 
 		if ( meshCostume.ModelScene?.Instantiate() is not Node3D model ) return false;
 
@@ -31,11 +42,16 @@ public partial class MeshWeaponModel : WeaponModel {
 		ParentToSkeleton();
 		Model.Name = $"{nameof(WeaponCostume)} - {meshCostume.DisplayName}";
 
+		_isLoaded = true;
+
 		return true;
 	}
-	protected override void UnloadModelImmediate() {
+	protected override void UnloadModelBehaviour() {
+		base.UnloadModelBehaviour();
 		Model?.UnparentAndQueueFree();
 		Model = null!;
+
+		_isLoaded = false;
 	}
 
 
@@ -58,12 +74,10 @@ public partial class MeshWeaponModel : WeaponModel {
 		Handedness = handedness;
 	}
 
-
-
-	public override void _Process(double delta) {
+    public override void _Process(double delta) {
 		base._Process(delta);
 
-		if ( Model is null ) return;
+		if ( Model is null || ! Model.IsInsideTree() ) return;
 
 		string boneName = Handedness switch {
 			IWeapon.Handedness.Left         => "LeftHand",

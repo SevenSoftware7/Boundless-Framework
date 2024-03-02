@@ -32,7 +32,7 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 			Jump();
 		}
 
-		inputInfo.RawInputToGroundedMovement(camRotation: out _, out Vector3 groundedMovement);
+		inputInfo.RawInputToGroundedMovement(inputInfo.ControlDevice.GetVector(ControlDevice.MotionType.Move), out _, out Vector3 groundedMovement);
 
 		float speedSquared = groundedMovement.LengthSquared();
 		MovementSpeed speed = speedSquared switch {

@@ -28,17 +28,20 @@ public abstract partial class Weapon : Loadable3D, IWeapon, IInjectable<Entity?>
 
 
 	protected Weapon() : base() {}
-	public Weapon(WeaponData data, WeaponCostume? costume) : base() {
-		ArgumentNullException.ThrowIfNull(data);
-
-		Data = data;
-		SetCostume(costume ?? data.BaseCostume);
-		Name = $"{nameof(Weapon)} - {Data.DisplayName}";
+	public Weapon(WeaponData? data, WeaponCostume? costume) : base() {
+		SetData(data, costume);
 	}
 
 
 
 	public abstract void SetCostume(WeaponCostume? costume);
+	protected void SetData(WeaponData? data, WeaponCostume? costume = null) {
+		Data = data!;
+
+		if (Data is null) return;
+		SetCostume(costume ?? data?.BaseCostume);
+		Name = $"{nameof(Weapon)} - {Data.DisplayName}";
+	}
 
 
 	public abstract IEnumerable<AttackAction.IInfo> GetAttacks(Entity target);

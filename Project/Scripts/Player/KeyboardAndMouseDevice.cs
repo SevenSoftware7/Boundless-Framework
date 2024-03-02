@@ -59,14 +59,14 @@ public partial class KeyboardAndMouseDevice : ControlDevice {
 
 		if ( Engine.IsEditorHint() ) return;
 
-		RebindInput(InputType.Evade, new InputEventKey() 								{ PhysicalKeycode = Key.Shift });
-		RebindInput(InputType.Jump, new InputEventKey() 								{ PhysicalKeycode = Key.Space });
-		RebindInput(InputType.LightAttack, new InputEventMouseButton() 					{ ButtonIndex = MouseButton.Left });
-		RebindInput(InputType.HeavyAttack, new InputEventMouseButton() 					{ ButtonIndex = MouseButton.Right });
-		RebindInput(MotionType.Move, MotionDirection.Forward, new InputEventKey() 		{ PhysicalKeycode = Key.W });
-		RebindInput(MotionType.Move, MotionDirection.Backward, new InputEventKey() 		{ PhysicalKeycode = Key.S });
-		RebindInput(MotionType.Move, MotionDirection.Left, new InputEventKey() 			{ PhysicalKeycode = Key.A });
-		RebindInput(MotionType.Move, MotionDirection.Right, new InputEventKey() 		{ PhysicalKeycode = Key.D });
+		RebindInput(InputType.Evade, new InputEventKey()                           { PhysicalKeycode = Key.Shift });
+		RebindInput(InputType.Jump, new InputEventKey()                            { PhysicalKeycode = Key.Space });
+		RebindInput(InputType.LightAttack, new InputEventMouseButton()             { ButtonIndex = MouseButton.Left });
+		RebindInput(InputType.HeavyAttack, new InputEventMouseButton()             { ButtonIndex = MouseButton.Right });
+		RebindInput(MotionType.Move, MotionDirection.Forward, new InputEventKey()  { PhysicalKeycode = Key.W });
+		RebindInput(MotionType.Move, MotionDirection.Backward, new InputEventKey() { PhysicalKeycode = Key.S });
+		RebindInput(MotionType.Move, MotionDirection.Left, new InputEventKey()     { PhysicalKeycode = Key.A });
+		RebindInput(MotionType.Move, MotionDirection.Right, new InputEventKey()    { PhysicalKeycode = Key.D });
 	}
 
 	public override void _ExitTree() {

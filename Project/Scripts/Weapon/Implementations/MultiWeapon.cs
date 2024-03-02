@@ -12,7 +12,10 @@ namespace LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public sealed partial class MultiWeapon : Weapon, IUIObject {
-
+	public override bool IsLoaded { 
+		get => CurrentWeapon is Weapon currentWeapon && currentWeapon.IsLoaded;
+		set => CurrentWeapon?.AsILoadable().SetLoaded(value);
+	}
 
 
 	[Export] private Array<SingleWeapon?> Weapons {
@@ -73,8 +76,7 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 		get => IndexInBounds(CurrentIndex) ? _weapons[CurrentIndex] : null;
 		private set {
 			if (value is not null) {
-				int index = _weapons.IndexOf(value); 
-				CurrentIndex = index;
+				CurrentIndex = _weapons.IndexOf(value);
 			}
 		}
 	}
@@ -127,7 +129,7 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 
 
 
-	private bool IndexInBounds(int index) => index < _weapons.Count && index >= 0;
+	private bool IndexInBounds(int index) => index < _weapons.Count;
 	private void UpdateCurrent() {
 		if ( ! IndexInBounds(_currentIndex) ) {
 			_currentIndex = 0;
@@ -165,7 +167,7 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 			})
 			.Execute();
 
-		_weapons[index] = weapon!;
+		_weapons[index] = weapon;
 		UpdateCurrent();
 	}
 
@@ -220,13 +222,24 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 	public override void Enable() => CurrentWeapon?.Enable();
 	public override void Disable() => _weapons.ForEach(w => w?.Disable());
 	public override void Destroy() => _weapons.ForEach(w => w?.Destroy());
-	public override void ReloadModel(bool forceLoad = false) => _weapons.ForEach(w => w?.ReloadModel(forceLoad));
 
-	protected override bool LoadModelImmediate() {
-		_weapons.ForEach(w => w?.LoadModel());
-		return true;
+	protected override bool LoadModelBehaviour() => CurrentWeapon?.AsILoadable().LoadModel() ?? false;
+	protected override void UnloadModelBehaviour() => CurrentWeapon?.AsILoadable().UnloadModel();
+	public void ReloadModel(bool forceLoad = false) => CurrentWeapon?.AsILoadable().ReloadModel(forceLoad);
+	
+
+	public ISaveData<Weapon> Save() {
+		return new MultiWeaponSaveData([.. _weapons]);
 	}
-	protected override void UnloadModelImmediate() {
-		_weapons.ForEach(w => w?.UnloadModel());
+
+
+	public class MultiWeaponSaveData(IEnumerable<Weapon> weapons) : ISaveData<Weapon> {
+		private readonly KeyValuePair<WeaponData, WeaponCostume?>[] Info = weapons
+			.Select(w => new KeyValuePair<WeaponData, WeaponCostume?>(w.Data, w.Costume))
+			.ToArray();
+
+		public Weapon Load() {
+			return new MultiWeapon([.. Info]);
+		}
 	}
 }

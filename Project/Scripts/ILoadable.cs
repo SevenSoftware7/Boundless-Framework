@@ -9,10 +9,51 @@ public interface ILoadable : IDestroyable, IEnablable {
 	bool IsLoaded { get; set; }
 
 
+	public sealed bool LoadModel() {
+		if ( IsLoaded ) return false;
 
-	bool LoadModel();
+		if ( ! LoadModelBehaviour() ) return false;
+		return true;
+	}
+	public sealed void UnloadModel() {
+		if ( ! IsLoaded ) return;
 
-	bool UnloadModel();
+		UnloadModelBehaviour();
+	}
 
-	void ReloadModel(bool forceLoad = false);
+	public sealed void SetLoaded(bool loaded) {
+		if (loaded) {
+			LoadModel();
+		} else {
+			UnloadModel();
+		}
+	}
+	
+	/// <summary>
+	/// Reloads the model by unloading it then loading it back again.
+	/// </summary>
+	/// <returns>
+	/// Returns true if there is .
+	/// </returns>
+	virtual void ReloadModel(bool forceLoad = false) {
+		bool wasLoaded = IsLoaded;
+		UnloadModel();
+
+		if ( wasLoaded || forceLoad ) {
+			LoadModel();
+		}
+	}
+
+	/// <summary>
+	/// Loads the model immediately, without checking if it's already loaded.
+	/// </summary>
+	/// <returns>
+	/// Returns true if the model was loaded, false if it wasn't.
+	/// </returns>
+	protected bool LoadModelBehaviour() => true;
+
+	/// <summary>
+	/// Unloads the model immediately, without checking if it's already unloaded.
+	/// </summary>
+	protected void UnloadModelBehaviour() {}
 }

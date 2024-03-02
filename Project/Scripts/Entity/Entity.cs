@@ -16,37 +16,25 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	public EntityBehaviourManager? BehaviourManager { get; private set; }
 
 
-	[Export] public bool GenerateScene {
-		get => false;
-		set {
-			if ( this.IsInitializationSetterCall() ) return;
+	// [Export] public bool GenerateScene {
+	// 	get => false;
+	// 	set {
+	// 		if ( this.IsInitializationSetterCall() ) return;
 
-			using PackedScene scene = new();
-			scene.PackWithSubnodes(this);
-			Dictionary dict = scene._Bundled;
-
-
-			using PackedScene duplicate = new();
-			duplicate._Bundled = dict;
-
-			Node resulting = duplicate.Instantiate();
-			resulting.ParentTo(GetParent());
-			resulting.MakeLocal(Owner);
-		}
-	}
+	// 		using PackedScene scene = new();
+	// 		scene.PackWithSubnodes(this);
+	// 		Dictionary dict = scene._Bundled;
 
 
-	[Export] public AnimationPlayer? AnimationPlayer {
-		get => _animationPlayer;
-		private set {
-			if (value is null) return;
-			_animationPlayer = value;
+	// 		using PackedScene duplicate = new();
+	// 		duplicate._Bundled = dict;
 
-			if ( this.IsInitializationSetterCall() ) return;
-			_animationPlayer.RootNode = GetTree().EditedSceneRoot.GetPathTo(this);
-		}
-	}
-	private AnimationPlayer? _animationPlayer;
+	// 		Node resulting = duplicate.Instantiate();
+	// 		resulting.ParentTo(GetParent());
+	// 		resulting.MakeLocal(Owner);
+	// 	}
+	// }
+
 
 	[Export] public Character? Character {
 		get => _character;
@@ -78,6 +66,18 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 
 
 	[ExportGroup("Dependencies")]
+	[Export] public AnimationPlayer? AnimationPlayer {
+		get => _animationPlayer;
+		private set {
+			if (value is null) return;
+			_animationPlayer = value;
+
+			if ( this.IsInitializationSetterCall() ) return;
+			_animationPlayer.RootNode = GetTree().EditedSceneRoot.GetPathTo(this);
+		}
+	}
+	private AnimationPlayer? _animationPlayer;
+	
 	[Export] public Health? Health;
 
 	[Export] public Weapon? Weapon {

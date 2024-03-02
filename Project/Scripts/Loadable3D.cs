@@ -6,23 +6,7 @@ namespace LandlessSkies.Core;
 public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
 
 
-
-	[Export] public bool IsLoaded {
-		get => _isLoaded;
-		set {
-			if ( this.IsInitializationSetterCall() ) {
-				_isLoaded = value;
-				return;
-			}
-
-			if ( value is true ) {
-				LoadModel();
-			} else {
-				UnloadModel();
-			}
-		}
-	}
-	private bool _isLoaded = false;
+	[Export] public abstract bool IsLoaded { get; set; }
 
 	[Signal] public delegate void LoadedUnloadedEventHandler(bool isLoaded);
 
@@ -32,45 +16,21 @@ public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
 
 
 
-	public bool LoadModel() {
-		if ( IsLoaded ) return false;
-
-		if ( ! LoadModelImmediate() ) return false;
+	public ILoadable AsILoadable() => this;
+	
+	bool ILoadable.LoadModelBehaviour() {
+		if ( ! IsInsideTree() || GetParent() is null || Owner is null ) return false;
+		if ( ! LoadModelBehaviour() ) return false;
 		EmitSignal(SignalName.LoadedUnloaded, true);
-
-		_isLoaded = true;
 		return true;
 	}
-	public bool UnloadModel() {
-		if ( ! IsLoaded ) return false;
-
+	void ILoadable.UnloadModelBehaviour() {
+		UnloadModelBehaviour();
 		EmitSignal(SignalName.LoadedUnloaded, false);
-		UnloadModelImmediate();
-
-		_isLoaded = false;
-		return true;
-	}
-	public virtual void ReloadModel(bool forceLoad = false) {
-		bool wasLoaded = IsLoaded;
-		UnloadModel();
-
-		if ( wasLoaded || forceLoad ) {
-			LoadModel();
-		}
 	}
 
-	/// <summary>
-	/// Loads the model immediately, without checking if it's already loaded.
-	/// </summary>
-	/// <returns>
-	/// Returns true if the model was loaded, false if it wasn't.
-	/// </returns>
-	protected abstract bool LoadModelImmediate();
-
-	/// <summary>
-	/// Unloads the model immediately, without checking if it's already unloaded.
-	/// </summary>
-	protected abstract void UnloadModelImmediate();
+	protected virtual bool LoadModelBehaviour() => true;
+	protected virtual void UnloadModelBehaviour() {}
 
 	public virtual void Enable() {
 		SetProcess(true);
@@ -81,19 +41,18 @@ public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
 		Visible = false;
 	}
 	public virtual void Destroy() {
-		UnloadModel();
+		AsILoadable().UnloadModel();
 		this.UnparentAndQueueFree();
 	}
 
 
 
-	public override void _Ready() {
-		base._Ready();
-		LoadModel();
+	public override void _EnterTree() {
+		base._EnterTree();
+		Callable.From(AsILoadable().LoadModel).CallDeferred();
 	}
-
-	// public override void _ExitTree() {
-	// 	base._ExitTree();
-	// 	UnloadModel();
-	// }
+	public override void _ExitTree() {
+		base._ExitTree();
+		Callable.From(AsILoadable().UnloadModel).CallDeferred();
+	}
 }

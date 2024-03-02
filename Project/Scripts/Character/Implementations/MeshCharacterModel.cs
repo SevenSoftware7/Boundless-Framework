@@ -13,6 +13,19 @@ public partial class MeshCharacterModel : CharacterModel {
 
 	[Export] protected Node3D Model { get; private set; } = null!;
 
+	private bool _isLoaded = false;
+    public override bool IsLoaded { 
+		get => _isLoaded;
+		set {
+			if ( this.IsInitializationSetterCall() ) {
+				_isLoaded = value;
+				return;
+			}
+
+			AsILoadable().SetLoaded(value);
+		}
+	}
+
 
 
 	protected MeshCharacterModel() : base() {}
@@ -38,9 +51,9 @@ public partial class MeshCharacterModel : CharacterModel {
 
 
 
-	protected override bool LoadModelImmediate() {
+	protected override bool LoadModelBehaviour() {
+		if ( ! base.LoadModelBehaviour() ) return false;
 		if ( Costume is not MeshCharacterCostume meshCostume ) return false;
-		if ( ! IsInsideTree() || GetParent() is null || Owner is null ) return false;
 
 		if ( meshCostume.ModelScene?.Instantiate() is not Node3D model ) return false;
 
@@ -48,11 +61,16 @@ public partial class MeshCharacterModel : CharacterModel {
 		ParentToSkeleton();
 		Model.Name = $"{nameof(CharacterCostume)} - {meshCostume.DisplayName}";
 
+		_isLoaded = true;
+
 		return true;
 	}
-	protected override void UnloadModelImmediate() {
+	protected override void UnloadModelBehaviour() {
+		base.UnloadModelBehaviour();
 		Model?.UnparentAndQueueFree();
 		Model = null!;
+
+		_isLoaded = false;
 	}
 
 

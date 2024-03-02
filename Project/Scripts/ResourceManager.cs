@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using SevenGame.Utility;
 
 using GDCol = Godot.Collections;
 
@@ -10,60 +9,78 @@ namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
-public partial class ResourceManager : Node, ISingleton<ResourceManager> {
-	[Export] private GDCol.Array<WeaponData> _weapons {
-		get => [.. Weapons.Values.Append(null)];
+public partial class ResourceManager : Node {
+	[Export] private GDCol.Array<WeaponData> Weapons {
+		get => [.. _weapons?.Values.Append(null) ?? []];
 		set {
 			try {
-				Weapons = value
-					.Where(d => d is not null)
-					.ToDictionary(keySelector: d => d.GetType());
+				SetWeapons(value);
 			} catch (ArgumentException e) {
 				GD.PushError(e.Message);
 			}
 		}
 	}
-	private static Dictionary<Type, WeaponData> Weapons = [];
+	private static Dictionary<Type, WeaponData>? _weapons = null;
 
 
-	[Export] private GDCol.Array<CharacterData> _characters {
-		get => [.. Characters.Values.Append(null)];
+	[Export] private GDCol.Array<CharacterData> Characters {
+		get => [.. _characters?.Values.Append(null) ?? []];
 		set {
 			try {
-				Characters = value
-					.Where(d => d is not null)
-					.ToDictionary(keySelector: d => d.GetType());
+				SetCharacters(value);
 			} catch (ArgumentException e) {
 				GD.PushError(e.Message);
 			}
 		}
 	}
-	private static Dictionary<Type, CharacterData> Characters = [];
-
-
+	private static Dictionary<Type, CharacterData>? _characters = null;
 
 
 	public ResourceManager() : base() {
-		ISingleton<ResourceManager>.SetInstance(this);
+		if (_characters is null) {
+			SetCharacters(Characters);
+		}
+		if (_weapons is null) {
+			SetWeapons(Weapons);
+		}
+	}
+	
+
+    private static void SetCharacters(IEnumerable<CharacterData> characters) {
+		_characters = characters
+			.Where(d => d is not null)
+			.ToDictionary(keySelector: d => d.GetType());
+	}
+	private static void SetWeapons(IEnumerable<WeaponData> weapons) {
+		_weapons = weapons
+			.Where(d => d is not null)
+			.ToDictionary(keySelector: d => d.GetType());
 	}
 
-
-	public static void RegisterWeapon<T>(T data, bool overwrite = false) where T : WeaponData {
+    public static void RegisterWeapon<T>(T data, bool overwrite = false) where T : WeaponData {
+		_weapons ??= [];
 		Type type = typeof(T);
-		if ( Weapons.ContainsKey(type) && ! overwrite ) return;
+		if ( _weapons.ContainsKey(type) && ! overwrite ) return;
 
-		Weapons[type] = data;
+		_weapons[type] = data;
 	}
 	public static void RegisterCharacter<T>(T data, bool overwrite = false) where T : CharacterData {
+		_characters ??= [];
 		Type type = typeof(T);
-		if ( Characters.ContainsKey(type) && ! overwrite ) return;
+		if ( _characters.ContainsKey(type) && ! overwrite ) return;
 
-		Characters[type] = data;
+		_characters[type] = data;
 	}
 
 	public static T? GetRegisteredWeapon<T>() where T : WeaponData
-		=> Weapons.GetValueOrDefault(typeof(T)) as T;
+		=> _weapons?.GetValueOrDefault(typeof(T)) as T;
 
 	public static T? GetRegisteredCharacter<T>() where T : CharacterData
-		=> Characters.GetValueOrDefault(typeof(T)) as T;
+		=> _characters?.GetValueOrDefault(typeof(T)) as T;
+
+
+
+    // public override void _Ready() {
+    //     base._Ready();
+    // }
 }

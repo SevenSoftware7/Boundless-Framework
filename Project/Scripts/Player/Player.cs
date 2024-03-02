@@ -109,18 +109,18 @@ public sealed partial class Player : Node {
 		public CameraController3D CameraController => cameraController;
 
 
-		public readonly void RawInputToGroundedMovement(out Basis camRotation, out Vector3 groundedMovement){
+		public readonly void RawInputToGroundedMovement(Vector2 moveInput, out Basis camRotation, out Vector3 groundedMovement){
 			Vector3 camRight = CameraController.AbsoluteRotation.X;
-			Vector3 camUp = Entity.Transform.Basis.Y * ((Mathf.Ceil(Entity.Transform.Basis.Y.Dot(CameraController.LocalRotation.Y)) - 0.5f) * 2f);
-			Vector3 camForward = camUp.Cross(camRight).Normalized();
-			camRotation = Basis.LookingAt(camForward, camUp);
+			Vector3 entityUp = Entity.Transform.Basis.Y * ((Mathf.Ceil(Entity.Transform.Basis.Y.Dot(CameraController.LocalRotation.Y)) - 0.5f) * 2f);
+			Vector3 groundedCamForward = entityUp.Cross(camRight).Normalized();
+			
+			camRotation = Basis.LookingAt(groundedCamForward, entityUp);
 
-			Vector2 moveInput = ControlDevice.GetVector(ControlDevice.MotionType.Move);
 			groundedMovement = camRotation * new Vector3(moveInput.X, 0, moveInput.Y);
 		}
-		public readonly void RawInputToCameraRelativeMovement(out Basis camRotation, out Vector3 cameraRelativeMovement){
+		public readonly void RawInputToCameraRelativeMovement(Vector2 moveInput, out Basis camRotation, out Vector3 cameraRelativeMovement){
 			camRotation = CameraController.AbsoluteRotation;
-			Vector2 moveInput = ControlDevice.GetVector(ControlDevice.MotionType.Move);
+
 			cameraRelativeMovement = camRotation * new Vector3(moveInput.X, 0, moveInput.Y);
 		}
 	}

@@ -13,6 +13,19 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 	[Export] public Node3D? Collisions { get; private set; }
 	[Export] public Skeleton3D? Skeleton { get; private set; }
 
+	private bool _isLoaded = false;
+    public override bool IsLoaded { 
+		get => _isLoaded;
+		set {
+			if ( this.IsInitializationSetterCall() ) {
+				_isLoaded = value;
+				return;
+			}
+
+			AsILoadable().SetLoaded(value);
+		}
+	}
+
 	[Export] public CharacterData Data {
 		get => _data;
 		private set {
@@ -75,14 +88,14 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 	}
 
 
-	protected override bool LoadModelImmediate() {
-		if ( GetParent() is not Node parent || Owner is null) return false;
+	protected override bool LoadModelBehaviour() {
+		if ( ! base.LoadModelBehaviour() ) return false;
 		if ( Data is null ) return false;
 
 		Collisions = Data.CollisionScene?.Instantiate() as Node3D;
 		if ( Collisions is not null ) {
 			Collisions.Name = PropertyName.Collisions;
-			Collisions.SetOwnerAndParent(parent);
+			Collisions.SetOwnerAndParent(GetParent());
 		}
 
 		Skeleton = Data.SkeletonScene?.Instantiate() as Skeleton3D;
@@ -92,13 +105,17 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 		}
 		CharacterModel?.Inject(Skeleton);
 
-		CharacterModel?.LoadModel();
+		CharacterModel?.AsILoadable().LoadModel();
 
 		RefreshRotation();
 
+		_isLoaded = true;
+
 		return true;
 	}
-	protected override void UnloadModelImmediate() {
+	protected override void UnloadModelBehaviour() {
+		base.UnloadModelBehaviour();
+		
 		Collisions?.UnparentAndQueueFree();
 		Collisions = null;
 
@@ -106,7 +123,9 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 		Skeleton?.UnparentAndQueueFree();
 		Skeleton = null;
 
-		CharacterModel?.UnloadModel();
+		CharacterModel?.AsILoadable().UnloadModel();
+
+		_isLoaded = false;
 	}
 
 

@@ -10,14 +10,17 @@ namespace LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public abstract partial class SingleWeapon : Weapon {
-	private int _style;
-	private Entity? _entity;
-	private WeaponData _data = null!;
 	private IWeapon.Handedness _weaponHandedness = IWeapon.Handedness.Right;
+
+
+    public override bool IsLoaded { 
+		get => WeaponModel is WeaponModel model && model.IsLoaded;
+		set => WeaponModel?.AsILoadable().SetLoaded(value);
+	}
 	
 	
 
-	
+
 	[Export] public override WeaponData Data {
 		get => _data;
 		protected set {
@@ -29,8 +32,11 @@ public abstract partial class SingleWeapon : Weapon {
 			SetCostume(_data?.BaseCostume);
 		}
 	}
+	private WeaponData _data = null!;
 
 	[ExportGroup("Costume")]
+	[Export] private WeaponModel? WeaponModel;
+	
 	[Export] public override WeaponCostume? Costume {
 		get => WeaponModel?.Costume;
 		set {
@@ -38,7 +44,6 @@ public abstract partial class SingleWeapon : Weapon {
 			SetCostume(value);
 		}
 	}
-	[Export] private WeaponModel? WeaponModel;
 
 
 	[ExportGroup("Dependencies")]
@@ -52,12 +57,14 @@ public abstract partial class SingleWeapon : Weapon {
 			Inject(value);
 		}
 	}
+	private Entity? _entity;
 
-	protected virtual uint StyleMax { get; } = 0;
+	protected virtual int StyleMax { get; } = 0;
 	public override int Style { 
 		get => _style;
-		set => _style = value % ((int)StyleMax + 1);
+		set => _style = value % (StyleMax + 1);
 	}
+	private int _style;
 
 	public override IWeapon.Handedness WeaponHandedness {
 		get => _weaponHandedness;
@@ -72,7 +79,7 @@ public abstract partial class SingleWeapon : Weapon {
 
 
 	protected SingleWeapon() : base() {}
-	public SingleWeapon(WeaponData data, WeaponCostume? costume) : base(data, costume) {}
+	public SingleWeapon(WeaponData? data, WeaponCostume? costume) : base(data, costume) {}
 
 
 	public override void SetCostume(WeaponCostume? costume) {
@@ -108,23 +115,27 @@ public abstract partial class SingleWeapon : Weapon {
 	}
 
 
-	protected override bool LoadModelImmediate() {
-		return WeaponModel?.LoadModel() ?? false;
+	protected override bool LoadModelBehaviour() {
+		WeaponModel?.Inject(Entity?.Skeleton);
+		return WeaponModel?.AsILoadable().LoadModel() ?? false;
 	}
-	protected override void UnloadModelImmediate() {
-		WeaponModel?.UnloadModel();
-	}
-
-
-
-	public override void _Predelete() {
-		base._Predelete();
-
-		UnloadModel();
-		WeaponModel?.QueueFree();
+	protected override void UnloadModelBehaviour() {
+		WeaponModel?.Inject(null);
+		WeaponModel?.AsILoadable().UnloadModel();
 	}
 
-	public override bool _PropertyCanRevert(StringName property) {
+
+	public ISaveData<Weapon> Save() {
+		return new SingleWeaponSaveData(Data, Costume);
+	}
+
+
+    public override void _Parented() {
+        base._Parented();
+        Callable.From(() => WeaponModel?.SafeReparentAndSetOwner(this)).CallDeferred();
+    }
+
+    public override bool _PropertyCanRevert(StringName property) {
 		if (property == PropertyName.Costume) {
 			return Costume != Data?.BaseCostume;
 		}
@@ -151,6 +162,14 @@ public abstract partial class SingleWeapon : Weapon {
 		} else if (name == PropertyName.Costume) {
 			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
 			
+		}
+	}
+
+
+
+	protected class SingleWeaponSaveData(WeaponData data, WeaponCostume? costume) : ISaveData<Weapon> {
+		public Weapon Load() {
+			return data.Instantiate(costume);
 		}
 	}
 }

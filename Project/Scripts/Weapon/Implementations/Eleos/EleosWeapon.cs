@@ -14,7 +14,6 @@ public partial class EleosWeapon : SingleWeapon {
 
 	protected EleosWeapon() : base() {
 		SlashAttack = new(this);
-		Data ??= ResourceManager.GetRegisteredWeapon<EleosWeaponData>()!;
 	}
 	public EleosWeapon(EleosWeaponData data, WeaponCostume? costume) : base(data, costume) {
 		SlashAttack = new(this);
@@ -40,4 +39,10 @@ public partial class EleosWeapon : SingleWeapon {
 		}
 	}
 
+    public override void _Ready() {
+		if (Data is null) {
+			SetData(ResourceManager.GetRegisteredWeapon<EleosWeaponData>());
+		}
+        base._Ready();
+    }
 }

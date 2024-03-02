@@ -38,7 +38,6 @@ public abstract partial class WeaponModel : Loadable3D, IInjectable<Skeleton3D?>
 		
 		if (name == PropertyName.Costume && Costume is not null) {
 			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
-		
 		}
 	}
 }

@@ -81,6 +81,9 @@ public static class EngineUtils {
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static T SafeReparent<T>(this T child, Node? newParent, bool keepGlobalTransform = true) where T : Node {
+		if ( ! child.IsInsideTree() ) {
+			child.GetParent()?.RemoveChild(child);
+		}
 		if (child.GetParent() is not Node parent) {
 			newParent?.AddChild(child);
 			return child;

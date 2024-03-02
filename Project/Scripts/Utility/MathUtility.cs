@@ -27,6 +27,12 @@ public static class MathUtility {
 		if (from.IsEqualApprox(to)) {
 			return from;
 		}
+		
+		// Avoid error on both vectors being inverses of each other, breaking a Cross Product operation in the Slerp method
+		if ((from + to) == Vector3.Zero) {
+			return from.Lerp(to, weight);
+		}
+		
 		return from.Slerp(to, weight);
 	}
 	public static Quaternion SafeSlerp(this Quaternion from, Quaternion to, float weight) {
