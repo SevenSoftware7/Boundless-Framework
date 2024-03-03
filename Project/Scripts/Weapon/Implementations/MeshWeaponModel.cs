@@ -5,7 +5,7 @@ using Godot.Collections;
 namespace LandlessSkies.Core;
 
 [Tool]
-public partial class MeshWeaponModel : WeaponModel {
+public partial class MeshWeaponModel : WeaponModel, ILoadable {
 
 	[ExportGroup("Dependencies")]
 	[Export] public Skeleton3D? Skeleton { get; private set; }
@@ -23,36 +23,14 @@ public partial class MeshWeaponModel : WeaponModel {
 				return;
 			}
 
-			AsILoadable().SetLoaded(value);
+			AsILoadable().LoadUnload(value);
 		}
 	}
 
 	protected MeshWeaponModel() : base() {}
-	public MeshWeaponModel(MeshWeaponCostume costume, Node3D root) : base(costume, root) {}
+	public MeshWeaponModel(MeshWeaponCostume costume) : base(costume) {}
 
 
-
-	protected override bool LoadModelBehaviour() {
-		if ( ! base.LoadModelBehaviour() ) return false;
-		if ( Costume is not MeshWeaponCostume meshCostume ) return false;
-
-		if ( meshCostume.ModelScene?.Instantiate() is not Node3D model ) return false;
-
-		Model = model;
-		ParentToSkeleton();
-		Model.Name = $"{nameof(WeaponCostume)} - {meshCostume.DisplayName}";
-
-		_isLoaded = true;
-
-		return true;
-	}
-	protected override void UnloadModelBehaviour() {
-		base.UnloadModelBehaviour();
-		Model?.UnparentAndQueueFree();
-		Model = null!;
-
-		_isLoaded = false;
-	}
 
 
 	private void ParentToSkeleton() {
@@ -74,6 +52,45 @@ public partial class MeshWeaponModel : WeaponModel {
 		Handedness = handedness;
 	}
 
+	protected override bool LoadModelBehaviour() {
+		if ( ! base.LoadModelBehaviour() ) return false;
+		if ( Costume is not MeshWeaponCostume meshCostume ) return false;
+
+		if ( meshCostume.ModelScene?.Instantiate() is not Node3D model ) return false;
+
+		Model = model;
+		ParentToSkeleton();
+		Model.SetProcess(IsProcessing());
+		Model.Visible = Visible;
+		Model.Name = $"{nameof(WeaponCostume)} - {meshCostume.DisplayName}";
+
+		_isLoaded = true;
+
+		return true;
+	}
+	protected override void UnloadModelBehaviour() {
+		base.UnloadModelBehaviour();
+		Model?.UnparentAndQueueFree();
+		Model = null!;
+
+		_isLoaded = false;
+	}
+
+    public override void Enable() {
+        base.Enable();
+		if (Model is not null) {
+			Model.SetProcess(true);
+			Model.Visible = true;
+		}
+    }
+    public override void Disable() {
+        base.Disable();
+		if (Model is not null) {
+			Model.SetProcess(false);
+			Model.Visible = false;
+		}
+    }
+
     public override void _Process(double delta) {
 		base._Process(delta);
 
@@ -88,17 +105,6 @@ public partial class MeshWeaponModel : WeaponModel {
 			Model.GlobalTransform = handTransform;
 		} else {
 			Model.Transform = Transform3D.Identity;
-		}
-	}
-
-	public override void _ValidateProperty(Dictionary property) {
-		base._ValidateProperty(property);
-		
-		StringName name = property["name"].AsStringName();
-		
-		if (name == PropertyName.Model) {
-			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
-			
 		}
 	}
 }

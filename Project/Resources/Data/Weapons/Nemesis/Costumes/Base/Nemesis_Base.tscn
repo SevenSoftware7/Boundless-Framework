@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://cbkv4cstjgb7i"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_tb6pr"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_55qpj"]
+albedo_color = Color(0.580392, 0.219608, 0.219608, 1)
+
+[node name="NemesisBase" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(3, 0, 0, 0, 0.6, 0, 0, 0, 0.25, -1.3, 0, 0)
+mesh = SubResource("BoxMesh_tb6pr")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_55qpj")

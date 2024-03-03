@@ -32,7 +32,6 @@ public partial class EleosWeapon : SingleWeapon {
 		base.HandleInput(inputInfo);
 
 		if ( Entity is null ) return;
-		if ( Entity.CurrentAction is EntityAction action && action.IsCancellable ) return;
 
 		if ( inputInfo.ControlDevice.IsInputJustPressed(ControlDevice.InputType.LightAttack) ) {
 			Entity.ExecuteAction(SlashAttack);

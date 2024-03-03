@@ -6,6 +6,7 @@ namespace LandlessSkies.Core;
 
 public interface IWeapon : IInputReader, ICustomizable, IDataContainer<WeaponData>, ICostumable<WeaponCostume> {
 	Type WeaponType { get; }
+	Size WeaponSize { get; }
 	Handedness WeaponHandedness { get; }
 
 
@@ -13,18 +14,28 @@ public interface IWeapon : IInputReader, ICustomizable, IDataContainer<WeaponDat
 	IEnumerable<AttackAction.IInfo> GetAttacks(Entity target);
 
 
-
 	[Flags]
 	public enum Type : byte {
-		Sparring = 1 << 0,
-		OneHanded = 1 << 1,
-		TwoHanded = 1 << 2,
-		Polearm = 1 << 3,
-		Shield = 1 << 4,
-		Dagger = 1 << 5,
+		Sword = 1 << 0,
+		Sparring = 1 << 1,
+		Polearm = 1 << 2,
+		Shield = 1 << 3,
+		Dagger = 1 << 4,
 	};
 
 	[Flags]
+	public enum Usage : byte {
+		Slashing = 1 << 0,
+		Thrusting = 1 << 1,
+		Bludgeoning = 1 << 2,
+	};
+
+	[Flags]
+	public enum Size : byte {
+		OneHanded = 1 << 0,
+		TwoHanded = 1 << 1,
+	};
+
 	public enum Handedness : byte {
 		Left = 1 << 0,
 		Right = 1 << 1,

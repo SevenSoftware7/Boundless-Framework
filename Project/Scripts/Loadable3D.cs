@@ -17,7 +17,7 @@ public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
 
 
 	public ILoadable AsILoadable() => this;
-	
+
 	bool ILoadable.LoadModelBehaviour() {
 		if ( ! IsInsideTree() || GetParent() is null || Owner is null ) return false;
 		if ( ! LoadModelBehaviour() ) return false;
@@ -49,7 +49,8 @@ public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
 
 	public override void _EnterTree() {
 		base._EnterTree();
-		Callable.From(AsILoadable().LoadModel).CallDeferred();
+		if (IsNodeReady())
+			Callable.From(AsILoadable().LoadModel).CallDeferred();
 	}
 	public override void _ExitTree() {
 		base._ExitTree();

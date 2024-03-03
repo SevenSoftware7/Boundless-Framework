@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="MeshCharacterCostume" load_steps=3 format=3 uid="uid://dac6uk4hxqsef"]
-
-[ext_resource type="PackedScene" uid="uid://cwllghypqnhne" path="res://Scenes/Characters/Selene/Costumes/chrcosmdl_Selene_base.tscn" id="1_dga8b"]
-[ext_resource type="Script" path="res://Scripts/Character/Implementations/MeshCharacterCostume.cs" id="1_e5pc2"]
-
-[resource]
-script = ExtResource("1_e5pc2")
-ModelScene = ExtResource("1_dga8b")
-DisplayName = "Selene (base)"

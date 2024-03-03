@@ -87,9 +87,8 @@ public static class MathUtility {
 	/// <param name="vector"></param>
 	/// <param name="direction"></param>
 	/// <returns></returns>
-	public static Vector3 FlattenInDirection( this Vector3 vector, Vector3 direction ) {
-		return vector - direction * Mathf.Max(vector.Project(direction).Dot(direction), 0);
-	}
+	public static Vector3 SlideOnFace( this Vector3 vector, Vector3 normal ) =>
+		vector + normal * Mathf.Max(vector.Project(-normal).Dot(-normal), 0);
 
 	public static double SmoothDamp(double current, double target, ref double currentVelocity, double smoothTime, double maxSpeed, double deltaTime) {
 		smoothTime = Math.Max(0.0001, smoothTime);

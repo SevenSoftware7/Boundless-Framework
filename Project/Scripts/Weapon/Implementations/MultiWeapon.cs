@@ -12,7 +12,7 @@ namespace LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public sealed partial class MultiWeapon : Weapon, IUIObject {
-	public override bool IsLoaded { 
+	public override bool IsLoaded {
 		get => CurrentWeapon is Weapon currentWeapon && currentWeapon.IsLoaded;
 		set => CurrentWeapon?.AsILoadable().SetLoaded(value);
 	}
@@ -22,7 +22,7 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 		get => [.. _weapons];
 		set {
 			_weapons = [.. value];
-			
+
 			if ( this.IsInitializationSetterCall() ) return;
 
 			_weapons.ForEach( w => w?.SafeReparentEditor(this) );
@@ -162,8 +162,8 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 
 		new LoadableUpdater<SingleWeapon>(ref weapon, () => data?.Instantiate(costume))
 			.BeforeLoad(w => {
-				w.SafeReparentEditor(this);
 				w.Inject(Entity);
+				w.SafeReparentEditor(this);
 			})
 			.Execute();
 
@@ -226,7 +226,7 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 	protected override bool LoadModelBehaviour() => CurrentWeapon?.AsILoadable().LoadModel() ?? false;
 	protected override void UnloadModelBehaviour() => CurrentWeapon?.AsILoadable().UnloadModel();
 	public void ReloadModel(bool forceLoad = false) => CurrentWeapon?.AsILoadable().ReloadModel(forceLoad);
-	
+
 
 	public ISaveData<Weapon> Save() {
 		return new MultiWeaponSaveData([.. _weapons]);

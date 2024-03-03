@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="NemesisWeaponData" load_steps=3 format=3 uid="uid://jdlq54nj3rcw"]
+
+[ext_resource type="Resource" uid="uid://ctyrw08y4svjk" path="res://Resources/Data/Weapons/Nemesis/Costumes/Base/Nemesis_Base.tres" id="1_bfbg6"]
+[ext_resource type="Script" path="res://Scripts/Weapon/Implementations/Nemesis/NemesisWeaponData.cs" id="1_rjt52"]
+
+[resource]
+script = ExtResource("1_rjt52")
+DisplayName = "Nemesis"
+BaseCostume = ExtResource("1_bfbg6")
+Type = 1
+Size = 2
+Usage = 5

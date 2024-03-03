@@ -90,21 +90,21 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 			coyoteTimer.Start();
 			horizontalInertia = horizontalInertia.MoveToward( Vector3.Zero, 0.25f * floatDelta );
 		} else {
-			const float fallInertia = 32f;
-			float targetInertia = fallInertia;
-			float fallVelocity = verticalInertia.Dot(-Entity.UpDirection);
+			const float fallSpeed = 32f;
+			float targetSpeed = fallSpeed;
+			float fallInertia = verticalInertia.Dot(-Entity.UpDirection);
 
 			// Float more if player is holding jump key & rising
 			float isFloating = jumpBuffer.IsDone ? 0f : 1f;
 			const float floatReductionFactor = 0.85f;
-			float floatFactor = Mathf.Lerp( 1f, floatReductionFactor, isFloating * Mathf.Clamp( 1f - fallVelocity, 0f, 1f ));
+			float floatFactor = Mathf.Lerp( 1f, floatReductionFactor, isFloating * Mathf.Clamp( 1f - fallInertia, 0f, 1f ));
 
 			// Slightly ramp up inertia when falling
 			const float fallIncreaseFactor = 1.75f;
-			float inertiaRampFactor = Mathf.Lerp(1f, fallIncreaseFactor, Mathf.Clamp( (1f + fallVelocity) * 0.5f, 0f, 1f ));
+			float inertiaRampFactor = Mathf.Lerp(1f, fallIncreaseFactor, Mathf.Clamp( (1f + fallInertia) * 0.5f, 0f, 1f ));
 
-
-			verticalInertia = verticalInertia.MoveToward(-Entity.UpDirection * Mathf.Max(targetInertia, fallVelocity), 45f * floatFactor * inertiaRampFactor * floatDelta);
+			Vector3 targetInertia = -Entity.UpDirection * Mathf.Max(targetSpeed, fallInertia);
+			verticalInertia = verticalInertia.MoveToward(targetInertia, 45f * floatFactor * inertiaRampFactor * floatDelta);
 		}
 
 		Entity.Inertia = verticalInertia + horizontalInertia;
@@ -152,7 +152,7 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 
 		// ----- Jump Instruction -----
 		if ( ! jumpBuffer.IsDone && jumpCooldown.IsDone && ! coyoteTimer.IsDone ) {
-			Entity.Inertia = Entity.Inertia.FlattenInDirection(-Entity.UpDirection) + Entity.UpDirection * 17.5f;
+			Entity.Inertia = Entity.Inertia.SlideOnFace(Entity.UpDirection) + Entity.UpDirection * 17.5f;
 			jumpBuffer.End();
 			jumpCooldown.Start();
 		}

@@ -14,7 +14,7 @@ public partial class MeshCharacterModel : CharacterModel {
 	[Export] protected Node3D Model { get; private set; } = null!;
 
 	private bool _isLoaded = false;
-    public override bool IsLoaded { 
+    public override bool IsLoaded {
 		get => _isLoaded;
 		set {
 			if ( this.IsInitializationSetterCall() ) {
@@ -22,21 +22,17 @@ public partial class MeshCharacterModel : CharacterModel {
 				return;
 			}
 
-			AsILoadable().SetLoaded(value);
+			AsILoadable().LoadUnload(value);
 		}
 	}
 
 
 
 	protected MeshCharacterModel() : base() {}
-	public MeshCharacterModel(MeshCharacterCostume costume, Node3D root) : base(costume, root) {}
+	public MeshCharacterModel(MeshCharacterCostume costume) : base(costume) {}
 
 
 
-	public override void Inject(Skeleton3D? skeleton) {
-		Skeleton = skeleton;
-		ParentToSkeleton();
-	}
 
 	private void ParentToSkeleton() {
 		if ( Model is null ) return;
@@ -50,6 +46,10 @@ public partial class MeshCharacterModel : CharacterModel {
 	}
 
 
+	public override void Inject(Skeleton3D? skeleton) {
+		Skeleton = skeleton;
+		ParentToSkeleton();
+	}
 
 	protected override bool LoadModelBehaviour() {
 		if ( ! base.LoadModelBehaviour() ) return false;
@@ -59,6 +59,8 @@ public partial class MeshCharacterModel : CharacterModel {
 
 		Model = model;
 		ParentToSkeleton();
+		Model.SetProcess(IsProcessing());
+		Model.Visible = Visible;
 		Model.Name = $"{nameof(CharacterCostume)} - {meshCostume.DisplayName}";
 
 		_isLoaded = true;
@@ -73,15 +75,18 @@ public partial class MeshCharacterModel : CharacterModel {
 		_isLoaded = false;
 	}
 
-
-
-	public override void _ValidateProperty(Dictionary property) {
-		base._ValidateProperty(property);
-		
-		StringName name = property["name"].AsStringName();
-		
-		if ( name == PropertyName.Model ) {
-			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
+    public override void Enable() {
+        base.Enable();
+		if (Model is not null) {
+			Model.SetProcess(true);
+			Model.Visible = true;
 		}
-	}
+    }
+    public override void Disable() {
+        base.Disable();
+		if (Model is not null) {
+			Model.SetProcess(false);
+			Model.Visible = false;
+		}
+    }
 }

@@ -13,12 +13,12 @@ public abstract partial class SingleWeapon : Weapon {
 	private IWeapon.Handedness _weaponHandedness = IWeapon.Handedness.Right;
 
 
-    public override bool IsLoaded { 
+    public override bool IsLoaded {
 		get => WeaponModel is WeaponModel model && model.IsLoaded;
 		set => WeaponModel?.AsILoadable().SetLoaded(value);
 	}
-	
-	
+
+
 
 
 	[Export] public override WeaponData Data {
@@ -36,7 +36,7 @@ public abstract partial class SingleWeapon : Weapon {
 
 	[ExportGroup("Costume")]
 	[Export] private WeaponModel? WeaponModel;
-	
+
 	[Export] public override WeaponCostume? Costume {
 		get => WeaponModel?.Costume;
 		set {
@@ -60,7 +60,7 @@ public abstract partial class SingleWeapon : Weapon {
 	private Entity? _entity;
 
 	protected virtual int StyleMax { get; } = 0;
-	public override int Style { 
+	public override int Style {
 		get => _style;
 		set => _style = value % (StyleMax + 1);
 	}
@@ -86,10 +86,11 @@ public abstract partial class SingleWeapon : Weapon {
 		WeaponCostume? oldCostume = Costume;
 		if ( costume == oldCostume ) return;
 
-		new LoadableUpdater<WeaponModel>(ref WeaponModel, () => costume?.Instantiate(this))
+		new LoadableUpdater<WeaponModel>(ref WeaponModel, () => costume?.Instantiate())
 			.BeforeLoad(m => {
 				m.Inject(Entity?.Skeleton);
 				m.Inject(WeaponHandedness);
+				m.SafeReparentEditor(this);
 			})
 			.Execute();
 
@@ -124,8 +125,17 @@ public abstract partial class SingleWeapon : Weapon {
 		WeaponModel?.AsILoadable().UnloadModel();
 	}
 
+    public override void Enable() {
+        base.Enable();
+		WeaponModel?.Enable();
+    }
+    public override void Disable() {
+        base.Disable();
+		WeaponModel?.Disable();
+    }
 
-	public ISaveData<Weapon> Save() {
+
+    public ISaveData<Weapon> Save() {
 		return new SingleWeaponSaveData(Data, Costume);
 	}
 
@@ -150,18 +160,18 @@ public abstract partial class SingleWeapon : Weapon {
 
 	public override void _ValidateProperty(Dictionary property) {
 		base._ValidateProperty(property);
-		
+
 		StringName name = property["name"].AsStringName();
-		
+
 		if (
 			name == PropertyName.WeaponModel ||
 			(name == PropertyName.Data && Data is not null)
 		) {
 			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
-		
+
 		} else if (name == PropertyName.Costume) {
 			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
-			
+
 		}
 	}
 

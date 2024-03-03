@@ -10,11 +10,15 @@ namespace LandlessSkies.Core;
 [GlobalClass]
 public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICostumable<CharacterCostume>, IInputReader, ICustomizable {
 
+	public readonly static string CollisionsName = "Collisions";
+	public readonly static string SkeletonName = "Skeleton";
+	public readonly static string ModelName = "Model";
+
 	[Export] public Node3D? Collisions { get; private set; }
 	[Export] public Skeleton3D? Skeleton { get; private set; }
 
 	private bool _isLoaded = false;
-    public override bool IsLoaded { 
+    public override bool IsLoaded {
 		get => _isLoaded;
 		set {
 			if ( this.IsInitializationSetterCall() ) {
@@ -22,7 +26,7 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 				return;
 			}
 
-			AsILoadable().SetLoaded(value);
+			AsILoadable().LoadUnload(value);
 		}
 	}
 
@@ -30,7 +34,7 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 		get => _data;
 		private set {
 			if (_data is not null) return;
-			
+
 			_data = value;
 
 			if ( this.IsInitializationSetterCall() ) return;
@@ -78,54 +82,14 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 		CharacterCostume? oldCostume = Costume;
 		if ( costume == oldCostume ) return;
 
-		new LoadableUpdater<CharacterModel>(ref CharacterModel, () => costume?.Instantiate(this))
+		new LoadableUpdater<CharacterModel>(ref CharacterModel, () => costume?.Instantiate())
 			.BeforeLoad(m => {
 				m.Inject(Skeleton);
+				m.SafeReparentEditor(this);
 			})
 			.Execute();
 
 		EmitSignal(SignalName.CostumeChanged, costume!, oldCostume!);
-	}
-
-
-	protected override bool LoadModelBehaviour() {
-		if ( ! base.LoadModelBehaviour() ) return false;
-		if ( Data is null ) return false;
-
-		Collisions = Data.CollisionScene?.Instantiate() as Node3D;
-		if ( Collisions is not null ) {
-			Collisions.Name = PropertyName.Collisions;
-			Collisions.SetOwnerAndParent(GetParent());
-		}
-
-		Skeleton = Data.SkeletonScene?.Instantiate() as Skeleton3D;
-		if ( Skeleton is not null ) {
-			Skeleton.Name = PropertyName.Skeleton;
-			Skeleton.SetOwnerAndParent(this);
-		}
-		CharacterModel?.Inject(Skeleton);
-
-		CharacterModel?.AsILoadable().LoadModel();
-
-		RefreshRotation();
-
-		_isLoaded = true;
-
-		return true;
-	}
-	protected override void UnloadModelBehaviour() {
-		base.UnloadModelBehaviour();
-		
-		Collisions?.UnparentAndQueueFree();
-		Collisions = null;
-
-		CharacterModel?.Inject(null);
-		Skeleton?.UnparentAndQueueFree();
-		Skeleton = null;
-
-		CharacterModel?.AsILoadable().UnloadModel();
-
-		_isLoaded = false;
 	}
 
 
@@ -150,35 +114,54 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 	public virtual void HandleInput(Player.InputInfo inputInfo) {}
 
 
-	public override bool _PropertyCanRevert(StringName property) {
-		if (property == PropertyName.Costume) {
-			return Costume != Data?.BaseCostume;
+	protected override bool LoadModelBehaviour() {
+		if ( ! base.LoadModelBehaviour() ) return false;
+		if ( Data is null ) return false;
+
+		Collisions = Data.CollisionScene?.Instantiate() as Node3D;
+		if ( Collisions is not null ) {
+			Collisions.Name = CollisionsName;
+			Collisions.SetOwnerAndParent(GetParent());
 		}
-		return base._PropertyCanRevert(property);
+
+		Skeleton = Data.SkeletonScene?.Instantiate() as Skeleton3D;
+		if ( Skeleton is not null ) {
+			Skeleton.Name = SkeletonName;
+			Skeleton.SetOwnerAndParent(this);
+		}
+
+		if ( CharacterModel is not null ) {
+			CharacterModel.Inject(Skeleton);
+			CharacterModel.AsILoadable().LoadModel();
+		}
+
+		RefreshRotation();
+
+		_isLoaded = true;
+
+		return true;
 	}
-	public override Variant _PropertyGetRevert(StringName property) {
-		if (property == PropertyName.Costume) {
-			return Data?.BaseCostume!;
-		}
-		return base._PropertyGetRevert(property);
+	protected override void UnloadModelBehaviour() {
+		base.UnloadModelBehaviour();
+
+		Collisions?.UnparentAndQueueFree();
+		Collisions = null;
+
+		CharacterModel?.Inject(null);
+		Skeleton?.UnparentAndQueueFree();
+		Skeleton = null;
+
+		CharacterModel?.AsILoadable().UnloadModel();
+
+		_isLoaded = false;
 	}
 
-	public override void _ValidateProperty(Dictionary property) {
-		base._ValidateProperty(property);
-
-		StringName name = property["name"].AsStringName();
-		
-		if (
-			name == PropertyName.Collisions ||
-			name == PropertyName.Skeleton ||
-			name == PropertyName.CharacterModel ||
-			(name == PropertyName.Data && Data is not null)
-		) {
-			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
-		
-		} else if (name == PropertyName.Costume) {
-			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
-
-		}
-	}
+    public override void Enable() {
+        base.Enable();
+		CharacterModel?.Enable();
+    }
+    public override void Disable() {
+        base.Disable();
+		CharacterModel?.Disable();
+    }
 }
