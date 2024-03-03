@@ -53,7 +53,7 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 			_animationPlayer = value;
 
 			if ( this.IsInitializationSetterCall() ) return;
-			_animationPlayer.RootNode = GetTree().EditedSceneRoot.GetPathTo(this);
+			_animationPlayer.RootNode = _animationPlayer.GetPathTo(this);
 		}
 	}
 	private AnimationPlayer? _animationPlayer;
