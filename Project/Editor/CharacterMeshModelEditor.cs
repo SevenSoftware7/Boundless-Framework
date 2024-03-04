@@ -4,7 +4,7 @@ using Godot.Collections;
 
 namespace LandlessSkies.Core;
 
-public partial class MeshCharacterModel {
+public partial class CharacterMeshModel {
 	public override void _ValidateProperty(Dictionary property) {
 		base._ValidateProperty(property);
 

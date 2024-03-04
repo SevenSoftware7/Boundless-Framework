@@ -1,13 +1,10 @@
 using Godot;
 
-
 namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
-public abstract partial class WeaponCostume : Resource, IUIObject {
-	[Export] public string DisplayName { get; private set; } = "";
-	[Export] public Texture2D? DisplayPortrait { get; private set; }
-
-	public abstract WeaponModel Instantiate();
+// TODO: when Interface reference [Export] is implemented in Godot, turn this into an interface
+public abstract partial class WeaponCostume : Costume {
+	public abstract override WeaponModel Instantiate();
 }

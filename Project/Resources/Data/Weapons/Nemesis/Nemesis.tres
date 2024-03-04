@@ -8,5 +8,5 @@ script = ExtResource("1_rjt52")
 DisplayName = "Nemesis"
 BaseCostume = ExtResource("1_bfbg6")
 Type = 1
-Size = 2
 Usage = 5
+Size = 2

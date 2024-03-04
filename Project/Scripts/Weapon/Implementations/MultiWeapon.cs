@@ -94,10 +94,10 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 	}
 
 
-	public override IWeapon.Handedness WeaponHandedness {
+	public override Handedness WeaponHandedness {
 		get {
 			if ( CurrentWeapon is not SingleWeapon weapon ) {
-				return IWeapon.Handedness.Right;
+				return Handedness.Right;
 			}
 
 			return weapon.WeaponHandedness;
@@ -129,7 +129,7 @@ public sealed partial class MultiWeapon : Weapon, IUIObject {
 
 
 
-	private bool IndexInBounds(int index) => index < _weapons.Count;
+	private bool IndexInBounds(int index) => index < _weapons.Count && index >= 0;
 	private void UpdateCurrent() {
 		if ( ! IndexInBounds(_currentIndex) ) {
 			_currentIndex = 0;

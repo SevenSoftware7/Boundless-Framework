@@ -5,7 +5,8 @@ using Godot.Collections;
 namespace LandlessSkies.Core;
 
 [Tool]
-public partial class MeshCharacterModel : CharacterModel {
+// TODO: See WeaponMeshModel
+public partial class CharacterMeshModel : CharacterModel {
 
 	[ExportGroup("Dependencies")]
 	[Export] public Skeleton3D? Skeleton;
@@ -28,8 +29,8 @@ public partial class MeshCharacterModel : CharacterModel {
 
 
 
-	protected MeshCharacterModel() : base() {}
-	public MeshCharacterModel(MeshCharacterCostume costume) : base(costume) {}
+	protected CharacterMeshModel() : base() {}
+	public CharacterMeshModel(CharacterMeshCostume costume) : base(costume) {}
 
 
 
@@ -53,7 +54,7 @@ public partial class MeshCharacterModel : CharacterModel {
 
 	protected override bool LoadModelBehaviour() {
 		if ( ! base.LoadModelBehaviour() ) return false;
-		if ( Costume is not MeshCharacterCostume meshCostume ) return false;
+		if ( Costume is not CharacterMeshCostume meshCostume ) return false;
 
 		if ( meshCostume.ModelScene?.Instantiate() is not Node3D model ) return false;
 
@@ -61,7 +62,7 @@ public partial class MeshCharacterModel : CharacterModel {
 		ParentToSkeleton();
 		Model.SetProcess(IsProcessing());
 		Model.Visible = Visible;
-		Model.Name = $"{nameof(CharacterCostume)} - {meshCostume.DisplayName}";
+		Model.Name = $"{nameof(Costume)} - {meshCostume.DisplayName}";
 
 		_isLoaded = true;
 

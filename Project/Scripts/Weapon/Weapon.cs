@@ -17,7 +17,7 @@ public abstract partial class Weapon : Loadable3D, IWeapon, IInjectable<Entity?>
 
 	public IWeapon.Type WeaponType => Data?.Type ?? 0;
 	public IWeapon.Size WeaponSize => Data?.Size ?? 0;
-	public abstract IWeapon.Handedness WeaponHandedness { get; set; }
+	public abstract Handedness WeaponHandedness { get; set; }
 
 	public virtual IUIObject UIObject => Data;
 	public virtual ICustomizable[] Children => [];

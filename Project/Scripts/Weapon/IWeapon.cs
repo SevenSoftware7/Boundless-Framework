@@ -35,9 +35,4 @@ public interface IWeapon : IInputReader, ICustomizable, IDataContainer<WeaponDat
 		OneHanded = 1 << 0,
 		TwoHanded = 1 << 1,
 	};
-
-	public enum Handedness : byte {
-		Left = 1 << 0,
-		Right = 1 << 1,
-	}
 }

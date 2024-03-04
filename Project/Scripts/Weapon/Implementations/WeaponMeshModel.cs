@@ -5,11 +5,12 @@ using Godot.Collections;
 namespace LandlessSkies.Core;
 
 [Tool]
-public partial class MeshWeaponModel : WeaponModel, ILoadable {
+// TODO: when Interface reference [Export] is implemented in Godot, merge this with CharacterMeshModel and inherit from it
+public partial class WeaponMeshModel : WeaponModel, ILoadable {
 
 	[ExportGroup("Dependencies")]
 	[Export] public Skeleton3D? Skeleton { get; private set; }
-	public IWeapon.Handedness Handedness { get; private set; }
+	public Handedness Handedness { get; private set; }
 	[ExportGroup("")]
 
 	[Export] protected Node3D Model { get; private set; } = null!;
@@ -27,8 +28,8 @@ public partial class MeshWeaponModel : WeaponModel, ILoadable {
 		}
 	}
 
-	protected MeshWeaponModel() : base() {}
-	public MeshWeaponModel(MeshWeaponCostume costume) : base(costume) {}
+	protected WeaponMeshModel() : base() {}
+	public WeaponMeshModel(WeaponMeshCostume costume) : base(costume) {}
 
 
 
@@ -48,13 +49,13 @@ public partial class MeshWeaponModel : WeaponModel, ILoadable {
 		Skeleton = skeleton;
 		ParentToSkeleton();
 	}
-	public override void Inject(IWeapon.Handedness handedness) {
+	public override void Inject(Handedness handedness) {
 		Handedness = handedness;
 	}
 
 	protected override bool LoadModelBehaviour() {
 		if ( ! base.LoadModelBehaviour() ) return false;
-		if ( Costume is not MeshWeaponCostume meshCostume ) return false;
+		if ( Costume is not WeaponMeshCostume meshCostume ) return false;
 
 		if ( meshCostume.ModelScene?.Instantiate() is not Node3D model ) return false;
 
@@ -62,7 +63,7 @@ public partial class MeshWeaponModel : WeaponModel, ILoadable {
 		ParentToSkeleton();
 		Model.SetProcess(IsProcessing());
 		Model.Visible = Visible;
-		Model.Name = $"{nameof(WeaponCostume)} - {meshCostume.DisplayName}";
+		Model.Name = $"{nameof(Costume)} - {meshCostume.DisplayName}";
 
 		_isLoaded = true;
 
@@ -97,8 +98,8 @@ public partial class MeshWeaponModel : WeaponModel, ILoadable {
 		if ( Model is null || ! Model.IsInsideTree() ) return;
 
 		string boneName = Handedness switch {
-			IWeapon.Handedness.Left         => "LeftHand",
-			IWeapon.Handedness.Right or _   => "RightHand",
+			Handedness.Left         => "LeftHand",
+			Handedness.Right or _   => "RightHand",
 		};
 
 		if ( Skeleton is not null && Skeleton.TryGetBoneTransform(boneName, out Transform3D handTransform) ) {

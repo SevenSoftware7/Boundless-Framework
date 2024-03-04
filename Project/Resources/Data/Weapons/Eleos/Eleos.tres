@@ -8,5 +8,5 @@ script = ExtResource("2_mh4c8")
 DisplayName = "Eleos"
 BaseCostume = ExtResource("1_7d8w5")
 Type = 1
-Size = 1
 Usage = 3
+Size = 1
