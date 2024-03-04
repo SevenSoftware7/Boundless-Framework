@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Godot;
-
 
 namespace LandlessSkies.Core;
 
@@ -96,7 +94,7 @@ public static class EngineUtils {
 		}
 		return child;
 	}
-	
+
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static T AddChildAndSetOwner<T>(this T obj, Node child, bool forceReadableName = false) where T : Node {
 		obj.AddChild(child, forceReadableName);

@@ -1,6 +1,3 @@
-
-
-using System;
 using Godot;
 
 namespace LandlessSkies.Core;

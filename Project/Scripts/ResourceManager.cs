@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-
 using GDCol = Godot.Collections;
 
 namespace LandlessSkies.Core;
@@ -44,7 +43,7 @@ public partial class ResourceManager : Node {
 			SetWeapons(Weapons);
 		}
 	}
-	
+
 
     private static void SetCharacters(IEnumerable<CharacterData> characters) {
 		_characters = characters

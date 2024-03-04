@@ -1,9 +1,4 @@
 using Godot;
-using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using CharacterEmotion = LandlessSkies.Core.IPortraitProvider.CharacterEmotion;
-
 
 namespace LandlessSkies.Core;
 

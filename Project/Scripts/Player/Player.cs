@@ -1,9 +1,4 @@
-using System;
-using System.Runtime.CompilerServices;
 using Godot;
-
-using Godot.Collections;
-
 
 namespace LandlessSkies.Core;
 
@@ -113,7 +108,7 @@ public sealed partial class Player : Node {
 			Vector3 camRight = CameraController.AbsoluteRotation.X;
 			Vector3 entityUp = Entity.Transform.Basis.Y * ((Mathf.Ceil(Entity.Transform.Basis.Y.Dot(CameraController.LocalRotation.Y)) - 0.5f) * 2f);
 			Vector3 groundedCamForward = entityUp.Cross(camRight).Normalized();
-			
+
 			camRotation = Basis.LookingAt(groundedCamForward, entityUp);
 
 			groundedMovement = camRotation * new Vector3(moveInput.X, 0, moveInput.Y);

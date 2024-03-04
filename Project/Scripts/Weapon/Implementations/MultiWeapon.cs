@@ -5,9 +5,7 @@ using System.Linq;
 using Godot;
 using Godot.Collections;
 
-
 namespace LandlessSkies.Core;
-
 
 [Tool]
 [GlobalClass]

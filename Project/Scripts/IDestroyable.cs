@@ -1,5 +1,3 @@
-
-
 namespace LandlessSkies.Core;
 
 public interface IDestroyable {

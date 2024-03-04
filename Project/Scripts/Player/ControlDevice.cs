@@ -1,7 +1,5 @@
 using Godot;
-using SevenGame.Utility;
 using System;
-
 
 namespace LandlessSkies.Core;
 
@@ -43,7 +41,7 @@ public abstract partial class ControlDevice : Node, IDisposable {
 	}
 	protected virtual void RebindInput(StringName actionName, params InputEvent[] events) {
 		if (actionName.IsEmpty) return;
-		
+
 		if ( ! InputMap.HasAction(actionName) ) {
 			InputMap.AddAction(actionName);
 		}
@@ -53,7 +51,7 @@ public abstract partial class ControlDevice : Node, IDisposable {
 			InputMap.ActionAddEvent(actionName, events[i]);
 		}
 	}
-	
+
 	protected void UnbindInput(InputType input) {
 		StringName actionName = GetActionName(input);
 		UnbindInput(actionName);
@@ -64,7 +62,7 @@ public abstract partial class ControlDevice : Node, IDisposable {
 	}
 	protected virtual void UnbindInput(StringName actionName) {
 		if (actionName.IsEmpty) return;
-		
+
 		if ( ! InputMap.HasAction(actionName) ) {
 			InputMap.EraseAction(actionName);
 		}

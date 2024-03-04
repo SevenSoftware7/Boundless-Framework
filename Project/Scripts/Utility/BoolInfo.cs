@@ -1,4 +1,3 @@
-
 namespace SevenGame.Utility;
 
 public struct BoolInfo {

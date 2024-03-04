@@ -1,9 +1,7 @@
 using System;
 using Godot;
 using SevenGame.Utility;
-
 using static LandlessSkies.Core.ControlDevice.InputType;
-
 
 namespace LandlessSkies.Core;
 
@@ -23,7 +21,7 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 
 		Entity.MotionMode = CharacterBody3D.MotionModeEnum.Grounded;
 	}
-	
+
 
 	public override void HandleInput(Player.InputInfo inputInfo) {
 		base.HandleInput(inputInfo);

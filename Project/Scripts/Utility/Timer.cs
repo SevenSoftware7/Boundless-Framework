@@ -1,6 +1,5 @@
 using Godot;
 
-
 namespace SevenGame.Utility;
 
 public struct Timer {

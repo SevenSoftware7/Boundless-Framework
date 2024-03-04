@@ -1,17 +1,14 @@
 using Godot;
-using Godot.Collections;
 using System;
-
 
 namespace LandlessSkies.Core;
 
 [Tool]
 public abstract partial class Model : Loadable3D, IInjectable<Skeleton3D?>, IInjectable<Handedness>, ICustomizable {
 
-	[Export] protected Costume _costume { get; private set; } = null!;
-	public abstract Costume Costume { get; }
+	[Export] public Costume Costume { get; protected set; } = null!;
 
-	public virtual IUIObject UIObject => _costume;
+	public virtual IUIObject UIObject => Costume;
 	public virtual ICustomizable[] Children => [];
 	public virtual ICustomizationParameter[] Customizations => [];
 
@@ -21,8 +18,8 @@ public abstract partial class Model : Loadable3D, IInjectable<Skeleton3D?>, IInj
 	public Model(Costume costume) : this() {
 		ArgumentNullException.ThrowIfNull(costume);
 
-		_costume = costume;
-		Name = $"{nameof(Model)} - {_costume.DisplayName}";
+		Costume = costume;
+		Name = $"{nameof(Model)} - {Costume.DisplayName}";
 	}
 
 

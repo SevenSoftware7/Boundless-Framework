@@ -1,13 +1,11 @@
 using Godot;
-using Godot.Collections;
-
 
 namespace LandlessSkies.Core;
 
 [Tool]
 // TODO: when Interface reference [Export] is implemented in Godot, merge this with CharacterMeshModel and inherit from it
 public partial class WeaponMeshModel : WeaponModel, ILoadable {
-
+	#region Generic Mesh Model stuff
 	[ExportGroup("Dependencies")]
 	[Export] public Skeleton3D? Skeleton { get; private set; }
 	public Handedness Handedness { get; private set; }
@@ -91,6 +89,7 @@ public partial class WeaponMeshModel : WeaponModel, ILoadable {
 			Model.Visible = false;
 		}
     }
+	#endregion
 
     public override void _Process(double delta) {
 		base._Process(delta);

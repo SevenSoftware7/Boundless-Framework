@@ -1,7 +1,3 @@
-
-
-using Godot;
-
 namespace LandlessSkies.Core;
 
 public interface ILoadable : IDestroyable, IEnablable {
@@ -30,7 +26,7 @@ public interface ILoadable : IDestroyable, IEnablable {
 			UnloadModel();
 		}
 	}
-	
+
 	/// <summary>
 	/// Reloads the model by unloading it then loading it back again.
 	/// </summary>

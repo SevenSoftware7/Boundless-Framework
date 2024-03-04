@@ -1,7 +1,6 @@
 using Godot;
 using SevenGame.Utility;
 
-
 namespace LandlessSkies.Core;
 
 [Tool]
@@ -55,7 +54,7 @@ public partial class CameraController3D : Camera3D {
 
 		if (Style == CameraStyle.ThirdPersonGrounded) {
 			float maxAngle = Mathf.Pi / 2f - Mathf.Epsilon;
-			
+
 			Vector3 eulerAngles = LocalRotation.GetEuler();
 			LocalRotation = Basis.FromEuler(new(
 				Mathf.Clamp(eulerAngles.X + cameraInput.Y, -maxAngle, maxAngle),
@@ -63,8 +62,8 @@ public partial class CameraController3D : Camera3D {
 				0
 			));
 		} else if (Style == CameraStyle.ThirdPerson) {
-			LocalRotation *= 
-				new Basis(LocalRotation.Inverse().Y, -cameraInput.X) * 
+			LocalRotation *=
+				new Basis(LocalRotation.Inverse().Y, -cameraInput.X) *
 				new Basis(Vector3.Right, cameraInput.Y);
 		}
 	}

@@ -1,7 +1,6 @@
 using Godot;
 using System;
 
-
 namespace LandlessSkies.Core;
 
 public sealed class EntityBehaviourManager {

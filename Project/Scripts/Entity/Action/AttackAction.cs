@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Collections.Generic;
 using Godot;
@@ -19,7 +17,7 @@ public abstract class AttackAction : EntityAction {
 		public new AttackAction Build();
 		EntityAction EntityAction.IInfo.Build() => Build();
 	}
-	
+
 
 	[Flags]
 	public enum AttackType : byte {

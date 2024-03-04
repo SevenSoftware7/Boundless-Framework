@@ -1,13 +1,13 @@
 using Godot;
-using Godot.Collections;
-using System;
-
 
 namespace LandlessSkies.Core;
 
 [Tool]
 public abstract partial class WeaponModel : Model {
-	public override WeaponCostume Costume => (_costume as WeaponCostume)!;
+	public new WeaponCostume Costume {
+		get => (base.Costume as WeaponCostume)!;
+		set => base.Costume = value;
+	}
 
 
 	protected WeaponModel() : base() {}

@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using Godot;
 
-
 namespace LandlessSkies.Core;
 
 [Tool]
@@ -101,7 +100,7 @@ public partial class KeyboardAndMouseDevice : ControlDevice {
 		base._Input(@event);
 
 		if ( Engine.IsEditorHint() ) return;
-		
+
 		if (@event is InputEventMouseMotion mouseMotion) {
 			KeyboardAndMouseDevice.mouseMotion = mouseMotion;
 		}

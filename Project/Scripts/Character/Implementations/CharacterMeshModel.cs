@@ -1,13 +1,11 @@
 using Godot;
-using Godot.Collections;
-
 
 namespace LandlessSkies.Core;
 
 [Tool]
 // TODO: See WeaponMeshModel
 public partial class CharacterMeshModel : CharacterModel {
-
+	#region Generic Mesh Model stuff
 	[ExportGroup("Dependencies")]
 	[Export] public Skeleton3D? Skeleton;
 	[ExportGroup("")]
@@ -90,4 +88,5 @@ public partial class CharacterMeshModel : CharacterModel {
 			Model.Visible = false;
 		}
     }
+	#endregion
 }

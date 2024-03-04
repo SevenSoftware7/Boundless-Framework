@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Godot.Collections;
-using Microsoft.VisualBasic;
 
 namespace SevenGame.Utility;
 
@@ -27,12 +25,12 @@ public static class MathUtility {
 		if (from.IsEqualApprox(to)) {
 			return from;
 		}
-		
+
 		// Avoid error on both vectors being inverses of each other, breaking a Cross Product operation in the Slerp method
 		if ((from + to) == Vector3.Zero) {
 			return from.Lerp(to, weight);
 		}
-		
+
 		return from.Slerp(to, weight);
 	}
 	public static Quaternion SafeSlerp(this Quaternion from, Quaternion to, float weight) {
@@ -157,7 +155,7 @@ public static class MathUtility {
 		parameters.CollideWithAreas = collideWithAreas;
 		parameters.HitFromInside = hitFromInside;
 		parameters.HitBackFaces = hitBackFaces;
-		
+
 		Dictionary intersect = spaceState.IntersectRay(parameters);
 		if ( intersect.Count == 0 ) {
 			result = new();
@@ -175,7 +173,7 @@ public static class MathUtility {
 			FaceIndex = intersect["face_index"].AsInt32(),
 			HitFromInside = normal == Vector3.Zero,
 		};
-		
+
 		return true;
 	}
 
