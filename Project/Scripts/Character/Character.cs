@@ -1,25 +1,20 @@
+namespace LandlessSkies.Core;
+
 using Godot;
 using SevenGame.Utility;
 using System;
 
-namespace LandlessSkies.Core;
-
 [Tool]
 [GlobalClass]
 public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICostumable<CharacterCostume>, IInputReader, ICustomizable {
-
-	public readonly static string CollisionsName = "Collisions";
-	public readonly static string SkeletonName = "Skeleton";
-	public readonly static string ModelName = "Model";
-
 	[Export] public Node3D? Collisions { get; private set; }
 	[Export] public Skeleton3D? Skeleton { get; private set; }
 
 	private bool _isLoaded = false;
-    public override bool IsLoaded {
+	public override bool IsLoaded {
 		get => _isLoaded;
 		set {
-			if ( this.IsInitializationSetterCall() ) {
+			if (this.IsInitializationSetterCall()) {
 				_isLoaded = value;
 				return;
 			}
@@ -31,12 +26,15 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 	[Export] public CharacterData Data {
 		get => _data;
 		private set {
-			if (_data is not null) return;
+			if (_data is not null)
+				return;
 
 			_data = value;
 
-			if ( this.IsInitializationSetterCall() ) return;
-			if (Costume is not null) return;
+			if (this.IsInitializationSetterCall())
+				return;
+			if (Costume is not null)
+				return;
 
 			SetCostume(_data.BaseCostume);
 		}
@@ -48,7 +46,8 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 	[Export] public CharacterCostume? Costume {
 		get => CharacterModel?.Costume;
 		set {
-			if ( this.IsInitializationSetterCall() ) return;
+			if (this.IsInitializationSetterCall())
+				return;
 			SetCostume(value);
 		}
 	}
@@ -65,7 +64,7 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 
 
 
-	public Character() : base() {}
+	public Character() : base() { }
 	public Character(CharacterData data, CharacterCostume? costume) : this() {
 		ArgumentNullException.ThrowIfNull(data);
 
@@ -78,7 +77,8 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 
 	public void SetCostume(CharacterCostume? costume, bool forceLoad = false) {
 		CharacterCostume? oldCostume = Costume;
-		if ( costume == oldCostume ) return;
+		if (costume == oldCostume)
+			return;
 
 		new LoadableUpdater<CharacterModel>(ref CharacterModel, () => costume?.Instantiate())
 			.BeforeLoad(m => {
@@ -92,7 +92,7 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 
 
 	public void RotateTowards(Basis target, double delta, float speed = 16f) {
-		CharacterRotation = CharacterRotation.SafeSlerp(target, (float)delta * speed);
+		CharacterRotation = CharacterRotation.SafeSlerp(target, (float) delta * speed);
 
 		RefreshRotation();
 	}
@@ -102,33 +102,36 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 			Basis = CharacterRotation,
 		};
 
-		if ( Collisions is null ) return;
+		if (Collisions is null)
+			return;
 
 		Collisions.Transform = Collisions.Transform with {
 			Basis = CharacterRotation,
 		};
 	}
 
-	public virtual void HandleInput(Player.InputInfo inputInfo) {}
+	public virtual void HandleInput(Player.InputInfo inputInfo) { }
 
 
 	protected override bool LoadModelBehaviour() {
-		if ( ! base.LoadModelBehaviour() ) return false;
-		if ( Data is null ) return false;
+		if (!base.LoadModelBehaviour())
+			return false;
+		if (Data is null)
+			return false;
 
 		Collisions = Data.CollisionScene?.Instantiate() as Node3D;
-		if ( Collisions is not null ) {
-			Collisions.Name = CollisionsName;
+		if (Collisions is not null) {
+			Collisions.Name = nameof(Collisions);
 			Collisions.SetOwnerAndParent(GetParent());
 		}
 
 		Skeleton = Data.SkeletonScene?.Instantiate() as Skeleton3D;
-		if ( Skeleton is not null ) {
-			Skeleton.Name = SkeletonName;
+		if (Skeleton is not null) {
+			Skeleton.Name = nameof(Skeleton);
 			Skeleton.SetOwnerAndParent(this);
 		}
 
-		if ( CharacterModel is not null ) {
+		if (CharacterModel is not null) {
 			CharacterModel.Inject(Skeleton);
 			CharacterModel.AsILoadable().LoadModel();
 		}
@@ -154,12 +157,12 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 		_isLoaded = false;
 	}
 
-    public override void Enable() {
-        base.Enable();
+	public override void Enable() {
+		base.Enable();
 		CharacterModel?.Enable();
-    }
-    public override void Disable() {
-        base.Disable();
+	}
+	public override void Disable() {
+		base.Disable();
 		CharacterModel?.Disable();
-    }
+	}
 }

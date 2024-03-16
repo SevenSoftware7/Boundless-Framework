@@ -10,6 +10,6 @@ public abstract partial class WeaponModel : Model {
 	}
 
 
-	protected WeaponModel() : base() {}
-	public WeaponModel(WeaponCostume costume) : base(costume) {}
+	protected WeaponModel() : base() { }
+	public WeaponModel(WeaponCostume costume) : base(costume) { }
 }

@@ -1,8 +1,8 @@
+namespace LandlessSkies.Core;
+
 using System;
 using System.Diagnostics;
 using Godot;
-
-namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
@@ -56,23 +56,26 @@ public partial class KeyboardAndMouseDevice : ControlDevice {
 	public override void _Ready() {
 		base._Ready();
 
-		if ( Engine.IsEditorHint() ) return;
+		if (Engine.IsEditorHint())
+			return;
 
-		RebindInput(InputType.Evade, new InputEventKey()                           { PhysicalKeycode = Key.Shift });
-		RebindInput(InputType.Jump, new InputEventKey()                            { PhysicalKeycode = Key.Space });
-		RebindInput(InputType.LightAttack, new InputEventMouseButton()             { ButtonIndex = MouseButton.Left });
-		RebindInput(InputType.HeavyAttack, new InputEventMouseButton()             { ButtonIndex = MouseButton.Right });
-		RebindInput(MotionType.Move, MotionDirection.Forward, new InputEventKey()  { PhysicalKeycode = Key.W });
+		RebindInput(InputType.Evade, new InputEventKey() { PhysicalKeycode = Key.Shift });
+		RebindInput(InputType.Jump, new InputEventKey() { PhysicalKeycode = Key.Space });
+		RebindInput(InputType.LightAttack, new InputEventMouseButton() { ButtonIndex = MouseButton.Left });
+		RebindInput(InputType.HeavyAttack, new InputEventMouseButton() { ButtonIndex = MouseButton.Right });
+		RebindInput(MotionType.Move, MotionDirection.Forward, new InputEventKey() { PhysicalKeycode = Key.W });
 		RebindInput(MotionType.Move, MotionDirection.Backward, new InputEventKey() { PhysicalKeycode = Key.S });
-		RebindInput(MotionType.Move, MotionDirection.Left, new InputEventKey()     { PhysicalKeycode = Key.A });
-		RebindInput(MotionType.Move, MotionDirection.Right, new InputEventKey()    { PhysicalKeycode = Key.D });
+		RebindInput(MotionType.Move, MotionDirection.Left, new InputEventKey() { PhysicalKeycode = Key.A });
+		RebindInput(MotionType.Move, MotionDirection.Right, new InputEventKey() { PhysicalKeycode = Key.D });
 	}
 
 	public override void _ExitTree() {
 		base._ExitTree();
 
-		if ( Engine.IsEditorHint() ) return;
-		if ( this.IsEditorExitTree() ) return;
+		if (Engine.IsEditorHint())
+			return;
+		if (this.IsEditorExitTree())
+			return;
 
 		UnbindInput(InputType.Evade);
 		UnbindInput(InputType.Jump);
@@ -87,7 +90,8 @@ public partial class KeyboardAndMouseDevice : ControlDevice {
 	public override void _Process(double delta) {
 		base._Process(delta);
 
-		if ( Engine.IsEditorHint() ) return;
+		if (Engine.IsEditorHint())
+			return;
 
 		Callable.From(UpdateMouse).CallDeferred();
 
@@ -99,7 +103,8 @@ public partial class KeyboardAndMouseDevice : ControlDevice {
 	public override void _Input(InputEvent @event) {
 		base._Input(@event);
 
-		if ( Engine.IsEditorHint() ) return;
+		if (Engine.IsEditorHint())
+			return;
 
 		if (@event is InputEventMouseMotion mouseMotion) {
 			KeyboardAndMouseDevice.mouseMotion = mouseMotion;

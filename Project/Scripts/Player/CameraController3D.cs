@@ -1,7 +1,7 @@
+namespace LandlessSkies.Core;
+
 using Godot;
 using SevenGame.Utility;
-
-namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
@@ -9,7 +9,7 @@ public partial class CameraController3D : Camera3D {
 
 	[ExportGroup("Options")]
 	[Export] private Vector3 cameraOriginPosition;
-	// [Export] private float distanceToPlayer = 1f;
+
 	[Export] private float horizontalSmoothTime = 0.02f;
 	[Export] private float verticalSmoothTime = 0.04f;
 	[Export(PropertyHint.Layers3DPhysics)] private uint CollisionMask = uint.MaxValue;
@@ -69,13 +69,14 @@ public partial class CameraController3D : Camera3D {
 	}
 
 	private void ComputeCamera(double delta) {
-		float floatDelta = (float)delta;
+		float floatDelta = (float) delta;
 
 		Vector3 smoothTargetPosition = GetSmoothTargetPosition(floatDelta);
 
 
 		// Vector3 targetSubjectSpaceOffset = new(cameraOriginPosition.X, cameraOriginPosition.Y, cameraOriginPosition.Z * distanceToPlayer);
 		// subjectSpaceOffset = subjectSpaceOffset.Slerp(targetSubjectSpaceOffset, 3f * floatDelta);
+
 
 		Basis TargetBasis = AbsoluteRotation;
 
@@ -92,13 +93,15 @@ public partial class CameraController3D : Camera3D {
 	private Vector3 GetSmoothTargetPosition(float floatDelta) {
 		Vector3 verticalPos = Subject.Project(SubjectBasis.Y);
 
-		if ( ! smoothVerticalPosition.IsEqualApprox(verticalPos) ) {
+		if (!smoothVerticalPosition.IsEqualApprox(verticalPos)) {
 			if (Style == CameraStyle.ThirdPersonGrounded) {
 				// The camera's new vertical speed is based on the camera's current vertical velocity
 				// The camera's vertical movement gets faster as the player keeps moving vertically
+
 				float targetVerticalTime = Mathf.Lerp(verticalSmoothTime, horizontalSmoothTime, Mathf.Clamp(verticalVelocity.LengthSquared(), 0f, 1f));
 
 				float transitionSpeed = targetVerticalTime > verticalTime ? 1.5f : 0.5f; // Accelerate faster than decelerate
+
 				verticalTime = Mathf.Lerp(verticalTime, targetVerticalTime, transitionSpeed * floatDelta);
 			} else {
 				verticalTime = horizontalSmoothTime;
@@ -107,8 +110,9 @@ public partial class CameraController3D : Camera3D {
 		}
 
 		// Make The Camera Movement slower on the Y axis than on the X axis
+
 		Vector3 horizontalPos = Subject - verticalPos;
-		if ( ! smoothHorizontalPosition.IsEqualApprox(horizontalPos) ) {
+		if (!smoothHorizontalPosition.IsEqualApprox(horizontalPos)) {
 			smoothHorizontalPosition = smoothHorizontalPosition.SmoothDamp(horizontalPos, ref horizontalVelocity, horizontalSmoothTime, Mathf.Inf, floatDelta);
 		}
 
@@ -118,14 +122,15 @@ public partial class CameraController3D : Camera3D {
 	}
 
 	private void ComputeWallCollision(Vector3 origin, Vector3 direction, float distance, ref float cameraDistance, double delta) {
-		float floatDelta = (float)delta;
+		float floatDelta = (float) delta;
 
 		// Check for collision with the camera
+
 		const float CAM_MIN_DISTANCE_TO_WALL = 0.4f;
 
 		bool rayCastHit = GetWorld3D().RayCast3D(origin, origin + direction * (distance + CAM_MIN_DISTANCE_TO_WALL), out MathUtility.RayCast3DResult result, CollisionMask);
-		if ( ! rayCastHit ) {
-			if ( ! Mathf.IsEqualApprox(cameraDistance, distance) ) {
+		if (!rayCastHit) {
+			if (!Mathf.IsEqualApprox(cameraDistance, distance)) {
 				cameraDistance = cameraDistance.SmoothDamp(distance, ref distanceVelocity, 0.2f, Mathf.Inf, floatDelta);
 			}
 
@@ -154,6 +159,7 @@ public partial class CameraController3D : Camera3D {
 		// |        |    /--          |
 		// |        | /--             |
 		// +-------[*]----------------+------------------------------------------
+
 		float angle = collisionToPlayer.AngleTo(result.Normal);
 		float collisionAngle = (Mathf.Pi / 2f) - angle;
 		float camMargin = CAM_MIN_DISTANCE_TO_WALL / Mathf.Sin(collisionAngle);
@@ -166,7 +172,8 @@ public partial class CameraController3D : Camera3D {
 	public override void _Process(double delta) {
 		base._Process(delta);
 
-		if ( Engine.IsEditorHint() ) return;
+		if (Engine.IsEditorHint())
+			return;
 
 		ComputeCamera(delta);
 	}

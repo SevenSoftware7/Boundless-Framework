@@ -1,15 +1,15 @@
+namespace LandlessSkies.Core;
+
 using System.Linq;
 using Godot;
-
-namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
 public abstract partial class SingleWeapon : Weapon {
-	private Handedness _weaponHandedness = Handedness.Right;
+	private Handedness _handedness = Handedness.Right;
 
 
-    public override bool IsLoaded {
+	public override bool IsLoaded {
 		get => WeaponModel is WeaponModel model && model.IsLoaded;
 		set => WeaponModel?.AsILoadable().SetLoaded(value);
 	}
@@ -20,12 +20,18 @@ public abstract partial class SingleWeapon : Weapon {
 	[Export] public override WeaponData Data {
 		get => _data;
 		protected set {
-			if (_data is not null) return;
+			if (_data is not null)
+				return;
 			_data = value;
 
-			if ( this.IsInitializationSetterCall() ) return;
-			if (Costume is not null) return;
-			SetCostume(_data?.BaseCostume);
+			if (this.IsInitializationSetterCall())
+				return;
+
+			if (Costume is null) {
+				SetCostume(_data?.BaseCostume);
+			}
+
+			Name = $"{nameof(Weapon)} - {_data?.DisplayName}";
 		}
 	}
 	private WeaponData _data = null!;
@@ -36,7 +42,8 @@ public abstract partial class SingleWeapon : Weapon {
 	[Export] public override WeaponCostume? Costume {
 		get => WeaponModel?.Costume;
 		set {
-			if ( this.IsInitializationSetterCall() ) return;
+			if (this.IsInitializationSetterCall())
+				return;
 			SetCostume(value);
 		}
 	}
@@ -46,7 +53,7 @@ public abstract partial class SingleWeapon : Weapon {
 	[Export] public Entity? Entity {
 		get => _entity;
 		private set {
-			if ( this.IsInitializationSetterCall() ) {
+			if (this.IsInitializationSetterCall()) {
 				_entity = value;
 				return;
 			}
@@ -62,39 +69,33 @@ public abstract partial class SingleWeapon : Weapon {
 	}
 	private int _style;
 
-	public override Handedness WeaponHandedness {
-		get => _weaponHandedness;
+	public override Handedness Handedness {
+		get => _handedness;
 		set {
-			_weaponHandedness = value;
+			_handedness = value;
 			WeaponModel?.Inject(value);
 		}
 	}
 
 	public override ICustomizable[] Children => [.. base.Children.Append(WeaponModel!)];
 
-
-
 	protected SingleWeapon() : base() {}
-	public SingleWeapon(WeaponData? data, WeaponCostume? costume) : base(data, costume) {}
-
-
-	public override void SetCostume(WeaponCostume? costume) {
-		WeaponCostume? oldCostume = Costume;
-		if ( costume == oldCostume ) return;
-
-		new LoadableUpdater<WeaponModel>(ref WeaponModel, () => costume?.Instantiate())
-			.BeforeLoad(m => {
-				m.Inject(Entity?.Skeleton);
-				m.Inject(WeaponHandedness);
-				m.SafeReparentEditor(this);
-			})
-			.Execute();
-
-		EmitSignal(SignalName.CostumeChanged, costume!, oldCostume!);
+	public SingleWeapon(WeaponData? data, WeaponCostume? costume) : base() {
+		SetData(data, costume);
 	}
 
+
+	protected void SetData(WeaponData? data, WeaponCostume? costume = null) {
+		_data = data!;
+		SetCostume(costume ?? _data?.BaseCostume);
+
+		Name = _data is null ? "Weapon" : $"Weapon - {_data.DisplayName}";
+	}
+
+
 	public override void Inject(Entity? entity) {
-		if (entity == _entity) return;
+		if (entity == _entity)
+			return;
 
 		Callable callableLoadUnloadEvent = new(this, MethodName.OnCharacterLoadedUnloaded);
 		_entity?.Disconnect(Entity.SignalName.CharacterLoadedUnloaded, callableLoadUnloadEvent);
@@ -102,7 +103,7 @@ public abstract partial class SingleWeapon : Weapon {
 		_entity = entity;
 
 		WeaponModel?.Inject(entity?.Skeleton);
-		entity?.Connect(Entity.SignalName.CharacterLoadedUnloaded, callableLoadUnloadEvent, (uint)ConnectFlags.Persist);
+		entity?.Connect(Entity.SignalName.CharacterLoadedUnloaded, callableLoadUnloadEvent, (uint) ConnectFlags.Persist);
 	}
 
 
@@ -121,25 +122,25 @@ public abstract partial class SingleWeapon : Weapon {
 		WeaponModel?.AsILoadable().UnloadModel();
 	}
 
-    public override void Enable() {
-        base.Enable();
+	public override void Enable() {
+		base.Enable();
 		WeaponModel?.Enable();
-    }
-    public override void Disable() {
-        base.Disable();
+	}
+	public override void Disable() {
+		base.Disable();
 		WeaponModel?.Disable();
-    }
+	}
 
 
-    public ISaveData<Weapon> Save() {
+	public ISaveData<Weapon> Save() {
 		return new SingleWeaponSaveData(Data, Costume);
 	}
 
 
-    public override void _Parented() {
-        base._Parented();
-        Callable.From(() => WeaponModel?.SafeReparentAndSetOwner(this)).CallDeferred();
-    }
+	public override void _Parented() {
+		base._Parented();
+		Callable.From(() => WeaponModel?.SafeReparentAndSetOwner(this)).CallDeferred();
+	}
 
 
 

@@ -14,7 +14,7 @@ public abstract partial class Model : Loadable3D, IInjectable<Skeleton3D?>, IInj
 
 
 
-	protected Model() : base() {}
+	protected Model() : base() { }
 	public Model(Costume costume) : this() {
 		ArgumentNullException.ThrowIfNull(costume);
 
@@ -24,6 +24,6 @@ public abstract partial class Model : Loadable3D, IInjectable<Skeleton3D?>, IInj
 
 
 
-	public virtual void Inject(Skeleton3D? value) {}
-	public virtual void Inject(Handedness value) {}
+	public virtual void Inject(Skeleton3D? value) { }
+	public virtual void Inject(Handedness value) { }
 }

@@ -1,11 +1,12 @@
+namespace LandlessSkies.Core;
+
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Godot;
 
-namespace LandlessSkies.Core;
-
 public static class EngineUtils {
+
 
 #if TOOLS
 	private static readonly ulong buildFrame = 0;
@@ -19,32 +20,40 @@ public static class EngineUtils {
 
 
 
+
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool JustBuilt(this Node node) =>
+
 #if TOOLS
 		node.IsNodeReady() && Engine.GetProcessFrames() == buildFrame;
 #else
 		false;
 #endif
 
+
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool IsInitializationSetterCall(this Node node) =>
+
 #if TOOLS
 		!node.IsNodeReady() || Engine.GetProcessFrames() == buildFrame;
 #else
 		false;
 #endif
 
+
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool IsEditorEnterTree(this Node node) =>
+
 #if TOOLS
 		node.IsNodeReady() || Engine.GetProcessFrames() == buildFrame; // TODO: Make this return true when switching scene
 #else
 		false;
 #endif
 
+
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool IsEditorExitTree(this Node node) =>
+
 #if TOOLS
 		!node.IsNodeReady() || Engine.GetProcessFrames() == buildFrame; // TODO: Make this return true when switching scene
 #else
@@ -53,12 +62,16 @@ public static class EngineUtils {
 
 
 
+
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static T SafeReparentEditor<T>(this T child, Node? newParent, bool keepGlobalTransform = true) where T : Node {
 		child.SafeReparent(newParent, keepGlobalTransform);
 
-		if ( ! Engine.IsEditorHint() ) return child;
-		if (child.Owner == newParent?.Owner) return child;
+		if (!Engine.IsEditorHint())
+			return child;
+
+		if (child.Owner == newParent?.Owner)
+			return child;
 
 		Reown(child, newParent?.Owner);
 
@@ -80,14 +93,15 @@ public static class EngineUtils {
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static T SafeReparent<T>(this T child, Node? newParent, bool keepGlobalTransform = true) where T : Node {
-		if ( ! child.IsInsideTree() ) {
+		if (!child.IsInsideTree()) {
 			child.GetParent()?.RemoveChild(child);
 		}
 		if (child.GetParent() is not Node parent) {
 			newParent?.AddChild(child);
 			return child;
 		}
-		if (parent == newParent) return child;
+		if (parent == newParent)
+			return child;
 
 		if (newParent is not null) {
 			child.Reparent(newParent, keepGlobalTransform);
@@ -133,9 +147,10 @@ public static class EngineUtils {
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool TryGetNode<T>(this Node obj, NodePath nodePath, out T node) where T : class {
 		node = default!;
-		if ( ! obj.HasNode(nodePath) ) return false;
+		if (!obj.HasNode(nodePath))
+			return false;
 
-		if ( obj.GetNodeOrNull(nodePath) is T tNode ) {
+		if (obj.GetNodeOrNull(nodePath) is T tNode) {
 			node = tNode;
 			return true;
 		}
@@ -166,7 +181,7 @@ public static class EngineUtils {
 	public static void MakeLocal(this Node node, Node owner) {
 		node.SceneFilePath = string.Empty;
 		node.Owner = owner;
-		foreach(Node childNode in node.GetChildren()) {
+		foreach (Node childNode in node.GetChildren()) {
 			MakeLocal(childNode, owner);
 		}
 	}

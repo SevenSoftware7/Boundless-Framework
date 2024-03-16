@@ -1,13 +1,13 @@
+namespace LandlessSkies.Core;
+
 using System;
 using System.Collections.Generic;
 using Godot;
 
-namespace LandlessSkies.Core;
-
 public abstract class AttackAction : EntityAction {
 
 	public new interface IInfo : EntityAction.IInfo {
-		public SingleWeapon Weapon { get; }
+		public SingleWeapon? Weapon { get; }
 
 		float PotentialDamage { get; }
 		AttackType Type { get; }

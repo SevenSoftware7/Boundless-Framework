@@ -1,6 +1,6 @@
-using Godot;
-
 namespace LandlessSkies.Core;
+
+using Godot;
 
 public abstract class EvadeAction : EntityAction {
 	public abstract Vector3 Direction { get; set; }

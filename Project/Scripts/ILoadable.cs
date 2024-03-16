@@ -8,13 +8,16 @@ public interface ILoadable : IDestroyable, IEnablable {
 		IsLoaded = loaded;
 	}
 	public sealed bool LoadModel() {
-		if ( IsLoaded ) return false;
+		if (IsLoaded)
+			return false;
 
-		if ( ! LoadModelBehaviour() ) return false;
+		if (!LoadModelBehaviour())
+			return false;
 		return true;
 	}
 	public sealed void UnloadModel() {
-		if ( ! IsLoaded ) return;
+		if (!IsLoaded)
+			return;
 
 		UnloadModelBehaviour();
 	}
@@ -27,6 +30,7 @@ public interface ILoadable : IDestroyable, IEnablable {
 		}
 	}
 
+
 	/// <summary>
 	/// Reloads the model by unloading it then loading it back again.
 	/// </summary>
@@ -34,10 +38,11 @@ public interface ILoadable : IDestroyable, IEnablable {
 		bool wasLoaded = IsLoaded;
 		UnloadModel();
 
-		if ( wasLoaded || forceLoad ) {
+		if (wasLoaded || forceLoad) {
 			LoadModel();
 		}
 	}
+
 
 	/// <summary>
 	/// Loads the model immediately, without checking if it's already loaded.
@@ -47,8 +52,9 @@ public interface ILoadable : IDestroyable, IEnablable {
 	/// </returns>
 	protected bool LoadModelBehaviour() => true;
 
+
 	/// <summary>
 	/// Unloads the model immediately, without checking if it's already unloaded.
 	/// </summary>
-	protected void UnloadModelBehaviour() {}
+	protected void UnloadModelBehaviour() { }
 }

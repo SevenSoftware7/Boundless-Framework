@@ -1,9 +1,9 @@
+namespace SevenGame.Utility;
+
 using System;
 using System.Linq;
 using Godot;
 using Godot.Collections;
-
-namespace SevenGame.Utility;
 
 public static class MathUtility {
 	public static Vector4 MoveToward(this Vector4 current, Vector4 target, float maxDistanceDelta) {
@@ -27,6 +27,7 @@ public static class MathUtility {
 		}
 
 		// Avoid error on both vectors being inverses of each other, breaking a Cross Product operation in the Slerp method
+
 		if ((from + to) == Vector3.Zero) {
 			return from.Lerp(to, weight);
 		}
@@ -79,13 +80,14 @@ public static class MathUtility {
 		return to * from.Inverse();
 	}
 
+
 	/// <summary>
 	/// Returns the target vector after being "flattened" against a surface defined by the given normal.
 	/// </summary>
 	/// <param name="vector"></param>
 	/// <param name="direction"></param>
 	/// <returns></returns>
-	public static Vector3 SlideOnFace( this Vector3 vector, Vector3 normal ) =>
+	public static Vector3 SlideOnFace(this Vector3 vector, Vector3 normal) =>
 		vector + normal * Mathf.Max(vector.Project(-normal).Dot(-normal), 0);
 
 	public static double SmoothDamp(double current, double target, ref double currentVelocity, double smoothTime, double maxSpeed, double deltaTime) {
@@ -157,7 +159,7 @@ public static class MathUtility {
 		parameters.HitBackFaces = hitBackFaces;
 
 		Dictionary intersect = spaceState.IntersectRay(parameters);
-		if ( intersect.Count == 0 ) {
+		if (intersect.Count == 0) {
 			result = new();
 			return false;
 		}
@@ -179,16 +181,15 @@ public static class MathUtility {
 
 	public static bool PointCast3D(this World3D world, Vector3 position, out ShapeCast3DResult[] results, uint collisionMask = uint.MaxValue, Array<Rid>? exclude = null, bool collideWithBodies = true, bool collideWithAreas = true, int maxResults = 32) {
 		PhysicsDirectSpaceState3D spaceState = world.DirectSpaceState;
-        PhysicsPointQueryParameters3D parameters = new()
-        {
+		PhysicsPointQueryParameters3D parameters = new() {
 			Position = position,
 			Exclude = exclude,
 			CollisionMask = collisionMask,
-            CollideWithBodies = collideWithBodies,
-            CollideWithAreas = collideWithAreas,
-        };
+			CollideWithBodies = collideWithBodies,
+			CollideWithAreas = collideWithAreas,
+		};
 
-        Array<Dictionary> intersections = spaceState.IntersectPoint(parameters, maxResults);
+		Array<Dictionary> intersections = spaceState.IntersectPoint(parameters, maxResults);
 		if (intersections.Count > 0) {
 			results = [];
 			return false;
@@ -210,17 +211,16 @@ public static class MathUtility {
 
 	public static bool ShapeCast3D(this World3D world, Transform3D origin, Vector3 motion, out ShapeCast3DResult[] results, uint collisionMask = uint.MaxValue, Array<Rid>? exclude = null, bool collideWithBodies = true, bool collideWithAreas = true, int maxResults = 32) {
 		PhysicsDirectSpaceState3D spaceState = world.DirectSpaceState;
-        PhysicsShapeQueryParameters3D parameters = new()
-        {
+		PhysicsShapeQueryParameters3D parameters = new() {
 			Transform = origin,
 			Motion = motion,
 			Exclude = exclude,
 			CollisionMask = collisionMask,
-            CollideWithBodies = collideWithBodies,
-            CollideWithAreas = collideWithAreas,
-        };
+			CollideWithBodies = collideWithBodies,
+			CollideWithAreas = collideWithAreas,
+		};
 
-        Array<Dictionary> intersections = spaceState.IntersectShape(parameters, maxResults);
+		Array<Dictionary> intersections = spaceState.IntersectShape(parameters, maxResults);
 		if (intersections.Count > 0) {
 			results = [];
 			return false;

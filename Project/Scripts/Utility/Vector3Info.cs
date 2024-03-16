@@ -1,6 +1,6 @@
-using Godot;
-
 namespace SevenGame.Utility;
+
+using Godot;
 
 public struct Vector3Info {
 	public Vector3 currentValue = Vector3.Zero;
@@ -15,7 +15,7 @@ public struct Vector3Info {
 
 
 
-	public Vector3Info() {;}
+	public Vector3Info() { }
 
 
 
@@ -27,7 +27,7 @@ public struct Vector3Info {
 	public void SetVal(Vector3 value) {
 		currentValue = value;
 
-		if ( LengthSquared() == 0 ) {
+		if (LengthSquared() == 0) {
 			nonZeroTimer.Start();
 		} else {
 			zeroTimer.Start();

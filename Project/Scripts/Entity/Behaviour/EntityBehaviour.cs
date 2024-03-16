@@ -1,7 +1,7 @@
+namespace LandlessSkies.Core;
+
 using Godot;
 using System;
-
-namespace LandlessSkies.Core;
 
 [GlobalClass]
 public abstract partial class EntityBehaviour : Node, IInputReader {
@@ -9,7 +9,7 @@ public abstract partial class EntityBehaviour : Node, IInputReader {
 
 
 
-	public EntityBehaviour() : base() {}
+	public EntityBehaviour() : base() { }
 	public EntityBehaviour(Entity entity) : base() {
 		ArgumentNullException.ThrowIfNull(entity);
 
@@ -19,7 +19,7 @@ public abstract partial class EntityBehaviour : Node, IInputReader {
 
 
 
-	public virtual void HandleInput(Player.InputInfo inputInfo) {}
+	public virtual void HandleInput(Player.InputInfo inputInfo) { }
 
 	public virtual bool SetSpeed(MovementSpeed speed) => true;
 	public virtual bool Move(Vector3 direction) => true;

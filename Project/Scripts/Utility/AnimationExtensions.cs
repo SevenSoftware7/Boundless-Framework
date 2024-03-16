@@ -1,14 +1,14 @@
+namespace LandlessSkies.Core;
+
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-
-namespace LandlessSkies.Core;
 
 public static class AnimationExtensions {
 	public static IEnumerable<Animation> GetAnimations(this AnimationPlayer animationPlayer) {
 		return animationPlayer
 			.GetAnimationList()
-			.Select( n => animationPlayer.GetAnimation(n) );
+			.Select(n => animationPlayer.GetAnimation(n));
 	}
 
 	public static IEnumerable<AnimationTrack> GetTracks(this Animation animation) {
@@ -58,11 +58,11 @@ public struct AnimationTrack(Animation animation, int id) {
 
 	public void MoveDown() {
 		Animation.TrackMoveDown(TrackIdx);
-		TrackIdx ++;
+		TrackIdx++;
 	}
 	public void MoveUp() {
 		Animation.TrackMoveUp(TrackIdx);
-		TrackIdx --;
+		TrackIdx--;
 	}
 	public void MoveTo(int toIdx) {
 		Animation.TrackMoveTo(TrackIdx, toIdx);

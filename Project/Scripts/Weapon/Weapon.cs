@@ -1,7 +1,7 @@
+namespace LandlessSkies.Core;
+
 using System.Collections.Generic;
 using Godot;
-
-namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
@@ -16,7 +16,7 @@ public abstract partial class Weapon : Loadable3D, IWeapon, IInjectable<Entity?>
 
 	public IWeapon.Type WeaponType => Data?.Type ?? 0;
 	public IWeapon.Size WeaponSize => Data?.Size ?? 0;
-	public abstract Handedness WeaponHandedness { get; set; }
+	public abstract Handedness Handedness { get; set; }
 
 	public virtual IUIObject UIObject => Data;
 	public virtual ICustomizable[] Children => [];
@@ -27,26 +27,12 @@ public abstract partial class Weapon : Loadable3D, IWeapon, IInjectable<Entity?>
 
 
 
-	protected Weapon() : base() {}
-	public Weapon(WeaponData? data, WeaponCostume? costume) : base() {
-		SetData(data, costume);
-	}
-
-
-
 	public abstract void SetCostume(WeaponCostume? costume);
-	protected void SetData(WeaponData? data, WeaponCostume? costume = null) {
-		Data = data!;
-
-		if (Data is null) return;
-		SetCostume(costume ?? data?.BaseCostume);
-		Name = $"{nameof(Weapon)} - {Data.DisplayName}";
-	}
 
 
 	public abstract IEnumerable<AttackAction.IInfo> GetAttacks(Entity target);
-	public virtual void Inject(Entity? owner) {}
+	public virtual void Inject(Entity? owner) { }
 
 
-	public virtual void HandleInput(Player.InputInfo inputInfo) {}
+	public virtual void HandleInput(Player.InputInfo inputInfo) { }
 }

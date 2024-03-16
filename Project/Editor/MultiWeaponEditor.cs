@@ -1,25 +1,25 @@
 #if TOOLS
 
+namespace LandlessSkies.Core;
+
 using System;
 using System.Linq;
 using Godot;
 using Godot.Collections;
 
-namespace LandlessSkies.Core;
-
-
 public partial class MultiWeapon {
-
-
-	[Export] private Array<WeaponData> WeaponDatas {
+	[Export]
+	private Array<WeaponData> WeaponDatas {
 		get => [.. _weapons.Select(weapon => weapon?.Data)];
 		set {
-			if ( this.IsInitializationSetterCall() ) {
+			if (this.IsInitializationSetterCall()) {
 				return;
 			}
-			
+
+
 			Array<WeaponData> datas = WeaponDatas;
-			if (datas.SequenceEqual(value)) return;
+			if (datas.SequenceEqual(value))
+				return;
 
 			int minLength = Math.Min(value.Count, datas.Count);
 			for (int i = 0; i < Math.Max(value.Count, datas.Count); i++) {
@@ -43,12 +43,15 @@ public partial class MultiWeapon {
 
 	public override void _ValidateProperty(Dictionary property) {
 		base._ValidateProperty(property);
-		
+
+
 		StringName name = property["name"].AsStringName();
-		
+
+
 		if (name == PropertyName.WeaponDatas) {
-			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
+			property["usage"] = (int) (property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
 		}
 	}
 }
+
 #endif

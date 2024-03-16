@@ -1,9 +1,9 @@
 #if TOOLS
 
+namespace LandlessSkies.Core;
+
 using Godot;
 using Godot.Collections;
-
-namespace LandlessSkies.Core;
 
 public partial class WeaponModel {
 	public override void _ValidateProperty(Dictionary property) {
@@ -12,9 +12,10 @@ public partial class WeaponModel {
 		StringName name = property["name"].AsStringName();
 
 		if (name == PropertyName.Costume && Costume is not null) {
-			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
+			property["usage"] = (int) (property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
 		}
 	}
 }
+
 
 #endif

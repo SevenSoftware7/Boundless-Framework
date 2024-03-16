@@ -1,8 +1,7 @@
+namespace LandlessSkies.Core;
 
 using Godot;
 using Godot.Collections;
-
-namespace LandlessSkies.Core;
 
 public partial class WeaponMeshModel {
 	public override void _ValidateProperty(Dictionary property) {
@@ -11,7 +10,7 @@ public partial class WeaponMeshModel {
 		StringName name = property["name"].AsStringName();
 
 		if (name == PropertyName.Model) {
-			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
+			property["usage"] = (int) (property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
 
 		}
 	}

@@ -4,23 +4,20 @@ namespace LandlessSkies.Core;
 
 [Tool]
 public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
-
-
 	[Export] public abstract bool IsLoaded { get; set; }
-
 	[Signal] public delegate void LoadedUnloadedEventHandler(bool isLoaded);
-
-
-
-	protected Loadable3D() : base() {}
 
 
 
 	public ILoadable AsILoadable() => this;
 
 	bool ILoadable.LoadModelBehaviour() {
-		if ( ! IsInsideTree() || GetParent() is null || Owner is null ) return false;
-		if ( ! LoadModelBehaviour() ) return false;
+		if (!IsInsideTree() || GetParent() is null || Owner is null)
+			return false;
+
+		if (!LoadModelBehaviour())
+			return false;
+
 		EmitSignal(SignalName.LoadedUnloaded, true);
 		return true;
 	}
@@ -30,7 +27,7 @@ public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
 	}
 
 	protected virtual bool LoadModelBehaviour() => true;
-	protected virtual void UnloadModelBehaviour() {}
+	protected virtual void UnloadModelBehaviour() { }
 
 	public virtual void Enable() {
 		SetProcess(true);

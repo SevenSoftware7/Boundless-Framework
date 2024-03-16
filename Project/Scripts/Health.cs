@@ -6,8 +6,7 @@ namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
-public partial class Health() : Node() {
-	
+public partial class Health : Node {
 	private TimeDuration _damagedHealthTimer = new(1000);
 	private float _damagedHealthVelocity = 0f;
 
@@ -42,6 +41,7 @@ public partial class Health() : Node() {
 
 
 
+	protected Health() : base() { }
 	public Health(float max) : this() {
 		_maxAmount = max;
 	}
@@ -58,33 +58,36 @@ public partial class Health() : Node() {
 	public override void _Process(double delta) {
 		base._Process(delta);
 
-		if ( DamagedHealth < Amount ) {
+		if (DamagedHealth < Amount) {
 			DamagedHealth = Amount;
 			return;
 		}
 
-		if ( ! _damagedHealthTimer.IsDone ) {
+		if (!_damagedHealthTimer.IsDone) {
 			_damagedHealthVelocity = 0f;
 			return;
 		}
 
-		DamagedHealth = MathUtility.SmoothDamp(DamagedHealth, _amount, ref _damagedHealthVelocity, 0.15f, Mathf.Inf, (float)delta);
+		DamagedHealth = MathUtility.SmoothDamp(DamagedHealth, _amount, ref _damagedHealthVelocity, 0.15f, Mathf.Inf, (float) delta);
 	}
 
 	public override void _ValidateProperty(Dictionary property) {
 		base._ValidateProperty(property);
-		
+
+
 		StringName name = property["name"].AsStringName();
-		
+
+
 		if (name == PropertyName.DamagedHealth) {
-			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage | PropertyUsageFlags.ReadOnly);
+			property["usage"] = (int) (property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage | PropertyUsageFlags.ReadOnly);
 		}
-		
+
+
 		if (
 			name == PropertyName.Amount ||
 			name == PropertyName.DamagedHealth
 		) {
-			property["hint"] = (int)PropertyHint.Range;
+			property["hint"] = (int) PropertyHint.Range;
 			property["hint_string"] = $"0,{MaxAmount},";
 		}
 	}

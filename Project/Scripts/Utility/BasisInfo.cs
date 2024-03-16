@@ -1,10 +1,10 @@
-using Godot;
-
 namespace SevenGame.Utility;
 
+using Godot;
+
 public struct BasisInfo {
-	[Export] public Basis currentValue = Basis.Identity;
-	[Export] public Basis lastValue = Basis.Identity;
+	public Basis currentValue = Basis.Identity;
+	public Basis lastValue = Basis.Identity;
 
 	public readonly Vector3 X => currentValue.X;
 	public readonly Vector3 Y => currentValue.Y;
@@ -12,7 +12,7 @@ public struct BasisInfo {
 
 
 
-	public BasisInfo() {;}
+	public BasisInfo() {; }
 
 
 

@@ -1,22 +1,26 @@
-using Godot;
-
 namespace LandlessSkies.Core;
+
+using Godot;
 
 public static class SkeletonUtils {
 	public static Vector3 GetBonePositionOrDefault(this Skeleton3D skeleton, StringName boneName, Vector3 defaultPosition) {
-		if ( skeleton is null ) return defaultPosition;
+		if (skeleton is null)
+			return defaultPosition;
 
 		int boneIndex = skeleton.FindBone(boneName);
-		if ( boneIndex == -1 ) return defaultPosition;
+		if (boneIndex == -1)
+			return defaultPosition;
 
 		return skeleton.ToGlobal(skeleton.GetBoneGlobalPose(boneIndex).Origin);
 	}
 	public static bool TryGetBonePosition(this Skeleton3D skeleton, StringName boneName, out Vector3 position) {
 		position = Vector3.Zero;
-		if ( skeleton is null ) return false;
+		if (skeleton is null)
+			return false;
 
 		int boneIndex = skeleton.FindBone(boneName);
-		if ( boneIndex == -1 ) return false;
+		if (boneIndex == -1)
+			return false;
 
 
 		position = skeleton.ToGlobal(skeleton.GetBoneGlobalPose(boneIndex).Origin);
@@ -25,10 +29,12 @@ public static class SkeletonUtils {
 
 
 	public static Transform3D GetBoneTransformOrDefault(this Skeleton3D skeleton, StringName boneName, Transform3D defaultTransform) {
-		if ( skeleton is null ) return defaultTransform;
+		if (skeleton is null)
+			return defaultTransform;
 
 		int boneIndex = skeleton.FindBone(boneName);
-		if ( boneIndex == -1 ) return defaultTransform;
+		if (boneIndex == -1)
+			return defaultTransform;
 
 
 		Transform3D pose = skeleton.GetBoneGlobalPose(boneIndex);
@@ -36,10 +42,12 @@ public static class SkeletonUtils {
 	}
 	public static bool TryGetBoneTransform(this Skeleton3D skeleton, StringName boneName, out Transform3D transform) {
 		transform = Transform3D.Identity;
-		if ( skeleton is null ) return false;
+		if (skeleton is null)
+			return false;
 
 		int boneIndex = skeleton.FindBone(boneName);
-		if ( boneIndex == -1 ) return false;
+		if (boneIndex == -1)
+			return false;
 
 
 		Transform3D pose = skeleton.GetBoneGlobalPose(boneIndex);

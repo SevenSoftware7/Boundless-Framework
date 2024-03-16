@@ -1,6 +1,6 @@
-using Godot;
-
 namespace SevenGame.Utility;
+
+using Godot;
 
 public struct TimeLimit {
 	public ulong stopTime = 0;
@@ -10,7 +10,7 @@ public struct TimeLimit {
 
 
 
-	public TimeLimit() {;}
+	public TimeLimit() {; }
 
 
 

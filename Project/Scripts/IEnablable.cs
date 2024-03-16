@@ -8,6 +8,8 @@ public interface IEnablable {
 			Disable();
 		}
 	}
+
+
 	void Enable();
 	void Disable();
 }

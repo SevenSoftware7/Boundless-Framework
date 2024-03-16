@@ -1,10 +1,12 @@
-using Godot;
-
 namespace LandlessSkies.Core;
+
+using Godot;
 
 [Tool]
 // TODO: See WeaponMeshModel
+
 public partial class CharacterMeshModel : CharacterModel {
+
 	#region Generic Mesh Model stuff
 	[ExportGroup("Dependencies")]
 	[Export] public Skeleton3D? Skeleton;
@@ -13,10 +15,10 @@ public partial class CharacterMeshModel : CharacterModel {
 	[Export] protected Node3D Model { get; private set; } = null!;
 
 	private bool _isLoaded = false;
-    public override bool IsLoaded {
+	public override bool IsLoaded {
 		get => _isLoaded;
 		set {
-			if ( this.IsInitializationSetterCall() ) {
+			if (this.IsInitializationSetterCall()) {
 				_isLoaded = value;
 				return;
 			}
@@ -27,14 +29,15 @@ public partial class CharacterMeshModel : CharacterModel {
 
 
 
-	protected CharacterMeshModel() : base() {}
-	public CharacterMeshModel(CharacterMeshCostume costume) : base(costume) {}
+	protected CharacterMeshModel() : base() { }
+	public CharacterMeshModel(CharacterMeshCostume costume) : base(costume) { }
 
 
 
 
 	private void ParentToSkeleton() {
-		if ( Model is null ) return;
+		if (Model is null)
+			return;
 
 		if (Skeleton is null) {
 			Model.SafeReparentAndSetOwner(this);
@@ -51,10 +54,13 @@ public partial class CharacterMeshModel : CharacterModel {
 	}
 
 	protected override bool LoadModelBehaviour() {
-		if ( ! base.LoadModelBehaviour() ) return false;
-		if ( Costume is not CharacterMeshCostume meshCostume ) return false;
+		if (!base.LoadModelBehaviour())
+			return false;
+		if (Costume is not CharacterMeshCostume meshCostume)
+			return false;
 
-		if ( meshCostume.ModelScene?.Instantiate() is not Node3D model ) return false;
+		if (meshCostume.ModelScene?.Instantiate() is not Node3D model)
+			return false;
 
 		Model = model;
 		ParentToSkeleton();
@@ -74,19 +80,20 @@ public partial class CharacterMeshModel : CharacterModel {
 		_isLoaded = false;
 	}
 
-    public override void Enable() {
-        base.Enable();
+	public override void Enable() {
+		base.Enable();
 		if (Model is not null) {
 			Model.SetProcess(true);
 			Model.Visible = true;
 		}
-    }
-    public override void Disable() {
-        base.Disable();
+	}
+	public override void Disable() {
+		base.Disable();
 		if (Model is not null) {
 			Model.SetProcess(false);
 			Model.Visible = false;
 		}
-    }
+	}
+
 	#endregion
 }

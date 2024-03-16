@@ -1,8 +1,8 @@
+namespace LandlessSkies.Core;
+
 using System;
 using Godot;
 using SevenGame.Utility;
-
-namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
@@ -15,10 +15,12 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	[Export] public Character? Character {
 		get => _character;
 		private set {
-			if (value is null) return;
+			if (value is null)
+				return;
 			_character = value;
 
-			if ( this.IsInitializationSetterCall() ) return;
+			if (this.IsInitializationSetterCall())
+				return;
 			_character.Name = PropertyName.Character;
 		}
 	}
@@ -27,7 +29,8 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	[Export] public CharacterData? CharacterData {
 		get => Character?.Data;
 		private set {
-			if ( this.IsInitializationSetterCall() ) return;
+			if (this.IsInitializationSetterCall())
+				return;
 			SetCharacter(value);
 		}
 	}
@@ -35,7 +38,8 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	[Export] public CharacterCostume? CharacterCostume {
 		get => Character?.Costume;
 		private set {
-			if ( this.IsInitializationSetterCall() ) return;
+			if (this.IsInitializationSetterCall())
+				return;
 			SetCostume(value);
 		}
 	}
@@ -45,10 +49,12 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	[Export] public AnimationPlayer? AnimationPlayer {
 		get => _animationPlayer;
 		private set {
-			if (value is null) return;
+			if (value is null)
+				return;
 			_animationPlayer = value;
 
-			if ( this.IsInitializationSetterCall() ) return;
+			if (this.IsInitializationSetterCall())
+				return;
 			_animationPlayer.RootNode = _animationPlayer.GetPathTo(this);
 		}
 	}
@@ -60,13 +66,13 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 		get => _weapon;
 		set {
 			bool isInitialization = this.IsInitializationSetterCall();
-			if ( ! isInitialization ) {
+			if (!isInitialization) {
 				_weapon?.Inject(null);
 			}
 
 			_weapon = value;
 
-			if ( ! isInitialization && _weapon is not null) {
+			if (!isInitialization && _weapon is not null) {
 				_weapon.Inject(this);
 				_weapon.Name = PropertyName.Weapon;
 			}
@@ -79,6 +85,7 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	[ExportGroup("Movement")]
 	[Export] public Vector3 Inertia = Vector3.Zero;
 	[Export] public Vector3 Movement = Vector3.Zero;
+
 
 
 	/// <summary>
@@ -130,13 +137,14 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 
 	public void SetCharacter(CharacterData? data, CharacterCostume? costume = null) {
 		CharacterData? oldData = CharacterData;
-		if ( data == oldData ) return;
+		if (data == oldData)
+			return;
 
 		new LoadableUpdater<Character>(ref _character, () => data?.Instantiate(costume))
 			.BeforeLoad(c => {
 				c.Name = PropertyName.Character;
 				c.SafeReparentEditor(this);
-				c.Connect(Character.SignalName.LoadedUnloaded, new Callable(this, MethodName.OnCharacterLoadedUnloaded), (uint)ConnectFlags.Persist);
+				c.Connect(Character.SignalName.LoadedUnloaded, new Callable(this, MethodName.OnCharacterLoadedUnloaded), (uint) ConnectFlags.Persist);
 			})
 			.Execute();
 
@@ -148,12 +156,13 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	}
 
 	public void ExecuteAction(EntityAction.IInfo action, bool forceExecute = false) {
-		if ( CurrentAction is EntityAction currentAction && ! currentAction.IsCancellable && ! forceExecute ) return;
+		if (CurrentAction is EntityAction currentAction && !currentAction.IsCancellable && !forceExecute)
+			return;
 
 		try {
 			CurrentAction?.Dispose();
 			CurrentAction = null;
-		} catch (ObjectDisposedException) {}
+		} catch (ObjectDisposedException) { }
 
 		action.AfterExecute += () => CurrentAction = null;
 		CurrentAction = action.Execute();
@@ -168,7 +177,7 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	}
 
 	public void SplitInertia(out Vector3 vertical, out Vector3 horizontal) {
-		vertical = Inertia.Project( UpDirection );
+		vertical = Inertia.Project(UpDirection);
 		horizontal = Inertia - vertical;
 	}
 
@@ -183,9 +192,10 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	}
 
 	private bool MoveStep(double delta) {
-		if ( Mathf.IsZeroApprox(Movement.LengthSquared()) || ! IsOnFloor() ) return false;
+		if (Mathf.IsZeroApprox(Movement.LengthSquared()) || !IsOnFloor())
+			return false;
 
-		Vector3 movement = Movement * (float)delta;
+		Vector3 movement = Movement * (float) delta;
 		Vector3 destination = GlobalTransform.Origin + movement;
 
 		KinematicCollision3D? stepObstacleCollision = MoveAndCollide(movement, true);
@@ -194,7 +204,8 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 		float stepHeight = CharacterStepHeight;
 		Vector3 sweepMotion = (CharacterStepHeight + Mathf.Epsilon) * -UpDirection;
 		Vector3 sweepStart = destination;
-		if (stepObstacleCollision is not null) sweepStart -= sweepMotion;
+		if (stepObstacleCollision is not null)
+			sweepStart -= sweepMotion;
 
 		PhysicsTestMotionResult3D stepTestResult = new();
 		bool findStep = PhysicsServer3D.BodyTestMotion(
@@ -206,8 +217,10 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 			stepTestResult
 		);
 
-		if ( ! findStep ) return false;
-		if ( stepObstacleCollision is not null && stepTestResult.GetColliderRid() != stepObstacleCollision.GetColliderRid() ) return false;
+		if (!findStep)
+			return false;
+		if (stepObstacleCollision is not null && stepTestResult.GetColliderRid() != stepObstacleCollision.GetColliderRid())
+			return false;
 
 
 
@@ -217,26 +230,29 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 		Vector3 pointHeight = point.Project(UpDirection);
 
 		float stepHeightSquared = destinationHeight.DistanceSquaredTo(pointHeight);
-		if ( stepHeightSquared >= sweepMotion.LengthSquared() ) return false;
+		if (stepHeightSquared >= sweepMotion.LengthSquared())
+			return false;
 
 
 		GlobalTransform = GlobalTransform with { Origin = destination - destinationHeight + pointHeight };
-		if ( stepHeightSquared >= Mathf.Pow(stepHeight, 2f) / 4f ) {
+		if (stepHeightSquared >= Mathf.Pow(stepHeight, 2f) / 4f) {
 			GD.Print("Step Found");
 		}
 		return true;
 	}
 
 	private void Move(double delta) {
-		if ( MotionMode == MotionModeEnum.Grounded ) {
+		if (MotionMode == MotionModeEnum.Grounded) {
 			SplitInertia(out Vector3 verticalInertia, out Vector3 horizontalInertia);
 
-			if ( IsOnFloor() ) verticalInertia = verticalInertia.SlideOnFace( UpDirection );
-			if ( IsOnCeiling() ) verticalInertia = verticalInertia.SlideOnFace( -UpDirection );
+			if (IsOnFloor())
+				verticalInertia = verticalInertia.SlideOnFace(UpDirection);
+			if (IsOnCeiling())
+				verticalInertia = verticalInertia.SlideOnFace(-UpDirection);
 
 			Inertia = horizontalInertia + verticalInertia;
 
-			if ( MoveStep(delta) ) {
+			if (MoveStep(delta)) {
 				Movement = Vector3.Zero;
 			}
 		}
@@ -250,16 +266,18 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	public override void _Process(double delta) {
 		base._Process(delta);
 
-		if ( Engine.IsEditorHint() ) return;
+		if (Engine.IsEditorHint())
+			return;
+
 		Move(delta);
 	}
 
 	public override void _Ready() {
 		base._Ready();
 
-		if ( ! Engine.IsEditorHint() ) {
+		if (!Engine.IsEditorHint()) {
 			BehaviourManager ??= new(this);
-			BehaviourManager?.SetBehaviour( new TestBehaviour(this) );
+			BehaviourManager?.SetBehaviour(new TestBehaviour(this));
 		}
 	}
 

@@ -12,7 +12,7 @@ public struct BoolInfo {
 
 
 
-	public BoolInfo() {;}
+	public BoolInfo() { }
 
 
 

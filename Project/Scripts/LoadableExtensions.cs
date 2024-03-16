@@ -16,14 +16,15 @@ public ref struct LoadableDestructor<TLoadable> where TLoadable : ILoadable {
 
 
 	public LoadableDestructor<TLoadable> BeforeUnload(Action<TLoadable> onBeforeUnload) =>
-		this with {onBeforeUnload = this.onBeforeUnload + onBeforeUnload};
+		this with { onBeforeUnload = this.onBeforeUnload + onBeforeUnload };
 
 	public LoadableDestructor<TLoadable> AfterUnload(Action<TLoadable> onAfterUnload) =>
-		this with {onAfterUnload = this.onAfterUnload + onAfterUnload};
+		this with { onAfterUnload = this.onAfterUnload + onAfterUnload };
 
 
 	public readonly void Execute() {
-		if ( loadable is null ) return;
+		if (loadable is null)
+			return;
 
 		onBeforeUnload?.Invoke(loadable);
 
@@ -46,7 +47,7 @@ public ref struct LoadableUpdater<TLoadable> where TLoadable : ILoadable {
 
 
 
-	internal LoadableUpdater(ref TLoadable? loadable, Func<TLoadable?> instantiator) {
+	internal LoadableUpdater(ref TLoadable? loadable, Func<TLoadable?>? instantiator = null) {
 		this.loadable = ref loadable;
 		this.instantiator = instantiator;
 		destructor = new(ref loadable);
@@ -55,24 +56,27 @@ public ref struct LoadableUpdater<TLoadable> where TLoadable : ILoadable {
 
 
 	public LoadableUpdater<TLoadable> BeforeUnload(Action<TLoadable> onBeforeUnload) =>
-		this with {destructor = destructor.BeforeUnload(onBeforeUnload)};
+		this with { destructor = destructor.BeforeUnload(onBeforeUnload) };
 
 	public LoadableUpdater<TLoadable> AfterUnload(Action<TLoadable> onAfterUnload) =>
-		this with {destructor = destructor.AfterUnload(onAfterUnload)};
+		this with { destructor = destructor.AfterUnload(onAfterUnload) };
 
 	public LoadableUpdater<TLoadable> BeforeLoad(Action<TLoadable> onBeforeLoad) =>
-		this with {onBeforeLoad = this.onBeforeLoad + onBeforeLoad};
+		this with { onBeforeLoad = this.onBeforeLoad + onBeforeLoad };
 
 	public LoadableUpdater<TLoadable> AfterLoad(Action<TLoadable> onAfterLoad) =>
-		this with {onAfterLoad = this.onAfterLoad + onAfterLoad};
+		this with { onAfterLoad = this.onAfterLoad + onAfterLoad };
 
 
 
 	public readonly void Execute() {
 		destructor.Execute();
-		if ( instantiator is null || instantiator() is not TLoadable instantiated ) return;
+		if (instantiator is not null && instantiator() is TLoadable instantiated) {
+			loadable = instantiated;
+		}
 
-		loadable = instantiated;
+		if (loadable is null)
+			return;
 
 		onBeforeLoad?.Invoke(loadable);
 

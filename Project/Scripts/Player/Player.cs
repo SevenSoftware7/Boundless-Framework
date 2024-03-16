@@ -1,12 +1,10 @@
-using Godot;
-
 namespace LandlessSkies.Core;
+
+using Godot;
 
 [Tool]
 [GlobalClass]
 public sealed partial class Player : Node {
-
-
 	public const byte MaxPlayers = 10;
 	public static readonly Player?[] Players = new Player[MaxPlayers];
 
@@ -27,19 +25,19 @@ public sealed partial class Player : Node {
 
 
 
-	public Player() : base() {}
+	public Player() : base() { }
 
 
 
 	private void SetPlayerId(byte value) {
-		if ( this.IsInitializationSetterCall() ) {
+		if (this.IsInitializationSetterCall()) {
 			_playerId = value;
 			return;
 		}
 
 		UnsetPlayerId();
 
-		if ( Players[value] == null ) {
+		if (Players[value] == null) {
 			Players[value] = this;
 		}
 		_playerId = value;
@@ -49,14 +47,16 @@ public sealed partial class Player : Node {
 
 	private void FindFreeId() {
 		// PlayerId is already set to 0 (default) or the PlayerId is already set to this Player.
-		if ( _playerId != 0 || Players[0] == this ) return;
 
-        byte index = (byte)System.Array.FindIndex(Players, p => p is null);
+		if (_playerId != 0 || Players[0] == this)
+			return;
+
+		byte index = (byte) System.Array.FindIndex(Players, p => p is null);
 		SetPlayerId(index);
 	}
 
 	private void UnsetPlayerId() {
-		if ( Players[_playerId] == this ) {
+		if (Players[_playerId] == this) {
 			Players[_playerId] = null;
 		}
 	}
@@ -64,12 +64,16 @@ public sealed partial class Player : Node {
 	public override void _Process(double delta) {
 		base._Process(delta);
 
-		if ( Engine.IsEditorHint() ) return;
+		if (Engine.IsEditorHint())
+			return;
 
-		if ( Entity is not null ) CameraController?.SetEntityAsSubject(Entity);
-		if ( ControlDevice is not null ) CameraController?.HandleCamera(ControlDevice);
+		if (Entity is not null)
+			CameraController?.SetEntityAsSubject(Entity);
+		if (ControlDevice is not null)
+			CameraController?.HandleCamera(ControlDevice);
 
-		if ( Entity is null || CameraController is null || ControlDevice is null ) return;
+		if (Entity is null || CameraController is null || ControlDevice is null)
+			return;
 
 		Callable.From(SendInput).CallDeferred();
 
@@ -87,12 +91,14 @@ public sealed partial class Player : Node {
 
 		FindFreeId();
 
-		if ( Engine.IsEditorHint() ) return;
+		if (Engine.IsEditorHint())
+			return;
 	}
 
 	public override void _ExitTree() {
 		base._ExitTree();
-		if ( this.IsEditorExitTree() ) return;
+		if (this.IsEditorExitTree())
+			return;
 
 		UnsetPlayerId();
 	}
@@ -104,7 +110,7 @@ public sealed partial class Player : Node {
 		public CameraController3D CameraController => cameraController;
 
 
-		public readonly void RawInputToGroundedMovement(Vector2 moveInput, out Basis camRotation, out Vector3 groundedMovement){
+		public readonly void RawInputToGroundedMovement(Vector2 moveInput, out Basis camRotation, out Vector3 groundedMovement) {
 			Vector3 camRight = CameraController.AbsoluteRotation.X;
 			Vector3 entityUp = Entity.Transform.Basis.Y * ((Mathf.Ceil(Entity.Transform.Basis.Y.Dot(CameraController.LocalRotation.Y)) - 0.5f) * 2f);
 			Vector3 groundedCamForward = entityUp.Cross(camRight).Normalized();
@@ -113,7 +119,7 @@ public sealed partial class Player : Node {
 
 			groundedMovement = camRotation * new Vector3(moveInput.X, 0, moveInput.Y);
 		}
-		public readonly void RawInputToCameraRelativeMovement(Vector2 moveInput, out Basis camRotation, out Vector3 cameraRelativeMovement){
+		public readonly void RawInputToCameraRelativeMovement(Vector2 moveInput, out Basis camRotation, out Vector3 cameraRelativeMovement) {
 			camRotation = CameraController.AbsoluteRotation;
 
 			cameraRelativeMovement = camRotation * new Vector3(moveInput.X, 0, moveInput.Y);

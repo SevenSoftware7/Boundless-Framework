@@ -45,7 +45,7 @@ public partial class ResourceManager : Node {
 	}
 
 
-    private static void SetCharacters(IEnumerable<CharacterData> characters) {
+	private static void SetCharacters(IEnumerable<CharacterData> characters) {
 		_characters = characters
 			.Where(d => d is not null)
 			.ToDictionary(keySelector: d => d.GetType());
@@ -56,17 +56,19 @@ public partial class ResourceManager : Node {
 			.ToDictionary(keySelector: d => d.GetType());
 	}
 
-    public static void RegisterWeapon<T>(T data, bool overwrite = false) where T : WeaponData {
+	public static void RegisterWeapon<T>(T data, bool overwrite = false) where T : WeaponData {
 		_weapons ??= [];
 		Type type = typeof(T);
-		if ( _weapons.ContainsKey(type) && ! overwrite ) return;
+		if (_weapons.ContainsKey(type) && !overwrite)
+			return;
 
 		_weapons[type] = data;
 	}
 	public static void RegisterCharacter<T>(T data, bool overwrite = false) where T : CharacterData {
 		_characters ??= [];
 		Type type = typeof(T);
-		if ( _characters.ContainsKey(type) && ! overwrite ) return;
+		if (_characters.ContainsKey(type) && !overwrite)
+			return;
 
 		_characters[type] = data;
 	}
@@ -79,7 +81,8 @@ public partial class ResourceManager : Node {
 
 
 
-    // public override void _Ready() {
-    //     base._Ready();
-    // }
+	// public override void _Ready() {
+	//     base._Ready();
+	// }
+
 }

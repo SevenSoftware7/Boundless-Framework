@@ -1,6 +1,6 @@
-using Godot;
-
 namespace SevenGame.Utility;
+
+using Godot;
 
 public struct TimeDuration(ulong durationMsec) {
 	public ulong stopTime = 0;

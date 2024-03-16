@@ -15,6 +15,7 @@ public abstract partial class WeaponData : Resource, IUIObject {
 	[Export] public IWeapon.Usage Usage { get; protected set; }
 	[Export] public IWeapon.Size Size { get; protected set; }
 
+
 #if TOOLS
 	protected virtual bool EditableType => true;
 	protected virtual bool EditableUsage => true;
@@ -23,7 +24,8 @@ public abstract partial class WeaponData : Resource, IUIObject {
 
 
 
-	public WeaponData() : base() {}
+
+	public WeaponData() : base() { }
 
 
 

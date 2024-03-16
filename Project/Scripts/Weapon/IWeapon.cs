@@ -1,13 +1,13 @@
 
+namespace LandlessSkies.Core;
+
 using System;
 using System.Collections.Generic;
 
-namespace LandlessSkies.Core;
-
-public interface IWeapon : IInputReader, ICustomizable, IDataContainer<WeaponData>, ICostumable<WeaponCostume> {
+public interface IWeapon : IInputReader, ICustomizable, IInjectable<Entity?> {
 	Type WeaponType { get; }
 	Size WeaponSize { get; }
-	Handedness WeaponHandedness { get; }
+	Handedness Handedness { get; }
 
 
 
@@ -25,9 +25,9 @@ public interface IWeapon : IInputReader, ICustomizable, IDataContainer<WeaponDat
 
 	[Flags]
 	public enum Usage : byte {
-		Slashing = 1 << 0,
-		Thrusting = 1 << 1,
-		Bludgeoning = 1 << 2,
+		Slash = 1 << 0,
+		Thrust = 1 << 1,
+		Strike = 1 << 2,
 	};
 
 	[Flags]

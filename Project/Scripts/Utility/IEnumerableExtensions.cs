@@ -1,7 +1,7 @@
+namespace LandlessSkies.Core;
+
 using System.Collections.Generic;
 using System.Linq;
-
-namespace LandlessSkies.Core;
 
 public static class IEnumerableExtensions {
 	public static bool ValueEquals<T>(this IEnumerable<T> enum1, IEnumerable<T> enum2) {

@@ -1,6 +1,6 @@
-using Godot;
-
 namespace SevenGame.Utility;
+
+using Godot;
 
 public struct Timer {
 	public float startTime = 0;
@@ -8,11 +8,11 @@ public struct Timer {
 
 
 
-	public Timer() {;}
+	public Timer() { }
 
 
 
-	public void Start(){
+	public void Start() {
 		startTime = Time.GetTicksMsec();
 	}
 

@@ -1,7 +1,7 @@
+namespace LandlessSkies.Core;
+
 using Godot;
 using System;
-
-namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
@@ -40,9 +40,10 @@ public abstract partial class ControlDevice : Node, IDisposable {
 		RebindInput(actionName, events);
 	}
 	protected virtual void RebindInput(StringName actionName, params InputEvent[] events) {
-		if (actionName.IsEmpty) return;
+		if (actionName.IsEmpty)
+			return;
 
-		if ( ! InputMap.HasAction(actionName) ) {
+		if (!InputMap.HasAction(actionName)) {
 			InputMap.AddAction(actionName);
 		}
 		InputMap.ActionEraseEvents(actionName);
@@ -61,9 +62,10 @@ public abstract partial class ControlDevice : Node, IDisposable {
 		UnbindInput(actionName);
 	}
 	protected virtual void UnbindInput(StringName actionName) {
-		if (actionName.IsEmpty) return;
+		if (actionName.IsEmpty)
+			return;
 
-		if ( ! InputMap.HasAction(actionName) ) {
+		if (!InputMap.HasAction(actionName)) {
 			InputMap.EraseAction(actionName);
 		}
 	}
@@ -81,7 +83,8 @@ public abstract partial class ControlDevice : Node, IDisposable {
 		Left = 3,
 		Right = 4,
 
-		 // Godot's inverted Z situation makes this confusing
+		// Godot's inverted Z situation makes this confusing
+
 		Forward = Down,
 		Backward = Up
 	}

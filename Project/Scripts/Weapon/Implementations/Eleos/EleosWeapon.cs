@@ -1,27 +1,19 @@
+namespace LandlessSkies.Core;
+
 using System.Collections.Generic;
 using Godot;
-
-namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
 public partial class EleosWeapon : SingleWeapon {
-	public SlashAttack.Info SlashAttack { get; init; }
-
-
-
-	protected EleosWeapon() : base() {
-		SlashAttack = new(this);
-	}
-	public EleosWeapon(EleosWeaponData data, WeaponCostume? costume) : base(data, costume) {
-		SlashAttack = new(this);
-	}
+	protected EleosWeapon() : base() {}
+	public EleosWeapon(EleosWeaponData? data = null, WeaponCostume? costume = null) : base(data ?? ResourceManager.GetRegisteredWeapon<EleosWeaponData>(), costume) {}
 
 
 
 	public override IEnumerable<AttackAction.IInfo> GetAttacks(Entity target) {
 		return [
-			SlashAttack,
+			SlashAttack.DefaultInfo with { Weapon = this },
 		];
 	}
 
@@ -29,17 +21,18 @@ public partial class EleosWeapon : SingleWeapon {
 	public override void HandleInput(Player.InputInfo inputInfo) {
 		base.HandleInput(inputInfo);
 
-		if ( Entity is null ) return;
+		if (Entity is null)
+			return;
 
-		if ( inputInfo.ControlDevice.IsInputJustPressed(ControlDevice.InputType.LightAttack) ) {
-			Entity.ExecuteAction(SlashAttack);
+		if (inputInfo.ControlDevice.IsInputJustPressed(ControlDevice.InputType.LightAttack)) {
+			Entity.ExecuteAction(SlashAttack.DefaultInfo with { Weapon = this });
 		}
 	}
 
-    public override void _Ready() {
+	public override void _Ready() {
 		if (Data is null) {
 			SetData(ResourceManager.GetRegisteredWeapon<EleosWeaponData>());
 		}
-        base._Ready();
-    }
+		base._Ready();
+	}
 }

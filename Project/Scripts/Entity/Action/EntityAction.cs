@@ -1,7 +1,7 @@
+namespace LandlessSkies.Core;
+
 using System;
 using Godot;
-
-namespace LandlessSkies.Core;
 
 public abstract class EntityAction : IDisposable, IInputReader {
 	private bool _disposed = false;
@@ -13,8 +13,8 @@ public abstract class EntityAction : IDisposable, IInputReader {
 
 
 
-	public virtual void HandleInput(Player.InputInfo inputInfo) {}
-	protected virtual void DisposeBehaviour() {}
+	public virtual void HandleInput(Player.InputInfo inputInfo) { }
+	protected virtual void DisposeBehaviour() { }
 
 
 

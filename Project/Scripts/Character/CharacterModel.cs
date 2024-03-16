@@ -1,6 +1,6 @@
-using Godot;
-
 namespace LandlessSkies.Core;
+
+using Godot;
 
 [Tool]
 public abstract partial class CharacterModel : Model {
@@ -10,6 +10,6 @@ public abstract partial class CharacterModel : Model {
 	}
 
 
-	protected CharacterModel() : base() {}
-	public CharacterModel(CharacterCostume costume) : base(costume) {}
+	protected CharacterModel() : base() { }
+	public CharacterModel(CharacterCostume costume) : base(costume) { }
 }

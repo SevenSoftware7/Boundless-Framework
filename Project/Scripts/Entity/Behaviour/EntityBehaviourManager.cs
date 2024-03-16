@@ -1,7 +1,7 @@
+namespace LandlessSkies.Core;
+
 using Godot;
 using System;
-
-namespace LandlessSkies.Core;
 
 public sealed class EntityBehaviourManager {
 	public Entity Entity { get; private set; } = null!;
@@ -30,7 +30,7 @@ public sealed class EntityBehaviourManager {
 
 	public void SetBehaviour<TBehaviour>(NodePath behaviourPath, Func<TBehaviour>? creator = null) where TBehaviour : EntityBehaviour {
 		TBehaviour? behaviour = Entity.GetNodeOrNull<TBehaviour>(behaviourPath);
-		if ( behaviour is null && creator is null ) {
+		if (behaviour is null && creator is null) {
 			throw new ArgumentException($"{nameof(behaviourPath)} not found in {nameof(EntityBehaviourManager)}.");
 		}
 

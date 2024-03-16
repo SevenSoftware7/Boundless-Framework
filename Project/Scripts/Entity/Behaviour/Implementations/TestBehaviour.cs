@@ -1,9 +1,8 @@
-using System;
+namespace LandlessSkies.Core;
+
 using Godot;
 using SevenGame.Utility;
 using static LandlessSkies.Core.ControlDevice.InputType;
-
-namespace LandlessSkies.Core;
 
 public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 	private Vector3 _moveDirection;
@@ -16,7 +15,7 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 
 
 
-    public override void Start(EntityBehaviour? previousBehaviour) {
+	public override void Start(EntityBehaviour? previousBehaviour) {
 		base.Start(previousBehaviour);
 
 		Entity.MotionMode = CharacterBody3D.MotionModeEnum.Grounded;
@@ -46,8 +45,10 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 	}
 
 	public override bool SetSpeed(MovementSpeed speed) {
-		if ( ! base.SetSpeed(speed) ) return false;
-		if ( speed == _movementSpeed ) return false;
+		if (!base.SetSpeed(speed))
+			return false;
+		if (speed == _movementSpeed)
+			return false;
 
 		// if (Entity.IsOnFloor() && Entity.CurrentAction is not EvadeAction) {
 		// 	if ( speed == MovementSpeed.Idle ) {
@@ -57,17 +58,20 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 		// 	}
 		// }
 
+
 		_movementSpeed = speed;
 		return true;
 	}
 	public override bool Move(Vector3 direction) {
-		if ( ! base.Move(direction) ) return false;
+		if (!base.Move(direction))
+			return false;
 
 		_moveDirection = direction;
 		return true;
 	}
 	public override bool Jump(Vector3? target = null) {
-		if ( ! base.Jump(target) ) return false;
+		if (!base.Jump(target))
+			return false;
 
 		jumpBuffer.Start();
 		return true;
@@ -78,28 +82,31 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 	public override void _Process(double delta) {
 		base._Process(delta);
 
-		float floatDelta = (float)delta;
+		float floatDelta = (float) delta;
 
 
 		// ----- Inertia Calculations -----
+
 		Entity.SplitInertia(out Vector3 verticalInertia, out Vector3 horizontalInertia);
 
-		if ( Entity.IsOnFloor() ) {
+		if (Entity.IsOnFloor()) {
 			coyoteTimer.Start();
-			horizontalInertia = horizontalInertia.MoveToward( Vector3.Zero, 0.25f * floatDelta );
+			horizontalInertia = horizontalInertia.MoveToward(Vector3.Zero, 0.25f * floatDelta);
 		} else {
 			const float fallSpeed = 32f;
 			float targetSpeed = fallSpeed;
 			float fallInertia = verticalInertia.Dot(-Entity.UpDirection);
 
 			// Float more if player is holding jump key & rising
+
 			float isFloating = jumpBuffer.IsDone ? 0f : 1f;
 			const float floatReductionFactor = 0.85f;
-			float floatFactor = Mathf.Lerp( 1f, floatReductionFactor, isFloating * Mathf.Clamp( 1f - fallInertia, 0f, 1f ));
+			float floatFactor = Mathf.Lerp(1f, floatReductionFactor, isFloating * Mathf.Clamp(1f - fallInertia, 0f, 1f));
 
 			// Slightly ramp up inertia when falling
+
 			const float fallIncreaseFactor = 1.75f;
-			float inertiaRampFactor = Mathf.Lerp(1f, fallIncreaseFactor, Mathf.Clamp( (1f + fallInertia) * 0.5f, 0f, 1f ));
+			float inertiaRampFactor = Mathf.Lerp(1f, fallIncreaseFactor, Mathf.Clamp((1f + fallInertia) * 0.5f, 0f, 1f));
 
 			Vector3 targetInertia = -Entity.UpDirection * Mathf.Max(targetSpeed, fallInertia);
 			verticalInertia = verticalInertia.MoveToward(targetInertia, 45f * floatFactor * inertiaRampFactor * floatDelta);
@@ -110,12 +117,14 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 
 
 		float newSpeed = 0f;
-		if ( ! _moveDirection.IsZeroApprox() ) {
+		if (!_moveDirection.IsZeroApprox()) {
+
 			// ----- Rotation -----
+
 			float directionLength = _moveDirection.Length();
 			Vector3 normalizedDirection = Entity.Transform.Basis.Inverse() * _moveDirection / directionLength;
 
-			Entity.RelativeForward = Entity.RelativeForward.SafeSlerp( normalizedDirection, Entity.CharacterRotationSpeed * floatDelta );
+			Entity.RelativeForward = Entity.RelativeForward.SafeSlerp(normalizedDirection, Entity.CharacterRotationSpeed * floatDelta);
 
 			Entity.Character?.RotateTowards(Basis.LookingAt(normalizedDirection, Vector3.Up), delta);
 
@@ -126,6 +135,7 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 
 
 			// Select the speed based on the movement type
+
 			newSpeed = _movementSpeed switch {
 				_ when Entity.Character is null  => CharacterData.DEFAULT_BASE_SPEED,
 				MovementSpeed.Walk               => Entity.Character.Data.slowSpeed,
@@ -136,20 +146,24 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 		}
 
 		// ---- Speed Calculation ----
+
 		float accelerationFactor = 1f / Mathf.Max(newSpeed, Mathf.Epsilon);  // Accelerate faster depending on how big the difference between current and target speeds is
+
 		float slowingFactor = (_moveSpeed < newSpeed) ? 1f : 0.5f;           // Slow down faster than speeding up
 
 		// Move towards the new speed with acceleration
+
 		float speedDifference = Mathf.Abs(newSpeed - _moveSpeed);
 		float speedDelta = speedDifference * accelerationFactor * slowingFactor;
 		_moveSpeed = Mathf.MoveToward(_moveSpeed, newSpeed, Entity.CharacterAcceleration * speedDelta * floatDelta);
 
 		// Update the movement vector based on the new speed and direction
+
 		Entity.Movement = _moveDirection * _moveSpeed;
 
-
 		// ----- Jump Instruction -----
-		if ( ! jumpBuffer.IsDone && jumpCooldown.IsDone && ! coyoteTimer.IsDone ) {
+
+		if (!jumpBuffer.IsDone && jumpCooldown.IsDone && !coyoteTimer.IsDone) {
 			Entity.Inertia = Entity.Inertia.SlideOnFace(Entity.UpDirection) + Entity.UpDirection * 17.5f;
 			jumpBuffer.End();
 			jumpCooldown.Start();

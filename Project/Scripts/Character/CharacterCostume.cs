@@ -1,18 +1,19 @@
+namespace LandlessSkies.Core;
+
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using Godot;
 using static LandlessSkies.Core.IPortraitProvider;
 
-namespace LandlessSkies.Core;
-
 [Tool]
 [GlobalClass]
 // TODO: See WeaponCostume
-public abstract partial class CharacterCostume : Costume, IPortraitProvider {
-    public override Texture2D? DisplayPortrait => PortraitNeutral;
 
-    [Export] public Texture2D? PortraitNeutral { get; private set; }
+public abstract partial class CharacterCostume : Costume, IPortraitProvider {
+	public override Texture2D? DisplayPortrait => PortraitNeutral;
+
+	[Export] public Texture2D? PortraitNeutral { get; private set; }
 	[Export] public Texture2D? PortraitDetermined { get; private set; }
 	[Export] public Texture2D? PortraitHesitant { get; private set; }
 	[Export] public Texture2D? PortraitShocked { get; private set; }

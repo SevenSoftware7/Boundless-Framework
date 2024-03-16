@@ -1,9 +1,9 @@
 #if TOOLS
 
+namespace LandlessSkies.Core;
+
 using Godot;
 using Godot.Collections;
-
-namespace LandlessSkies.Core;
 
 public partial class Character {
 	public override bool _PropertyCanRevert(StringName property) {
@@ -23,17 +23,17 @@ public partial class Character {
 		base._ValidateProperty(property);
 
 		StringName name = property["name"].AsStringName();
-		
+
 		if (
 			name == PropertyName.Collisions ||
 			name == PropertyName.Skeleton ||
 			name == PropertyName.CharacterModel ||
 			(name == PropertyName.Data && Data is not null)
 		) {
-			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
-		
+			property["usage"] = (int) (property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
+
 		} else if (name == PropertyName.Costume) {
-			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
+			property["usage"] = (int) (property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
 
 		}
 	}
