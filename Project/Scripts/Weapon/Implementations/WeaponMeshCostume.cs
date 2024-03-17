@@ -4,7 +4,7 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public sealed partial class WeaponMeshCostume : WeaponCostume {
+public sealed partial class WeaponMeshCostume : WeaponCostume, IMeshCostume {
 	public override string DisplayName => _displayName;
 	[Export] private string _displayName = string.Empty;
 
@@ -13,7 +13,9 @@ public sealed partial class WeaponMeshCostume : WeaponCostume {
 
 	[Export] public PackedScene? ModelScene { get; private set; }
 
-	public override WeaponMeshModel Instantiate() {
-		return new WeaponMeshModel(this);
+
+
+	public override BoneMeshModel Instantiate() {
+		return new BoneMeshModel(this);
 	}
 }

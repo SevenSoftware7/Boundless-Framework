@@ -5,9 +5,9 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public partial class EleosWeapon : SingleWeapon {
-	protected EleosWeapon() : base() {}
-	public EleosWeapon(EleosWeaponData? data = null, WeaponCostume? costume = null) : base(data ?? ResourceManager.GetRegisteredWeapon<EleosWeaponData>(), costume) {}
+public sealed partial class EleosWeapon : SingleWeapon<EleosWeaponData> {
+	private EleosWeapon() : base() {}
+	public EleosWeapon(EleosWeaponData? data = null, WeaponCostume? costume = null) : base(data, costume) {}
 
 
 
@@ -27,12 +27,5 @@ public partial class EleosWeapon : SingleWeapon {
 		if (inputInfo.ControlDevice.IsInputJustPressed(ControlDevice.InputType.LightAttack)) {
 			Entity.ExecuteAction(SlashAttack.DefaultInfo with { Weapon = this });
 		}
-	}
-
-	public override void _Ready() {
-		if (Data is null) {
-			SetData(ResourceManager.GetRegisteredWeapon<EleosWeaponData>());
-		}
-		base._Ready();
 	}
 }

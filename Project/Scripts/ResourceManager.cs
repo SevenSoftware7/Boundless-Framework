@@ -78,11 +78,4 @@ public partial class ResourceManager : Node {
 
 	public static T? GetRegisteredCharacter<T>() where T : CharacterData
 		=> _characters?.GetValueOrDefault(typeof(T)) as T;
-
-
-
-	// public override void _Ready() {
-	//     base._Ready();
-	// }
-
 }

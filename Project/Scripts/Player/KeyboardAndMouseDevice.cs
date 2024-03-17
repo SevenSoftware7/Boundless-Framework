@@ -30,26 +30,26 @@ public partial class KeyboardAndMouseDevice : ControlDevice {
 
 	protected override StringName GetActionName(InputType input) {
 		return input switch {
-			InputType.Evade                 => EvadeName,
-			InputType.Jump                  => JumpName,
-			InputType.LightAttack           => LightAttackName,
-			InputType.HeavyAttack           => HeavyAttackName,
-			_ when Enum.IsDefined(input)    => throw new UnreachableException($"Undefined Action Name for {input}"),
-			_                               => throw new ArgumentOutOfRangeException(nameof(input))
+			InputType.Evade => EvadeName,
+			InputType.Jump => JumpName,
+			InputType.LightAttack => LightAttackName,
+			InputType.HeavyAttack => HeavyAttackName,
+			_ when Enum.IsDefined(input) => throw new UnreachableException($"Undefined Action Name for {input}"),
+			_ => throw new ArgumentOutOfRangeException(nameof(input))
 		};
 	}
 	protected override StringName GetActionName(MotionType motion, MotionDirection direction) {
 		return motion switch {
-			MotionType.Move					=> direction switch {
-				MotionDirection.Forward		=> MoveForwardName,
-				MotionDirection.Backward	=> MoveBackwardName,
-				MotionDirection.Left		=> MoveLeftName,
-				MotionDirection.Right		=> MoveRightName,
-				_							=> throw new ArgumentOutOfRangeException(nameof(direction))
+			MotionType.Move => direction switch {
+				MotionDirection.Forward => MoveForwardName,
+				MotionDirection.Backward => MoveBackwardName,
+				MotionDirection.Left => MoveLeftName,
+				MotionDirection.Right => MoveRightName,
+				_ => throw new ArgumentOutOfRangeException(nameof(direction))
 			},
-			MotionType.Look                 => string.Empty,
-			_ when Enum.IsDefined(motion)   => throw new UnreachableException($"Undefined Action Name for {motion}"),
-			_                               => throw new ArgumentOutOfRangeException(nameof(motion))
+			MotionType.Look => string.Empty,
+			_ when Enum.IsDefined(motion) => throw new UnreachableException($"Undefined Action Name for {motion}"),
+			_ => throw new ArgumentOutOfRangeException(nameof(motion))
 		};
 	}
 

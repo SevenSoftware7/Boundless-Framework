@@ -10,7 +10,7 @@ using Godot.Collections;
 public partial class MultiWeapon {
 	[Export]
 	private Array<WeaponData> WeaponDatas {
-		get => [.. _weapons.Select(weapon => weapon?.Data)];
+		get => [.. _weapons.Select(weapon => weapon?.WeaponData)];
 		set {
 			if (this.IsInitializationSetterCall()) {
 				return;

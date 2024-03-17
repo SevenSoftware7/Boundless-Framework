@@ -33,10 +33,10 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 
 		float speedSquared = groundedMovement.LengthSquared();
 		MovementSpeed speed = speedSquared switch {
-			_ when Mathf.IsZeroApprox(speedSquared)               => MovementSpeed.Idle,
-			_ when speedSquared <= 0.25f                          => MovementSpeed.Walk,
-			_ when inputInfo.ControlDevice.IsInputPressed(Evade)  => MovementSpeed.Sprint,
-			_                                                     => MovementSpeed.Run
+			_ when Mathf.IsZeroApprox(speedSquared) => MovementSpeed.Idle,
+			_ when speedSquared <= 0.25f => MovementSpeed.Walk,
+			_ when inputInfo.ControlDevice.IsInputPressed(Evade) => MovementSpeed.Sprint,
+			_ => MovementSpeed.Run
 		};
 		SetSpeed(speed);
 
@@ -137,11 +137,11 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 			// Select the speed based on the movement type
 
 			newSpeed = _movementSpeed switch {
-				_ when Entity.Character is null  => CharacterData.DEFAULT_BASE_SPEED,
-				MovementSpeed.Walk               => Entity.Character.Data.slowSpeed,
-				MovementSpeed.Run                => Entity.Character.Data.baseSpeed,
-				MovementSpeed.Sprint             => Entity.Character.Data.sprintSpeed,
-				_                                => newSpeed
+				_ when Entity.Character is null => CharacterData.DEFAULT_BASE_SPEED,
+				MovementSpeed.Walk => Entity.Character.Data.slowSpeed,
+				MovementSpeed.Run => Entity.Character.Data.baseSpeed,
+				MovementSpeed.Sprint => Entity.Character.Data.sprintSpeed,
+				_ => newSpeed
 			};
 		}
 

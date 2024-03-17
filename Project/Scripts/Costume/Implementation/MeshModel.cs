@@ -2,14 +2,12 @@ namespace LandlessSkies.Core;
 
 using Godot;
 
-// TODO: when Interface reference [Export] is implemented in Godot, merge this with CharacterMeshModel and inherit from it
 [Tool]
-public partial class WeaponMeshModel : WeaponModel, ILoadable {
+public partial class MeshModel : Model {
 
-	#region Generic Mesh Model stuff
 	[ExportGroup("Dependencies")]
-	[Export] public Skeleton3D? Skeleton { get; private set; }
-	public Handedness Handedness { get; private set; }
+	[Export] public Skeleton3D? Skeleton;
+	[Export] public Handedness Handedness { get; private set; }
 	[ExportGroup("")]
 
 	[Export] protected Node3D Model { get; private set; } = null!;
@@ -27,9 +25,10 @@ public partial class WeaponMeshModel : WeaponModel, ILoadable {
 		}
 	}
 
-	protected WeaponMeshModel() : base() { }
-	public WeaponMeshModel(WeaponMeshCostume costume) : base(costume) { }
 
+
+	protected MeshModel() : base() { }
+	public MeshModel(Costume costume) : base(costume) { }
 
 
 
@@ -45,6 +44,7 @@ public partial class WeaponMeshModel : WeaponModel, ILoadable {
 		Model.SafeReparentAndSetOwner(Skeleton);
 	}
 
+
 	public override void Inject(Skeleton3D? skeleton) {
 		Skeleton = skeleton;
 		ParentToSkeleton();
@@ -56,7 +56,7 @@ public partial class WeaponMeshModel : WeaponModel, ILoadable {
 	protected override bool LoadModelBehaviour() {
 		if (!base.LoadModelBehaviour())
 			return false;
-		if (Costume is not WeaponMeshCostume meshCostume)
+		if (Costume is not IMeshCostume meshCostume)
 			return false;
 
 		if (meshCostume.ModelScene?.Instantiate() is not Node3D model)
@@ -66,7 +66,7 @@ public partial class WeaponMeshModel : WeaponModel, ILoadable {
 		ParentToSkeleton();
 		Model.SetProcess(IsProcessing());
 		Model.Visible = Visible;
-		Model.Name = $"{nameof(Costume)} - {meshCostume.DisplayName}";
+		Model.Name = $"{nameof(Costume)} - {Costume.DisplayName}";
 
 		_isLoaded = true;
 
@@ -92,25 +92,6 @@ public partial class WeaponMeshModel : WeaponModel, ILoadable {
 		if (Model is not null) {
 			Model.SetProcess(false);
 			Model.Visible = false;
-		}
-	}
-	#endregion
-
-	public override void _Process(double delta) {
-		base._Process(delta);
-
-		if (Model is null || !Model.IsInsideTree())
-			return;
-
-		string boneName = Handedness switch {
-			Handedness.Left => "LeftHand",
-			Handedness.Right or _ => "RightHand",
-		};
-
-		if (Skeleton is not null && Skeleton.TryGetBoneTransform(boneName, out Transform3D handTransform)) {
-			Model.GlobalTransform = handTransform;
-		} else {
-			Model.Transform = Transform3D.Identity;
 		}
 	}
 }

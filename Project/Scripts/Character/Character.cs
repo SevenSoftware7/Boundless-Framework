@@ -6,7 +6,7 @@ using System;
 
 [Tool]
 [GlobalClass]
-public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICostumable<CharacterCostume>, IInputReader, ICustomizable {
+public partial class Character : Loadable3D, IInputReader, ICustomizable {
 	[Export] public Node3D? Collisions { get; private set; }
 	[Export] public Skeleton3D? Skeleton { get; private set; }
 
@@ -42,9 +42,9 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 	private CharacterData _data = null!;
 
 	[ExportGroup("Costume")]
-	[Export] private CharacterModel? CharacterModel;
+	[Export] private Model? CharacterModel;
 	[Export] public CharacterCostume? Costume {
-		get => CharacterModel?.Costume;
+		get => CharacterModel?.Costume as CharacterCostume;
 		set {
 			if (this.IsInitializationSetterCall())
 				return;
@@ -56,7 +56,7 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 
 
 	public virtual IUIObject UIObject => Data;
-	public virtual ICustomizable[] Children => CharacterModel is CharacterModel model ? [model] : [];
+	public virtual ICustomizable[] Children => CharacterModel is Model model ? [model] : [];
 	public virtual ICustomizationParameter[] Customizations => [];
 
 
@@ -80,7 +80,7 @@ public partial class Character : Loadable3D, IDataContainer<CharacterData>, ICos
 		if (costume == oldCostume)
 			return;
 
-		new LoadableUpdater<CharacterModel>(ref CharacterModel, () => costume?.Instantiate())
+		new LoadableUpdater<Model>(ref CharacterModel, () => costume?.Instantiate())
 			.BeforeLoad(m => {
 				m.Inject(Skeleton);
 				m.SafeReparentEditor(this);

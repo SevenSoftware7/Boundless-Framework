@@ -6,5 +6,5 @@ using Godot;
 [Tool]
 [GlobalClass]
 public abstract partial class WeaponCostume : Costume {
-	public abstract override WeaponModel Instantiate();
+	public abstract override Model Instantiate();
 }

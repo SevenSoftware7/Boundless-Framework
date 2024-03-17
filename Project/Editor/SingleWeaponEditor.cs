@@ -5,7 +5,7 @@ namespace LandlessSkies.Core;
 using Godot;
 using Godot.Collections;
 
-public partial class SingleWeapon {
+public partial class SingleWeapon<T> {
 	public override bool _PropertyCanRevert(StringName property) {
 		if (property == PropertyName.Costume) {
 			return Costume != Data?.BaseCostume;
@@ -26,7 +26,7 @@ public partial class SingleWeapon {
 
 		if (
 			name == PropertyName.WeaponModel ||
-			(name == PropertyName.Data && Data is not null)
+			(name == PropertyName.WeaponData && WeaponData is not null)
 		) {
 			property["usage"] = (int) (property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
 
