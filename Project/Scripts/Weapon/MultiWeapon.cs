@@ -25,6 +25,7 @@ public sealed partial class MultiWeapon : Weapon {
 				return;
 
 			_weapons.ForEach(w => w?.SafeReparentEditor(this));
+			UpdateCurrent();
 		}
 	}
 	private List<SingleWeapon?> _weapons = [];
@@ -115,6 +116,14 @@ public sealed partial class MultiWeapon : Weapon {
 		}
 		_weapons.ForEach((w) => w?.Disable());
 		CurrentWeapon?.Enable();
+
+		if (Engine.IsEditorHint()) {
+			// Rearrange the weapons in the Node hierarchy
+			List<SingleWeapon> weapons = Weapons.OfType<SingleWeapon>().ToList();
+			foreach (SingleWeapon weapon in weapons) {
+				weapon.GetParent().MoveChild(weapon, weapons.IndexOf(weapon));
+			}
+		}
 	}
 
 	public void SwitchTo(SingleWeapon? weapon) =>

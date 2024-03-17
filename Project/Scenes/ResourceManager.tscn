@@ -1,11 +1,12 @@
-[gd_scene load_steps=5 format=3 uid="uid://d0wdh4d7ww8nn"]
+[gd_scene load_steps=6 format=3 uid="uid://d0wdh4d7ww8nn"]
 
 [ext_resource type="Script" path="res://Scripts/ResourceManager.cs" id="1_bos0v"]
-[ext_resource type="Resource" uid="uid://cvmjc2y8h0yri" path="res://Resources/Data/Weapons/Eleos/Eleos.tres" id="2_xy6g7"]
+[ext_resource type="Resource" uid="uid://bfuqmybchohej" path="res://Resources/Data/Weapons/Eleos/Eleos.tres" id="2_xy6g7"]
 [ext_resource type="Resource" uid="uid://dsreon2gkt4ng" path="res://Resources/Data/Characters/Selene/Selene.tres" id="3_8m2yi"]
-[ext_resource type="Resource" uid="uid://jdlq54nj3rcw" path="res://Resources/Data/Weapons/Nemesis/Nemesis.tres" id="3_lf6ol"]
+[ext_resource type="Resource" uid="uid://dtoyomm5pp52l" path="res://Resources/Data/Weapons/Nemesis/Nemesis.tres" id="3_lf6ol"]
+[ext_resource type="Resource" uid="uid://dbe8xey2608rj" path="res://Resources/Data/Weapons/Epiphron/Epiphron.tres" id="4_qvddi"]
 
 [node name="ResourceManager" type="Node"]
 script = ExtResource("1_bos0v")
-Weapons = [ExtResource("2_xy6g7"), ExtResource("3_lf6ol"), null]
+Weapons = [ExtResource("2_xy6g7"), ExtResource("3_lf6ol"), ExtResource("4_qvddi"), null]
 Characters = [ExtResource("3_8m2yi"), null]

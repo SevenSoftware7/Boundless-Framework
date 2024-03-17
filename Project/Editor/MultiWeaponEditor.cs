@@ -16,27 +16,40 @@ public partial class MultiWeapon {
 				return;
 			}
 
-
 			Array<WeaponData> datas = WeaponDatas;
+
+			// If nothing changed
 			if (datas.SequenceEqual(value))
 				return;
+
+			// If the items were only moved
+			if (datas.Count == value.Count && datas.All(value.Contains)) {
+				Weapons = [.. value.Select(d => Weapons.FirstOrDefault(w => w?.WeaponData == d))];
+
+				UpdateCurrent();
+				return;
+			}
 
 			int minLength = Math.Min(value.Count, datas.Count);
 			for (int i = 0; i < Math.Max(value.Count, datas.Count); i++) {
 				switch (i) {
+					// If an item was modified
 					case int index when index < minLength && datas[index] != value[index]:
 						SetWeapon(index, value[index]);
 						break;
 
+					// If an item was added
 					case int index when index >= minLength && index < value.Count:
 						AddWeapon(value[index]);
 						break;
 
+					// If an item was removed
 					case int index when index >= minLength && index >= value.Count:
 						RemoveWeapon(index);
 						break;
 				}
 			}
+			UpdateCurrent();
 			NotifyPropertyListChanged();
 		}
 	}
