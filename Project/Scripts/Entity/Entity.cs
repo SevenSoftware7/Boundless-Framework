@@ -171,8 +171,12 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 
 
 	public void HandleInput(Player.InputInfo inputInfo) {
-		BehaviourManager?.CurrentBehaviour?.HandleInput(inputInfo);
+		inputInfo.CameraController.SetEntityAsSubject(this);
+		inputInfo.CameraController.MoveCamera(
+			inputInfo.InputDevice.GetVector("look_left", "look_right", "look_down", "look_up") * inputInfo.InputDevice.Sensitivity
+		);
 
+		BehaviourManager?.CurrentBehaviour?.HandleInput(inputInfo);
 		Weapon?.HandleInput(inputInfo);
 	}
 

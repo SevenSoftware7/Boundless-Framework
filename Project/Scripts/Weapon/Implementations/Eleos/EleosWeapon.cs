@@ -24,7 +24,7 @@ public sealed partial class EleosWeapon : SingleWeapon<EleosWeaponData> {
 		if (Entity is null)
 			return;
 
-		if (inputInfo.ControlDevice.IsInputJustPressed(ControlDevice.InputType.LightAttack)) {
+		if (inputInfo.InputDevice.IsActionJustPressed("attack_light")/* inputInfo.ControlDevice.IsInputJustPressed(ControlDevice.InputType.LightAttack) */) {
 			Entity.ExecuteAction(SlashAttack.DefaultInfo with { Weapon = this });
 		}
 	}

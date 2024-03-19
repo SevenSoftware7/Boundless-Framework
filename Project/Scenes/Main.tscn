@@ -1,4 +1,4 @@
-[gd_scene load_steps=79 format=3 uid="uid://b505xodur2iff"]
+[gd_scene load_steps=78 format=3 uid="uid://b505xodur2iff"]
 
 [ext_resource type="Script" path="res://Scripts/Entity/Entity.cs" id="4_ghy15"]
 [ext_resource type="Script" path="res://addons/cyclops_level_builder/nodes/cyclops_block.gd" id="4_xwxtm"]
@@ -8,7 +8,6 @@
 [ext_resource type="Script" path="res://Scripts/Health.cs" id="7_de20v"]
 [ext_resource type="Script" path="res://Scripts/Player/Player.cs" id="7_h05j4"]
 [ext_resource type="Script" path="res://Scripts/Weapon/Implementations/Eleos/EleosWeapon.cs" id="8_plqwt"]
-[ext_resource type="Script" path="res://Scripts/Player/KeyboardAndMouseDevice.cs" id="9_5fqvf"]
 [ext_resource type="Resource" uid="uid://bfuqmybchohej" path="res://Resources/Data/Weapons/Eleos/Eleos.tres" id="9_lajlq"]
 [ext_resource type="Script" path="res://Scripts/Costume/Implementation/BoneMeshModel.cs" id="11_0w6ac"]
 [ext_resource type="Resource" uid="uid://q68mneifjek2" path="res://Resources/Data/Weapons/Eleos/Costumes/Base/Eleos_base.tres" id="11_go6fo"]
@@ -1209,11 +1208,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -10)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_dxejf")
 
-[node name="Player" type="Node" parent="." node_paths=PackedStringArray("CameraController", "Entity", "ControlDevice")]
+[node name="Player" type="Node" parent="." node_paths=PackedStringArray("CameraController", "Entity")]
 script = ExtResource("7_h05j4")
 CameraController = NodePath("CameraController3D")
 Entity = NodePath("../Entity")
-ControlDevice = NodePath("KeyboardAndMouseDevice")
 
 [node name="CameraController3D" type="Camera3D" parent="Player"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.01904, 3.4167)
@@ -1223,9 +1221,6 @@ cameraOriginPosition = Vector3(1, -0.12, 5.2)
 horizontalSmoothTime = 0.065
 verticalSmoothTime = 0.16
 CollisionMask = 4294967289
-
-[node name="KeyboardAndMouseDevice" type="Node" parent="Player"]
-script = ExtResource("9_5fqvf")
 
 [node name="Entity" type="CharacterBody3D" parent="." node_paths=PackedStringArray("Character", "AnimationPlayer", "Health", "Weapon")]
 transform = Transform3D(-0.208782, 0, 0.977962, 0, 1, 0, -0.977962, 0, -0.208782, 0, 0, 0)

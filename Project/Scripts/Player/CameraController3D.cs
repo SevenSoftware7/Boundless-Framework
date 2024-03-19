@@ -45,11 +45,7 @@ public partial class CameraController3D : Camera3D {
 		SubjectBasis = entity.Transform.Basis;
 	}
 
-	public void HandleCamera(ControlDevice controlDevice) {
-		HandleCameraInput(controlDevice.GetVector(ControlDevice.MotionType.Look) * 0.00325f); // TODO : Proper sensitivity adjustments
-	}
-
-	public void HandleCameraInput(Vector2 cameraInput) {
+	public void MoveCamera(Vector2 cameraInput) {
 		Input.MouseMode = Input.MouseModeEnum.Captured;
 
 		if (Style == CameraStyle.ThirdPersonGrounded) {
