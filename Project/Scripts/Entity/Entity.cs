@@ -235,9 +235,9 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 
 
 		GlobalTransform = GlobalTransform with { Origin = destination - destinationHeight + pointHeight };
-		if (stepHeightSquared >= Mathf.Pow(stepHeight, 2f) / 4f) {
-			GD.Print("Step Found");
-		}
+		// if (stepHeightSquared >= Mathf.Pow(stepHeight, 2f) / 4f) {
+		// 	GD.Print("Step Found");
+		// }
 		return true;
 	}
 

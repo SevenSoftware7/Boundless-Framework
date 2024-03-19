@@ -43,10 +43,11 @@ public abstract partial class ControlDevice : Node, IDisposable {
 		if (actionName.IsEmpty)
 			return;
 
-		if (!InputMap.HasAction(actionName)) {
+		if (InputMap.HasAction(actionName)) {
+			InputMap.ActionEraseEvents(actionName);
+		} else {
 			InputMap.AddAction(actionName);
 		}
-		InputMap.ActionEraseEvents(actionName);
 
 		for (int i = 0; i < events.Length; i++) {
 			InputMap.ActionAddEvent(actionName, events[i]);

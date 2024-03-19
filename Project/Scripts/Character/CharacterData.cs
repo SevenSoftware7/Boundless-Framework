@@ -12,8 +12,8 @@ public partial class CharacterData : Resource, IUIObject {
 	public const float DEFAULT_ACCELERATION = 100f;
 	public const float DEFAULT_ROTATION_SPEED = 100f;
 	public const float DEFAULT_BASE_SPEED = 8f;
-	public const float DEFAULT_SPRINT_SPEED = 13f;
-	public const float DEFAULT_SLOW_SPEED = 5f;
+	public const float DEFAULT_SPRINT_SPEED = 14f;
+	public const float DEFAULT_SLOW_SPEED = 3f;
 
 
 

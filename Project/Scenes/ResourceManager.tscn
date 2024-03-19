@@ -8,5 +8,5 @@
 
 [node name="ResourceManager" type="Node"]
 script = ExtResource("1_bos0v")
-Weapons = [ExtResource("2_xy6g7"), ExtResource("3_lf6ol"), ExtResource("4_qvddi"), null]
+Weapons = [ExtResource("4_qvddi"), ExtResource("3_lf6ol"), ExtResource("2_xy6g7"), null]
 Characters = [ExtResource("3_8m2yi"), null]

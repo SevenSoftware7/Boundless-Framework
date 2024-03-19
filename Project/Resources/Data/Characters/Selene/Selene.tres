@@ -18,5 +18,5 @@ jumpHeight = 16.0
 acceleration = 100.0
 rotationSpeed = 100.0
 baseSpeed = 8.0
-sprintSpeed = 13.0
-slowSpeed = 5.0
+sprintSpeed = 14.0
+slowSpeed = 3.0

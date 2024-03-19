@@ -10,7 +10,6 @@ public partial class Character : Loadable3D, IInputReader, ICustomizable {
 	[Export] public Node3D? Collisions { get; private set; }
 	[Export] public Skeleton3D? Skeleton { get; private set; }
 
-	private bool _isLoaded = false;
 	public override bool IsLoaded {
 		get => _isLoaded;
 		set {
@@ -22,6 +21,7 @@ public partial class Character : Loadable3D, IInputReader, ICustomizable {
 			AsILoadable().LoadUnload(value);
 		}
 	}
+	private bool _isLoaded = false;
 
 	[Export] public CharacterData Data {
 		get => _data;
