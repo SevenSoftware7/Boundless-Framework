@@ -23,7 +23,7 @@ public partial class MultiWeapon {
 				return;
 
 			// If the items were only moved
-			if (datas.Count == value.Count && datas.All(value.Contains)) {
+			if (datas.Count == value.Count && datas.Intersect(value).Count() == value.Count) {
 				Weapons = [.. value.Select(d => Weapons.FirstOrDefault(w => w?.WeaponData == d))];
 
 				UpdateCurrent();

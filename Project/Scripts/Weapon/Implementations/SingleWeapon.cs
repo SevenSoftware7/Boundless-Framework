@@ -3,8 +3,8 @@ using Godot;
 namespace LandlessSkies.Core;
 
 [Tool]
-public abstract partial class SingleWeapon<T> : SingleWeapon where T : WeaponData {
-	public override WeaponData WeaponData {
+public abstract partial class SingleWeapon<[MustBeVariant] T> : SingleWeapon where T : WeaponData {
+	[Export] public override WeaponData WeaponData {
 		get => Data;
 		protected set => Data = (value as T)!;
 	}
@@ -52,11 +52,11 @@ public abstract partial class SingleWeapon<T> : SingleWeapon where T : WeaponDat
 		base._Ready();
 	}
 
-	public override ISaveData<SingleWeapon> SingleWeaponSave() {
+	public override ISaveData<Weapon> Save() {
 		return new SingleWeaponSaveData(Data, Costume);
 	}
-	protected class SingleWeaponSaveData(T data, WeaponCostume? costume) : ISaveData<SingleWeapon> {
-		public SingleWeapon Load() {
+	protected class SingleWeaponSaveData(T data, WeaponCostume? costume) : ISaveData<Weapon> {
+		public Weapon Load() {
 			return data.Instantiate(costume);
 		}
 	}

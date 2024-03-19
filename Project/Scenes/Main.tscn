@@ -7,26 +7,26 @@
 [ext_resource type="Script" path="res://Scripts/Player/CameraController3D.cs" id="7_07vdy"]
 [ext_resource type="Script" path="res://Scripts/Health.cs" id="7_de20v"]
 [ext_resource type="Script" path="res://Scripts/Player/Player.cs" id="7_h05j4"]
-[ext_resource type="Script" path="res://Scripts/Weapon/Implementations/Eleos/EleosWeapon.cs" id="8_plqwt"]
-[ext_resource type="Resource" uid="uid://bfuqmybchohej" path="res://Resources/Data/Weapons/Eleos/Eleos.tres" id="9_lajlq"]
-[ext_resource type="Script" path="res://Scripts/Costume/Implementation/BoneMeshModel.cs" id="11_0w6ac"]
-[ext_resource type="Resource" uid="uid://q68mneifjek2" path="res://Resources/Data/Weapons/Eleos/Costumes/Base/Eleos_base.tres" id="11_go6fo"]
+[ext_resource type="Script" path="res://Scripts/Weapon/Implementations/Epiphron/EpiphronWeapon.cs" id="8_hy12m"]
+[ext_resource type="Resource" uid="uid://dbe8xey2608rj" path="res://Resources/Data/Weapons/Epiphron/Epiphron.tres" id="9_17l5c"]
+[ext_resource type="Script" path="res://Scripts/Costume/Implementation/BoneMeshModel.cs" id="10_7i4ij"]
+[ext_resource type="Resource" uid="uid://c376t1le83xwr" path="res://Resources/Data/Weapons/Epiphron/Costumes/Base/Epiphron_base.tres" id="11_7btab"]
 [ext_resource type="Resource" uid="uid://dvcjw3gon7rak" path="res://Resources/Data/Characters/Selene/Costumes/Base/Selene_base.tres" id="11_qd1of"]
 [ext_resource type="Script" path="res://Scripts/Costume/Implementation/MeshModel.cs" id="11_qyww5"]
-[ext_resource type="Script" path="res://Scripts/Weapon/Implementations/Nemesis/NemesisWeapon.cs" id="12_xbamg"]
+[ext_resource type="Script" path="res://Scripts/Weapon/Implementations/Nemesis/NemesisWeapon.cs" id="12_ealet"]
+[ext_resource type="Resource" uid="uid://dtoyomm5pp52l" path="res://Resources/Data/Weapons/Nemesis/Nemesis.tres" id="13_1j0iq"]
 [ext_resource type="Script" path="res://Scripts/Weapon/MultiWeapon.cs" id="13_d6cna"]
-[ext_resource type="Script" path="res://Scripts/Weapon/Implementations/Epiphron/EpiphronWeapon.cs" id="13_hoevm"]
-[ext_resource type="Resource" uid="uid://dtoyomm5pp52l" path="res://Resources/Data/Weapons/Nemesis/Nemesis.tres" id="13_xwbhh"]
-[ext_resource type="Resource" uid="uid://ctyrw08y4svjk" path="res://Resources/Data/Weapons/Nemesis/Costumes/Base/Nemesis_Base.tres" id="14_13irr"]
-[ext_resource type="Resource" uid="uid://dbe8xey2608rj" path="res://Resources/Data/Weapons/Epiphron/Epiphron.tres" id="14_f0mxr"]
-[ext_resource type="Resource" uid="uid://c376t1le83xwr" path="res://Resources/Data/Weapons/Epiphron/Costumes/Base/Epiphron_base.tres" id="15_ekp4l"]
+[ext_resource type="Resource" uid="uid://ctyrw08y4svjk" path="res://Resources/Data/Weapons/Nemesis/Costumes/Base/Nemesis_Base.tres" id="14_nof6s"]
+[ext_resource type="Script" path="res://Scripts/Weapon/Implementations/Eleos/EleosWeapon.cs" id="15_phf61"]
+[ext_resource type="Resource" uid="uid://bfuqmybchohej" path="res://Resources/Data/Weapons/Eleos/Eleos.tres" id="16_qc2sf"]
 [ext_resource type="Script" path="res://Scripts/Character/Character.cs" id="16_r11x1"]
+[ext_resource type="Resource" uid="uid://q68mneifjek2" path="res://Resources/Data/Weapons/Eleos/Costumes/Base/Eleos_base.tres" id="17_p2r2u"]
 [ext_resource type="PackedScene" uid="uid://cwllghypqnhne" path="res://Resources/Data/Characters/Selene/Costumes/Base/Selene_base.tscn" id="19_wiqe2"]
 [ext_resource type="PackedScene" uid="uid://dy6781obdw22b" path="res://Resources/Data/Characters/Selene/Scenes/Skeleton.tscn" id="20_k6viy"]
 [ext_resource type="PackedScene" uid="uid://b7njxt2tckv16" path="res://Resources/Data/Characters/Selene/Scenes/Collisions.tscn" id="21_3oq50"]
-[ext_resource type="PackedScene" uid="uid://chsj82irsedw6" path="res://Resources/Data/Weapons/Eleos/Costumes/Base/Eleos_base.tscn" id="21_gglef"]
-[ext_resource type="PackedScene" uid="uid://cbkv4cstjgb7i" path="res://Resources/Data/Weapons/Nemesis/Costumes/Base/Nemesis_Base.tscn" id="22_p4kx8"]
-[ext_resource type="PackedScene" uid="uid://cdrk073syqpbj" path="res://Resources/Data/Weapons/Epiphron/Costumes/Base/Epiphron_base.tscn" id="27_cxr7h"]
+[ext_resource type="PackedScene" uid="uid://cdrk073syqpbj" path="res://Resources/Data/Weapons/Epiphron/Costumes/Base/Epiphron_base.tscn" id="24_gjs3a"]
+[ext_resource type="PackedScene" uid="uid://cbkv4cstjgb7i" path="res://Resources/Data/Weapons/Nemesis/Costumes/Base/Nemesis_Base.tscn" id="25_2qu5n"]
+[ext_resource type="PackedScene" uid="uid://chsj82irsedw6" path="res://Resources/Data/Weapons/Eleos/Costumes/Base/Eleos_base.tscn" id="26_47vhc"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4yjue"]
 sky_curve = 0.0375001
@@ -1244,52 +1244,52 @@ Entity = NodePath("..")
 IsLoaded = true
 
 [node name="Weapon - Epiphron" type="Node3D" parent="Entity/Weapon" node_paths=PackedStringArray("WeaponModel", "Entity")]
-script = ExtResource("13_hoevm")
-WeaponData = ExtResource("14_f0mxr")
+script = ExtResource("8_hy12m")
+WeaponData = ExtResource("9_17l5c")
 WeaponModel = NodePath("Model - Epiphron (base)")
 Entity = NodePath("../..")
 IsLoaded = true
 
 [node name="Model - Epiphron (base)" type="Node3D" parent="Entity/Weapon/Weapon - Epiphron" node_paths=PackedStringArray("Skeleton", "Model")]
-script = ExtResource("11_0w6ac")
+script = ExtResource("10_7i4ij")
 Skeleton = NodePath("../../../Character/Skeleton")
 Handedness = 2
 Model = NodePath("../../../Character/Skeleton/Costume - Epiphron (base)")
-Costume = ExtResource("15_ekp4l")
+Costume = ExtResource("11_7btab")
 IsLoaded = true
 
 [node name="Weapon - Nemesis" type="Node3D" parent="Entity/Weapon" node_paths=PackedStringArray("WeaponModel", "Entity")]
 visible = false
-script = ExtResource("12_xbamg")
-WeaponData = ExtResource("13_xwbhh")
+script = ExtResource("12_ealet")
+WeaponData = ExtResource("13_1j0iq")
 WeaponModel = NodePath("Model - Nemesis (base)")
 Entity = NodePath("../..")
 IsLoaded = true
 
 [node name="Model - Nemesis (base)" type="Node3D" parent="Entity/Weapon/Weapon - Nemesis" node_paths=PackedStringArray("Skeleton", "Model")]
 visible = false
-script = ExtResource("11_0w6ac")
+script = ExtResource("10_7i4ij")
 Skeleton = NodePath("../../../Character/Skeleton")
 Handedness = 2
 Model = NodePath("../../../Character/Skeleton/Costume - Nemesis (base)")
-Costume = ExtResource("14_13irr")
+Costume = ExtResource("14_nof6s")
 IsLoaded = true
 
 [node name="Weapon - Eleos" type="Node3D" parent="Entity/Weapon" node_paths=PackedStringArray("WeaponModel", "Entity")]
 visible = false
-script = ExtResource("8_plqwt")
-WeaponData = ExtResource("9_lajlq")
+script = ExtResource("15_phf61")
+WeaponData = ExtResource("16_qc2sf")
 WeaponModel = NodePath("Model - Eleos (base)")
 Entity = NodePath("../..")
 IsLoaded = true
 
 [node name="Model - Eleos (base)" type="Node3D" parent="Entity/Weapon/Weapon - Eleos" node_paths=PackedStringArray("Skeleton", "Model")]
 visible = false
-script = ExtResource("11_0w6ac")
+script = ExtResource("10_7i4ij")
 Skeleton = NodePath("../../../Character/Skeleton")
 Handedness = 2
 Model = NodePath("../../../Character/Skeleton/Costume - Eleos (base)")
-Costume = ExtResource("11_go6fo")
+Costume = ExtResource("17_p2r2u")
 IsLoaded = true
 
 [node name="Character" type="Node3D" parent="Entity" node_paths=PackedStringArray("Collisions", "Skeleton", "CharacterModel")]
@@ -1311,16 +1311,16 @@ IsLoaded = true
 
 [node name="Costume - Selene (base)" parent="Entity/Character/Skeleton" instance=ExtResource("19_wiqe2")]
 
-[node name="Costume - Epiphron (base)" parent="Entity/Character/Skeleton" instance=ExtResource("27_cxr7h")]
-transform = Transform3D(0, -1, 0, 0, 0, -1, 1, 0, 0, 1.11649, 2.61582, 0.185957)
-
-[node name="Costume - Nemesis (base)" parent="Entity/Character/Skeleton" instance=ExtResource("22_p4kx8")]
+[node name="Costume - Nemesis (base)" parent="Entity/Character/Skeleton" instance=ExtResource("25_2qu5n")]
 transform = Transform3D(0, -1, 0, 0, 0, -1, 1, 0, 0, 1.11649, 2.61582, 0.185957)
 visible = false
 
-[node name="Costume - Eleos (base)" parent="Entity/Character/Skeleton" instance=ExtResource("21_gglef")]
+[node name="Costume - Eleos (base)" parent="Entity/Character/Skeleton" instance=ExtResource("26_47vhc")]
 transform = Transform3D(0, -1, 0, 0, 0, -1, 1, 0, 0, 1.11649, 2.61582, 0.185957)
 visible = false
+
+[node name="Costume - Epiphron (base)" parent="Entity/Character/Skeleton" instance=ExtResource("24_gjs3a")]
+transform = Transform3D(0, -1, 0, 0, 0, -1, 1, 0, 0, 1.11649, 2.61582, 0.185957)
 
 [node name="Collisions" parent="Entity" instance=ExtResource("21_3oq50")]
 

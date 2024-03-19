@@ -24,10 +24,9 @@ public abstract partial class WeaponData : Resource, IUIObject {
 
 
 
-
 	public WeaponData() : base() { }
 
 
 
-	public abstract SingleWeapon Instantiate(WeaponCostume? costume = null);
+	public abstract Weapon Instantiate(WeaponCostume? costume = null);
 }

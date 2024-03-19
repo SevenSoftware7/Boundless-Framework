@@ -63,8 +63,6 @@ public sealed partial class Player : Node {
 		}
 	}
 
-
-
 	public override void _Process(double delta) {
 		base._Process(delta);
 
@@ -76,8 +74,7 @@ public sealed partial class Player : Node {
 
 		Entity.HandleInput(new(
 			InputManager.CurrentDevice,
-			CameraController,
-			Entity
+			CameraController
 		));
 	}
 
@@ -99,16 +96,15 @@ public sealed partial class Player : Node {
 	}
 
 
-	public readonly struct InputInfo(InputDevice inputDevice, CameraController3D cameraController, Entity entity) {
-		public readonly Entity Entity => entity;
+	public readonly struct InputInfo(InputDevice inputDevice, CameraController3D cameraController) {
 		public readonly InputDevice InputDevice => inputDevice;
 		public readonly CameraController3D CameraController => cameraController;
 
 
-		public readonly void RawInputToGroundedMovement(Vector2 moveInput, out Basis camRotation, out Vector3 groundedMovement) {
+		public readonly void RawInputToGroundedMovement(Entity entity, Vector2 moveInput, out Basis camRotation, out Vector3 groundedMovement) {
 			Vector3 camRight = CameraController.AbsoluteRotation.X;
-			float localAlignment = Mathf.Ceil(Entity.Transform.Basis.Y.Dot(CameraController.LocalRotation.Y));
-			Vector3 entityUp = Entity.Transform.Basis.Y * (localAlignment * 2f - 1f);
+			float localAlignment = Mathf.Ceil(entity.Transform.Basis.Y.Dot(CameraController.LocalRotation.Y));
+			Vector3 entityUp = entity.Transform.Basis.Y * (localAlignment * 2f - 1f);
 			Vector3 groundedCamForward = entityUp.Cross(camRight).Normalized();
 
 			camRotation = Basis.LookingAt(groundedCamForward, entityUp);

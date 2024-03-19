@@ -11,12 +11,16 @@ using Godot.Collections;
 [GlobalClass]
 public sealed partial class MultiWeapon : Weapon {
 	public override bool IsLoaded {
-		get => CurrentWeapon is SingleWeapon currentWeapon && currentWeapon.IsLoaded;
+		get => CurrentWeapon is Weapon currentWeapon && currentWeapon.IsLoaded;
 		set => CurrentWeapon?.AsILoadable().SetLoaded(value);
 	}
 
 
-	[Export] private Array<SingleWeapon?> Weapons {
+	public override WeaponData WeaponData {
+		get => CurrentWeapon?.WeaponData!;
+		protected set { }
+	}
+	[Export] private Array<Weapon?> Weapons {
 		get => [.. _weapons];
 		set {
 			_weapons = [.. value];
@@ -28,12 +32,12 @@ public sealed partial class MultiWeapon : Weapon {
 			UpdateCurrent();
 		}
 	}
-	private List<SingleWeapon?> _weapons = [];
+	private List<Weapon?> _weapons = [];
 
 	public override int Style {
 		get => _currentIndex;
 		set {
-			if (value == _currentIndex && CurrentWeapon is SingleWeapon currentWeapon) {
+			if (value == _currentIndex && CurrentWeapon is Weapon currentWeapon) {
 				currentWeapon.Style++;
 				return;
 			}
@@ -72,7 +76,7 @@ public sealed partial class MultiWeapon : Weapon {
 
 
 
-	public SingleWeapon? CurrentWeapon {
+	public Weapon? CurrentWeapon {
 		get => IndexInBounds(CurrentIndex) ? _weapons[CurrentIndex] : null;
 		private set {
 			if (value is not null) {
@@ -92,17 +96,17 @@ public sealed partial class MultiWeapon : Weapon {
 	public override Handedness Handedness {
 		get => CurrentWeapon?.Handedness ?? 0;
 		set {
-			if (CurrentWeapon is SingleWeapon currentWeapon)
+			if (CurrentWeapon is Weapon currentWeapon)
 				currentWeapon.Handedness = value;
 		}
 	}
 
 	private MultiWeapon() : base() { }
-	public MultiWeapon(IEnumerable<SingleWeapon> weapons) : this() {
+	public MultiWeapon(IEnumerable<Weapon> weapons) : this() {
 		Weapons = [.. weapons];
 	}
-	public MultiWeapon(ImmutableArray<ISaveData<SingleWeapon>> weaponSaves) : this() {
-		foreach (ISaveData<SingleWeapon> data in weaponSaves) {
+	public MultiWeapon(ImmutableArray<ISaveData<Weapon>> weaponSaves) : this() {
+		foreach (ISaveData<Weapon> data in weaponSaves) {
 			AddWeapon(data.Load());
 		}
 	}
@@ -119,24 +123,29 @@ public sealed partial class MultiWeapon : Weapon {
 
 		if (Engine.IsEditorHint()) {
 			// Rearrange the weapons in the Node hierarchy
-			List<SingleWeapon> weapons = Weapons.OfType<SingleWeapon>().ToList();
-			foreach (SingleWeapon weapon in weapons) {
+			List<Weapon> weapons = Weapons.OfType<Weapon>().ToList();
+			foreach (Weapon weapon in weapons) {
 				weapon.GetParent().MoveChild(weapon, weapons.IndexOf(weapon));
 			}
 		}
 	}
 
-	public void SwitchTo(SingleWeapon? weapon) =>
+	public void SwitchTo(Weapon? weapon) =>
 		SwitchTo(_weapons.IndexOf(weapon));
 
 	public void SwitchTo(int index) {
 		_currentIndex = index % Math.Max(_weapons.Count, 1);
 
+		// TODO: if the Entity is a player, check for the corresponding preference setting
+		if (CurrentWeapon is Weapon currentWeapon) {
+			currentWeapon.Style = 0;
+		}
+
 		UpdateCurrent();
 	}
 
 
-	public void AddWeapon(SingleWeapon weapon) {
+	public void AddWeapon(Weapon weapon) {
 		_weapons.Add(null!);
 
 		SetWeapon(_weapons.Count - 1, weapon);
@@ -148,14 +157,14 @@ public sealed partial class MultiWeapon : Weapon {
 		SetWeapon(_weapons.Count - 1, data, costume);
 	}
 
-	public void SetWeapon(int index, SingleWeapon? weapon) {
+	public void SetWeapon(int index, Weapon? weapon) {
 		if (! IndexInBounds(index))
 			return;
 
 		if (weapon is null)
 			return;
 
-		new LoadableUpdater<SingleWeapon>(ref weapon)
+		new LoadableUpdater<Weapon>(ref weapon)
 			.BeforeLoad(w => {
 				w.Inject(Entity);
 				w.SafeReparentEditor(this);
@@ -170,11 +179,11 @@ public sealed partial class MultiWeapon : Weapon {
 		if (! IndexInBounds(index))
 			return;
 
-		SingleWeapon? weapon = _weapons[index];
-		if (data is not null && data == weapon?.WeaponData)
-			return;
+		Weapon? weapon = _weapons[index];
+		// if (data is not null && data == weapon?.WeaponData)
+		// 	return;
 
-		new LoadableUpdater<SingleWeapon>(ref weapon, () => data?.Instantiate(costume))
+		new LoadableUpdater<Weapon>(ref weapon, () => data?.Instantiate(costume))
 			.BeforeLoad(w => {
 				w.Inject(Entity);
 				w.SafeReparentEditor(this);
@@ -189,8 +198,8 @@ public sealed partial class MultiWeapon : Weapon {
 		if (!IndexInBounds(index))
 			return;
 
-		SingleWeapon? weapon = _weapons[index];
-		new LoadableDestructor<SingleWeapon>(ref weapon)
+		Weapon? weapon = _weapons[index];
+		new LoadableDestructor<Weapon>(ref weapon)
 			.Execute();
 
 		_weapons.RemoveAt(index);
@@ -199,7 +208,7 @@ public sealed partial class MultiWeapon : Weapon {
 
 
 	public override IEnumerable<AttackAction.IInfo> GetAttacks(Entity target) {
-		SingleWeapon? currentWeapon = CurrentWeapon;
+		Weapon? currentWeapon = CurrentWeapon;
 		return _weapons
 			.SelectMany((w) => w?.GetAttacks(target) ?? [])
 			.Select(a => {
@@ -219,6 +228,16 @@ public sealed partial class MultiWeapon : Weapon {
 		_weapons.ForEach(w => w?.Inject(entity));
 	}
 
+	public override void HandleStyleInput(Player.InputInfo inputInfo) {
+		base.HandleStyleInput(inputInfo);
+			if (inputInfo.InputDevice.IsActionJustPressed("switch_weapon_primary")) {
+				Style = 0;
+			} else if (inputInfo.InputDevice.IsActionJustPressed("switch_weapon_secondary")) {
+				Style = 1;
+			} else if (inputInfo.InputDevice.IsActionJustPressed("switch_weapon_ternary")) {
+				Style = 2;
+			}
+	}
 	public override void HandleInput(Player.InputInfo inputInfo) {
 		base.HandleInput(inputInfo);
 		CurrentWeapon?.HandleInput(inputInfo);
@@ -239,9 +258,9 @@ public sealed partial class MultiWeapon : Weapon {
 	}
 
 
-	public readonly struct MultiWeaponSaveData(IEnumerable<SingleWeapon> weapons) : ISaveData<Weapon> {
-		private readonly ISaveData<SingleWeapon>[] WeaponSaves = weapons
-			.Select(w => w.SingleWeaponSave())
+	public readonly struct MultiWeaponSaveData(IEnumerable<Weapon> weapons) : ISaveData<Weapon> {
+		private readonly ISaveData<Weapon>[] WeaponSaves = weapons
+			.Select(w => w.Save())
 			.ToArray();
 
 		public Weapon Load() {

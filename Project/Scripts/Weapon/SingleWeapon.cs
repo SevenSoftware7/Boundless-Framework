@@ -11,8 +11,6 @@ public abstract partial class SingleWeapon : Weapon {
 	}
 
 
-	[Export] public abstract WeaponData WeaponData { get; protected set; }
-
 	[ExportGroup("Costume")]
 	[Export] private Model? WeaponModel;
 
@@ -121,9 +119,6 @@ public abstract partial class SingleWeapon : Weapon {
 	}
 
 
-
-	public override ISaveData<Weapon> Save() => (ISaveData<Weapon>) SingleWeaponSave();
-	public abstract ISaveData<SingleWeapon> SingleWeaponSave();
 
 	public override void _Parented() {
 		base._Parented();

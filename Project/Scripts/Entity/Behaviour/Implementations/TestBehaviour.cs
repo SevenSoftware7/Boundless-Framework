@@ -24,17 +24,17 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 	public override void HandleInput(Player.InputInfo inputInfo) {
 		base.HandleInput(inputInfo);
 
-		if (inputInfo.InputDevice.IsActionPressed("jump")/* inputInfo.ControlDevice.IsInputPressed(ControlDevice.InputType.Jump) */) {
+		if (inputInfo.InputDevice.IsActionPressed("jump")) {
 			Jump();
 		}
 
 		Vector2 movement = inputInfo.InputDevice.GetVector("move_left", "move_right", "move_forward", "move_backward").ClampMagnitude(1f);
-		inputInfo.RawInputToGroundedMovement(movement, out _, out Vector3 groundedMovement);
+		inputInfo.RawInputToGroundedMovement(Entity, movement, out _, out Vector3 groundedMovement);
 
 		float speedSquared = groundedMovement.LengthSquared();
 		MovementSpeed speed = speedSquared switch {
 			_ when Mathf.IsZeroApprox(speedSquared) => MovementSpeed.Idle,
-			_ when speedSquared <= 0.25f => MovementSpeed.Walk,
+			_ when speedSquared <= 0.25f || inputInfo.InputDevice.IsActionPressed("walk") => MovementSpeed.Walk,
 			_ when inputInfo.InputDevice.IsActionPressed("evade") => MovementSpeed.Sprint,
 			_ => MovementSpeed.Run
 		};
@@ -81,9 +81,7 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 
 	public override void _Process(double delta) {
 		base._Process(delta);
-
 		float floatDelta = (float) delta;
-
 
 		// ----- Inertia Calculations -----
 

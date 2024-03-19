@@ -10,7 +10,7 @@ public sealed partial class JoypadInputDevice : InputDevice {
 	public new string Name { get; private set; } = string.Empty;
 	public string GUID { get; private set; } = Guid.Empty.ToString();
 
-	protected override StringName ActionSuffix => Id.ToString();
+	protected override StringName ActionSuffix => $"joy{Id}";
 
 	private JoypadInputDevice() : base() { }
 	public JoypadInputDevice(int DeviceId) : base() {

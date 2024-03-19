@@ -177,7 +177,11 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 		);
 
 		BehaviourManager?.CurrentBehaviour?.HandleInput(inputInfo);
-		Weapon?.HandleInput(inputInfo);
+
+		if (Weapon is Weapon weapon) {
+			weapon.HandleStyleInput(inputInfo);
+			weapon.HandleInput(inputInfo);
+		}
 	}
 
 	public void SplitInertia(out Vector3 vertical, out Vector3 horizontal) {

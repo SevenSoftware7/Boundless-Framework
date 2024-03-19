@@ -10,6 +10,7 @@ public abstract partial class Weapon : Loadable3D, IWeapon, IInjectable<Entity?>
 
 
 
+	public abstract WeaponData WeaponData { get; protected set; }
 	public abstract IWeapon.Type WeaponType { get; }
 	public abstract IWeapon.Size WeaponSize { get; }
 	public abstract Handedness Handedness { get; set; }
@@ -23,6 +24,7 @@ public abstract partial class Weapon : Loadable3D, IWeapon, IInjectable<Entity?>
 	public virtual void Inject(Entity? owner) { }
 
 
+	public virtual void HandleStyleInput(Player.InputInfo inputInfo) { }
 	public virtual void HandleInput(Player.InputInfo inputInfo) { }
 
 	public abstract ISaveData<Weapon> Save();
