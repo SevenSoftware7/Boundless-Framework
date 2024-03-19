@@ -30,11 +30,11 @@ public abstract partial class Loadable2D : ExtendedNode2D, ILoadable {
 	protected virtual void UnloadModelBehaviour() { }
 
 	public virtual void Enable() {
-		SetProcess(true);
+		ProcessMode = ProcessModeEnum.Inherit;
 		Visible = true;
 	}
 	public virtual void Disable() {
-		SetProcess(false);
+		ProcessMode = ProcessModeEnum.Disabled;
 		Visible = false;
 	}
 	public virtual void Destroy() {

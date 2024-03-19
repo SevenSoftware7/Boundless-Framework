@@ -28,22 +28,17 @@ public sealed partial class MultiWeapon : Weapon {
 			if (this.IsInitializationSetterCall())
 				return;
 
-			_weapons.ForEach(w => w?.SafeReparentEditor(this));
+			_weapons.ForEach(w => w?.SafeReparentEditor(this).Inject(Entity));
 			UpdateCurrent();
 		}
 	}
 	private List<Weapon?> _weapons = [];
 
+	public override int StyleCount => Mathf.Max(_weapons.Count, 1);
+
 	public override int Style {
 		get => _currentIndex;
-		set {
-			if (value == _currentIndex && CurrentWeapon is Weapon currentWeapon) {
-				currentWeapon.Style++;
-				return;
-			}
-
-			SwitchTo(value);
-		}
+		set => SwitchTo(value);
 	}
 
 	[ExportGroup("Current Weapon")]
@@ -134,11 +129,17 @@ public sealed partial class MultiWeapon : Weapon {
 		SwitchTo(_weapons.IndexOf(weapon));
 
 	public void SwitchTo(int index) {
-		_currentIndex = index % Math.Max(_weapons.Count, 1);
+		int newIndex = index % StyleCount;
+		if (newIndex == _currentIndex && CurrentWeapon is Weapon currentWeapon) {
+			currentWeapon.Style++;
+			return;
+		}
+
+		_currentIndex = newIndex;
 
 		// TODO: if the Entity is a player, check for the corresponding preference setting
-		if (CurrentWeapon is Weapon currentWeapon) {
-			currentWeapon.Style = 0;
+		if (CurrentWeapon is Weapon newWeapon) {
+			newWeapon.Style = 0;
 		}
 
 		UpdateCurrent();
@@ -180,8 +181,8 @@ public sealed partial class MultiWeapon : Weapon {
 			return;
 
 		Weapon? weapon = _weapons[index];
-		// if (data is not null && data == weapon?.WeaponData)
-		// 	return;
+		if (data is not null && data == weapon?.WeaponData)
+			return;
 
 		new LoadableUpdater<Weapon>(ref weapon, () => data?.Instantiate(costume))
 			.BeforeLoad(w => {
@@ -223,8 +224,6 @@ public sealed partial class MultiWeapon : Weapon {
 	public override void Inject(Entity? entity) {
 		_entity = entity;
 
-		this.SafeReparentEditor(entity);
-
 		_weapons.ForEach(w => w?.Inject(entity));
 	}
 
@@ -243,9 +242,18 @@ public sealed partial class MultiWeapon : Weapon {
 		CurrentWeapon?.HandleInput(inputInfo);
 	}
 
-	public override void Enable() => CurrentWeapon?.Enable();
-	public override void Disable() => _weapons.ForEach(w => w?.Disable());
-	public override void Destroy() => _weapons.ForEach(w => w?.Destroy());
+	public override void Enable() {
+		base.Enable();
+		CurrentWeapon?.Enable();
+	}
+	public override void Disable() {
+		_weapons.ForEach(w => w?.Disable());
+		base.Disable();
+	}
+	public override void Destroy() {
+		_weapons.ForEach(w => w?.Destroy());
+		base.Destroy();
+	}
 
 	protected override bool LoadModelBehaviour() => CurrentWeapon?.AsILoadable().LoadModel() ?? false;
 	protected override void UnloadModelBehaviour() => CurrentWeapon?.AsILoadable().UnloadModel();
@@ -253,17 +261,18 @@ public sealed partial class MultiWeapon : Weapon {
 
 
 
-	public override ISaveData<Weapon> Save() {
+	public ISaveData<MultiWeapon> SaveMulti() {
 		return new MultiWeaponSaveData([.. _weapons]);
 	}
+	public override ISaveData<Weapon> Save() => (ISaveData<Weapon>)SaveMulti();
 
 
-	public readonly struct MultiWeaponSaveData(IEnumerable<Weapon> weapons) : ISaveData<Weapon> {
+	public readonly struct MultiWeaponSaveData(IEnumerable<Weapon> weapons) : ISaveData<MultiWeapon> {
 		private readonly ISaveData<Weapon>[] WeaponSaves = weapons
 			.Select(w => w.Save())
 			.ToArray();
 
-		public Weapon Load() {
+		public MultiWeapon Load() {
 			return new MultiWeapon([.. WeaponSaves]);
 		}
 	}

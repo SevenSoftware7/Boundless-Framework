@@ -5,7 +5,8 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public abstract partial class Weapon : Loadable3D, IWeapon, IInjectable<Entity?> {
+public abstract partial class Weapon : Loadable3D, IWeapon {
+	public virtual int StyleCount { get; } = 1;
 	public abstract int Style { get; set; }
 
 

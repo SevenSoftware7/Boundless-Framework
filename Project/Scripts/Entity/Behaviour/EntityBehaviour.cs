@@ -26,10 +26,10 @@ public abstract partial class EntityBehaviour : Node, IInputReader {
 	public virtual bool Jump(Vector3? target = null) => true;
 
 	public virtual void Start(EntityBehaviour? previousBehaviour) {
-		SetProcess(true);
+		ProcessMode = ProcessModeEnum.Inherit;
 	}
 	public virtual void Stop() {
-		SetProcess(false);
+		ProcessMode = ProcessModeEnum.Disabled;
 	}
 
 

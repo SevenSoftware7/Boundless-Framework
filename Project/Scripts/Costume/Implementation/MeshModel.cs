@@ -64,7 +64,7 @@ public partial class MeshModel : Model {
 
 		Model = model;
 		ParentToSkeleton();
-		Model.SetProcess(IsProcessing());
+		Model.ProcessMode = ProcessMode;
 		Model.Visible = Visible;
 		Model.Name = $"{nameof(Costume)} - {Costume.DisplayName}";
 
@@ -83,14 +83,14 @@ public partial class MeshModel : Model {
 	public override void Enable() {
 		base.Enable();
 		if (Model is not null) {
-			Model.SetProcess(true);
+			Model.ProcessMode = ProcessModeEnum.Inherit;
 			Model.Visible = true;
 		}
 	}
 	public override void Disable() {
 		base.Disable();
 		if (Model is not null) {
-			Model.SetProcess(false);
+			Model.ProcessMode = ProcessModeEnum.Disabled;
 			Model.Visible = false;
 		}
 	}

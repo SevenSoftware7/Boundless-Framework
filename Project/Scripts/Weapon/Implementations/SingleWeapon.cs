@@ -9,6 +9,7 @@ public abstract partial class SingleWeapon<[MustBeVariant] T> : SingleWeapon whe
 		protected set => Data = (value as T)!;
 	}
 
+	// I'm pretty sure this should be Exportable but it is not, TODO: Export this instead of WeaponData when/if possible
 	public T Data {
 		get => _data;
 		protected set {

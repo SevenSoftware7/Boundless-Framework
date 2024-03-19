@@ -37,11 +37,10 @@ public abstract partial class SingleWeapon : Weapon {
 	}
 	private Entity? _entity;
 
-	protected virtual int StyleMax { get; } = 0;
 
 	public override int Style {
 		get => _style;
-		set => _style = value % (StyleMax + 1);
+		set => _style = value % (StyleCount + 1);
 	}
 	private int _style;
 

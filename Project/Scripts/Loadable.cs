@@ -30,10 +30,10 @@ public abstract partial class Loadable : ExtendedNode, ILoadable {
 	protected virtual void UnloadModelBehaviour() { }
 
 	public virtual void Enable() {
-		SetProcess(true);
+		ProcessMode = ProcessModeEnum.Inherit;
 	}
 	public virtual void Disable() {
-		SetProcess(false);
+		ProcessMode = ProcessModeEnum.Disabled;
 	}
 	public virtual void Destroy() {
 		AsILoadable().UnloadModel();
