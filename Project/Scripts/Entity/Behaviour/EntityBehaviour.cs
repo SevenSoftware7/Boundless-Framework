@@ -19,7 +19,7 @@ public abstract partial class EntityBehaviour : Node, IInputReader {
 
 
 
-	public virtual void HandleInput(Player.InputInfo inputInfo) { }
+	public virtual void HandleInput(CameraController3D cameraController, InputDevice inputDevice) { }
 
 	public virtual bool SetSpeed(MovementSpeed speed) => true;
 	public virtual bool Move(Vector3 direction) => true;

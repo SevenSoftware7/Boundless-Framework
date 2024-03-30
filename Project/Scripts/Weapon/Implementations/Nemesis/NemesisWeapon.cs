@@ -5,27 +5,38 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public sealed partial class NemesisWeapon : SingleWeapon<NemesisWeaponData> {
-	private NemesisWeapon() : base() {}
-	public NemesisWeapon(NemesisWeaponData? data = null, WeaponCostume? costume = null) : base(data, costume) {}
+public sealed partial class NemesisWeapon(NemesisWeaponData? data = null, WeaponCostume? costume = null) : SingleWeapon<NemesisWeaponData>(data, costume) {
+	private SlashAttackInfo slashAttack = null!;
 
 
+	private NemesisWeapon() : this(null) {}
 
-	public override IEnumerable<AttackAction.IInfo> GetAttacks(Entity target) {
+
+	public override IEnumerable<AttackInfo> GetAttacks(Entity target) {
 		return [
-			SlashAttack.DefaultInfo with { Weapon = this },
+			slashAttack,
 		];
 	}
 
 
-	public override void HandleInput(Player.InputInfo inputInfo) {
-		base.HandleInput(inputInfo);
+	public override void HandleInput(CameraController3D cameraController, InputDevice inputDevice) {
+		base.HandleInput(cameraController, inputDevice);
+
+		if (! CanProcess()) {
+			return;
+		}
 
 		if (Entity is null)
 			return;
 
-		if (inputInfo.InputDevice.IsActionJustPressed("attack_light")) {
-			Entity.ExecuteAction(SlashAttack.DefaultInfo with { Weapon = this });
+		if (inputDevice.IsActionJustPressed("attack_light")) {
+			Entity.ExecuteAction(slashAttack with {});
 		}
+	}
+
+	public override void _Ready() {
+		base._Ready();
+
+		slashAttack = new(this);
 	}
 }

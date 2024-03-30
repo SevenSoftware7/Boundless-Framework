@@ -72,10 +72,8 @@ public sealed partial class Player : Node {
 		if (Entity is null || CameraController is null)
 			return;
 
-		Entity.HandleInput(new(
-			InputManager.CurrentDevice,
-			CameraController
-		));
+
+		Entity.PropagateCall(nameof(IInputReader.HandleInput), [CameraController, InputManager.CurrentDevice]);
 	}
 
 	public override void _Ready() {
@@ -93,28 +91,5 @@ public sealed partial class Player : Node {
 			return;
 
 		UnsetPlayerId();
-	}
-
-
-	public readonly struct InputInfo(InputDevice inputDevice, CameraController3D cameraController) {
-		public readonly InputDevice InputDevice => inputDevice;
-		public readonly CameraController3D CameraController => cameraController;
-
-
-		public readonly void RawInputToGroundedMovement(Entity entity, Vector2 moveInput, out Basis camRotation, out Vector3 groundedMovement) {
-			Vector3 camRight = CameraController.AbsoluteRotation.X;
-			float localAlignment = Mathf.Ceil(entity.Transform.Basis.Y.Dot(CameraController.LocalRotation.Y));
-			Vector3 entityUp = entity.Transform.Basis.Y * (localAlignment * 2f - 1f);
-			Vector3 groundedCamForward = entityUp.Cross(camRight).Normalized();
-
-			camRotation = Basis.LookingAt(groundedCamForward, entityUp);
-
-			groundedMovement = camRotation * new Vector3(moveInput.X, 0, moveInput.Y).ClampMagnitude(1f);
-		}
-		public readonly void RawInputToCameraRelativeMovement(Vector2 moveInput, out Basis camRotation, out Vector3 cameraRelativeMovement) {
-			camRotation = CameraController.AbsoluteRotation;
-
-			cameraRelativeMovement = camRotation * new Vector3(moveInput.X, 0, moveInput.Y);
-		}
 	}
 }

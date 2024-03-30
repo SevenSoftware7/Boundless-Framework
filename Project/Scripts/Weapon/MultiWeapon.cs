@@ -208,7 +208,7 @@ public sealed partial class MultiWeapon : Weapon {
 	}
 
 
-	public override IEnumerable<AttackAction.IInfo> GetAttacks(Entity target) {
+	public override IEnumerable<AttackInfo> GetAttacks(Entity target) {
 		Weapon? currentWeapon = CurrentWeapon;
 		return _weapons
 			.SelectMany((w) => w?.GetAttacks(target) ?? [])
@@ -225,21 +225,6 @@ public sealed partial class MultiWeapon : Weapon {
 		_entity = entity;
 
 		_weapons.ForEach(w => w?.Inject(entity));
-	}
-
-	public override void HandleStyleInput(Player.InputInfo inputInfo) {
-		base.HandleStyleInput(inputInfo);
-			if (inputInfo.InputDevice.IsActionJustPressed("switch_weapon_primary")) {
-				Style = 0;
-			} else if (inputInfo.InputDevice.IsActionJustPressed("switch_weapon_secondary")) {
-				Style = 1;
-			} else if (inputInfo.InputDevice.IsActionJustPressed("switch_weapon_ternary")) {
-				Style = 2;
-			}
-	}
-	public override void HandleInput(Player.InputInfo inputInfo) {
-		base.HandleInput(inputInfo);
-		CurrentWeapon?.HandleInput(inputInfo);
 	}
 
 	public override void Enable() {

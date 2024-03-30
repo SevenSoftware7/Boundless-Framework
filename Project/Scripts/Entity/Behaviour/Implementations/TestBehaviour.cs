@@ -21,21 +21,21 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 	}
 
 
-	public override void HandleInput(Player.InputInfo inputInfo) {
-		base.HandleInput(inputInfo);
+	public override void HandleInput(CameraController3D cameraController, InputDevice inputDevice) {
+		base.HandleInput(cameraController, inputDevice);
 
-		if (inputInfo.InputDevice.IsActionPressed("jump")) {
+		if (inputDevice.IsActionPressed("jump")) {
 			Jump();
 		}
 
-		Vector2 movement = inputInfo.InputDevice.GetVector("move_left", "move_right", "move_forward", "move_backward").ClampMagnitude(1f);
-		inputInfo.RawInputToGroundedMovement(Entity, movement, out _, out Vector3 groundedMovement);
+		Vector2 movement = inputDevice.GetVector("move_left", "move_right", "move_forward", "move_backward").ClampMagnitude(1f);
+		cameraController.RawInputToGroundedMovement(Entity, movement, out _, out Vector3 groundedMovement);
 
 		float speedSquared = groundedMovement.LengthSquared();
 		MovementSpeed speed = speedSquared switch {
 			_ when Mathf.IsZeroApprox(speedSquared) => MovementSpeed.Idle,
-			_ when speedSquared <= 0.25f || inputInfo.InputDevice.IsActionPressed("walk") => MovementSpeed.Walk,
-			_ when inputInfo.InputDevice.IsActionPressed("evade") => MovementSpeed.Sprint,
+			_ when speedSquared <= 0.25f || inputDevice.IsActionPressed("walk") => MovementSpeed.Walk,
+			_ when inputDevice.IsActionPressed("evade") => MovementSpeed.Sprint,
 			_ => MovementSpeed.Run
 		};
 		SetSpeed(speed);

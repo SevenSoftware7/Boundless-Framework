@@ -32,11 +32,9 @@ public sealed partial class KMInputDevice : InputDevice {
 		if (Engine.IsEditorHint())
 			return;
 
-		Callable.From(UpdateMouse).CallDeferred();
-
-		static void UpdateMouse() {
+		Callable.From(() => {
 			mouseMotion = new();
-		}
+		}).CallDeferred();
 	}
 
 	public override void _UnhandledInput(InputEvent @event) {

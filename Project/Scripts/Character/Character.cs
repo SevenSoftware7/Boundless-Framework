@@ -110,7 +110,7 @@ public partial class Character : Loadable3D, IInputReader, ICustomizable {
 		};
 	}
 
-	public virtual void HandleInput(Player.InputInfo inputInfo) { }
+	public virtual void HandleInput(CameraController3D cameraController, InputDevice inputDevice) { }
 
 
 	protected override bool LoadModelBehaviour() {

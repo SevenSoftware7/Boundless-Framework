@@ -34,6 +34,10 @@ public abstract partial class SingleWeapon<[MustBeVariant] T> : SingleWeapon whe
 
 	protected SingleWeapon() : base() {}
 	public SingleWeapon(T? data, WeaponCostume? costume) : this() {
+		if (this.JustBuilt()) {
+			return;
+		}
+
 		SetData(data ?? ResourceManager.GetRegisteredWeapon<T>(), costume);
 	}
 

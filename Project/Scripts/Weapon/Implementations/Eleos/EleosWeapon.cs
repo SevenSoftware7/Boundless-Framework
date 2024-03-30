@@ -5,27 +5,45 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public sealed partial class EleosWeapon : SingleWeapon<EleosWeaponData> {
-	private EleosWeapon() : base() {}
-	public EleosWeapon(EleosWeaponData? data = null, WeaponCostume? costume = null) : base(data, costume) {}
+public sealed partial class EleosWeapon(EleosWeaponData? data = null, WeaponCostume? costume = null) : SingleWeapon<EleosWeaponData>(data, costume) {
+	private SlashAttackInfo slashAttack = null!;
+	private CompositeChargeAttackInfo chargeAttack = null!;
 
 
+	private EleosWeapon() : this(null) {}
 
-	public override IEnumerable<AttackAction.IInfo> GetAttacks(Entity target) {
+
+	public override IEnumerable<AttackInfo> GetAttacks(Entity target) {
 		return [
-			SlashAttack.DefaultInfo with { Weapon = this },
+			slashAttack,
+			chargeAttack
 		];
 	}
 
 
-	public override void HandleInput(Player.InputInfo inputInfo) {
-		base.HandleInput(inputInfo);
+	public override void HandleInput(CameraController3D cameraController, InputDevice inputDevice) {
+		base.HandleInput(cameraController, inputDevice);
+
+		if (! CanProcess()) {
+			return;
+		}
 
 		if (Entity is null)
 			return;
 
-		if (inputInfo.InputDevice.IsActionJustPressed("attack_light")) {
-			Entity.ExecuteAction(SlashAttack.DefaultInfo with { Weapon = this });
+		if (inputDevice.IsActionJustPressed("attack_light")) {
+			Entity.ExecuteAction(slashAttack with {});
 		}
+
+		if (inputDevice.IsActionJustPressed("attack_heavy")) {
+			Entity.ExecuteAction(chargeAttack);
+		}
+	}
+
+	public override void _Ready() {
+		base._Ready();
+
+		slashAttack = new(this);
+		chargeAttack = new(this, slashAttack, slashAttack, "attack_heavy");
 	}
 }

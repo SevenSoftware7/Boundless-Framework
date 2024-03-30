@@ -31,6 +31,7 @@ file_logging/enable_file_logging=true
 
 window/size/mode=4
 window/size/borderless=true
+window/vsync/vsync_mode=2
 
 [dotnet]
 
@@ -157,12 +158,17 @@ switch_weapon_ternary={
 
 [layer_names]
 
+3d_render/layer_1="Terrain"
+3d_render/layer_2="Characters"
+3d_render/layer_3="Water"
 3d_physics/layer_1="Terrain"
 3d_physics/layer_2="Entity"
 3d_physics/layer_3="Water"
 
 [rendering]
 
+lights_and_shadows/directional_shadow/size=8192
+lights_and_shadows/directional_shadow/size.mobile=4096
 lights_and_shadows/directional_shadow/soft_shadow_filter_quality=5
 lights_and_shadows/positional_shadow/soft_shadow_filter_quality=5
 anti_aliasing/quality/screen_space_aa=1

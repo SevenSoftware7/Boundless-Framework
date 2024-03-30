@@ -2,19 +2,28 @@ namespace SevenGame.Utility;
 
 using Godot;
 
-public struct TimeDuration(ulong durationMsec) {
-	public ulong stopTime = 0;
+public struct TimeDuration {
+	public ulong DurationMsec { get; init; } = 0;
+	public ulong StopTime { get; private set; } = 0;
 
-	public readonly bool IsDone => Time.GetTicksMsec() >= stopTime;
-	public readonly ulong RemainingDuration => IsDone ? 0 : stopTime - Time.GetTicksMsec();
+	public readonly bool IsDone => Time.GetTicksMsec() >= StopTime;
+	public readonly ulong RemainingDuration => IsDone ? 0 : StopTime - Time.GetTicksMsec();
+	public readonly ulong Overtime => IsDone ? Time.GetTicksMsec() - StopTime : 0;
+
+
+
+	public TimeDuration(ulong durationMsec) {
+		DurationMsec = durationMsec;
+		Start();
+	}
 
 
 
 	public void End() {
-		stopTime = Time.GetTicksMsec();
+		StopTime = Time.GetTicksMsec();
 	}
 	public void Start() {
-		stopTime = Time.GetTicksMsec() + durationMsec;
+		StopTime = Time.GetTicksMsec() + DurationMsec;
 	}
 
 

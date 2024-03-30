@@ -11,7 +11,7 @@ public interface IWeapon : IInputReader, ICustomizable, IInjectable<Entity?> {
 
 
 
-	IEnumerable<AttackAction.IInfo> GetAttacks(Entity target);
+	IEnumerable<AttackInfo> GetAttacks(Entity target);
 
 
 	[Flags]

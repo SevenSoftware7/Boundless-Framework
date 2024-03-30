@@ -3,9 +3,8 @@ namespace LandlessSkies.Core;
 using System;
 using Godot;
 
-public abstract class EntityAction : IDisposable, IInputReader {
-	private bool _disposed = false;
-	public event Action? OnDispose;
+public abstract partial class EntityAction : Node, IInputReader {
+	public event Action? OnDestroy;
 
 
 	public abstract bool IsCancellable { get; }
@@ -13,50 +12,13 @@ public abstract class EntityAction : IDisposable, IInputReader {
 
 
 
-	public virtual void HandleInput(Player.InputInfo inputInfo) { }
-	protected virtual void DisposeBehaviour() { }
+	public virtual void HandleInput(CameraController3D cameraController, InputDevice inputDevice) { }
 
 
-
-	public void Dispose() {
-		Callable.From(DisposeAction).CallDeferred();
-
-		void DisposeAction() {
-			Dispose(true);
-			GC.SuppressFinalize(this);
+	public override void _Notification(int what) {
+		base._Notification(what);
+		if (what == NotificationPredelete) {
+			OnDestroy?.Invoke();
 		}
-	}
-
-	private void Dispose(bool disposing) {
-		if (_disposed) {
-			return;
-		}
-
-		if (disposing) {
-			OnDispose?.Invoke();
-			DisposeBehaviour();
-		}
-
-		_disposed = true;
-	}
-
-
-
-	public interface IInfo {
-		Action? BeforeExecute { get; set; }
-		Action? AfterExecute { get; set; }
-
-
-		EntityAction Build();
-	}
-}
-
-public static class EntityActionExtensions {
-	public static EntityAction Execute(this EntityAction.IInfo info) {
-		info.BeforeExecute?.Invoke();
-		EntityAction action = info.Build();
-		action.OnDispose += info.AfterExecute;
-
-		return action;
 	}
 }

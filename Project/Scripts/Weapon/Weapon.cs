@@ -21,12 +21,12 @@ public abstract partial class Weapon : Loadable3D, IWeapon {
 	public virtual ICustomizationParameter[] Customizations => [];
 
 
-	public abstract IEnumerable<AttackAction.IInfo> GetAttacks(Entity target);
-	public virtual void Inject(Entity? owner) { }
+	public abstract IEnumerable<AttackInfo> GetAttacks(Entity target);
+	public virtual void Inject(Entity? entity) { }
 
 
-	public virtual void HandleStyleInput(Player.InputInfo inputInfo) { }
-	public virtual void HandleInput(Player.InputInfo inputInfo) { }
+	// public virtual void HandleStyleInput(Player.InputInfo inputInfo) { }
+	public virtual void HandleInput(CameraController3D cameraController, InputDevice inputDevice) { }
 
 	public abstract ISaveData<Weapon> Save();
 }

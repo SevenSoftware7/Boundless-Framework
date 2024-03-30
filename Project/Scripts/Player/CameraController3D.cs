@@ -64,6 +64,24 @@ public partial class CameraController3D : Camera3D {
 		}
 	}
 
+	public void RawInputToGroundedMovement(Entity entity, Vector2 moveInput, out Basis camRotation, out Vector3 groundedMovement) {
+		Vector3 camRight = AbsoluteRotation.X;
+		float localAlignment = Mathf.Ceil(entity.Transform.Basis.Y.Dot(LocalRotation.Y));
+		Vector3 entityUp = entity.Transform.Basis.Y * (localAlignment * 2f - 1f);
+		Vector3 groundedCamForward = entityUp.Cross(camRight).Normalized();
+
+		camRotation = Basis.LookingAt(groundedCamForward, entityUp);
+
+		groundedMovement = camRotation * new Vector3(moveInput.X, 0, moveInput.Y).ClampMagnitude(1f);
+	}
+
+	public void RawInputToCameraRelativeMovement(Vector2 moveInput, out Basis camRotation, out Vector3 cameraRelativeMovement) {
+		camRotation = AbsoluteRotation;
+
+		cameraRelativeMovement = camRotation * new Vector3(moveInput.X, 0, moveInput.Y);
+	}
+
+
 	private void ComputeCamera(double delta) {
 		float floatDelta = (float) delta;
 

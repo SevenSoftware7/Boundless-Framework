@@ -155,33 +155,40 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 		Character?.SetCostume(costume);
 	}
 
-	public void ExecuteAction(EntityAction.IInfo action, bool forceExecute = false) {
-		if (CurrentAction is EntityAction currentAction && !currentAction.IsCancellable && !forceExecute)
+	public bool CanCancelAction() {
+		return CurrentAction is null || CurrentAction.IsCancellable;
+	}
+
+	public void ExecuteAction(EntityActionInfo action, bool forceExecute = false) {
+		if (! forceExecute && ! CanCancelAction())
 			return;
 
-		try {
-			CurrentAction?.Dispose();
-			CurrentAction = null;
-		} catch (ObjectDisposedException) { }
+		CurrentAction?.QueueFree();
+		CurrentAction = null;
 
 		action.AfterExecute += () => CurrentAction = null;
 		CurrentAction = action.Execute();
+
+		Callable.From(() => CurrentAction.ParentTo(this)).CallDeferred();
 	}
 
 
-
-	public void HandleInput(Player.InputInfo inputInfo) {
-		inputInfo.CameraController.SetEntityAsSubject(this);
-		inputInfo.CameraController.MoveCamera(
-			inputInfo.InputDevice.GetVector("look_left", "look_right", "look_down", "look_up") * inputInfo.InputDevice.Sensitivity
+	public void HandleInput(CameraController3D cameraController, InputDevice inputDevice) {
+		cameraController.SetEntityAsSubject(this);
+		cameraController.MoveCamera(
+			inputDevice.GetVector("look_left", "look_right", "look_down", "look_up") * inputDevice.Sensitivity
 		);
 
-		BehaviourManager?.CurrentBehaviour?.HandleInput(inputInfo);
-
-		if (Weapon is Weapon weapon) {
-			weapon.HandleStyleInput(inputInfo);
-			weapon.HandleInput(inputInfo);
+		if (_weapon is not null) {
+			if (inputDevice.IsActionJustPressed("switch_weapon_primary")) {
+				_weapon.Style = 0;
+			} else if (inputDevice.IsActionJustPressed("switch_weapon_secondary")) {
+				_weapon.Style = 1;
+			} else if (inputDevice.IsActionJustPressed("switch_weapon_ternary")) {
+				_weapon.Style = 2;
+			}
 		}
+
 	}
 
 	public void SplitInertia(out Vector3 vertical, out Vector3 horizontal) {
@@ -290,10 +297,11 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	}
 
 
-	public override void _Notification(int what) {
-		base._Notification(what);
-		if (what == NotificationPredelete) {
-			Callable.From(() => _weapon?.Inject(null)).CallDeferred();
-		}
-	}
+	// public override void _Notification(int what) {
+	// 	base._Notification(what);
+	// 	if (what == NotificationPredelete) {
+	// 		// Callable.From(() => _weapon?.Inject(null)).CallDeferred();
+	// 		PropagateCall(nameof(IInjectable<Entity>.Inject), [Variant.From<Entity>(null!)]);
+	// 	}
+	// }
 }
