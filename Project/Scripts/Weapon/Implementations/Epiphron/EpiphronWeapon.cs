@@ -5,11 +5,12 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public sealed partial class EpiphronWeapon(EpiphronWeaponData? data = null, WeaponCostume? costume = null) : SingleWeapon<EpiphronWeaponData>(data, costume) {
+public sealed partial class EpiphronWeapon : SingleWeapon<EpiphronWeaponData> {
 	private SlashAttackInfo slashAttack = null!;
 
 
-	private EpiphronWeapon() : this(null) {}
+	public EpiphronWeapon(EpiphronWeaponData? data = null, WeaponCostume? costume = null) : base(data, costume) {}
+	private EpiphronWeapon() : base() {}
 
 
 	public override IEnumerable<AttackInfo> GetAttacks(Entity target) {

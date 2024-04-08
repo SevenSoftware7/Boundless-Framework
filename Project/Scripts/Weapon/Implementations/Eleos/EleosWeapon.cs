@@ -5,12 +5,13 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public sealed partial class EleosWeapon(EleosWeaponData? data = null, WeaponCostume? costume = null) : SingleWeapon<EleosWeaponData>(data, costume) {
+public sealed partial class EleosWeapon : SingleWeapon<EleosWeaponData> {
 	private SlashAttackInfo slashAttack = null!;
 	private CompositeChargeAttackInfo chargeAttack = null!;
 
 
-	private EleosWeapon() : this(null) {}
+	public EleosWeapon(EleosWeaponData? data = null, WeaponCostume? costume = null) : base(data, costume) {}
+	private EleosWeapon() : base() {}
 
 
 	public override IEnumerable<AttackInfo> GetAttacks(Entity target) {

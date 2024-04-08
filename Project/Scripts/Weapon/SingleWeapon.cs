@@ -6,7 +6,7 @@ using Godot;
 [GlobalClass]
 public abstract partial class SingleWeapon : Weapon {
 	public override bool IsLoaded {
-		get => WeaponModel is Model model && model.IsLoaded;
+		get => WeaponModel?.IsLoaded ?? false;
 		set => WeaponModel?.AsILoadable().SetLoaded(value);
 	}
 
@@ -72,6 +72,7 @@ public abstract partial class SingleWeapon : Weapon {
 				m.Inject(Entity?.Skeleton);
 				m.Inject(Handedness);
 				m.SafeReparentEditor(this);
+				m.AsIEnablable().EnableDisable(IsEnabled);
 			})
 			.Execute();
 
@@ -99,22 +100,22 @@ public abstract partial class SingleWeapon : Weapon {
 	}
 
 
-	protected override bool LoadModelBehaviour() {
+	protected override bool LoadBehaviour() {
 		WeaponModel?.Inject(Entity?.Skeleton);
-		return WeaponModel?.AsILoadable().LoadModel() ?? false;
+		return WeaponModel?.AsILoadable().Load() ?? false;
 	}
-	protected override void UnloadModelBehaviour() {
+	protected override void UnloadBehaviour() {
 		WeaponModel?.Inject(null);
-		WeaponModel?.AsILoadable().UnloadModel();
+		WeaponModel?.AsILoadable().Unload();
 	}
 
-	public override void Enable() {
-		base.Enable();
-		WeaponModel?.Enable();
+	protected override void EnableBehaviour() {
+		base.EnableBehaviour();
+		WeaponModel?.AsIEnablable().Enable();
 	}
-	public override void Disable() {
-		base.Disable();
-		WeaponModel?.Disable();
+	protected override void DisableBehaviour() {
+		base.DisableBehaviour();
+		WeaponModel?.AsIEnablable().Disable();
 	}
 
 

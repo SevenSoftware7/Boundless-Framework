@@ -5,40 +5,56 @@ namespace LandlessSkies.Core;
 [Tool]
 public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
 	[Export] public abstract bool IsLoaded { get; set; }
+	[Export] public virtual bool IsEnabled {
+		get => ProcessMode != ProcessModeEnum.Disabled;
+		set {
+			if (this.IsInitializationSetterCall())
+				return;
+
+			AsIEnablable().EnableDisable(value);
+		}
+	}
+
 	[Signal] public delegate void LoadedUnloadedEventHandler(bool isLoaded);
 
 
-
 	public ILoadable AsILoadable() => this;
+	public IEnablable AsIEnablable() => this;
 
-	bool ILoadable.LoadModelBehaviour() {
+	bool ILoadable.LoadBehaviour() {
 		if (!IsInsideTree() || GetParent() is null || Owner is null)
 			return false;
 
-		if (!LoadModelBehaviour())
+		if (!LoadBehaviour())
 			return false;
 
 		EmitSignal(SignalName.LoadedUnloaded, true);
 		return true;
 	}
-	void ILoadable.UnloadModelBehaviour() {
-		UnloadModelBehaviour();
+	protected virtual bool LoadBehaviour() => true;
+
+	void ILoadable.UnloadBehaviour() {
+		UnloadBehaviour();
 		EmitSignal(SignalName.LoadedUnloaded, false);
 	}
+	protected virtual void UnloadBehaviour() { }
 
-	protected virtual bool LoadModelBehaviour() => true;
-	protected virtual void UnloadModelBehaviour() { }
-
-	public virtual void Enable() {
+	void IEnablable.EnableBehaviour() {
 		ProcessMode = ProcessModeEnum.Inherit;
 		Visible = true;
+		EnableBehaviour();
 	}
-	public virtual void Disable() {
+	protected virtual void EnableBehaviour() { }
+
+	void IEnablable.DisableBehaviour() {
 		ProcessMode = ProcessModeEnum.Disabled;
 		Visible = false;
+		DisableBehaviour();
 	}
+	protected virtual void DisableBehaviour() { }
+
 	public virtual void Destroy() {
-		AsILoadable().UnloadModel();
+		AsILoadable().Unload();
 		this.UnparentAndQueueFree();
 	}
 
@@ -47,10 +63,10 @@ public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
 	public override void _EnterTree() {
 		base._EnterTree();
 		if (IsNodeReady())
-			Callable.From(AsILoadable().LoadModel).CallDeferred();
+			Callable.From(AsILoadable().Load).CallDeferred();
 	}
 	public override void _ExitTree() {
 		base._ExitTree();
-		Callable.From(AsILoadable().UnloadModel).CallDeferred();
+		Callable.From(AsILoadable().Unload).CallDeferred();
 	}
 }

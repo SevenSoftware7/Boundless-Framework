@@ -6,7 +6,7 @@ namespace LandlessSkies.Core;
 [GlobalClass]
 public partial class TestCompositorEffect : CompositorEffect {
 	private Rid nearestSampler;
-	private Rid linearSampler;
+	// private Rid linearSampler;
 
 
 	[Export] private RDShaderFile? ShaderFile {
@@ -49,10 +49,10 @@ public partial class TestCompositorEffect : CompositorEffect {
 			MinFilter = RenderingDevice.SamplerFilter.Nearest,
 			MagFilter = RenderingDevice.SamplerFilter.Nearest
 		});
-		linearSampler = renderingDevice.SamplerCreate(new() {
-			MinFilter = RenderingDevice.SamplerFilter.Linear,
-			MagFilter = RenderingDevice.SamplerFilter.Linear
-		});
+		// linearSampler = renderingDevice.SamplerCreate(new() {
+		// 	MinFilter = RenderingDevice.SamplerFilter.Linear,
+		// 	MagFilter = RenderingDevice.SamplerFilter.Linear
+		// });
 	}
 	private void Destruct() {
 		if (CompositorExtensions.RenderingDevice is not RenderingDevice renderingDevice)
@@ -61,7 +61,7 @@ public partial class TestCompositorEffect : CompositorEffect {
 		FreeShader(renderingDevice);
 
 		renderingDevice.FreeRid(nearestSampler);
-		renderingDevice.FreeRid(linearSampler);
+		// renderingDevice.FreeRid(linearSampler);
 	}
 
 	private void FreeShader(RenderingDevice renderingDevice) {
@@ -95,7 +95,7 @@ public partial class TestCompositorEffect : CompositorEffect {
 		uint yGroups = (uint)((renderSize.Y - 1) / 8) + 1;
 
 
-		bool linear = true;
+		// bool linear = true;
 
 		renderingDevice.DrawCommandBeginLabel("Test Label", new Color(1f, 1f, 1f));
 
@@ -103,7 +103,7 @@ public partial class TestCompositorEffect : CompositorEffect {
 			long computeList = renderingDevice.ComputeListBegin();
 			renderingDevice.ComputeListBindComputePipeline(computeList, shaderPipeline);
 			renderingDevice.ComputeListBindColor(computeList, sceneBuffers, view, shader, 0);
-			renderingDevice.ComputeListBindDepth(computeList, sceneBuffers, view, shader, linear ? linearSampler : nearestSampler, 1);
+			renderingDevice.ComputeListBindDepth(computeList, sceneBuffers, view, shader, /* linear ? linearSampler :  */nearestSampler, 1);
 			// renderingDevice.ComputeListSetPushConstant(computeList, push_constant.to_byte_array(), push_constant.size() * 4);
 			renderingDevice.ComputeListDispatch(computeList, xGroups, yGroups, 1);
 			renderingDevice.ComputeListEnd();

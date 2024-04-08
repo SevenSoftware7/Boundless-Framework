@@ -11,7 +11,7 @@ using Godot.Collections;
 [GlobalClass]
 public sealed partial class MultiWeapon : Weapon {
 	public override bool IsLoaded {
-		get => CurrentWeapon is Weapon currentWeapon && currentWeapon.IsLoaded;
+		get => CurrentWeapon?.IsLoaded ?? false;
 		set => CurrentWeapon?.AsILoadable().SetLoaded(value);
 	}
 
@@ -113,8 +113,8 @@ public sealed partial class MultiWeapon : Weapon {
 		if (!IndexInBounds(_currentIndex)) {
 			_currentIndex = 0;
 		}
-		_weapons.ForEach((w) => w?.Disable());
-		CurrentWeapon?.Enable();
+		_weapons.ForEach((w) => w?.AsIEnablable().Disable());
+		CurrentWeapon?.AsIEnablable().Enable();
 
 		if (Engine.IsEditorHint()) {
 			// Rearrange the weapons in the Node hierarchy
@@ -227,21 +227,21 @@ public sealed partial class MultiWeapon : Weapon {
 		_weapons.ForEach(w => w?.Inject(entity));
 	}
 
-	public override void Enable() {
-		base.Enable();
-		CurrentWeapon?.Enable();
+	protected override void EnableBehaviour() {
+		base.EnableBehaviour();
+		CurrentWeapon?.AsIEnablable().Enable();
 	}
-	public override void Disable() {
-		_weapons.ForEach(w => w?.Disable());
-		base.Disable();
+	protected override void DisableBehaviour() {
+		_weapons.ForEach(w => w?.AsIEnablable().Disable());
+		base.DisableBehaviour();
 	}
 	public override void Destroy() {
 		_weapons.ForEach(w => w?.Destroy());
 		base.Destroy();
 	}
 
-	protected override bool LoadModelBehaviour() => CurrentWeapon?.AsILoadable().LoadModel() ?? false;
-	protected override void UnloadModelBehaviour() => CurrentWeapon?.AsILoadable().UnloadModel();
+	protected override bool LoadBehaviour() => CurrentWeapon?.AsILoadable().Load() ?? false;
+	protected override void UnloadBehaviour() => CurrentWeapon?.AsILoadable().Unload();
 	public void ReloadModel(bool forceLoad = false) => CurrentWeapon?.AsILoadable().ReloadModel(forceLoad);
 
 

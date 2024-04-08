@@ -20,8 +20,8 @@ config/icon="res://icon.svg"
 [autoload]
 
 GameResources="*res://Scenes/ResourceManager.tscn"
-CyclopsAutoload="*res://addons/cyclops_level_builder/cyclops_global_scene.tscn"
 GameInputs="*res://Scenes/InputManager.tscn"
+CyclopsAutoload="*res://addons/cyclops_level_builder/cyclops_global_scene.tscn"
 
 [debug]
 

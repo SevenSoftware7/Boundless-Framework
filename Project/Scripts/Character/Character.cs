@@ -17,11 +17,11 @@ public partial class Character : Loadable3D, IInputReader, ICustomizable {
 				_isLoaded = value;
 				return;
 			}
-
 			AsILoadable().LoadUnload(value);
 		}
 	}
 	private bool _isLoaded = false;
+
 
 	[Export] public CharacterData Data {
 		get => _data;
@@ -113,8 +113,8 @@ public partial class Character : Loadable3D, IInputReader, ICustomizable {
 	public virtual void HandleInput(CameraController3D cameraController, InputDevice inputDevice) { }
 
 
-	protected override bool LoadModelBehaviour() {
-		if (!base.LoadModelBehaviour())
+	protected override bool LoadBehaviour() {
+		if (!base.LoadBehaviour())
 			return false;
 		if (Data is null)
 			return false;
@@ -133,7 +133,7 @@ public partial class Character : Loadable3D, IInputReader, ICustomizable {
 
 		if (CharacterModel is not null) {
 			CharacterModel.Inject(Skeleton);
-			CharacterModel.AsILoadable().LoadModel();
+			CharacterModel.AsILoadable().Load();
 		}
 
 		RefreshRotation();
@@ -142,8 +142,8 @@ public partial class Character : Loadable3D, IInputReader, ICustomizable {
 
 		return true;
 	}
-	protected override void UnloadModelBehaviour() {
-		base.UnloadModelBehaviour();
+	protected override void UnloadBehaviour() {
+		base.UnloadBehaviour();
 
 		Collisions?.UnparentAndQueueFree();
 		Collisions = null;
@@ -152,17 +152,17 @@ public partial class Character : Loadable3D, IInputReader, ICustomizable {
 		Skeleton?.UnparentAndQueueFree();
 		Skeleton = null;
 
-		CharacterModel?.AsILoadable().UnloadModel();
+		CharacterModel?.AsILoadable().Unload();
 
 		_isLoaded = false;
 	}
 
-	public override void Enable() {
-		base.Enable();
-		CharacterModel?.Enable();
+	protected override void EnableBehaviour() {
+		base.EnableBehaviour();
+		CharacterModel?.AsIEnablable().Enable();
 	}
-	public override void Disable() {
-		base.Disable();
-		CharacterModel?.Disable();
+	protected override void DisableBehaviour() {
+		base.DisableBehaviour();
+		CharacterModel?.AsIEnablable().Disable();
 	}
 }

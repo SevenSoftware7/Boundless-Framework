@@ -1197,6 +1197,8 @@ Entity = NodePath("../Entity")
 
 [node name="CameraController3D" type="Camera3D" parent="Player"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.01904, 3.4167)
+environment = ExtResource("1_l7i5q")
+compositor = ExtResource("2_w2ny8")
 fov = 90.0
 script = ExtResource("7_07vdy")
 cameraOriginPosition = Vector3(1, -0.12, 5.2)
@@ -1224,6 +1226,7 @@ script = ExtResource("13_d6cna")
 Weapons = [NodePath("Primary"), NodePath("Secondary"), NodePath("Ternary")]
 Entity = NodePath("..")
 IsLoaded = true
+IsEnabled = true
 
 [node name="Primary" type="Node3D" parent="Entity/Weapon" node_paths=PackedStringArray("Weapons", "Entity")]
 transform = Transform3D(1, 0, -7.10543e-15, 0, 1, 0, 7.10543e-15, 0, 1, 0, 0, 0)
@@ -1231,6 +1234,7 @@ script = ExtResource("13_d6cna")
 Weapons = [NodePath("Weapon - Epiphron"), NodePath("Weapon - Eleos")]
 Entity = NodePath("../..")
 IsLoaded = true
+IsEnabled = true
 
 [node name="Weapon - Epiphron" type="Node3D" parent="Entity/Weapon/Primary" node_paths=PackedStringArray("WeaponModel", "Entity")]
 script = ExtResource("8_hy12m")
@@ -1238,6 +1242,7 @@ WeaponData = ExtResource("9_17l5c")
 WeaponModel = NodePath("Model - Epiphron (base)")
 Entity = NodePath("../../..")
 IsLoaded = true
+IsEnabled = true
 
 [node name="Model - Epiphron (base)" type="Node3D" parent="Entity/Weapon/Primary/Weapon - Epiphron" node_paths=PackedStringArray("Skeleton", "Model")]
 script = ExtResource("10_7i4ij")
@@ -1246,6 +1251,7 @@ Handedness = 2
 Model = NodePath("../../../../Character/Skeleton/Costume - Epiphron (base)")
 Costume = ExtResource("11_7btab")
 IsLoaded = true
+IsEnabled = true
 
 [node name="Weapon - Eleos" type="Node3D" parent="Entity/Weapon/Primary" node_paths=PackedStringArray("WeaponModel", "Entity")]
 process_mode = 4
@@ -1295,12 +1301,11 @@ Costume = ExtResource("14_nof6s")
 IsLoaded = true
 
 [node name="Ternary" type="Node3D" parent="Entity/Weapon" node_paths=PackedStringArray("Weapons", "Entity")]
-process_mode = 4
 transform = Transform3D(1, 0, -2.13163e-14, 0, 1, 0, 2.13163e-14, 0, 1, 0, 0, 0)
-visible = false
 script = ExtResource("13_d6cna")
 Weapons = []
 Entity = NodePath("../..")
+IsEnabled = true
 
 [node name="Character" type="Node3D" parent="Entity" node_paths=PackedStringArray("Collisions", "Skeleton", "CharacterModel")]
 script = ExtResource("16_r11x1")
@@ -1308,14 +1313,14 @@ Collisions = NodePath("../Collisions")
 Skeleton = NodePath("Skeleton")
 Data = ExtResource("5_ensrg")
 CharacterModel = NodePath("Model - Selene (base)")
-IsLoaded = true
+IsEnabled = true
 
 [node name="Model - Selene (base)" type="Node3D" parent="Entity/Character" node_paths=PackedStringArray("Skeleton", "Model")]
 script = ExtResource("11_qyww5")
 Skeleton = NodePath("../Skeleton")
 Model = NodePath("../Skeleton/Costume - Selene (base)")
 Costume = ExtResource("11_qd1of")
-IsLoaded = true
+IsEnabled = true
 
 [node name="Skeleton" parent="Entity/Character" instance=ExtResource("20_k6viy")]
 
@@ -1324,14 +1329,14 @@ IsLoaded = true
 [node name="Costume - Epiphron (base)" parent="Entity/Character/Skeleton" instance=ExtResource("24_gjs3a")]
 transform = Transform3D(0, -1, 0, 0, 0, -1, 1, 0, 0, 1.11649, 2.61582, 0.185957)
 
-[node name="Costume - Eleos (base)" type="Node3D" parent="Entity/Character/Skeleton" instance=ExtResource("26_47vhc")]
+[node name="Costume - Eleos (base)" parent="Entity/Character/Skeleton" instance=ExtResource("26_47vhc")]
 process_mode = 4
 transform = Transform3D(0, -1, 0, 0, 0, -1, 1, 0, 0, 1.11649, 2.61582, 0.185957)
 visible = false
 
 [node name="Costume - Nemesis (base)" parent="Entity/Character/Skeleton" instance=ExtResource("25_2qu5n")]
 process_mode = 4
-transform = Transform3D(1, 0, -1.42109e-14, 0, 1, 0, 1.42109e-14, 0, 1, 0, 0, 0)
+transform = Transform3D(0, -1, 0, 0, 0, -1, 1, 0, 0, 1.11649, 2.61582, 0.185957)
 visible = false
 
 [node name="Collisions" parent="Entity" instance=ExtResource("21_3oq50")]

@@ -5,11 +5,12 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public sealed partial class NemesisWeapon(NemesisWeaponData? data = null, WeaponCostume? costume = null) : SingleWeapon<NemesisWeaponData>(data, costume) {
+public sealed partial class NemesisWeapon : SingleWeapon<NemesisWeaponData> {
 	private SlashAttackInfo slashAttack = null!;
 
 
-	private NemesisWeapon() : this(null) {}
+	public NemesisWeapon(NemesisWeaponData? data = null, WeaponCostume? costume = null) : base(data, costume) {}
+	private NemesisWeapon() : base() {}
 
 
 	public override IEnumerable<AttackInfo> GetAttacks(Entity target) {

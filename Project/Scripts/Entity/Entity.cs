@@ -7,7 +7,6 @@ using SevenGame.Utility;
 [Tool]
 [GlobalClass]
 public sealed partial class Entity : CharacterBody3D, IInputReader {
-
 	public EntityAction? CurrentAction { get; private set; }
 	public EntityBehaviourManager? BehaviourManager { get; private set; }
 
@@ -295,13 +294,4 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 			BehaviourManager?.SetBehaviour(new TestBehaviour(this));
 		}
 	}
-
-
-	// public override void _Notification(int what) {
-	// 	base._Notification(what);
-	// 	if (what == NotificationPredelete) {
-	// 		// Callable.From(() => _weapon?.Inject(null)).CallDeferred();
-	// 		PropagateCall(nameof(IInjectable<Entity>.Inject), [Variant.From<Entity>(null!)]);
-	// 	}
-	// }
 }

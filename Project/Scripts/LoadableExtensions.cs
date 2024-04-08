@@ -28,7 +28,7 @@ public ref struct LoadableDestructor<TLoadable> where TLoadable : ILoadable {
 
 		onBeforeUnload?.Invoke(loadable);
 
-		loadable.UnloadModel();
+		loadable.Unload();
 
 		onAfterUnload?.Invoke(loadable);
 
@@ -80,7 +80,7 @@ public ref struct LoadableUpdater<TLoadable> where TLoadable : ILoadable {
 
 		onBeforeLoad?.Invoke(loadable);
 
-		loadable.LoadModel();
+		loadable.Load();
 
 		onAfterLoad?.Invoke(loadable);
 	}

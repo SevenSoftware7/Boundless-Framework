@@ -12,7 +12,6 @@ public partial class MeshModel : Model {
 
 	[Export] protected Node3D Model { get; private set; } = null!;
 
-	private bool _isLoaded = false;
 	public override bool IsLoaded {
 		get => _isLoaded;
 		set {
@@ -20,10 +19,10 @@ public partial class MeshModel : Model {
 				_isLoaded = value;
 				return;
 			}
-
 			AsILoadable().LoadUnload(value);
 		}
 	}
+	private bool _isLoaded = false;
 
 
 
@@ -53,8 +52,8 @@ public partial class MeshModel : Model {
 		Handedness = handedness;
 	}
 
-	protected override bool LoadModelBehaviour() {
-		if (!base.LoadModelBehaviour())
+	protected override bool LoadBehaviour() {
+		if (!base.LoadBehaviour())
 			return false;
 		if (Costume is not IMeshCostume meshCostume)
 			return false;
@@ -72,23 +71,23 @@ public partial class MeshModel : Model {
 
 		return true;
 	}
-	protected override void UnloadModelBehaviour() {
-		base.UnloadModelBehaviour();
+	protected override void UnloadBehaviour() {
+		base.UnloadBehaviour();
 		Model?.UnparentAndQueueFree();
 		Model = null!;
 
 		_isLoaded = false;
 	}
 
-	public override void Enable() {
-		base.Enable();
+	protected override void EnableBehaviour() {
+		base.EnableBehaviour();
 		if (Model is not null) {
 			Model.ProcessMode = ProcessModeEnum.Inherit;
 			Model.Visible = true;
 		}
 	}
-	public override void Disable() {
-		base.Disable();
+	protected override void DisableBehaviour() {
+		base.DisableBehaviour();
 		if (Model is not null) {
 			Model.ProcessMode = ProcessModeEnum.Disabled;
 			Model.Visible = false;
