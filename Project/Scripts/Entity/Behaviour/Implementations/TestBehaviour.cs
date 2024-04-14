@@ -53,7 +53,8 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 		// if (Entity.IsOnFloor() && Entity.CurrentAction is not EvadeAction) {
 		// 	if ( speed == MovementSpeed.Idle ) {
 		// 		MovementStopAnimation();
-		// 	} else if ( (int)speed > (int)_movementSpeed ) {
+		// 	}
+		// 	else if ( (int)speed > (int)_movementSpeed ) {
 		// 		MovementStartAnimation(speed);
 		// 	}
 		// }
@@ -162,7 +163,7 @@ public partial class TestBehaviour(Entity entity) : EntityBehaviour(entity) {
 		// ----- Jump Instruction -----
 
 		if (!jumpBuffer.IsDone && jumpCooldown.IsDone && !coyoteTimer.IsDone) {
-			Entity.Inertia = Entity.Inertia.SlideOnFace(Entity.UpDirection) + Entity.UpDirection * 17.5f;
+			Entity.Inertia = Entity.Inertia.SlideOnFace(Entity.UpDirection) + (Entity.UpDirection * 17.5f);
 			jumpBuffer.End();
 			jumpCooldown.Start();
 		}

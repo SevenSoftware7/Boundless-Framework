@@ -29,8 +29,8 @@ public partial class SingleWeapon<T> {
 			(name == PropertyName.WeaponData && WeaponData is not null)
 		) {
 			property["usage"] = (int) (property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
-
-		} else if (name == PropertyName.Costume) {
+		}
+		else if (name == PropertyName.Costume) {
 			property["usage"] = (int) (property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
 
 		}

@@ -10,7 +10,7 @@ public struct TimeLimit {
 
 
 
-	public TimeLimit() {; }
+	public TimeLimit() { }
 
 
 

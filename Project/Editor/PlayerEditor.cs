@@ -9,7 +9,7 @@ public partial class Player {
 	[Export]
 	public Array<Player?> PlayersList {
 		get => [.. Players];
-		private set {; }
+		private set { }
 	}
 
 
@@ -36,14 +36,11 @@ public partial class Player {
 
 
 		if (name == PropertyName.PlayersList) {
-			property["usage"] = (int) (property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage | PropertyUsageFlags.ReadOnly);
-
-
-		} else if (name == PropertyName.PlayerId) {
+			property["usage"] = (int) ((property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage) | PropertyUsageFlags.ReadOnly);
+		}
+		else if (name == PropertyName.PlayerId) {
 			property["hint"] = (int) PropertyHint.Range;
 			property["hint_string"] = $"0,{MaxPlayers - 1},";
-
-
 		}
 	}
 }

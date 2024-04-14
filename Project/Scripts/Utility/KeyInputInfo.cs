@@ -15,7 +15,7 @@ public struct KeyInputInfo {
 
 
 
-	public KeyInputInfo() {; }
+	public KeyInputInfo() { }
 
 
 

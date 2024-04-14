@@ -12,7 +12,7 @@ public struct BasisInfo {
 
 
 
-	public BasisInfo() {; }
+	public BasisInfo() { }
 
 
 

@@ -12,9 +12,9 @@ public partial class WeaponData {
 		StringName name = property["name"].AsStringName();
 
 		if (
-			name == PropertyName.Type && !EditableType ||
-			name == PropertyName.Usage && !EditableUsage ||
-			name == PropertyName.Size && !EditableSize
+			(name == PropertyName.Type && !EditableType) ||
+			(name == PropertyName.Usage && !EditableUsage) ||
+			(name == PropertyName.Size && !EditableSize)
 		) {
 			property["usage"] = (int) (property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
 

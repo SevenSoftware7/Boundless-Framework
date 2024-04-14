@@ -31,10 +31,9 @@ public partial class Character {
 			(name == PropertyName.Data && Data is not null)
 		) {
 			property["usage"] = (int) (property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
-
-		} else if (name == PropertyName.Costume) {
+		}
+		else if (name == PropertyName.Costume) {
 			property["usage"] = (int) (property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
-
 		}
 	}
 }

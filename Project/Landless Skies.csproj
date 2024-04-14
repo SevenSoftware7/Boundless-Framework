@@ -5,7 +5,7 @@
 		<RootNamespace>LandlessSkies</RootNamespace>
 		<Nullable>enable</Nullable>
 		<PublishAot>true</PublishAot>
-		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<!-- <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild> -->
 	</PropertyGroup>
 	<ItemGroup>
 		<TrimmerRootAssembly Include="GodotSharp" />

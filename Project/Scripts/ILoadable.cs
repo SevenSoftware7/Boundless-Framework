@@ -11,11 +11,7 @@ public interface ILoadable : IDestroyable, IEnablable {
 		if (IsLoaded)
 			return false;
 
-		if (!LoadBehaviour())
-			return false;
-
-
-		return true;
+		return LoadBehaviour();
 	}
 	public sealed void Unload() {
 		if (!IsLoaded)

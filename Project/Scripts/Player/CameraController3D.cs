@@ -49,7 +49,7 @@ public partial class CameraController3D : Camera3D {
 		Input.MouseMode = Input.MouseModeEnum.Captured;
 
 		if (Style == CameraStyle.ThirdPersonGrounded) {
-			float maxAngle = Mathf.Pi / 2f - Mathf.Epsilon;
+			float maxAngle = (Mathf.Pi / 2f) - Mathf.Epsilon;
 
 			Vector3 eulerAngles = LocalRotation.GetEuler();
 			LocalRotation = Basis.FromEuler(new(
@@ -57,7 +57,8 @@ public partial class CameraController3D : Camera3D {
 				eulerAngles.Y - cameraInput.X,
 				0
 			));
-		} else if (Style == CameraStyle.ThirdPerson) {
+		}
+		else if (Style == CameraStyle.ThirdPerson) {
 			LocalRotation *=
 				new Basis(LocalRotation.Inverse().Y, -cameraInput.X) *
 				new Basis(Vector3.Right, cameraInput.Y);
@@ -67,7 +68,7 @@ public partial class CameraController3D : Camera3D {
 	public void RawInputToGroundedMovement(Entity entity, Vector2 moveInput, out Basis camRotation, out Vector3 groundedMovement) {
 		Vector3 camRight = AbsoluteRotation.X;
 		float localAlignment = Mathf.Ceil(entity.Transform.Basis.Y.Dot(LocalRotation.Y));
-		Vector3 entityUp = entity.Transform.Basis.Y * (localAlignment * 2f - 1f);
+		Vector3 entityUp = entity.Transform.Basis.Y * ((localAlignment * 2f) - 1f);
 		Vector3 groundedCamForward = entityUp.Cross(camRight).Normalized();
 
 		camRotation = Basis.LookingAt(groundedCamForward, entityUp);
@@ -100,7 +101,7 @@ public partial class CameraController3D : Camera3D {
 		ComputeWallCollision(smoothTargetPosition, absoluteOffset, targetDistance, ref distanceToSubject, delta);
 
 
-		Vector3 finalPos = smoothTargetPosition + absoluteOffset * distanceToSubject;
+		Vector3 finalPos = smoothTargetPosition + (absoluteOffset * distanceToSubject);
 		GlobalTransform = new(TargetBasis, finalPos);
 	}
 
@@ -142,7 +143,7 @@ public partial class CameraController3D : Camera3D {
 
 		const float CAM_MIN_DISTANCE_TO_WALL = 0.4f;
 
-		bool rayCastHit = GetWorld3D().RayCast3D(origin, origin + direction * (distance + CAM_MIN_DISTANCE_TO_WALL), out MathUtility.RayCast3DResult result, CollisionMask);
+		bool rayCastHit = GetWorld3D().RayCast3D(origin, origin + (direction * (distance + CAM_MIN_DISTANCE_TO_WALL)), out MathUtility.RayCast3DResult result, CollisionMask);
 		if (!rayCastHit) {
 			if (!Mathf.IsEqualApprox(cameraDistance, distance)) {
 				cameraDistance = cameraDistance.SmoothDamp(distance, ref distanceVelocity, 0.2f, Mathf.Inf, floatDelta);

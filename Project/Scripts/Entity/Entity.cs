@@ -14,13 +14,14 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	[Export] public Character? Character {
 		get => _character;
 		private set {
-			if (value is null)
-				return;
 			_character = value;
 
 			if (this.IsInitializationSetterCall())
 				return;
-			_character.Name = PropertyName.Character;
+
+			if (_character is not null) {
+				_character.Name = PropertyName.Character;
+			}
 		}
 	}
 	private Character? _character;
@@ -48,13 +49,14 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	[Export] public AnimationPlayer? AnimationPlayer {
 		get => _animationPlayer;
 		private set {
-			if (value is null)
-				return;
 			_animationPlayer = value;
 
 			if (this.IsInitializationSetterCall())
 				return;
-			_animationPlayer.RootNode = _animationPlayer.GetPathTo(this);
+
+			if (_animationPlayer is not null) {
+				_animationPlayer.RootNode = _animationPlayer.GetPathTo(this);
+			}
 		}
 	}
 	private AnimationPlayer? _animationPlayer;
@@ -64,14 +66,14 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 	[Export] public Weapon? Weapon {
 		get => _weapon;
 		set {
-			bool isInitialization = this.IsInitializationSetterCall();
-			if (!isInitialization) {
-				_weapon?.Inject(null);
+			if (this.IsInitializationSetterCall()) {
+				_weapon = value;
+				return;
 			}
 
+			_weapon?.Inject(null);
 			_weapon = value;
-
-			if (!isInitialization && _weapon is not null) {
+			if (_weapon is not null) {
 				_weapon.Inject(this);
 				_weapon.Name = PropertyName.Weapon;
 			}
@@ -181,9 +183,11 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 		if (_weapon is not null) {
 			if (inputDevice.IsActionJustPressed("switch_weapon_primary")) {
 				_weapon.Style = 0;
-			} else if (inputDevice.IsActionJustPressed("switch_weapon_secondary")) {
+			}
+			else if (inputDevice.IsActionJustPressed("switch_weapon_secondary")) {
 				_weapon.Style = 1;
-			} else if (inputDevice.IsActionJustPressed("switch_weapon_ternary")) {
+			}
+			else if (inputDevice.IsActionJustPressed("switch_weapon_ternary")) {
 				_weapon.Style = 2;
 			}
 		}
