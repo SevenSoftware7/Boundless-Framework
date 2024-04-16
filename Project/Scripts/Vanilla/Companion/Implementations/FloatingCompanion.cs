@@ -53,7 +53,7 @@ public partial class FloatingCompanion : Companion {
 			}
 		}).CallDeferred();
 
-		OnFace = inputDevice.IsActionPressed("focus");
+		OnFace |= inputDevice.IsActionPressed("focus");
 	}
 
 
@@ -80,12 +80,11 @@ public partial class FloatingCompanion : Companion {
 
 		Callable.From(() => {
 			float floatDelta = (float)delta;
-			// relativePos = OnRight ? rightOrigin : leftOrigin;
+			OnFace |= PositionBlocked(GetPosition(0f)) && PositionBlocked(GetPosition(1f));
 
 			if (!OnFace && PositionBlocked(GetPosition(GetCurveT())))
 				OnRight = !OnRight;
 
-			OnFace |= PositionBlocked(GetPosition(1f)) && PositionBlocked(GetPosition(0f));
 
 
 			T = Mathf.MoveToward(T, OnFace ? 0.5f : GetCurveT(), 6f * floatDelta);
@@ -101,6 +100,8 @@ public partial class FloatingCompanion : Companion {
 				Origin = finalPosition,
 				Basis = finalRotation,
 			};
+
+			OnFace = false;
 
 			float GetCurveT() {
 				return OnRight ? 1f : 0f;
