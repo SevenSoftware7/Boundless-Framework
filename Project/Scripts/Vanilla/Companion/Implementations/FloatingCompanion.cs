@@ -59,11 +59,11 @@ public partial class FloatingCompanion : Companion {
 
 
 	private bool PositionBlocked(Vector3 position) {
-		BoxShape3D boxShape = new() {
-			Size = CompanionModel?.GetAabb().Size * 1.25f ?? Vector3.One,
+		SphereShape3D sphere = new() {
+			Radius = (CompanionModel?.GetAabb().GetLongestAxisSize() ?? 1f) + 0.5f,
 		};
 
-		return GetWorld3D().CollideShape3D(Transform3D.Identity.Translated(position), out _, boxShape, CollisionMask, maxResults: 1);
+		return GetWorld3D().CollideShape3D(Transform3D.Identity.Translated(position), out _, sphere, CollisionMask, maxResults: 1);
 	}
 
 
@@ -85,12 +85,14 @@ public partial class FloatingCompanion : Companion {
 			if (!OnFace && PositionBlocked(GetPosition(GetCurveT())))
 				OnRight = !OnRight;
 
-
-			T = Mathf.MoveToward(T, OnFace ? 0.5f : GetCurveT(), 4f * floatDelta);
-			TFace = Mathf.MoveToward(TFace, OnFace ? 1f : 0f, 4f * floatDelta);
+			OnFace |= PositionBlocked(GetPosition(1f)) && PositionBlocked(GetPosition(0f));
 
 
-			HoveringPosition = HoveringPosition.Lerp(GetPosition(T), 15f * floatDelta);
+			T = Mathf.MoveToward(T, OnFace ? 0.5f : GetCurveT(), 6f * floatDelta);
+			TFace = Mathf.MoveToward(TFace, OnFace ? 1f : 0f, 8f * floatDelta);
+
+
+			HoveringPosition = HoveringPosition.Lerp(GetPosition(T), 10f * floatDelta);
 			Vector3 finalPosition = HoveringPosition.Lerp(Head.Origin, TFace);
 			Basis finalRotation = Subject.Basis.SafeSlerp(Head.Basis, TFace);
 
@@ -105,7 +107,7 @@ public partial class FloatingCompanion : Companion {
 			}
 
 			Vector3 GetPosition(float t) {
-				return Head.Origin + (Head.Basis * Curve.Sample(0, t));
+				return Head.Origin + Head.Basis * Curve.Sample(0, t);
 			}
 		}).CallDeferred();
 	}

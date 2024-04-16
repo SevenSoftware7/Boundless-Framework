@@ -1,8 +1,11 @@
 [gd_scene load_steps=2 format=3 uid="uid://r6yqclqm3ubp"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_vq4kn"]
+size = Vector3(0.3, 0.3, 0.15)
 
 [node name="ErebosBase" type="Skeleton3D"]
 
 [node name="Model" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -0.15)
+layers = 2
 mesh = SubResource("BoxMesh_vq4kn")

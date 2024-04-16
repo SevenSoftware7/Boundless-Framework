@@ -38,7 +38,7 @@ public static class AttackExtensions {
 
 
 	public static class Priorities {
-		public readonly static IComparer<AttackInfo> PureDamage = new ComparisonComparer(
+		public static readonly IComparer<AttackInfo> PureDamage = new ComparisonComparer(
 			(a, b) => a?.PotentialDamage.CompareTo(b?.PotentialDamage ?? 0) ?? 0
 		);
 

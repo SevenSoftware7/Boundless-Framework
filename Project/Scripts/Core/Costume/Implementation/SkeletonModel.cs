@@ -12,7 +12,6 @@ public partial class SkeletonModel : Model {
 	[ExportGroup("")]
 
 	[Export] protected Skeleton3D Model { get; private set; } = null!;
-	[Export] protected Array<GeometryInstance3D> Meshes = [];
 
 	public override bool IsLoaded {
 		get => _isLoaded;
@@ -27,24 +26,24 @@ public partial class SkeletonModel : Model {
 
 
 
-	public override Aabb GetAabb() => new()/* Meshes.Aggregate(new Aabb(), (final, mesh) => final.Merge(mesh.GetAabb())) */;
+	public override Aabb GetAabb() => _aabb;
+	[Export] private Aabb _aabb;
 
 	public void SetHandedness(Handedness handedness) {
 		Handedness = handedness;
 	}
 
-	private void GetMeshes() {
-		// Meshes = [];
+	private void UpdateAabb() {
+		_aabb = new();
+		MergeChildrenAabb(Model);
 
-		// GetChildrenMeshes(this);
+		void MergeChildrenAabb(Node parent) {
+			if (parent is GeometryInstance3D mesh) _aabb = _aabb.Merge(mesh.GetAabb());
 
-		// void GetChildrenMeshes(Node parent) {
-		// 	foreach (var child in parent.GetChildren()) {
-		// 		if (child is GeometryInstance3D mesh) {
-		// 			Meshes.Add(mesh);
-		// 		}
-		// 	}
-		// }
+			foreach (Node child in parent.GetChildren()) {
+				MergeChildrenAabb(child);
+			}
+		}
 	}
 
 	protected override bool LoadBehaviour() {
@@ -61,7 +60,7 @@ public partial class SkeletonModel : Model {
 		Model.Visible = Visible;
 		Model.Name = $"{nameof(Costume)} - {Costume.DisplayName}";
 
-		GetMeshes();
+		UpdateAabb();
 
 		_isLoaded = true;
 
@@ -71,6 +70,8 @@ public partial class SkeletonModel : Model {
 		base.UnloadBehaviour();
 		Model?.UnparentAndQueueFree();
 		Model = null!;
+
+		_aabb = new();
 
 		_isLoaded = false;
 	}
@@ -88,11 +89,5 @@ public partial class SkeletonModel : Model {
 			Model.ProcessMode = ProcessModeEnum.Disabled;
 			Model.Visible = false;
 		}
-	}
-
-
-	public override void _ChildOrderChanged() {
-		base._ChildOrderChanged();
-		GetMeshes();
 	}
 }
