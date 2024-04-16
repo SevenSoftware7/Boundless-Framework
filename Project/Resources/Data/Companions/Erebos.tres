@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="CompanionData" load_steps=3 format=3 uid="uid://cpbqawix4u3q7"]
+
+[ext_resource type="Resource" uid="uid://caqyvip0olism" path="res://Resources/Data/Companions/Erebos/Costumes/Base/Erebos_base.tres" id="1_88sin"]
+[ext_resource type="Script" path="res://Scripts/Vanilla/Companion/CompanionData.cs" id="1_vkack"]
+
+[resource]
+script = ExtResource("1_vkack")
+BaseCostume = ExtResource("1_88sin")
+DisplayName = "Erebos"
