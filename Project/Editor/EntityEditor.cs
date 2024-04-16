@@ -13,14 +13,13 @@ public partial class Entity {
 
 
 		if (name == PropertyName.Character && _character is not null) {
-			property["usage"] = (int) (property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
 		}
 		else if (
 			name == PropertyName.CharacterCostume ||
 			name == PropertyName.CharacterData
 		) {
-			property["usage"] = (int) (property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
-
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
 		}
 	}
 }

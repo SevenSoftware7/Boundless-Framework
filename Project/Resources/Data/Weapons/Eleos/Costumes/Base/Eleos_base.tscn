@@ -1,15 +1,16 @@
 [gd_scene load_steps=3 format=3 uid="uid://chsj82irsedw6"]
 
-[sub_resource type="BoxMesh" id="BoxMesh_8gkqy"]
+[sub_resource type="BoxMesh" id="BoxMesh_2kvh4"]
+size = Vector3(4, 0.25, 0.25)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lw4eq"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g4lnn"]
 albedo_color = Color(0.2412, 0.362693, 0.67, 1)
 
-[node name="EleosBase" type="Node3D"]
+[node name="Wrapper" type="MeshInstance3D"]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(4, 0, 0, 0, 0.25, 0, 0, 0, 0.25, -1.8, 0, 0)
+[node name="Model" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0, 0)
 layers = 2
-mesh = SubResource("BoxMesh_8gkqy")
+mesh = SubResource("BoxMesh_2kvh4")
 skeleton = NodePath("../..")
-surface_material_override/0 = SubResource("StandardMaterial3D_lw4eq")
+surface_material_override/0 = SubResource("StandardMaterial3D_g4lnn")

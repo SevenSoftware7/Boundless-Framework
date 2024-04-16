@@ -49,6 +49,7 @@ public partial class MultiWeapon {
 						break;
 				}
 			}
+
 			UpdateCurrent();
 			NotifyPropertyListChanged();
 		}
@@ -62,7 +63,7 @@ public partial class MultiWeapon {
 
 
 		if (name == PropertyName.WeaponDatas) {
-			property["usage"] = (int) (property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
 		}
 	}
 }

@@ -12,7 +12,7 @@ public partial class Model {
 		StringName name = property["name"].AsStringName();
 
 		if (name == PropertyName.Costume && Costume is not null) {
-			property["usage"] = (int) (property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
 		}
 	}
 }

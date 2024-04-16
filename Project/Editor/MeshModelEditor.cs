@@ -1,3 +1,5 @@
+#if TOOLS
+
 namespace LandlessSkies.Core;
 
 using Godot;
@@ -10,8 +12,9 @@ public partial class MeshModel {
 		StringName name = property["name"].AsStringName();
 
 		if (name == PropertyName.Model) {
-			property["usage"] = (int) (property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
-
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
 		}
 	}
 }
+
+#endif

@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="WeaponMeshCostume" load_steps=3 format=3 uid="uid://ctyrw08y4svjk"]
 
 [ext_resource type="PackedScene" uid="uid://cbkv4cstjgb7i" path="res://Resources/Data/Weapons/Nemesis/Costumes/Base/Nemesis_Base.tscn" id="1_opthf"]
-[ext_resource type="Script" path="res://Scripts/Weapon/Implementations/WeaponMeshCostume.cs" id="2_4stkr"]
+[ext_resource type="Script" path="res://Scripts/Core/Weapon/Implementations/WeaponMeshCostume.cs" id="2_4stkr"]
 
 [resource]
 script = ExtResource("2_4stkr")

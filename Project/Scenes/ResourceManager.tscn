@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://d0wdh4d7ww8nn"]
 
-[ext_resource type="Script" path="res://Scripts/ResourceManager.cs" id="1_bos0v"]
+[ext_resource type="Script" path="res://Scripts/Core/ResourceManager.cs" id="1_bos0v"]
 [ext_resource type="Resource" uid="uid://bfuqmybchohej" path="res://Resources/Data/Weapons/Eleos/Eleos.tres" id="2_xy6g7"]
 [ext_resource type="Resource" uid="uid://dsreon2gkt4ng" path="res://Resources/Data/Characters/Selene/Selene.tres" id="3_8m2yi"]
 [ext_resource type="Resource" uid="uid://dtoyomm5pp52l" path="res://Resources/Data/Weapons/Nemesis/Nemesis.tres" id="3_lf6ol"]

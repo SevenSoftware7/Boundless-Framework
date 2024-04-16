@@ -16,7 +16,7 @@ public partial class WeaponData {
 			(name == PropertyName.Usage && !EditableUsage) ||
 			(name == PropertyName.Size && !EditableSize)
 		) {
-			property["usage"] = (int) (property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
 
 		}
 	}

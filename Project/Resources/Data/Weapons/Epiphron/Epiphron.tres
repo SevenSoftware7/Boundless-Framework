@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="EpiphronWeaponData" load_steps=3 format=3 uid="uid://dbe8xey2608rj"]
 
 [ext_resource type="Resource" uid="uid://c376t1le83xwr" path="res://Resources/Data/Weapons/Epiphron/Costumes/Base/Epiphron_base.tres" id="1_7n5n4"]
-[ext_resource type="Script" path="res://Scripts/Weapon/Implementations/Epiphron/EpiphronWeaponData.cs" id="2_3yx0d"]
+[ext_resource type="Script" path="res://Scripts/Vanilla/Weapon/Epiphron/EpiphronWeaponData.cs" id="2_3yx0d"]
 
 [resource]
 script = ExtResource("2_3yx0d")
