@@ -18,7 +18,7 @@ public abstract partial class EntityBehaviour : Node, IInputReader {
 	}
 
 
-
+	public abstract Interactable? GetInteractionCandidate();
 	public virtual void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice) { }
 
 	public virtual bool SetSpeed(MovementSpeed speed) => true;

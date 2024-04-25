@@ -203,6 +203,10 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 			}
 		}
 
+		Interactable? interactionCandidate = BehaviourManager?.CurrentBehaviour?.GetInteractionCandidate();
+		if (inputDevice.IsActionJustPressed("interact") && interactionCandidate is not null && interactionCandidate.IsInteractable(entity)) {
+			interactionCandidate.Interact(entity);
+		}
 	}
 
 	public void SplitInertia(out Vector3 vertical, out Vector3 horizontal) {

@@ -10,6 +10,7 @@ public static class MathUtility {
 	public static readonly uint TerrainCollisionLayer = 1 << 0;
 	public static readonly uint EntityCollisionLayer = 1 << 1;
 	public static readonly uint WaterCollisionLayer = 1 << 2;
+	public static readonly uint InteractableCollisionLayer = 1 << 3;
 
 
 	public static Vector4 MoveToward(this Vector4 current, Vector4 target, float maxDistanceDelta) {

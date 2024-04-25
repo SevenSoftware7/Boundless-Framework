@@ -44,6 +44,10 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 		Move(groundedMovement.Normalized());
 	}
 
+	public override Interactable? GetInteractionCandidate() {
+		return Interactable.GetNearestCandidate(Entity, 7.5f, 0.5f);
+	}
+
 	public override bool SetSpeed(MovementSpeed speed) {
 		if (!base.SetSpeed(speed))
 			return false;
