@@ -7,6 +7,11 @@ using Godot;
 using Godot.Collections;
 
 public static class MathUtility {
+	public static readonly uint TerrainCollisionLayer = 1 << 0;
+	public static readonly uint EntityCollisionLayer = 1 << 1;
+	public static readonly uint WaterCollisionLayer = 1 << 2;
+
+
 	public static Vector4 MoveToward(this Vector4 current, Vector4 target, float maxDistanceDelta) {
 		Vector4 vector4 = target - current;
 		float magnitude = vector4.Length();
@@ -172,7 +177,7 @@ public static class MathUtility {
 		result = new IntersectRay3DResult() {
 			Point = intersect["position"].AsVector3(),
 			Normal = normal,
-			Collider = intersect["collider"].AsGodotObject(),
+			Collider = intersect["collider"].As<Node3D>(),
 			Id = intersect["collider_id"].AsUInt64(),
 			Rid = intersect["rid"].AsRid(),
 			Shape = intersect["shape"].AsInt32(),
@@ -201,9 +206,8 @@ public static class MathUtility {
 
 
 		results = intersections.Select(intersection => {
-			Vector3 normal = intersection["normal"].AsVector3();
 			return new IntersectShape3DResult() {
-				Collider = intersection["collider"].AsGodotObject(),
+				Collider = intersection["collider"].As<Node3D>(),
 				Id = intersection["collider_id"].AsUInt64(),
 				Rid = intersection["rid"].AsRid(),
 				Shape = intersection["shape"].AsInt32()
@@ -233,9 +237,8 @@ public static class MathUtility {
 
 
 		results = intersections.Select(intersection => {
-			Vector3 normal = intersection["normal"].AsVector3();
 			return new IntersectShape3DResult() {
-				Collider = intersection["collider"].AsGodotObject(),
+				Collider = intersection["collider"].As<Node3D>(),
 				Id = intersection["collider_id"].AsUInt64(),
 				Rid = intersection["rid"].AsRid(),
 				Shape = intersection["shape"].AsInt32()
@@ -279,7 +282,7 @@ public static class MathUtility {
 	public struct IntersectRay3DResult {
 		public Vector3 Point;
 		public Vector3 Normal;
-		public GodotObject Collider;
+		public Node3D Collider;
 		public ulong Id;
 		public Rid Rid;
 		public int Shape;
@@ -288,7 +291,7 @@ public static class MathUtility {
 	}
 
 	public struct IntersectShape3DResult {
-		public GodotObject Collider;
+		public Node3D Collider;
 		public ulong Id;
 		public Rid Rid;
 		public int Shape;

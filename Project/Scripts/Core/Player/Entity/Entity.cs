@@ -142,7 +142,7 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 
 
 	public Entity() : base() {
-		CollisionLayer = 1 << 1;
+		CollisionLayer = MathUtility.EntityCollisionLayer;
 	}
 
 
@@ -320,7 +320,7 @@ public sealed partial class Entity : CharacterBody3D, IInputReader {
 
 		if (!Engine.IsEditorHint()) {
 			BehaviourManager ??= new(this);
-			BehaviourManager?.SetBehaviour(new TestBehaviour(this));
+			BehaviourManager?.SetBehaviour(new BipedBehaviour(this));
 		}
 	}
 }
