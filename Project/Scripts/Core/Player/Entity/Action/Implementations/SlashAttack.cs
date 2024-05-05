@@ -12,7 +12,7 @@ public sealed partial class SlashAttack(SingleWeapon weapon) : Attack(weapon) {
 
 	public override void _Ready() {
 		base._Ready();
-		GD.Print($"{Weapon.WeaponData.DisplayName} Slash Attack");
+		GD.Print($"{Weapon.DisplayName} Slash Attack");
 		QueueFree();
 	}
 }

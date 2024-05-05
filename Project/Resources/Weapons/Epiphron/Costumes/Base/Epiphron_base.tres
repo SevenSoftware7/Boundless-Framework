@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="WeaponMeshCostume" load_steps=3 format=3 uid="uid://c376t1le83xwr"]
+
+[ext_resource type="PackedScene" uid="uid://cdrk073syqpbj" path="res://Resources/Weapons/Epiphron/Costumes/Base/Epiphron_base.tscn" id="1_k81ic"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/Implementations/WeaponMeshCostume.cs" id="2_ia38e"]
+
+[resource]
+script = ExtResource("2_ia38e")
+_displayName = "Epiphron (base)"
+ModelScene = ExtResource("1_k81ic")

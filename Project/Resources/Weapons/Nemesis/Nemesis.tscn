@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://b7b17ebmgtrfy"]
+
+[ext_resource type="Script" path="res://Scripts/Vanilla/Weapon/Nemesis/NemesisWeapon.cs" id="1_vy2ad"]
+[ext_resource type="Resource" uid="uid://ctyrw08y4svjk" path="res://Resources/Weapons/Nemesis/Costumes/Base/Nemesis_Base.tres" id="2_snlmi"]
+
+[node name="Nemesis" type="Node3D"]
+script = ExtResource("1_vy2ad")
+DisplayName = "Nemesis"
+Costume = ExtResource("2_snlmi")
+IsEnabled = true

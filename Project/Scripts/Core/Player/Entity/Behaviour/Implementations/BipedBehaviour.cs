@@ -4,9 +4,11 @@ using Godot;
 using SevenGame.Utility;
 
 public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
-	private Vector3 _moveDirection;
+	private Vector3 _inputDirection;
 	private float _moveSpeed;
-	private MovementSpeed _movementSpeed;
+	private MovementType _movementType;
+
+	private Vector3 _lastDirection;
 
 	private TimeDuration jumpBuffer = new(125);
 	private TimeDuration coyoteTimer = new(150);
@@ -32,11 +34,11 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 		cameraController.RawInputToGroundedMovement(Entity, movement, out _, out Vector3 groundedMovement);
 
 		float speedSquared = groundedMovement.LengthSquared();
-		MovementSpeed speed = speedSquared switch {
-			_ when Mathf.IsZeroApprox(speedSquared) => MovementSpeed.Idle,
-			_ when speedSquared <= 0.25f || inputDevice.IsActionPressed("walk") => MovementSpeed.Walk,
-			_ when inputDevice.IsActionPressed("evade") => MovementSpeed.Sprint,
-			_ => MovementSpeed.Run
+		MovementType speed = speedSquared switch {
+			_ when Mathf.IsZeroApprox(speedSquared) => MovementType.Idle,
+			_ when speedSquared <= 0.25f || inputDevice.IsActionPressed("walk") => MovementType.Walk,
+			_ when inputDevice.IsActionPressed("evade") => MovementType.Sprint,
+			_ => MovementType.Run
 		};
 		SetSpeed(speed);
 
@@ -48,10 +50,10 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 		return Interactable.GetNearestCandidate(Entity, 7.5f, 0.5f);
 	}
 
-	public override bool SetSpeed(MovementSpeed speed) {
+	public override bool SetSpeed(MovementType speed) {
 		if (!base.SetSpeed(speed))
 			return false;
-		if (speed == _movementSpeed)
+		if (speed == _movementType)
 			return false;
 
 		// if (Entity.IsOnFloor() && Entity.CurrentAction is not EvadeAction) {
@@ -67,14 +69,14 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 
 
 
-		_movementSpeed = speed;
+		_movementType = speed;
 		return true;
 	}
 	public override bool Move(Vector3 direction) {
 		if (!base.Move(direction))
 			return false;
 
-		_moveDirection = direction;
+		_inputDirection = direction;
 		return true;
 	}
 	public override bool Jump(Vector3? target = null) {
@@ -121,49 +123,41 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 
 		Entity.Inertia = verticalInertia + horizontalInertia;
 
+		// Select the speed based on the movement type
+		float newSpeed = _movementType switch {
+			MovementType.Walk => Entity.Stats.SlowSpeed,
+			MovementType.Run => Entity.Stats.BaseSpeed,
+			MovementType.Sprint => Entity.Stats.SprintSpeed,
+			_ => 0f
+		};
 
+		Basis newRotation = Basis.LookingAt(Entity.AbsoluteForward, Vector3.Up);
+		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * Entity.Stats.RotationSpeed);
 
-		float newSpeed = 0f;
-		if (!_moveDirection.IsZeroApprox()) {
-			// ----- Rotation -----
+		// ---- Speed Calculation ----
 
-			float directionLength = _moveDirection.Length();
-			Vector3 normalizedDirection = Entity.Transform.Basis.Inverse() * _moveDirection / directionLength;
+		float speedDelta = _moveSpeed < newSpeed ? Entity.Stats.Acceleration : Entity.Stats.Deceleration;
+		_moveSpeed = Mathf.MoveToward(_moveSpeed, newSpeed, speedDelta * floatDelta);
 
-			Entity.RelativeForward = Entity.RelativeForward.SafeSlerp(normalizedDirection, Entity.CharacterRotationSpeed * floatDelta);
+		// ----- Rotation & Movement -----
 
-			Entity.Character?.RotateTowards(Basis.LookingAt(normalizedDirection, Vector3.Up), delta);
+		if (_movementType != MovementType.Idle) {
+			Vector3 normalizedInput = _inputDirection.Normalized();
+
+			_lastDirection = _lastDirection.Lerp(normalizedInput, Entity.Stats.RotationSpeed * floatDelta);
+			Entity.AbsoluteForward = Entity.AbsoluteForward.SafeSlerp(normalizedInput, Entity.Stats.RotationSpeed * floatDelta);
 
 			// Vector3 groundedMovement = _moveDirection;
 			// if (Entity.IsOnFloor()) {
 			//     groundedMovement = Entity.UpDirection.FromToBasis(Entity.GetFloorNormal()) * groundedMovement;
 			// }
-
-
-			// Select the speed based on the movement type
-			newSpeed = _movementSpeed switch {
-				_ when Entity.Character is null => CharacterData.DEFAULT_BASE_SPEED,
-				MovementSpeed.Walk => Entity.Character.Data.slowSpeed,
-				MovementSpeed.Run => Entity.Character.Data.baseSpeed,
-				MovementSpeed.Sprint => Entity.Character.Data.sprintSpeed,
-				_ => newSpeed
-			};
+			Entity.Movement = _lastDirection * _moveSpeed * Mathf.Clamp(_lastDirection.Dot(Entity.AbsoluteForward), 0f, 1f);
+		} else {
+			Entity.Movement = _lastDirection * _moveSpeed;
 		}
 
-		// ---- Speed Calculation ----
-
-		float accelerationFactor = 1f / Mathf.Max(newSpeed, Mathf.Epsilon);  // Accelerate faster depending on how big the difference between current and target speeds is
-		float slowingFactor = (_moveSpeed < newSpeed) ? 1f : 0.5f;           // Slow down faster than speeding up
-
-		// Move towards the new speed with acceleration
-		float speedDifference = Mathf.Abs(newSpeed - _moveSpeed);
-		float speedDelta = speedDifference * accelerationFactor * slowingFactor;
-		_moveSpeed = Mathf.MoveToward(_moveSpeed, newSpeed, Entity.CharacterAcceleration * speedDelta * floatDelta);
-
-		// Update the movement vector based on the new speed and direction
-		Entity.Movement = _moveDirection * _moveSpeed;
-
 		// ----- Jump Instruction -----
+
 		if (!jumpBuffer.IsDone && jumpCooldown.IsDone && !coyoteTimer.IsDone) {
 			Entity.Inertia = Entity.Inertia.SlideOnFace(Entity.UpDirection) + Entity.UpDirection * 17.5f;
 			jumpBuffer.End();

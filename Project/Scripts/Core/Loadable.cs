@@ -52,11 +52,6 @@ public abstract partial class Loadable : ExtendedNode, ILoadable {
 	}
 	protected virtual void DisableBehaviour() { }
 
-	public virtual void Destroy() {
-		AsILoadable().Unload();
-		this.UnparentAndQueueFree();
-	}
-
 
 
 	public override void _EnterTree() {

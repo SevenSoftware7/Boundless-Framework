@@ -2,6 +2,8 @@ namespace LandlessSkies.Core;
 
 using Godot;
 using SevenGame.Utility;
+using static SevenGame.Utility.MathUtility;
+
 
 [Tool]
 [GlobalClass]
@@ -47,6 +49,7 @@ public partial class CameraController3D : Camera3D {
 		}
 
 		Subject = transform with {
+			Basis = Subject.Basis * MathUtility.FromToBasis(Subject.Basis.Y, transform.Basis.Y),
 			Origin = origin
 		};
 	}
@@ -55,7 +58,7 @@ public partial class CameraController3D : Camera3D {
 		Input.MouseMode = Input.MouseModeEnum.Captured;
 
 		if (Style == CameraStyle.ThirdPersonGrounded) {
-			float maxAngle = (Mathf.Pi / 2f) - Mathf.Epsilon;
+			float maxAngle = Mathf.Pi / 2f - Mathf.Epsilon;
 
 			Vector3 eulerAngles = LocalRotation.GetEuler();
 			LocalRotation = Basis.FromEuler(new(
@@ -74,7 +77,7 @@ public partial class CameraController3D : Camera3D {
 	public void RawInputToGroundedMovement(Entity entity, Vector2 moveInput, out Basis camRotation, out Vector3 groundedMovement) {
 		Vector3 camRight = AbsoluteRotation.X;
 		float localAlignment = Mathf.Ceil(entity.Transform.Basis.Y.Dot(LocalRotation.Y));
-		Vector3 entityUp = entity.Transform.Basis.Y * ((localAlignment * 2f) - 1f);
+		Vector3 entityUp = entity.Transform.Basis.Y * (localAlignment * 2f - 1f);
 		Vector3 groundedCamForward = entityUp.Cross(camRight).Normalized();
 
 		camRotation = Basis.LookingAt(groundedCamForward, entityUp);
@@ -89,17 +92,14 @@ public partial class CameraController3D : Camera3D {
 	}
 
 
+
 	private void ComputeCamera(double delta) {
 		float floatDelta = (float)delta;
 
 		Vector3 smoothTargetPosition = GetSmoothTargetPosition(floatDelta);
 
-
 		// Vector3 targetSubjectSpaceOffset = new(cameraOriginPosition.X, cameraOriginPosition.Y, cameraOriginPosition.Z * distanceToPlayer);
 		// subjectSpaceOffset = subjectSpaceOffset.Slerp(targetSubjectSpaceOffset, 3f * floatDelta);
-
-
-
 
 
 		Basis TargetBasis = AbsoluteRotation;
@@ -110,7 +110,7 @@ public partial class CameraController3D : Camera3D {
 		ComputeWallCollision(smoothTargetPosition, absoluteOffset, targetDistance, ref distanceToSubject, delta);
 
 
-		Vector3 finalPos = smoothTargetPosition + (absoluteOffset * distanceToSubject);
+		Vector3 finalPos = smoothTargetPosition + absoluteOffset * distanceToSubject;
 		GlobalTransform = new(TargetBasis, finalPos);
 	}
 
@@ -139,7 +139,6 @@ public partial class CameraController3D : Camera3D {
 			smoothHorizontalPosition = smoothHorizontalPosition.SmoothDamp(horizontalPos, ref horizontalVelocity, horizontalSmoothTime, Mathf.Inf, floatDelta);
 		}
 
-
 		return smoothHorizontalPosition + smoothVerticalPosition;
 	}
 
@@ -148,9 +147,22 @@ public partial class CameraController3D : Camera3D {
 
 		// Check for collision with the camera
 
-		const float CAM_MIN_DISTANCE_TO_WALL = 0.4f;
+		const float CAM_MIN_DISTANCE_TO_WALL = 0.3f;
 
-		bool rayCastHit = GetWorld3D().IntersectRay3D(origin, origin + (direction * (distance + CAM_MIN_DISTANCE_TO_WALL)), out MathUtility.IntersectRay3DResult result, CollisionMask);
+		SphereShape3D shape = new() {
+			Radius = CAM_MIN_DISTANCE_TO_WALL
+		};
+
+		PhysicsShapeQueryParameters3D castParameters = new() {
+			Transform = new(Basis.Identity, origin),
+			Motion = direction * distance,
+			Shape = shape,
+			CollisionMask = CollisionMask,
+		};
+
+		bool rayCastHit = GetWorld3D().CastMotion(castParameters, out CastMotionResult result );
+
+
 		if (!rayCastHit) {
 			if (!Mathf.IsEqualApprox(cameraDistance, distance)) {
 				cameraDistance = cameraDistance.SmoothDamp(distance, ref distanceVelocity, 0.2f, Mathf.Inf, floatDelta);
@@ -159,34 +171,7 @@ public partial class CameraController3D : Camera3D {
 			return;
 		}
 
-
-		Vector3 collisionToPlayer = origin - result.Point;
-		float collisionDistance = collisionToPlayer.Length();
-		collisionToPlayer /= collisionDistance; // cheaper than Normalize, since we already have the length
-
-		// Fancy Trigonometry to keep the camera at least CAM_MIN_DISTANCE_TO_WALL away from the wall
-		// this will keep the camera in the same direction as it would have been without collision,
-		// but at a constant distance from the wall
-		//
-		// |                                          [Camera]
-		// |                                        /--
-		// |                                     /--
-		// |                                  /--
-		// |                               /--
-		// |                            /--
-		// |  Collision point        [*]--> Final position
-		// |        ^             /-- |
-		// |        |          /--    |
-		// |        |       /--       +---> length of CAM_MIN_DISTANCE_TO_WALL
-		// |        |    /--          |
-		// |        | /--             |
-		// +-------[*]----------------+------------------------------------------
-
-		float angle = collisionToPlayer.AngleTo(result.Normal);
-		float collisionAngle = (Mathf.Pi / 2f) - angle;
-		float camMargin = CAM_MIN_DISTANCE_TO_WALL / Mathf.Sin(collisionAngle);
-
-		cameraDistance = collisionDistance - camMargin;
+		cameraDistance = distance * result.SafeProportion;
 	}
 
 
@@ -200,8 +185,8 @@ public partial class CameraController3D : Camera3D {
 		ComputeCamera(delta);
 	}
 
-	public override void _EnterTree() {
-		base._EnterTree();
+	public override void _Ready() {
+		base._Ready();
 		distanceToSubject = cameraOriginPosition.Length();
 		verticalTime = horizontalSmoothTime;
 	}

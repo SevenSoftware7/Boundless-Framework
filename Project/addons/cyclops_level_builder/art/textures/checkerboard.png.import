@@ -2,17 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://chwx1tgb0aoqi"
-path.s3tc="res://.godot/imported/checkerboard.png-cfbf91dbc6f1912b9574735ecca5a514.s3tc.ctex"
+uid="uid://oi60f3rtil4t"
+path="res://.godot/imported/checkerboard.png-cfbf91dbc6f1912b9574735ecca5a514.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://addons/cyclops_level_builder/art/textures/checkerboard.png"
-dest_files=["res://.godot/imported/checkerboard.png-cfbf91dbc6f1912b9574735ecca5a514.s3tc.ctex"]
+dest_files=["res://.godot/imported/checkerboard.png-cfbf91dbc6f1912b9574735ecca5a514.ctex"]
 
 [params]
 

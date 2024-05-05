@@ -1,5 +1,6 @@
 namespace LandlessSkies.Core;
 
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -23,24 +24,47 @@ public sealed partial class MultiWeapon : Weapon {
 	}
 
 
-	public override WeaponData WeaponData {
-		get => CurrentWeapon?.WeaponData!;
-		protected set { }
-	}
-	[Export]
-	private Array<Weapon?> Weapons {
+	[Export] private Array<Weapon?> Weapons {
 		get => [.. _weapons];
 		set {
-			List<Weapon?> newWeapons = [.. value];
-			if (Engine.IsEditorHint()) {
-				_weapons.Except(newWeapons).ToList().ForEach(weapon => weapon?.AsIEnablable().Enable());
+			if (this.IsInitializationSetterCall()) {
+				_weapons = [.. value];
+				return;
 			}
-			_weapons = newWeapons;
 
-			if (this.IsInitializationSetterCall())
+			// If nothing changed
+			if (_weapons.SequenceEqual(value))
 				return;
 
-			_weapons.ForEach(w => w?.SafeReparentEditor(this));
+			// If the items were only moved
+			if (_weapons.Count == value.Count && _weapons.Intersect(value).Count() == value.Count) {
+				_weapons = [.. value];
+
+				UpdateCurrent();
+				RearrangeHierarchy();
+				return;
+			}
+
+			int minLength = Math.Min(value.Count, _weapons.Count);
+			for (int i = 0; i < Math.Max(value.Count, _weapons.Count); i++) {
+				switch (i) {
+					// If an item was modified
+					case int index when index < minLength && _weapons[index] != value[index]:
+						SetWeapon(index, value[index]);
+						break;
+
+					// If an item was added
+					case int index when index >= minLength && index < value.Count:
+						AddWeapon(value[index]);
+						break;
+
+					// If an item was removed
+					case int index when index >= minLength && index >= value.Count:
+						RemoveWeapon(index);
+						break;
+				}
+			}
+
 			UpdateCurrent();
 		}
 	}
@@ -54,8 +78,7 @@ public sealed partial class MultiWeapon : Weapon {
 	}
 
 	[ExportGroup("Current Weapon")]
-	[Export]
-	private int CurrentIndex {
+	[Export] private int CurrentIndex {
 		get => _currentIndex;
 		set {
 			if (this.IsInitializationSetterCall()) {
@@ -117,7 +140,9 @@ public sealed partial class MultiWeapon : Weapon {
 	public override ICustomizable[] Children => [.. _weapons.Cast<ICustomizable>()];
 
 	public override IWeapon.Type WeaponType => CurrentWeapon?.WeaponType ?? 0;
+	public override IWeapon.Usage WeaponUsage => CurrentWeapon?.WeaponUsage ?? 0;
 	public override IWeapon.Size WeaponSize => CurrentWeapon?.WeaponSize ?? 0;
+
 
 	private MultiWeapon() : base() { }
 	public MultiWeapon(IEnumerable<Weapon> weapons) : this() {
@@ -138,14 +163,6 @@ public sealed partial class MultiWeapon : Weapon {
 		}
 		_weapons.ForEach((w) => w?.AsIEnablable().Disable());
 		CurrentWeapon?.AsIEnablable().SetEnabled(IsEnabled);
-
-		if (Engine.IsEditorHint()) {
-			// Rearrange the weapons in the Node hierarchy
-			List<Weapon> weapons = Weapons.OfType<Weapon>().ToList();
-			foreach (Weapon weapon in weapons) {
-				weapon.GetParent().MoveChild(weapon, weapons.IndexOf(weapon));
-			}
-		}
 	}
 
 	public void SwitchTo(Weapon? weapon) =>
@@ -168,17 +185,16 @@ public sealed partial class MultiWeapon : Weapon {
 		UpdateCurrent();
 	}
 
+	private void InjectWeapon(Weapon weapon) {
+		weapon.SetHandedness(Handedness);
+		weapon.SetParentSkeleton(Skeleton);
+	}
 
-	public void AddWeapon(Weapon weapon) {
+
+	public void AddWeapon(Weapon? weapon) {
 		_weapons.Add(null!);
 
 		SetWeapon(_weapons.Count - 1, weapon);
-	}
-
-	public void AddWeapon(WeaponData? data, WeaponCostume? costume = null) {
-		_weapons.Add(null!);
-
-		SetWeapon(_weapons.Count - 1, data, costume);
 	}
 
 	public void SetWeapon(int index, Weapon? weapon) {
@@ -188,48 +204,32 @@ public sealed partial class MultiWeapon : Weapon {
 		if (weapon is null)
 			return;
 
-		new LoadableUpdater<Weapon>(ref weapon)
-			.BeforeLoad(w => {
-				w.SafeReparentEditor(this);
-				w.SetHandedness(Handedness);
-				w.SetParentSkeleton(Skeleton);
-			})
-			.Execute();
-
+		weapon.SafeReparentEditor(this);
+		InjectWeapon(weapon);
 		_weapons[index] = weapon;
+
 		UpdateCurrent();
+		RearrangeHierarchy();
 	}
 
-	public void SetWeapon(int index, WeaponData? data, WeaponCostume? costume = null) {
-		if (!IndexInBounds(index))
-			return;
-
-		Weapon? weapon = _weapons[index];
-		if (data is not null && data == weapon?.WeaponData)
-			return;
-
-		new LoadableUpdater<Weapon>(ref weapon, () => data?.Instantiate(costume))
-			.BeforeLoad(w => {
-				w.SafeReparentEditor(this);
-				w.SetHandedness(Handedness);
-				w.SetParentSkeleton(Skeleton);
-			})
-			.Execute();
-
-		_weapons[index] = weapon;
-		UpdateCurrent();
-	}
 
 	public void RemoveWeapon(int index) {
 		if (!IndexInBounds(index))
 			return;
 
-		Weapon? weapon = _weapons[index];
-		new LoadableDestructor<Weapon>(ref weapon)
-			.Execute();
-
 		_weapons.RemoveAt(index);
+
 		UpdateCurrent();
+		RearrangeHierarchy();
+	}
+
+	private void RearrangeHierarchy() {
+		if (Engine.IsEditorHint()) {
+			List<Weapon> weapons = Weapons.OfType<Weapon>().ToList();
+			foreach (Weapon weapon in weapons) {
+				weapon.GetParent().MoveChild(weapon, weapons.IndexOf(weapon));
+			}
+		}
 	}
 
 
@@ -255,14 +255,10 @@ public sealed partial class MultiWeapon : Weapon {
 		_weapons.ForEach(w => w?.AsIEnablable().Disable());
 		base.DisableBehaviour();
 	}
-	public override void Destroy() {
-		_weapons.ForEach(w => w?.Destroy());
-		base.Destroy();
-	}
 
 	protected override bool LoadBehaviour() => CurrentWeapon?.AsILoadable().Load() ?? false;
 	protected override void UnloadBehaviour() => CurrentWeapon?.AsILoadable().Unload();
-	public void ReloadModel(bool forceLoad = false) => CurrentWeapon?.AsILoadable().ReloadModel(forceLoad);
+	public void ReloadModel(bool forceLoad = false) => CurrentWeapon?.AsILoadable().Reload(forceLoad);
 
 
 

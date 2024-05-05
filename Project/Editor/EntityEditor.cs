@@ -12,13 +12,7 @@ public partial class Entity {
 		StringName name = property["name"].AsStringName();
 
 
-		if (name == PropertyName.Character && _character is not null) {
-			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() | PropertyUsageFlags.ReadOnly);
-		}
-		else if (
-			name == PropertyName.CharacterCostume ||
-			name == PropertyName.CharacterData
-		) {
+		if (name == PropertyName.RelativeForward) {
 			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
 		}
 	}

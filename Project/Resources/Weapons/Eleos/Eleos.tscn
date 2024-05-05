@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://bp1e6thwkkcrr"]
+
+[ext_resource type="Script" path="res://Scripts/Vanilla/Weapon/Eleos/EleosWeapon.cs" id="1_pwvbn"]
+[ext_resource type="Resource" uid="uid://q68mneifjek2" path="res://Resources/Weapons/Eleos/Costumes/Base/Eleos_base.tres" id="2_ft1fa"]
+
+[node name="Eleos" type="Node3D"]
+script = ExtResource("1_pwvbn")
+DisplayName = "Eleos"
+Costume = ExtResource("2_ft1fa")
+IsEnabled = true

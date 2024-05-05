@@ -6,12 +6,16 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public sealed partial class EpiphronWeapon : SingleWeapon<EpiphronWeaponData> {
+public sealed partial class EpiphronWeapon : SingleWeapon {
 	private SlashAttackInfo slashAttack = null!;
 
+	public override IWeapon.Type WeaponType => IWeapon.Type.Sword;
+	public override IWeapon.Usage WeaponUsage => IWeapon.Usage.Slash | IWeapon.Usage.Thrust;
+	public override IWeapon.Size WeaponSize => IWeapon.Size.OneHanded;
 
-	public EpiphronWeapon(EpiphronWeaponData? data = null, WeaponCostume? costume = null) : base(data, costume) { }
+
 	private EpiphronWeapon() : base() { }
+	public EpiphronWeapon(WeaponCostume? costume = null) : base(costume) { }
 
 
 	public override IEnumerable<AttackInfo> GetAttacks(Entity target) {

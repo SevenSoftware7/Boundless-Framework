@@ -1,6 +1,6 @@
 namespace LandlessSkies.Core;
 
-public interface ILoadable : IDestroyable, IEnablable {
+public interface ILoadable : IEnablable {
 
 	bool IsLoaded { get; set; }
 
@@ -25,7 +25,7 @@ public interface ILoadable : IDestroyable, IEnablable {
 	/// <summary>
 	/// Reloads the model by unloading it then loading it back again.
 	/// </summary>
-	void ReloadModel(bool forceLoad = false) {
+	void Reload(bool forceLoad = false) {
 		bool wasLoaded = IsLoaded;
 		Unload();
 

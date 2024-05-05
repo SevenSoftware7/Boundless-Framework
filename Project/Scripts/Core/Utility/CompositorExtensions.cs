@@ -3,8 +3,6 @@ using Godot;
 namespace LandlessSkies.Core;
 
 public static class CompositorExtensions {
-	public static readonly RenderingDevice? RenderingDevice = RenderingServer.GetRenderingDevice();
-
 
 	public static RDUniform GetImageUniform(Rid image, int binding = 0) {
 		RDUniform uniform = new() {

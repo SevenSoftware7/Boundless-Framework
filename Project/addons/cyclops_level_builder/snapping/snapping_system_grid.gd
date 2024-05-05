@@ -26,24 +26,26 @@
 extends CyclopsSnappingSystem
 class_name SnappingSystemGrid
 
-const TOOL_ID:String = "grid"
+const SNAPPING_TOOL_ID:String = "grid"
 
 var snap_to_grid_util:SnapToGridUtil = SnapToGridUtil.new()
 
 func _activate(plugin:CyclopsLevelBuilder):
 	super._activate(plugin)
 	
-	snap_to_grid_util = CyclopsAutoload.calc_snap_to_grid_util()
+	snap_to_grid_util = plugin.get_global_scene().calc_snap_to_grid_util()
 
-	var cache:Dictionary = plugin.get_snapping_cache(TOOL_ID)
+	var cache:Dictionary = plugin.get_snapping_cache(SNAPPING_TOOL_ID)
 	snap_to_grid_util.load_from_cache(cache)
 		
 func _deactivate():
 	super._deactivate()
 
+	flush_cache()
+
+func flush_cache():
 	var cache:Dictionary = snap_to_grid_util.save_to_cache()
-	plugin.set_snapping_cache(TOOL_ID, cache)
-				
+	plugin.set_snapping_cache(SNAPPING_TOOL_ID, cache)
 
 #Point is in world space
 func _snap_point(point:Vector3, query:SnappingQuery)->Vector3:
@@ -52,7 +54,7 @@ func _snap_point(point:Vector3, query:SnappingQuery)->Vector3:
 	return target_point
 
 func _snap_angle(angle:float, query:SnappingQuery)->float:
-	var snap_angle:float = CyclopsAutoload.settings.get_property(CyclopsGlobalScene.SNAPPING_GRID_ANGLE)
+	var snap_angle:float = plugin.get_global_scene().settings.get_property(CyclopsGlobalScene.SNAPPING_GRID_ANGLE)
 	return floor(angle / snap_angle) * snap_angle
 
 

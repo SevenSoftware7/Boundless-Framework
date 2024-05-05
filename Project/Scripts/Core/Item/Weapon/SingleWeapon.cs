@@ -1,27 +1,39 @@
 namespace LandlessSkies.Core;
 
+using System;
 using Godot;
 
 [Tool]
 [GlobalClass]
-public abstract partial class SingleWeapon : Weapon {
+public abstract partial class SingleWeapon : Weapon, IUIObject {
+
+	[Export] public string DisplayName { get; private set; } = string.Empty;
+	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
+	public override IUIObject UIObject => this;
+
+
+
 	public override bool IsLoaded {
-		get => WeaponModel?.IsLoaded ?? false;
-		set => WeaponModel?.AsILoadable().SetLoaded(value);
+		get => _isLoaded;
+		set => this.BackingFieldLoadUnload(ref _isLoaded, value);
 	}
+	private bool _isLoaded = false;
 
 
 	[ExportGroup("Costume")]
 	[Export] private Model? WeaponModel;
-
 	[Export] public WeaponCostume? Costume {
-		get => WeaponModel?.Costume as WeaponCostume;
-		set {
-			if (this.IsInitializationSetterCall())
+		get => _costume;
+		private set {
+			if (this.IsInitializationSetterCall()) {
+				_costume = value;
 				return;
+			}
+
 			SetCostume(value);
 		}
 	}
+	private WeaponCostume? _costume;
 
 	[ExportGroup("Dependencies")]
 	[Export] public override Skeleton3D? Skeleton {
@@ -62,26 +74,23 @@ public abstract partial class SingleWeapon : Weapon {
 	[Signal] public delegate void CostumeChangedEventHandler(WeaponCostume? newCostume, WeaponCostume? oldCostume);
 
 
-
 	protected SingleWeapon() : base() { }
+	public SingleWeapon(WeaponCostume? costume) : this() {
+		SetCostume(costume);
+	}
 
 
 
-	public void SetCostume(WeaponCostume? costume) {
-		WeaponCostume? oldCostume = Costume;
-		if (costume == oldCostume)
+	public void SetCostume(WeaponCostume? newCostume) {
+		WeaponCostume? oldCostume = _costume;
+		if (newCostume == oldCostume)
 			return;
 
-		new LoadableUpdater<Model>(ref WeaponModel, () => costume?.Instantiate())
-			.BeforeLoad(m => {
-				if (m is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(Skeleton);
-				if (m is IHandAdaptable mHanded) mHanded.SetHandedness(Handedness);
-				m.SafeReparentEditor(this);
-				m.AsIEnablable().EnableDisable(IsEnabled);
-			})
-			.Execute();
+		_costume = newCostume;
 
-		EmitSignal(SignalName.CostumeChanged, costume!, oldCostume!);
+		AsILoadable().Reload();
+
+		EmitSignal(SignalName.CostumeChanged, newCostume!, oldCostume!);
 	}
 
 
@@ -91,15 +100,36 @@ public abstract partial class SingleWeapon : Weapon {
 	// 	WeaponModel?.Inject(result);
 	// }
 
-
+	public override void SetParentSkeleton(Skeleton3D? skeleton) {
+		base.SetParentSkeleton(skeleton);
+		if (skeleton is null) {
+			AsILoadable().Unload();
+		}
+		else {
+			AsILoadable().Load();
+		}
+	}
 
 	protected override bool LoadBehaviour() {
-		// WeaponModel?.Inject(Skeleton);
-		return WeaponModel?.AsILoadable().Load() ?? false;
+		new LoadableUpdater<Model>(ref WeaponModel, () => Costume?.Instantiate())
+			.BeforeLoad(m => {
+				if (m is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(Skeleton);
+				if (m is IHandAdaptable mHanded) mHanded.SetHandedness(Handedness);
+				m.SafeReparentEditor(this);
+				m.AsIEnablable().EnableDisable(IsEnabled);
+			})
+			.Execute();
+
+		_isLoaded = true;
+
+		return true;
 	}
 	protected override void UnloadBehaviour() {
-		// WeaponModel?.Inject(null as Skeleton3D);
-		WeaponModel?.AsILoadable().Unload();
+		new LoadableDestructor<Model>(ref WeaponModel)
+			.AfterUnload(w => w.QueueFree())
+			.Execute();
+
+		_isLoaded = false;
 	}
 
 	protected override void EnableBehaviour() {
@@ -111,11 +141,21 @@ public abstract partial class SingleWeapon : Weapon {
 		WeaponModel?.AsIEnablable().Disable();
 	}
 
+	public override ISaveData<Weapon> Save() {
+		return new SingleWeaponSaveData(this);
+	}
+
+	[Serializable]
+	protected class SingleWeaponSaveData(SingleWeapon weapon) : ISaveData<Weapon> {
+		public string TypeName { get; set; } = weapon.GetType().Name;
+		public Weapon Load() {
+			return null!;
+		}
+	}
 
 
 	public override void _Parented() {
 		base._Parented();
 		Callable.From(() => WeaponModel?.SafeReparentAndSetOwner(this)).CallDeferred();
 	}
-
 }

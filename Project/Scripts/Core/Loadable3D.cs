@@ -53,11 +53,6 @@ public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
 	}
 	protected virtual void DisableBehaviour() { }
 
-	public virtual void Destroy() {
-		AsILoadable().Unload();
-		this.UnparentAndQueueFree();
-	}
-
 
 
 	public override void _EnterTree() {

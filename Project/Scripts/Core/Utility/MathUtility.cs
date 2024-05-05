@@ -113,7 +113,7 @@ public static class MathUtility {
 		double num7 = (currentVelocity + num1 * num6) * deltaTime;
 		currentVelocity = (currentVelocity - num1 * num7) * num3;
 		double num8 = target + (num6 + num7) * num3;
-		if (num5 - current > 0.0 == num8 > num5) {
+		if ((num5 - current > 0.0) == (num8 > num5)) {
 			num8 = num5;
 			currentVelocity = (num8 - num5) / deltaTime;
 		}
@@ -133,7 +133,7 @@ public static class MathUtility {
 		float num7 = (currentVelocity + num1 * num6) * deltaTime;
 		currentVelocity = (currentVelocity - num1 * num7) * num3;
 		float num8 = target + (num6 + num7) * num3;
-		if (num5 - current > 0.0f == num8 > num5) {
+		if ((num5 - current > 0.0f) == (num8 > num5)) {
 			num8 = num5;
 			currentVelocity = (num8 - num5) / deltaTime;
 		}
@@ -161,12 +161,16 @@ public static class MathUtility {
 	}
 
 	public static bool IntersectRay3D(this World3D world, Vector3 from, Vector3 to, out IntersectRay3DResult result, uint collisionMask = uint.MaxValue, Array<Rid>? exclude = null, bool collideWithBodies = true, bool collideWithAreas = true, bool hitFromInside = false, bool hitBackFaces = false) {
-		PhysicsDirectSpaceState3D spaceState = world.DirectSpaceState;
 		PhysicsRayQueryParameters3D parameters = PhysicsRayQueryParameters3D.Create(from, to, collisionMask, exclude);
 		parameters.CollideWithBodies = collideWithBodies;
 		parameters.CollideWithAreas = collideWithAreas;
 		parameters.HitFromInside = hitFromInside;
 		parameters.HitBackFaces = hitBackFaces;
+
+		return world.IntersectRay3D(parameters, out result);
+	}
+	public static bool IntersectRay3D(this World3D world, PhysicsRayQueryParameters3D parameters, out IntersectRay3DResult result) {
+		PhysicsDirectSpaceState3D spaceState = world.DirectSpaceState;
 
 		Dictionary intersect = spaceState.IntersectRay(parameters);
 		if (intersect.Count == 0) {
@@ -190,7 +194,6 @@ public static class MathUtility {
 	}
 
 	public static bool IntersectPoint3D(this World3D world, Vector3 position, out IntersectShape3DResult[] results, uint collisionMask = uint.MaxValue, Array<Rid>? exclude = null, bool collideWithBodies = true, bool collideWithAreas = true, int maxResults = 32) {
-		PhysicsDirectSpaceState3D spaceState = world.DirectSpaceState;
 		PhysicsPointQueryParameters3D parameters = new() {
 			Position = position,
 			Exclude = exclude,
@@ -198,6 +201,11 @@ public static class MathUtility {
 			CollideWithBodies = collideWithBodies,
 			CollideWithAreas = collideWithAreas,
 		};
+
+		return world.IntersectPoint3D(parameters, out results, maxResults);
+	}
+	public static bool IntersectPoint3D(this World3D world, PhysicsPointQueryParameters3D parameters, out IntersectShape3DResult[] results, int maxResults = 32) {
+		PhysicsDirectSpaceState3D spaceState = world.DirectSpaceState;
 
 		Array<Dictionary> intersections = spaceState.IntersectPoint(parameters, maxResults);
 		if (intersections.Count == 0) {
@@ -219,7 +227,6 @@ public static class MathUtility {
 	}
 
 	public static bool IntersectShape3D(this World3D world, Transform3D origin, Vector3 motion, out IntersectShape3DResult[] results, Shape3D shape, uint collisionMask = uint.MaxValue, Array<Rid>? exclude = null, bool collideWithBodies = true, bool collideWithAreas = true, int maxResults = 32) {
-		PhysicsDirectSpaceState3D spaceState = world.DirectSpaceState;
 		PhysicsShapeQueryParameters3D parameters = new() {
 			Transform = origin,
 			Motion = motion,
@@ -229,6 +236,11 @@ public static class MathUtility {
 			CollideWithAreas = collideWithAreas,
 			Shape = shape,
 		};
+
+		return world.IntersectShape3D(parameters, out results, maxResults);
+	}
+	public static bool IntersectShape3D(this World3D world, PhysicsShapeQueryParameters3D parameters, out IntersectShape3DResult[] results, int maxResults = 32) {
+		PhysicsDirectSpaceState3D spaceState = world.DirectSpaceState;
 
 		Array<Dictionary> intersections = spaceState.IntersectShape(parameters, maxResults);
 		if (intersections.Count == 0) {
@@ -250,7 +262,6 @@ public static class MathUtility {
 	}
 
 	public static bool CollideShape3D(this World3D world, Transform3D origin, out CollideShape3DResult[] results, Shape3D shape, uint collisionMask = uint.MaxValue, Array<Rid>? exclude = null, bool collideWithBodies = true, bool collideWithAreas = true, int maxResults = 32) {
-		PhysicsDirectSpaceState3D spaceState = world.DirectSpaceState;
 		PhysicsShapeQueryParameters3D parameters = new() {
 			Transform = origin,
 			Exclude = exclude,
@@ -259,6 +270,11 @@ public static class MathUtility {
 			CollideWithAreas = collideWithAreas,
 			Shape = shape,
 		};
+
+		return world.CollideShape3D(parameters, out results, maxResults);
+	}
+	public static bool CollideShape3D(this World3D world, PhysicsShapeQueryParameters3D parameters, out CollideShape3DResult[] results, int maxResults = 32) {
+		PhysicsDirectSpaceState3D spaceState = world.DirectSpaceState;
 
 		Array<Vector3> collisions = spaceState.CollideShape(parameters, maxResults);
 		if (collisions.Count == 0) {
@@ -277,6 +293,41 @@ public static class MathUtility {
 		results = [.. resultsList];
 
 		return results.Length > 0;
+	}
+
+
+	public static bool CastMotion(this World3D world, Transform3D origin, Vector3 motion, out CastMotionResult result, Shape3D shape, uint collisionMask = uint.MaxValue, Array<Rid>? exclude = null, bool collideWithBodies = true, bool collideWithAreas = true) {
+		PhysicsShapeQueryParameters3D parameters = new() {
+			Transform = origin,
+			Motion = motion,
+			Exclude = exclude,
+			CollisionMask = collisionMask,
+			CollideWithBodies = collideWithBodies,
+			CollideWithAreas = collideWithAreas,
+			Shape = shape,
+		};
+
+		return world.CastMotion(parameters, out result);
+	}
+	public static bool CastMotion(this World3D world, PhysicsShapeQueryParameters3D parameters, out CastMotionResult result) {
+		PhysicsDirectSpaceState3D spaceState = world.DirectSpaceState;
+
+		float[] proportions = spaceState.CastMotion(parameters);
+		float safeProportion = proportions[0];
+		float unsafeProportion = proportions[1];
+
+		if (proportions.Length != 2 || safeProportion == 1f && unsafeProportion == 1f) {
+			result = new();
+			return false;
+		}
+
+
+		result = new() {
+			SafeProportion = safeProportion,
+			UnsafeProportion = unsafeProportion
+		};
+
+		return true;
 	}
 
 
@@ -301,6 +352,11 @@ public static class MathUtility {
 	public struct CollideShape3DResult {
 		public Vector3 InShape;
 		public Vector3 InWorld;
+	}
+
+	public struct CastMotionResult {
+		public float SafeProportion;
+		public float UnsafeProportion;
 	}
 
 

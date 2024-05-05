@@ -1,31 +1,31 @@
-using Godot;
+// using Godot;
 
-namespace LandlessSkies.Core;
+// namespace LandlessSkies.Core;
 
-[Tool]
-[GlobalClass]
-public abstract partial class WeaponData : Resource, IUIObject {
+// [Tool]
+// [GlobalClass]
+// public abstract partial class WeaponData : Resource, IUIObject {
 
-	[Export] public string DisplayName { get; private set; } = string.Empty;
-	public Texture2D? DisplayPortrait => BaseCostume?.DisplayPortrait;
+// 	[Export] public string DisplayName { get; private set; } = string.Empty;
+// 	public Texture2D? DisplayPortrait => BaseCostume?.DisplayPortrait;
 
-	[Export] public WeaponCostume? BaseCostume { get; private set; }
+// 	[Export] public WeaponCostume? BaseCostume { get; private set; }
 
-	[Export] public IWeapon.Type Type { get; protected set; }
-	[Export] public IWeapon.Usage Usage { get; protected set; }
-	[Export] public IWeapon.Size Size { get; protected set; }
-
-
-#if TOOLS
-	protected virtual bool EditableType => true;
-	protected virtual bool EditableUsage => true;
-	protected virtual bool EditableSize => true;
-#endif
+// 	[Export] public IWeapon.Type Type { get; protected set; }
+// 	[Export] public IWeapon.Usage Usage { get; protected set; }
+// 	[Export] public IWeapon.Size Size { get; protected set; }
 
 
-	public WeaponData() : base() { }
+// #if TOOLS
+// 	protected virtual bool EditableType => true;
+// 	protected virtual bool EditableUsage => true;
+// 	protected virtual bool EditableSize => true;
+// #endif
+
+
+// 	public WeaponData() : base() { }
 
 
 
-	public abstract Weapon Instantiate(WeaponCostume? costume = null);
-}
+// 	public abstract Weapon Instantiate(WeaponCostume? costume = null);
+// }

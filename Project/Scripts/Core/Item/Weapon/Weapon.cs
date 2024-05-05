@@ -10,9 +10,8 @@ public abstract partial class Weapon : Loadable3D, IWeapon, ISkeletonAdaptable {
 	public abstract int Style { get; set; }
 
 
-
-	public abstract WeaponData WeaponData { get; protected set; }
 	public abstract IWeapon.Type WeaponType { get; }
+	public abstract IWeapon.Usage WeaponUsage { get; }
 	public abstract IWeapon.Size WeaponSize { get; }
 	public abstract Handedness Handedness { get; protected set; }
 	public abstract Skeleton3D? Skeleton { get; protected set; }

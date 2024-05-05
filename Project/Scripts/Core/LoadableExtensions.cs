@@ -33,7 +33,6 @@ public ref struct LoadableDestructor<TLoadable> where TLoadable : ILoadable {
 
 		onAfterUnload?.Invoke(loadable);
 
-		loadable.Destroy();
 		loadable = default;
 	}
 }

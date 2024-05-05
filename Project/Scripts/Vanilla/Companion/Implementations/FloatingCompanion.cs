@@ -46,7 +46,7 @@ public partial class FloatingCompanion : Companion {
 		base.HandleInput(entity, cameraController, inputDevice);
 
 		Callable.From(() => {
-			Subject = entity.Character?.GlobalTransform ?? entity.GlobalTransform;
+			Subject = entity.GlobalTransform;
 
 			if (entity.Skeleton is not null && entity.Skeleton.TryGetBoneTransform("Head", out var boneTransform)) {
 				Head = boneTransform;
@@ -63,7 +63,7 @@ public partial class FloatingCompanion : Companion {
 			Radius = (CompanionModel?.GetAabb().GetLongestAxisSize() ?? 1f) + 0.5f,
 		};
 
-		return GetWorld3D().CollideShape3D(Transform3D.Identity.Translated(position), out _, sphere, CollisionMask, maxResults: 1);
+		return GetWorld3D().CollideShape3D(Transform3D.Identity.Translated(position), out _, sphere, CollisionMask, maxResults: 1, collideWithAreas: false);
 	}
 
 

@@ -53,11 +53,16 @@ func _deactivate():
 	builder.set_tool_cache(TOOL_ID, cache)
 			
 func _get_tool_properties_editor()->Control:
-	var res_insp:ResourceInspector = preload("res://addons/cyclops_level_builder/controls/resource_inspector/resource_inspector.tscn").instantiate()
+	#var res_insp:ResourceInspector = preload("res://addons/cyclops_level_builder/controls/resource_inspector/resource_inspector.tscn").instantiate()
+	#
+	#res_insp.target = settings
+	#
+	#return res_insp
+	var ed:ToolStairsSettingsEditor = preload("res://addons/cyclops_level_builder/tools/tool_stairs_settings_editor.tscn").instantiate()
 	
-	res_insp.target = settings
+	ed.settings = settings
 	
-	return res_insp
+	return ed
 	
 func _draw_tool(viewport_camera:Camera3D):
 	var global_scene:CyclopsGlobalScene = builder.get_global_scene()
@@ -178,7 +183,12 @@ func _gui_input(viewport_camera:Camera3D, event:InputEvent)->bool:
 						
 					else:
 						#print("init base point empty space")
-						var hit_result = calc_hit_point_empty_space(origin, dir, viewport_camera)
+						var draw_plane_point:Vector3 = Vector3.ZERO
+						var draw_plane_normal:Vector3 = Vector3.UP
+						if settings.match_selected_block:
+							draw_plane_point = calc_empty_space_draw_plane_origin(viewport_camera, draw_plane_point, draw_plane_normal)
+							
+						var hit_result = calc_hit_point_empty_space(origin, dir, viewport_camera, draw_plane_point, draw_plane_normal)
 						var start_pos:Vector3 = hit_result[0]
 						floor_normal = hit_result[1]
 
@@ -195,7 +205,11 @@ func _gui_input(viewport_camera:Camera3D, event:InputEvent)->bool:
 					var angle_with_base:float = acos(floor_normal.dot(camera_dir))
 					var drag_angle_limit:float = builder.get_global_scene().drag_angle_limit
 					if angle_with_base < drag_angle_limit || angle_with_base > PI - drag_angle_limit:
-						block_drag_cur = base_drag_cur + floor_normal
+						var height = settings.default_block_height
+						if settings.match_selected_block:
+							height = calc_active_block_orthogonal_height(base_drag_cur, floor_normal)
+						
+						block_drag_cur = base_drag_cur + floor_normal * height
 						
 						create_block()
 						
@@ -212,11 +226,11 @@ func _gui_input(viewport_camera:Camera3D, event:InputEvent)->bool:
 					tool_state = ToolState.READY
 					return true
 					
-		elif e.button_index == MOUSE_BUTTON_RIGHT:
-			if tool_state == ToolState.DRAG_BASE || tool_state == ToolState.DRAG_HEIGHT:
-				if e.is_pressed():
-					tool_state = ToolState.READY
-				return true
+		#elif e.button_index == MOUSE_BUTTON_RIGHT:
+			#if tool_state == ToolState.DRAG_BASE || tool_state == ToolState.DRAG_HEIGHT:
+				#if e.is_pressed():
+					#tool_state = ToolState.READY
+				#return true
 					
 		elif e.button_index == MOUSE_BUTTON_WHEEL_UP:
 			if tool_state == ToolState.DRAG_BASE || tool_state == ToolState.DRAG_HEIGHT:
@@ -296,6 +310,9 @@ func create_block():
 	cmd.direction = settings.direction
 	cmd.uv_transform = builder.tool_uv_transform
 	cmd.material_path = builder.tool_material_path
+	cmd.collision_type = settings.collision_type
+	cmd.collision_layers = settings.collision_layer
+	cmd.collision_mask = settings.collision_mask
 
 	var undo:EditorUndoRedoManager = builder.get_undo_redo()
 

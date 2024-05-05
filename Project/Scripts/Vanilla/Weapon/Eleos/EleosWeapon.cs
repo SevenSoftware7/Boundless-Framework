@@ -6,14 +6,17 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public sealed partial class EleosWeapon : SingleWeapon<EleosWeaponData> {
+public sealed partial class EleosWeapon : SingleWeapon {
 	private SlashAttackInfo slashAttack = null!;
 	private CompositeChargeAttackInfo chargeAttack = null!;
 
+	public override IWeapon.Type WeaponType => IWeapon.Type.Sword;
+	public override IWeapon.Usage WeaponUsage => IWeapon.Usage.Slash | IWeapon.Usage.Thrust;
+	public override IWeapon.Size WeaponSize => IWeapon.Size.OneHanded |IWeapon.Size.TwoHanded;
 
-	public EleosWeapon(EleosWeaponData? data = null, WeaponCostume? costume = null) : base(data, costume) { }
+
+	public EleosWeapon(WeaponCostume? costume = null) : base(costume) { }
 	private EleosWeapon() : base() { }
-
 
 	public override IEnumerable<AttackInfo> GetAttacks(Entity target) {
 		return [
@@ -41,6 +44,7 @@ public sealed partial class EleosWeapon : SingleWeapon<EleosWeaponData> {
 			entity.ExecuteAction(chargeAttack);
 		}
 	}
+
 
 	public override void _Ready() {
 		base._Ready();

@@ -25,22 +25,6 @@
 class_name CommandDeleteBlocks
 extends CyclopsCommand
 
-#class TrackedBlock extends RefCounted:
-#	var path:NodePath
-#	var path_parent:NodePath
-#	var data:ConvexBlockData
-#	var materials:Array[Material]
-#	var selected:bool
-#	var name:String
-#
-#	func _init(block:CyclopsBlock):
-#		path = block.get_path()
-#		path_parent = block.get_parent().get_path()
-#		name = block.name
-#		data = block.block_data.duplicate()
-#		selected = block.selected
-#		materials = block.materials
-
 #Public 
 var block_paths:Array[NodePath]
 
@@ -71,6 +55,7 @@ func do_it():
 	#Delete source blocks
 	for block_path in block_paths:
 		var del_block:CyclopsBlock = builder.get_node(block_path)
+		del_block.get_parent().remove_child(del_block)
 		del_block.queue_free()
 
 
@@ -83,7 +68,10 @@ func undo_it():
 		block.block_data = tracked.data
 		block.materials = tracked.materials
 		block.name = tracked.name
-		block.selected = tracked.selected
+		#block.selected = tracked.selected
+		block.collision_type = tracked.collision_type
+		block.collision_layer = tracked.collision_layers
+		block.collision_mask = tracked.collision_mask
 		
 		parent.add_child(block)
 		block.owner = builder.get_editor_interface().get_edited_scene_root()

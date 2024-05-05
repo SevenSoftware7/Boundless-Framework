@@ -21,7 +21,7 @@ public abstract partial class EntityBehaviour : Node, IInputReader {
 	public abstract Interactable? GetInteractionCandidate();
 	public virtual void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice) { }
 
-	public virtual bool SetSpeed(MovementSpeed speed) => true;
+	public virtual bool SetSpeed(MovementType speed) => true;
 	public virtual bool Move(Vector3 direction) => true;
 	public virtual bool Jump(Vector3? target = null) => true;
 
@@ -34,7 +34,7 @@ public abstract partial class EntityBehaviour : Node, IInputReader {
 
 
 
-	public enum MovementSpeed {
+	public enum MovementType {
 		Idle = 0,
 		Walk = 1,
 		Run = 2,

@@ -28,9 +28,23 @@ class_name ToolMaterialBrushSettingsEditor
 @export var settings:ToolMaterialBrushSettings:
 	get:
 		return settings
+		
 	set(value):
+		if settings == value:
+			return
+		
+		if settings:
+			settings.changed.disconnect(on_settings_changed)
+		
 		settings = value
+		
+		if settings:
+			settings.changed.connect(on_settings_changed)
+		
 		update()
+
+func on_settings_changed():
+	update()
 
 func update():
 	if !settings:
@@ -43,16 +57,19 @@ func update():
 
 		%check_paint_visibility.disabled = true
 		%check_visibility.disabled = true
-		
+
+		%check_paint_uv.disabled = true
+
 		return
-		
+
 	%check_paint_material.disabled = false
 	%check_paint_color.disabled = false
 	%check_paint_visibility.disabled = false
 	%check_individual_faces.disabled = false
 
 	%check_individual_faces.button_pressed = settings.individual_faces
-	
+	#%opbn_geom_component.selected = settings.component_type
+
 	%check_paint_material.button_pressed = settings.paint_materials
 	%check_erase_material.button_pressed = settings.erase_material
 	%check_erase_material.disabled = !settings.paint_materials
@@ -60,12 +77,12 @@ func update():
 	%check_paint_color.button_pressed = settings.paint_color
 	%color_button.color = settings.color
 	%color_button.disabled = !settings.paint_color
-	
+
 	%check_paint_visibility.button_pressed = settings.paint_visibility
 	%check_visibility.button_pressed = settings.visibility
 	%check_visibility.disabled = !settings.paint_visibility
-	
-	
+
+	%check_paint_uv.button_pressed = settings.paint_uv
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -78,12 +95,10 @@ func _process(delta):
 
 
 func _on_check_paint_material_toggled(button_pressed:bool):
+	#print("_on_check_paint_material_toggled ", button_pressed)
 	settings.paint_materials = button_pressed
 	%check_erase_material.disabled = !settings.paint_materials
 
-
-func _on_check_individual_faces_toggled(button_pressed:bool):
-	settings.individual_faces = button_pressed
 
 
 func _on_check_erase_material_toggled(button_pressed:bool):
@@ -107,3 +122,21 @@ func _on_check_paint_visibility_toggled(button_pressed:bool):
 func _on_check_visibility_toggled(button_pressed:bool):
 	settings.visibility = button_pressed
 
+
+func _on_check_paint_uv_toggled(button_pressed:bool):
+	settings.paint_uv = button_pressed
+
+
+func _on_check_individual_faces_toggled(button_pressed:bool):
+	settings.individual_faces = button_pressed
+
+#func _on_opbn_geom_component_item_selected(index):
+	#match index:
+		#0:
+			#settings.component_type = GeometryComponentType.Type.OBJECT
+		#1:
+			#settings.component_type = GeometryComponentType.Type.VERTEX
+		#2:
+			#settings.component_type = GeometryComponentType.Type.FACE
+		#3:
+			#settings.component_type = GeometryComponentType.Type.FACE_VERTEX

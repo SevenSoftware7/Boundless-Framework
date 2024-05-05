@@ -6,12 +6,16 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public sealed partial class NemesisWeapon : SingleWeapon<NemesisWeaponData> {
+public sealed partial class NemesisWeapon : SingleWeapon {
 	private SlashAttackInfo slashAttack = null!;
 
+	public override IWeapon.Type WeaponType => IWeapon.Type.Sword;
+	public override IWeapon.Usage WeaponUsage => IWeapon.Usage.Slash | IWeapon.Usage.Strike;
+	public override IWeapon.Size WeaponSize => IWeapon.Size.TwoHanded;
 
-	public NemesisWeapon(NemesisWeaponData? data = null, WeaponCostume? costume = null) : base(data, costume) { }
+
 	private NemesisWeapon() : base() { }
+	public NemesisWeapon(WeaponCostume? costume = null) : base(costume) { }
 
 
 	public override IEnumerable<AttackInfo> GetAttacks(Entity target) {

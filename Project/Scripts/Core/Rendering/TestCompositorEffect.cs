@@ -5,34 +5,14 @@ namespace LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public partial class TestCompositorEffect : CompositorEffect {
+	private RenderingDevice? renderingDevice;
 	private Rid nearestSampler;
 	// private Rid linearSampler;
 
 
-	[Export]
-	private RDShaderFile? ShaderFile {
-		get => _shaderFile;
-		set {
-			_shaderFile = value;
-			if (CompositorExtensions.RenderingDevice is not RenderingDevice renderingDevice)
-				return;
-
-
-			if (_shaderFile is null) {
-				FreeShader(renderingDevice);
-				return;
-			}
-
-			shader = renderingDevice.ShaderCreateFromSpirV(_shaderFile.GetSpirV());
-			shaderPipeline = renderingDevice.ComputePipelineCreate(shader);
-		}
-	}
-
-
-	private RDShaderFile? _shaderFile;
-
 	private Rid shader;
 	private Rid shaderPipeline;
+	[Export] private RDShaderFile? ShaderFile;
 
 
 
@@ -41,44 +21,53 @@ public partial class TestCompositorEffect : CompositorEffect {
 		RenderingServer.CallOnRenderThread(Callable.From(Construct));
 	}
 
+	public override void _Notification(int what) {
+		base._Notification(what);
+		if (what == NotificationPredelete) {
+			Destruct();
+		}
+	}
+
 
 	private void Construct() {
-		if (CompositorExtensions.RenderingDevice is not RenderingDevice renderingDevice)
+		renderingDevice = RenderingServer.GetRenderingDevice();
+		if (renderingDevice is null)
 			return;
 
 		nearestSampler = renderingDevice.SamplerCreate(new() {
 			MinFilter = RenderingDevice.SamplerFilter.Nearest,
 			MagFilter = RenderingDevice.SamplerFilter.Nearest
 		});
+
 		// linearSampler = renderingDevice.SamplerCreate(new() {
 		// 	MinFilter = RenderingDevice.SamplerFilter.Linear,
 		// 	MagFilter = RenderingDevice.SamplerFilter.Linear
 		// });
+
+		if (ShaderFile is not null) {
+			shader = renderingDevice.ShaderCreateFromSpirV(ShaderFile.GetSpirV());
+			shaderPipeline = renderingDevice.ComputePipelineCreate(shader);
+		}
 	}
 	private void Destruct() {
-		if (CompositorExtensions.RenderingDevice is not RenderingDevice renderingDevice)
+		if (renderingDevice is null)
 			return;
 
-		FreeShader(renderingDevice);
+		if (nearestSampler.IsValid) {
+			renderingDevice.FreeRid(nearestSampler);
+		}
 
-		renderingDevice.FreeRid(nearestSampler);
-		// renderingDevice.FreeRid(linearSampler);
-	}
-
-	private void FreeShader(RenderingDevice renderingDevice) {
 		if (shaderPipeline.IsValid) {
 			renderingDevice.FreeRid(shaderPipeline);
-			shaderPipeline = default;
 		}
 		if (shader.IsValid) {
 			renderingDevice.FreeRid(shader);
-			shader = default;
 		}
 	}
 
 	public override void _RenderCallback(int effectCallbackType, RenderData renderData) {
 		base._RenderCallback(effectCallbackType, renderData);
-		if (CompositorExtensions.RenderingDevice is not RenderingDevice renderingDevice || _shaderFile is null)
+		if (renderingDevice is null || ShaderFile is null)
 			return;
 
 		if (effectCallbackType != (long)EffectCallbackTypeEnum.PostTransparent)
@@ -111,12 +100,5 @@ public partial class TestCompositorEffect : CompositorEffect {
 		}
 
 		renderingDevice.DrawCommandEndLabel();
-	}
-
-	public override void _Notification(int what) {
-		base._Notification(what);
-		if (what == NotificationPredelete) {
-			Destruct();
-		}
 	}
 }

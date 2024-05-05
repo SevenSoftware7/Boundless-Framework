@@ -38,8 +38,6 @@ var mesh_instance:MeshInstance3D
 var mesh_wire:MeshInstance3D
 var collision_body:PhysicsBody3D
 var collision_shape:CollisionShape3D
-#var occluder:OccluderInstance3D
-#var selected:bool
 var active:bool
 
 var dirty:bool = true
@@ -57,7 +55,9 @@ var control_mesh:ConvexVolume
 			
 			dirty = true
 			mesh_changed.emit()
-	
+
+#@export var mesh_vector_data:MeshVectorData
+
 @export var materials:Array[Material]
 
 var default_material:Material = preload("res://addons/cyclops_level_builder/materials/grid.tres")

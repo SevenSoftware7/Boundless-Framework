@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 public interface IWeapon : IInputReader, ICustomizable {
 	Type WeaponType { get; }
+	Usage WeaponUsage { get; }
 	Size WeaponSize { get; }
 	Handedness Handedness { get; }
 

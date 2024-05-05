@@ -19,7 +19,6 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-GameResources="*res://Scenes/ResourceManager.tscn"
 GameInputs="*res://Scenes/InputManager.tscn"
 CyclopsAutoload="*res://addons/cyclops_level_builder/cyclops_global_scene.tscn"
 
@@ -52,11 +51,10 @@ enabled=PackedStringArray("res://addons/cyclops_level_builder/plugin.cfg")
 
 folder_colors={
 "res://Resources/Animations/": "green",
+"res://Resources/Characters/": "purple",
+"res://Resources/Companions/": "blue",
 "res://Resources/Costumes/": "purple",
-"res://Resources/Data/": "orange",
-"res://Resources/Data/Characters/": "purple",
-"res://Resources/Data/Companions/": "blue",
-"res://Resources/Data/Weapons/": "red"
+"res://Resources/Weapons/": "red"
 }
 
 [input]

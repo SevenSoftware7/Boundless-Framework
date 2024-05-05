@@ -25,15 +25,17 @@ public partial class MeshModel : Model, ISkeletonAdaptable {
 
 
 	private void ParentToSkeleton() {
-		if (Model is null)
+		if (Model is null || Model is not MeshInstance3D meshInstance)
 			return;
 
 		if (Skeleton is null) {
-			Model.SafeReparentAndSetOwner(this);
+			// Model.SafeReparentAndSetOwner(this);
+			meshInstance.Skeleton = "..";
 			return;
 		}
 
-		Model.SafeReparentAndSetOwner(Skeleton);
+		meshInstance.Skeleton = meshInstance.GetPathTo(Skeleton);
+		// Model.SafeReparentAndSetOwner(Skeleton);
 	}
 
 
@@ -56,7 +58,7 @@ public partial class MeshModel : Model, ISkeletonAdaptable {
 		if (meshCostume.ModelScene?.Instantiate() is not GeometryInstance3D model)
 			return false;
 
-		Model = model;
+		Model = model.SetOwnerAndParent(this);
 		Model.ProcessMode = ProcessMode;
 		Model.Visible = Visible;
 		Model.Name = $"{nameof(Costume)} - {Costume.DisplayName}";

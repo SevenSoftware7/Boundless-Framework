@@ -16,6 +16,8 @@ public partial class Health : Node {
 		get => _maxAmount;
 		set {
 			_maxAmount = Mathf.Max(value, 1f);
+			if (this.IsInitializationSetterCall()) return;
+
 			Amount = Mathf.Min(Amount, _maxAmount);
 
 			NotifyPropertyListChanged();
@@ -28,6 +30,10 @@ public partial class Health : Node {
 		set {
 			_amount = Mathf.Clamp(value, 0f, _maxAmount);
 
+			if (_amount == 0f) {
+				EmitSignal(SignalName.Death);
+			}
+
 			_damagedHealthTimer.Start();
 			EmitSignal(SignalName.HealthChange, Amount);
 		}
@@ -38,6 +44,7 @@ public partial class Health : Node {
 
 
 	[Signal] public delegate void HealthChangeEventHandler(float amount);
+	[Signal] public delegate void DeathEventHandler();
 
 
 
@@ -46,7 +53,9 @@ public partial class Health : Node {
 		_maxAmount = max;
 	}
 
-
+	public void Kill() {
+		Amount = 0f;
+	}
 
 	public override void _Ready() {
 		base._Ready();

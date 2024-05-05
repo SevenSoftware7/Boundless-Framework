@@ -30,18 +30,55 @@ var settings:ToolPrismSettings:
 		return settings
 	set(value):
 		settings = value
-		update()
+		dirty = true
 
+var dirty:bool = true
+
+func _ready():
+	%collision_type.clear()
+	for text in Collision.Type.keys():
+		%collision_type.add_item(text)
+
+func _process(delta):
+	if dirty:
+		update()
+		dirty = false
 
 func update():
 	if !settings:
-		#%default_block_height.value = 0
+		%check_match_selected_block.disabled = true
+		%default_block_elevation.disabled = true
 		%default_block_height.disabled = true
 		return
 
+	%check_match_selected_block.disabled = false
+	%check_match_selected_block.button_pressed = settings.match_selected_block
+	%default_block_elevation.disabled = false
+	%default_block_elevation.value = settings.default_block_elevation
 	%default_block_height.disabled = false
 	%default_block_height.value = settings.default_block_height
 
-
-func _on_default_block_height_value_changed(value):
+	%collision_type.selected = settings.collision_type
+	%collision_layers.value = settings.collision_layer
+	%collision_mask.value = settings.collision_mask
+	
+func _on_default_block_height_value_changed(value:float):
 	settings.default_block_height = value
+
+
+func _on_default_block_elevation_value_changed(value:float):
+	settings.default_block_elevation = value
+
+
+func _on_check_match_selected_block_toggled(value:bool):
+	settings.match_selected_block = value
+
+func _on_collision_layers_value_changed(value):
+	settings.collision_layer = value
+
+
+func _on_collision_mask_value_changed(value):
+	settings.collision_mask = value
+
+func _on_collision_type_item_selected(index):
+	settings.collision_type = index
