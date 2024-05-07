@@ -7,50 +7,42 @@ using SevenGame.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class Companion : Loadable3D, IInputReader, ICustomizable {
+public partial class Companion : Loadable3D, IUIObject, IInputReader, ICustomizable {
+	[Export] public string DisplayName { get; private set; } = string.Empty;
+	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
+
+	public virtual IUIObject UIObject => this;
+	public virtual ICustomizable[] Children => Model is Model model ? [model] : [];
+	public virtual ICustomizationParameter[] Customizations => [];
+
 	public override bool IsLoaded {
-		get => CompanionModel?.IsLoaded ?? false;
-		set => CompanionModel?.AsILoadable().SetLoaded(value);
+		get => _isLoaded;
+		set => this.BackingFieldLoadUnload(ref _isLoaded, value);
 	}
+	private bool _isLoaded = false;
 
-
-	[Export] public CompanionData Data {
-		get => _data;
-		private set {
-			_data = value;
-
-			if (this.IsInitializationSetterCall())
-				return;
-			if (Costume is not null)
-				return;
-
-			SetCostume(_data?.BaseCostume);
-		}
-	}
-	private CompanionData _data = null!;
 
 	[ExportGroup("Costume")]
-	[Export] protected Model? CompanionModel {
-		get => _companionModel;
-		private set => _companionModel = value;
-	}
-	private Model? _companionModel = null!;
-
 	[Export] public CompanionCostume? Costume {
-		get => CompanionModel?.Costume as CompanionCostume;
-		set {
-			if (this.IsInitializationSetterCall())
+		get => _costume;
+		private set {
+			if (this.IsInitializationSetterCall()) {
+				_costume = value;
 				return;
+			}
+
 			SetCostume(value);
 		}
 	}
+	private CompanionCostume? _costume;
+
+	[Export] protected Model? Model {
+		get => _model;
+		private set => _model = value;
+	}
+	private Model? _model;
 
 	public Basis CompanionRotation { get; private set; } = Basis.Identity;
-
-
-	public virtual IUIObject UIObject => Data;
-	public virtual ICustomizable[] Children => CompanionModel is Model model ? [model] : [];
-	public virtual ICustomizationParameter[] Customizations => [];
 
 
 	[Signal] public delegate void CostumeChangedEventHandler(CompanionCostume? newCostume, CompanionCostume? oldCostume);
@@ -58,72 +50,62 @@ public partial class Companion : Loadable3D, IInputReader, ICustomizable {
 
 
 	public Companion() : base() { }
-	public Companion(CompanionData data, CompanionCostume? costume) : this() {
-		ArgumentNullException.ThrowIfNull(data);
-
-		_data = data;
-		SetCostume(costume ?? data.BaseCostume);
-		Name = $"{nameof(Companion)} - {Data.DisplayName}";
+	public Companion(CompanionCostume? costume) : this() {
+		SetCostume(costume);
+		Name = $"{nameof(Companion)} - {DisplayName}";
 	}
 
 
 
-	public void SetCostume(CompanionCostume? costume, bool forceLoad = false) {
-		CompanionCostume? oldCostume = Costume;
-		if (costume == oldCostume)
+	public void SetCostume(CompanionCostume? newCostume, bool forceLoad = false) {
+		CompanionCostume? oldCostume = _costume;
+		if (newCostume == oldCostume)
 			return;
 
-		new LoadableUpdater<Model>(ref _companionModel, () => costume?.Instantiate())
-			.BeforeLoad(m => {
-				// m.Inject(Skeleton);
-				m.SafeReparentEditor(this);
-			})
-			.Execute();
+		_costume = newCostume;
 
-		EmitSignal(SignalName.CostumeChanged, costume!, oldCostume!);
+		AsILoadable().Reload(forceLoad);
+
+		EmitSignal(SignalName.CostumeChanged, newCostume!, oldCostume!);
 	}
 
 
-	public void RotateTowards(Basis target, double delta, float speed = 16f) {
-		CompanionRotation = CompanionRotation.SafeSlerp(target, (float)delta * speed);
-
-		RefreshRotation();
-	}
-
-	protected virtual void RefreshRotation() {
-		Transform = Transform with {
-			Basis = CompanionRotation,
-		};
-	}
 
 	public virtual void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice) { }
 
 
 	protected override bool LoadBehaviour() {
-		if (!base.LoadBehaviour())
-			return false;
-		if (Data is null)
-			return false;
+		new LoadableUpdater<Model>(ref _model, () => Costume?.Instantiate())
+			.BeforeLoad(m => {
+				m.SafeReparentEditor(this);
+				m.AsIEnablable().EnableDisable(IsEnabled);
+			})
+			.Execute();
 
-		// CompanionModel.Inject(Skeleton);
-		CompanionModel?.AsILoadable().Load();
-
-		RefreshRotation();
+		_isLoaded = true;
 
 		return true;
 	}
 	protected override void UnloadBehaviour() {
-		base.UnloadBehaviour();
+		new LoadableDestructor<Model>(ref _model)
+			.AfterUnload(w => w.QueueFree())
+			.Execute();
 
-		CompanionModel?.AsILoadable().Unload();
+		_isLoaded = false;
 	}
 
 	protected override void EnableBehaviour() {
 		base.EnableBehaviour();
-		CompanionModel?.AsIEnablable().Enable();
+		Model?.AsIEnablable().Enable();
 	}
 	protected override void DisableBehaviour() {
 		base.DisableBehaviour();
-		CompanionModel?.AsIEnablable().Disable();
+		Model?.AsIEnablable().Disable();
+	}
+
+
+	public override void _Parented() {
+		base._Parented();
+		Callable.From(() => Model?.SafeReparentAndSetOwner(this)).CallDeferred();
 	}
 }

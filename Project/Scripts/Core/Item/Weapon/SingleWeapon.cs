@@ -21,7 +21,6 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 
 
 	[ExportGroup("Costume")]
-	[Export] private Model? WeaponModel;
 	[Export] public WeaponCostume? Costume {
 		get => _costume;
 		private set {
@@ -35,6 +34,13 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 	}
 	private WeaponCostume? _costume;
 
+	[Export] protected Model? Model {
+		get => _model;
+		private set => _model = value;
+	}
+	private Model? _model;
+
+
 	[ExportGroup("Dependencies")]
 	[Export] public override Skeleton3D? Skeleton {
 		get => _skeleton;
@@ -44,7 +50,7 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 			if (this.IsInitializationSetterCall())
 				return;
 
-			if (WeaponModel is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(value);
+			if (Model is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(value);
 		}
 	}
 	private Skeleton3D? _skeleton;
@@ -57,7 +63,7 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 			if (this.IsInitializationSetterCall())
 				return;
 
-			if (WeaponModel is IHandAdaptable mHanded) mHanded.SetHandedness(value);
+			if (Model is IHandAdaptable mHanded) mHanded.SetHandedness(value);
 		}
 	}
 	private Handedness _handedness = Handedness.Right;
@@ -81,14 +87,14 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 
 
 
-	public void SetCostume(WeaponCostume? newCostume) {
+	public void SetCostume(WeaponCostume? newCostume, bool forceLoad = false) {
 		WeaponCostume? oldCostume = _costume;
 		if (newCostume == oldCostume)
 			return;
 
 		_costume = newCostume;
 
-		AsILoadable().Reload();
+		AsILoadable().Reload(forceLoad);
 
 		EmitSignal(SignalName.CostumeChanged, newCostume!, oldCostume!);
 	}
@@ -111,7 +117,7 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 	}
 
 	protected override bool LoadBehaviour() {
-		new LoadableUpdater<Model>(ref WeaponModel, () => Costume?.Instantiate())
+		new LoadableUpdater<Model>(ref _model, () => Costume?.Instantiate())
 			.BeforeLoad(m => {
 				if (m is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(Skeleton);
 				if (m is IHandAdaptable mHanded) mHanded.SetHandedness(Handedness);
@@ -125,7 +131,7 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 		return true;
 	}
 	protected override void UnloadBehaviour() {
-		new LoadableDestructor<Model>(ref WeaponModel)
+		new LoadableDestructor<Model>(ref _model)
 			.AfterUnload(w => w.QueueFree())
 			.Execute();
 
@@ -134,11 +140,11 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 
 	protected override void EnableBehaviour() {
 		base.EnableBehaviour();
-		WeaponModel?.AsIEnablable().Enable();
+		Model?.AsIEnablable().Enable();
 	}
 	protected override void DisableBehaviour() {
 		base.DisableBehaviour();
-		WeaponModel?.AsIEnablable().Disable();
+		Model?.AsIEnablable().Disable();
 	}
 
 	public override ISaveData<Weapon> Save() {
@@ -156,6 +162,6 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 
 	public override void _Parented() {
 		base._Parented();
-		Callable.From(() => WeaponModel?.SafeReparentAndSetOwner(this)).CallDeferred();
+		Callable.From(() => Model?.SafeReparentAndSetOwner(this)).CallDeferred();
 	}
 }

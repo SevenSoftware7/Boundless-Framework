@@ -23,7 +23,7 @@ public partial class FloatingCompanion : Companion {
 	public FloatingCompanion() : base() {
 		Curve = CreateCurve();
 	}
-	public FloatingCompanion(CompanionData data, CompanionCostume costume) : base(data, costume) {
+	public FloatingCompanion(CompanionCostume costume) : base(costume) {
 		Curve = CreateCurve();
 	}
 
@@ -60,7 +60,7 @@ public partial class FloatingCompanion : Companion {
 
 	private bool PositionBlocked(Vector3 position) {
 		SphereShape3D sphere = new() {
-			Radius = (CompanionModel?.GetAabb().GetLongestAxisSize() ?? 1f) + 0.5f,
+			Radius = (Model?.GetAabb().GetLongestAxisSize() ?? 1f) + 0.5f,
 		};
 
 		return GetWorld3D().CollideShape3D(Transform3D.Identity.Translated(position), out _, sphere, CollisionMask, maxResults: 1, collideWithAreas: false);

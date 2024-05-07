@@ -56,6 +56,9 @@ folder_colors={
 "res://Resources/Costumes/": "purple",
 "res://Resources/Weapons/": "red"
 }
+[gui]
+
+theme/custom="res://Resources/theme.tres"
 
 [input]
 

@@ -55,13 +55,17 @@ public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
 
 
 
-	public override void _EnterTree() {
-		base._EnterTree();
-		if (IsNodeReady())
-			Callable.From(AsILoadable().Load).CallDeferred();
+	public override void _Ready() {
+		base._Ready();
+		Callable.From(AsILoadable().Load).CallDeferred();
 	}
-	public override void _ExitTree() {
-		base._ExitTree();
-		Callable.From(AsILoadable().Unload).CallDeferred();
+
+	public override void _Notification(int what) {
+		base._Notification(what);
+		switch ((ulong)what) {
+			case NotificationPredelete:
+				Callable.From(AsILoadable().Unload).CallDeferred();
+				break;
+		}
 	}
 }

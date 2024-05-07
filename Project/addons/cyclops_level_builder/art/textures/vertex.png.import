@@ -3,15 +3,16 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://7lony1gei6d0"
-path="res://.godot/imported/vertex.png-5de890d5df12b689ad042d7798719e34.ctex"
+path.s3tc="res://.godot/imported/vertex.png-5de890d5df12b689ad042d7798719e34.s3tc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
 }
 
 [deps]
 
 source_file="res://addons/cyclops_level_builder/art/textures/vertex.png"
-dest_files=["res://.godot/imported/vertex.png-5de890d5df12b689ad042d7798719e34.ctex"]
+dest_files=["res://.godot/imported/vertex.png-5de890d5df12b689ad042d7798719e34.s3tc.ctex"]
 
 [params]
 

@@ -13,8 +13,8 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 	private TimeDuration jumpBuffer = new(125);
 	private TimeDuration coyoteTimer = new(150);
 	private TimeDuration jumpCooldown = new(500);
-
-
+	private Interactable? lastInteractCandidate;
+	private ulong lastInteractUpdateFrame;
 
 	public override void Start(EntityBehaviour? previousBehaviour) {
 		base.Start(previousBehaviour);
@@ -47,7 +47,12 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 	}
 
 	public override Interactable? GetInteractionCandidate() {
-		return Interactable.GetNearestCandidate(Entity, 7.5f, 0.5f);
+		ulong currentFrame = Engine.GetProcessFrames();
+		if (lastInteractUpdateFrame == currentFrame)
+			return lastInteractCandidate;
+
+		lastInteractUpdateFrame = currentFrame;
+		return lastInteractCandidate = Interactable.GetNearestCandidate(Entity, 7.5f, 0.5f);
 	}
 
 	public override bool SetSpeed(MovementType speed) {

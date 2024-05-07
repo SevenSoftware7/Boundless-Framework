@@ -25,9 +25,29 @@ public sealed partial class Entity : LoadableCharacterBody3D, IInputReader, IUIO
 	[Export] public Handedness Handedness { get; private set; }
 	[Export] public CharacterStats Stats { get; private set; } = new();
 
-	[Export] public Skeleton3D? Skeleton { get; private set; }
-	[Export] private Model? CharacterModel;
 
+	[ExportGroup("Costume")]
+	[Export] public CharacterCostume? Costume {
+		get => _costume;
+		private set {
+			if (this.IsInitializationSetterCall()) {
+				_costume = value;
+				return;
+			}
+
+			SetCostume(value);
+		}
+	}
+	private CharacterCostume? _costume;
+
+	[Export] protected Model? Model {
+		get => _model;
+		private set => _model = value;
+	}
+	private Model? _model;
+
+
+	[ExportGroup("Weapon")]
 	[Export] public Weapon? Weapon {
 		get => _weapon;
 		set {
@@ -65,6 +85,8 @@ public sealed partial class Entity : LoadableCharacterBody3D, IInputReader, IUIO
 	}
 	private AnimationPlayer? _animationPlayer;
 
+	[Export] public Skeleton3D? Skeleton { get; private set; }
+
 	[Export] public Health? Health {
 		get => _health;
 		set {
@@ -82,19 +104,6 @@ public sealed partial class Entity : LoadableCharacterBody3D, IInputReader, IUIO
 		}
 	}
 	private Health? _health;
-
-	[Export] public CharacterCostume? Costume {
-		get => _costume;
-		private set {
-			if (this.IsInitializationSetterCall()) {
-				_costume = value;
-				return;
-			}
-
-			SetCostume(value);
-		}
-	}
-	private CharacterCostume? _costume;
 
 
 
@@ -290,7 +299,7 @@ public sealed partial class Entity : LoadableCharacterBody3D, IInputReader, IUIO
 		if (!base.LoadBehaviour())
 			return false;
 
-		new LoadableUpdater<Model>(ref CharacterModel, () => Costume?.Instantiate())
+		new LoadableUpdater<Model>(ref _model, () => Costume?.Instantiate())
 			.BeforeLoad(m => {
 				if (m is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(Skeleton);
 				if (m is IHandAdaptable mHanded) mHanded.SetHandedness(Handedness.Right); // TODO: get handedness
@@ -309,7 +318,7 @@ public sealed partial class Entity : LoadableCharacterBody3D, IInputReader, IUIO
 
 		OnLoadedUnloaded(false);
 
-		new LoadableDestructor<Model>(ref CharacterModel)
+		new LoadableDestructor<Model>(ref _model)
 			.AfterUnload(w => w.QueueFree())
 			.Execute();
 
@@ -362,6 +371,8 @@ public sealed partial class Entity : LoadableCharacterBody3D, IInputReader, IUIO
 			interactionCandidate.Interact(entity);
 		}
 	}
+
+	public Interactable? GetInteractionCandidate() => CurrentBehaviour?.GetInteractionCandidate();
 
 
 	public override void _Process(double delta) {
