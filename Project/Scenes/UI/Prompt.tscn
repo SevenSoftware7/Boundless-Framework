@@ -1,0 +1,32 @@
+[gd_scene load_steps=2 format=3 uid="uid://br8bdv51nxt4p"]
+
+[ext_resource type="Script" path="res://Scripts/Core/UI/PromptControl.cs" id="1_hpr37"]
+
+[node name="Prompt" type="PanelContainer" node_paths=PackedStringArray("Label")]
+auto_translate_mode = 1
+visible = false
+self_modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(200, 0)
+offset_left = -200.0
+offset_bottom = 26.0
+mouse_filter = 2
+script = ExtResource("1_hpr37")
+Label = NodePath("MarginContainer/RichTextLabel")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+auto_translate_mode = 1
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.273438, 0.273438, 0.273438, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="MarginContainer"]
+auto_translate_mode = 1
+layout_mode = 2
+text = "Text"
+fit_content = true
+shortcut_keys_enabled = false
+text_direction = 2

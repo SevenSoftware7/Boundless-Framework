@@ -22,6 +22,8 @@ public sealed partial class Player : Node {
 
 	[Export] public CameraController3D CameraController { get; private set; } = null!;
 	[Export] public Entity Entity { get; private set; } = null!;
+	[Export] public PromptControl InteractPrompt { get; private set; } = null!;
+	[Export] public PointerControl InteractPointer { get; private set; } = null!;
 
 
 
@@ -70,8 +72,18 @@ public sealed partial class Player : Node {
 		if (Entity is null || CameraController is null)
 			return;
 
-
 		Entity.PropagateCall(nameof(IInputReader.HandleInput), [Entity, CameraController, InputManager.CurrentDevice]);
+
+		Interactable? interactionCandidate = Entity.GetInteractionCandidate();
+
+		if (InteractPrompt is not null && InteractPointer is not null) {
+			InteractPrompt.IsVisible = interactionCandidate is not null;
+			if (interactionCandidate is not null) {
+				InteractPrompt.Label.Text = interactionCandidate.InteractLabel;
+			}
+
+			InteractPointer.Target = interactionCandidate;
+		}
 	}
 
 	public override void _Ready() {
