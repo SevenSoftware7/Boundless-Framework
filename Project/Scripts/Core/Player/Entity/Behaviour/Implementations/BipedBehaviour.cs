@@ -71,9 +71,6 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 		// }
 
 
-
-
-
 		_movementType = speed;
 		return true;
 	}
@@ -135,6 +132,7 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 			MovementType.Sprint => Entity.Stats.SprintSpeed,
 			_ => 0f
 		};
+		newSpeed = Entity.GetModifiers(Attributes.MoveSpeed).Apply(newSpeed);
 
 		Basis newRotation = Basis.LookingAt(Entity.AbsoluteForward, Vector3.Up);
 		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * Entity.Stats.RotationSpeed);
@@ -164,7 +162,9 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 		// ----- Jump Instruction -----
 
 		if (!jumpBuffer.IsDone && jumpCooldown.IsDone && !coyoteTimer.IsDone) {
-			Entity.Inertia = Entity.Inertia.SlideOnFace(Entity.UpDirection) + Entity.UpDirection * 17.5f;
+			float jumpHeight = Entity.GetModifiers(Attributes.jumpHeight).Apply(Entity.Stats.JumpHeight);
+
+			Entity.Inertia = Entity.Inertia.SlideOnFace(Entity.UpDirection) + Entity.UpDirection * jumpHeight;
 			jumpBuffer.End();
 			jumpCooldown.Start();
 		}

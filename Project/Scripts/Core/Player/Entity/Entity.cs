@@ -2,12 +2,14 @@ namespace LandlessSkies.Core;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using SevenGame.Utility;
 
 [Tool]
 [GlobalClass]
-public sealed partial class Entity : LoadableCharacterBody3D, IInputReader, IUIObject {
+public partial class Entity : LoadableCharacterBody3D, IInputReader, IUIObject {
+	[Export] public Godot.Collections.Array<AttributeModifier> Attributes { get; private set; } = [];
 	public EntityAction? CurrentAction { get; private set; }
 	public EntityBehaviour? CurrentBehaviour { get; private set; }
 
@@ -196,6 +198,11 @@ public sealed partial class Entity : LoadableCharacterBody3D, IInputReader, IUIO
 			return;
 
 		SetBehaviour(creator?.Invoke());
+	}
+
+
+	public MultiAttributeModifier GetModifiers(StringName attributeName) {
+		return new(Attributes.Where(a => a.Name == attributeName));
 	}
 
 
