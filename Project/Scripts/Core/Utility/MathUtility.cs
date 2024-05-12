@@ -1,4 +1,4 @@
-namespace SevenGame.Utility;
+namespace SevenDev.Utility;
 
 using System;
 using System.Collections.Generic;
@@ -99,6 +99,9 @@ public static class MathUtility {
 	/// <returns></returns>
 	public static Vector3 SlideOnFace(this Vector3 vector, Vector3 normal) =>
 		vector + normal * Mathf.Max(vector.Project(-normal).Dot(-normal), 0);
+
+	public static Vector3 DirectionToUnormalized(this Vector3 vector, Vector3 to)
+		=> new(to.X - vector.X, to.Y - vector.Y, to.Z - vector.Z);
 
 	public static double SmoothDamp(double current, double target, ref double currentVelocity, double smoothTime, double maxSpeed, double deltaTime) {
 		smoothTime = Math.Max(0.0001, smoothTime);
@@ -226,10 +229,9 @@ public static class MathUtility {
 		return results.Length > 0;
 	}
 
-	public static bool IntersectShape3D(this World3D world, Transform3D origin, Vector3 motion, out IntersectShape3DResult[] results, Shape3D shape, uint collisionMask = uint.MaxValue, Array<Rid>? exclude = null, bool collideWithBodies = true, bool collideWithAreas = true, int maxResults = 32) {
+	public static bool IntersectShape3D(this World3D world, Transform3D origin, out IntersectShape3DResult[] results, Shape3D shape, uint collisionMask = uint.MaxValue, Array<Rid>? exclude = null, bool collideWithBodies = true, bool collideWithAreas = true, int maxResults = 32) {
 		PhysicsShapeQueryParameters3D parameters = new() {
 			Transform = origin,
-			Motion = motion,
 			Exclude = exclude,
 			CollisionMask = collisionMask,
 			CollideWithBodies = collideWithBodies,
@@ -247,7 +249,6 @@ public static class MathUtility {
 			results = [];
 			return false;
 		}
-
 
 		results = intersections.Select(intersection => {
 			return new IntersectShape3DResult() {

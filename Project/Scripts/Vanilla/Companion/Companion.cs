@@ -3,7 +3,7 @@ namespace LandlessSkies.Vanilla;
 using LandlessSkies.Core;
 using Godot;
 using System;
-using SevenGame.Utility;
+using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]

@@ -1,7 +1,7 @@
 namespace LandlessSkies.Core;
 
 using Godot;
-using SevenGame.Utility;
+using SevenDev.Utility;
 
 public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 	private Vector3 _inputDirection;
@@ -50,7 +50,7 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 	}
 
 	private void HandleInteraction(Entity entity, InputDevice inputDevice, HudManager hud) {
-		InteractTarget? target = Interactable.GetNearestCandidate(Entity, 7.5f, 0.5f);
+		InteractTarget? target = Interactable.GetNearestCandidate(Entity, 3.25f, 0.5f);
 
 		if (target is not null) {
 			if (inputDevice.IsActionJustPressed("interact") && target.Value.interactable.IsInteractable(entity)) {
@@ -69,13 +69,13 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 			interactPointer = hud.AddPointer(entity.HudPack.InteractPointer);
 		}
 
-			lastInteractCandidate = target?.interactable;
+		lastInteractCandidate = target?.interactable;
 
-			interactPrompt.IsVisible = target.HasValue;
-			if (target.HasValue) {
-				interactPrompt.SetText(target.Value.interactable.InteractLabel);
-				interactPrompt.SetPrompt(/* "E" */inputDevice.GetActionSymbol("interact")); // TODO
-			}
+		interactPrompt.IsVisible = target.HasValue;
+		if (target.HasValue) {
+			interactPrompt.SetText(target.Value.interactable.InteractLabel);
+			interactPrompt.SetPrompt(/* "E" */inputDevice.GetActionSymbol("interact")); // TODO
+		}
 
 		interactPointer.Target = target?.shapeTransform;
 	}

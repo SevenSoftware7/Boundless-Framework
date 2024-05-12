@@ -1,4 +1,4 @@
-namespace SevenGame.Utility;
+namespace SevenDev.Utility;
 
 public struct BoolInfo {
 	public bool currentValue = false;

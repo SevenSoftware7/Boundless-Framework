@@ -1,9 +1,7 @@
-namespace LandlessSkies;
+namespace LandlessSkies.Core;
 
 using System.Linq;
 using Godot;
-using LandlessSkies.Core;
-
 
 public abstract partial class InputDevice : Node {
 	public bool DeviceConnected { get; protected set; }

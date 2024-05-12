@@ -2,7 +2,7 @@ namespace LandlessSkies.Core;
 
 using Godot;
 
-public static class SkeletonUtils {
+public static class SkeletonExtensions {
 	public static Vector3 GetBonePositionOrDefault(this Skeleton3D skeleton, StringName boneName, Vector3 defaultPosition) {
 		if (skeleton is null)
 			return defaultPosition;

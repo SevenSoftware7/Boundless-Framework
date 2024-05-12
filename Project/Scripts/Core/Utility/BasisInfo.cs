@@ -1,4 +1,4 @@
-namespace SevenGame.Utility;
+namespace SevenDev.Utility;
 
 using Godot;
 

@@ -1,8 +1,8 @@
 namespace LandlessSkies.Core;
 
 using Godot;
-using SevenGame.Utility;
-using static SevenGame.Utility.MathUtility;
+using SevenDev.Utility;
+using static SevenDev.Utility.MathUtility;
 
 
 [Tool]

@@ -1,4 +1,4 @@
-namespace LandlessSkies;
+namespace LandlessSkies.Core;
 
 using System;
 using Godot;

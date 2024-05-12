@@ -2,8 +2,7 @@ namespace LandlessSkies.Core;
 
 using Godot;
 
-public abstract partial class ExtendedNode2D : Node2D {
-	public virtual void _PostInitialize() { }
+public abstract partial class ExtendedNode : Node {
 	public virtual void _Predelete() { }
 	public virtual void _Disabled() { }
 	public virtual void _Enabled() { }
@@ -15,9 +14,6 @@ public abstract partial class ExtendedNode2D : Node2D {
 	public override void _Notification(int what) {
 		base._Notification(what);
 		switch ((long)what) {
-			case NotificationPostinitialize:
-				_PostInitialize();
-				break;
 			case NotificationPredelete:
 				_Predelete();
 				break;

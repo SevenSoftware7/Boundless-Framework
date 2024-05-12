@@ -1,4 +1,4 @@
-namespace SevenGame.Utility;
+namespace SevenDev.Utility;
 
 public struct KeyInputInfo {
 	private const float HOLD_TIME = 0.15f;

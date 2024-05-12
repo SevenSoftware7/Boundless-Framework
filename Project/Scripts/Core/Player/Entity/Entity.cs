@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using SevenGame.Utility;
+using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
@@ -351,9 +351,20 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 		}
 	}
 
-	private void OnKill() {
+	private void OnKill(float fromHealth) {
+	}
+
+	public void VoidOut() {
+		if (lastStandableSurfaces.Count == 0)
+			return;
+
 		GlobalPosition = lastStandableSurfaces[0];
-		GD.Print($"Entity {Name} died.");
+
+		GD.Print($"Entity {Name} Voided out.");
+
+		if (Health is not null) {
+			Health.Amount -= Health.MaxAmount / 8f;
+		}
 	}
 
 	public void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice, HudManager hud) {

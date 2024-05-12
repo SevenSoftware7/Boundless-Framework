@@ -1,9 +1,10 @@
-[gd_scene load_steps=13 format=3 uid="uid://b7rhbgw2dujty"]
+[gd_scene load_steps=14 format=3 uid="uid://b7rhbgw2dujty"]
 
 [ext_resource type="Script" path="res://Scripts/Core/Player/Entity/Entity.cs" id="1_fjps2"]
 [ext_resource type="Script" path="res://Scripts/Core/Player/Entity/EntityStats.cs" id="2_lubr1"]
 [ext_resource type="PackedScene" uid="uid://dr77fv5m8yjck" path="res://Scenes/UI/Pointer.tscn" id="3_qcq8b"]
 [ext_resource type="Script" path="res://Scripts/Core/Player/Entity/Health.cs" id="3_r2tw0"]
+[ext_resource type="PackedScene" uid="uid://cck2wboppochk" path="res://Scenes/UI/Bar.tscn" id="3_uuynt"]
 [ext_resource type="PackedScene" uid="uid://br8bdv51nxt4p" path="res://Scenes/UI/Prompt.tscn" id="4_qonq2"]
 [ext_resource type="PackedScene" uid="uid://bjf6xuch8ncq0" path="res://Scenes/GenericHumanSkeleton.tscn" id="5_j1koo"]
 [ext_resource type="Script" path="res://Scripts/Core/Player/Entity/HudPack.cs" id="5_y0ifp"]
@@ -24,6 +25,7 @@ SlowSpeed = 3.0
 
 [sub_resource type="Resource" id="Resource_qwv27"]
 script = ExtResource("5_y0ifp")
+HealthBar = ExtResource("3_uuynt")
 InteractPrompt = ExtResource("4_qonq2")
 InteractPointer = ExtResource("3_qcq8b")
 

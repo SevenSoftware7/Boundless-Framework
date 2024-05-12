@@ -1,22 +1,17 @@
-namespace SevenGame.Utility;
+namespace SevenDev.Utility;
 
 using Godot;
 
-public struct TimeDuration {
-	public ulong DurationMsec { get; init; } = 0;
+/// <summary>
+/// TimeDuration is used to check whether a specific time duration has passed or not
+/// </summary>
+public struct TimeDuration(ulong durationMsec = 1000) {
+	public ulong DurationMsec = durationMsec;
 	public ulong StopTime { get; private set; } = 0;
 
 	public readonly bool IsDone => Time.GetTicksMsec() >= StopTime;
 	public readonly ulong RemainingDuration => IsDone ? 0 : StopTime - Time.GetTicksMsec();
 	public readonly ulong Overtime => IsDone ? Time.GetTicksMsec() - StopTime : 0;
-
-
-
-	public TimeDuration(ulong durationMsec) {
-		DurationMsec = durationMsec;
-		Start();
-	}
-
 
 
 	public void End() {
@@ -28,4 +23,5 @@ public struct TimeDuration {
 
 
 	public static implicit operator float(TimeDuration timeUntil) => timeUntil.RemainingDuration;
+	public static implicit operator bool(TimeDuration timeUntil) => timeUntil.IsDone;
 }

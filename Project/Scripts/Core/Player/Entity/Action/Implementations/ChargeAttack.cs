@@ -1,7 +1,7 @@
 namespace LandlessSkies.Core;
 
 using Godot;
-using SevenGame.Utility;
+using SevenDev.Utility;
 
 public abstract partial class ChargeAttack : Attack {
 	public override bool IsCancellable => true;

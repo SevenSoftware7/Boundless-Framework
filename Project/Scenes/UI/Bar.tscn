@@ -1,0 +1,52 @@
+[gd_scene load_steps=4 format=3 uid="uid://cck2wboppochk"]
+
+[ext_resource type="Script" path="res://Scripts/Core/UI/BarControl.cs" id="1_s2kjl"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_sx0on"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_xi2i3"]
+
+[node name="Control" type="Control" node_paths=PackedStringArray("Bar", "DamagedBar")]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 200.0
+offset_bottom = 25.0
+scale = Vector2(1.222, 1)
+script = ExtResource("1_s2kjl")
+DamageDelay = 1.0
+Bar = NodePath("Progress")
+DamagedBar = NodePath("Damaged")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Damaged" type="TextureProgressBar" parent="."]
+modulate = Color(0.372549, 0, 0, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+step = 0.1
+value = 100.0
+nine_patch_stretch = true
+texture_progress = SubResource("PlaceholderTexture2D_sx0on")
+
+[node name="Progress" type="TextureProgressBar" parent="."]
+modulate = Color(1, 0, 0, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+step = 0.1
+value = 100.0
+nine_patch_stretch = true
+texture_progress = SubResource("PlaceholderTexture2D_xi2i3")

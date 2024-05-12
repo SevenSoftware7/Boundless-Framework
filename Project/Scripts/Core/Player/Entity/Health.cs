@@ -1,21 +1,15 @@
 using Godot;
 using Godot.Collections;
-using SevenGame.Utility;
 
 namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
 public partial class Health : Node {
-	private TimeDuration _damagedHealthTimer = new(1000);
-	private float _damagedHealthVelocity;
-
-
-
 	[Export] public float MaxAmount {
 		get => _maxAmount;
 		set {
-			_maxAmount = Mathf.Max(value, 1f);
+			_maxAmount = Mathf.Max(value, 0f);
 			if (this.IsInitializationSetterCall()) return;
 
 			Amount = Mathf.Min(Amount, _maxAmount);
@@ -28,23 +22,21 @@ public partial class Health : Node {
 	[Export] public float Amount {
 		get => _amount;
 		set {
+			float oldAmount = _amount;
 			_amount = Mathf.Clamp(value, 0f, _maxAmount);
 
 			if (_amount == 0f) {
-				EmitSignal(SignalName.Death);
+				EmitSignal(SignalName.Death, oldAmount);
 			}
 
-			_damagedHealthTimer.Start();
 			EmitSignal(SignalName.HealthChange, Amount);
 		}
 	}
 	private float _amount;
 
-	[Export] public float DamagedHealth { get; private set; }
-
 
 	[Signal] public delegate void HealthChangeEventHandler(float amount);
-	[Signal] public delegate void DeathEventHandler();
+	[Signal] public delegate void DeathEventHandler(float fromHealth);
 
 
 
@@ -61,39 +53,14 @@ public partial class Health : Node {
 		base._Ready();
 
 		_amount = _maxAmount;
-		DamagedHealth = _amount;
-	}
-
-	public override void _Process(double delta) {
-		base._Process(delta);
-
-		if (DamagedHealth < Amount) {
-			DamagedHealth = Amount;
-			return;
-		}
-
-		if (!_damagedHealthTimer.IsDone) {
-			_damagedHealthVelocity = 0f;
-			return;
-		}
-
-		DamagedHealth = MathUtility.SmoothDamp(DamagedHealth, _amount, ref _damagedHealthVelocity, 0.15f, Mathf.Inf, (float)delta);
 	}
 
 	public override void _ValidateProperty(Dictionary property) {
 		base._ValidateProperty(property);
 
-
 		StringName name = property["name"].AsStringName();
 
-
-		if (name == PropertyName.DamagedHealth) {
-			property["usage"] = (int)((property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage) | PropertyUsageFlags.ReadOnly);
-		}
-		else if (
-			name == PropertyName.Amount ||
-			name == PropertyName.DamagedHealth
-		) {
+		if (name == PropertyName.Amount) {
 			property["hint"] = (int)PropertyHint.Range;
 			property["hint_string"] = $"0,{MaxAmount},";
 		}

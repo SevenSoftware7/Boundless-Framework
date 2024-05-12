@@ -2,7 +2,7 @@ namespace LandlessSkies.Vanilla;
 
 using Godot;
 using LandlessSkies.Core;
-using SevenGame.Utility;
+using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
