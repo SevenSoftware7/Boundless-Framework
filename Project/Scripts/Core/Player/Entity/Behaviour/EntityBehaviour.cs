@@ -4,7 +4,7 @@ using Godot;
 using System;
 
 [GlobalClass]
-public abstract partial class EntityBehaviour : Node, IInputReader {
+public abstract partial class EntityBehaviour : Node, IInputHandler {
 	[Export] public Entity Entity = null!;
 
 
@@ -18,8 +18,7 @@ public abstract partial class EntityBehaviour : Node, IInputReader {
 	}
 
 
-	public abstract Interactable? GetInteractionCandidate();
-	public virtual void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice) { }
+	public virtual void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice, HudManager hud) { }
 
 	public virtual bool SetSpeed(MovementType speed) => true;
 	public virtual bool Move(Vector3 direction) => true;

@@ -1,9 +1,11 @@
+global using InteractTarget = (LandlessSkies.Core.Interactable interactable, Godot.Transform3D shapeTransform);
+
 namespace LandlessSkies.Core;
 
-using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using SevenGame.Utility;
+using static SevenGame.Utility.MathUtility;
 
 
 public abstract partial class Interactable : Area3D {
@@ -18,30 +20,31 @@ public abstract partial class Interactable : Area3D {
 	public abstract void Interact(Entity entity);
 
 
-	public static Interactable? GetNearestCandidate(Entity entity, float maxDistance, float maxAngle) {
+	public static InteractTarget? GetNearestCandidate(Entity entity, float maxDistance, float maxAngle) {
 		SphereShape3D sphere = new() {
 			Radius = maxDistance,
 		};
 		float maxDistanceSquared = maxDistance * maxDistance;
 
-		bool anyCandidates = MathUtility.IntersectShape3D(entity.GetWorld3D(), entity.GlobalTransform, Vector3.Zero, out var collisions, sphere, MathUtility.InteractableCollisionLayer);
+		bool anyCandidates = MathUtility.IntersectShape3D(entity.GetWorld3D(), entity.GlobalTransform, Vector3.Zero, out IntersectShape3DResult[] collisions, sphere, MathUtility.InteractableCollisionLayer);
 
-		IEnumerable<Node3D> buffer = collisions.Select(collision => collision.Collider);
+		var (target, shapeTransform, distance, angle) = collisions.Aggregate((Target: null as Interactable, Shape: Transform3D.Identity, DistanceSquared: float.PositiveInfinity, Angle: float.NegativeInfinity), (best, i) => {
+			if (i.Collider is not Interactable interactable) return best;
+			Transform3D collisionShape = PhysicsServer3D.AreaGetShapeTransform(i.Rid, i.Shape);
+			// Vector3 shapePosition = interactable.ToGlobal(collisionShape.Origin);
+			Transform3D shapeTransform = interactable.GlobalTransform * collisionShape;
 
-		var (candidate, distance, angle) = buffer.Aggregate((Interactable: null as Interactable, DistanceSquared: float.PositiveInfinity, Angle: float.NegativeInfinity), (best, i) => {
-			if (i is not Interactable interactable) return best;
-
-			Vector3 direction = interactable.GlobalPosition.DirectionTo(entity.GlobalPosition);
-			float distanceSquared = interactable.GlobalPosition.DistanceSquaredTo(entity.GlobalPosition);
+			Vector3 direction = shapeTransform.Origin.DirectionTo(entity.GlobalPosition);
+			float distanceSquared = shapeTransform.Origin.DistanceSquaredTo(entity.GlobalPosition);
 			float angle = direction.Dot(-entity.AbsoluteForward);
 
 			if ( distanceSquared > maxDistanceSquared || angle < maxAngle ) return best;
 			if ( distanceSquared > best.DistanceSquared || angle < best.Angle ) return best;
 
-			return (interactable, distanceSquared, angle);
+			return (interactable, shapeTransform, distanceSquared, angle);
 		});
 
 
-		return candidate;
+		return target is null ? null : (target, shapeTransform);
 	}
 }

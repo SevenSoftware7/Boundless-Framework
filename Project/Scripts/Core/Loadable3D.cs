@@ -66,6 +66,9 @@ public abstract partial class Loadable3D : ExtendedNode3D, ILoadable {
 			case NotificationPredelete:
 				Callable.From(AsILoadable().Unload).CallDeferred();
 				break;
+			case NotificationSceneInstantiated:
+				Callable.From(AsILoadable().Load).CallDeferred();
+				break;
 		}
 	}
 }

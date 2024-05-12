@@ -6,20 +6,37 @@ namespace LandlessSkies.Core;
 [GlobalClass]
 public partial class PromptControl : PanelContainer {
 	[Export] public bool IsVisible;
-	[Export] public RichTextLabel Label { get; private set; } = null!;
+	[Export] private RichTextLabel Label = null!;
+	[Export] private TextureRect Prompt = null!;
+
+
+	public void SetText(string text) {
+		Label.Text = text;
+	}
+	public void SetPrompt(Texture2D image) {
+		Prompt.Texture = image;
+	}
 
 	public override void _Process(double delta) {
 		base._Process(delta);
 
-		float X = IsVisible ? 0f : - Size.X;
-		Visible = Position.X != - Size.X;
-
-		if (Position.X == X)
-			return;
-
-
-		Position = Position with {
-			X = Mathf.Lerp(Position.X, X, 15f * (float)delta)
+		Vector2 target = GlobalPosition with {
+			X = IsVisible ? 0 : - Size.X
 		};
+		float speed = 15f * (float)delta;
+
+
+		if (! IsVisible && GlobalPosition.IsEqualApprox(target)) {
+			Scale = Scale with {
+				Y = Mathf.Lerp(Scale.Y, Mathf.Epsilon, speed)
+			};
+		}
+		else {
+			Scale = Vector2.One;
+		}
+
+		GlobalPosition = GlobalPosition.Lerp(target, speed);
+
+		// Visible = ! Mathf.IsEqualApprox(Scale.Y, Mathf.Epsilon); // This causes the scale and Position to reset for some reason.
 	}
 }

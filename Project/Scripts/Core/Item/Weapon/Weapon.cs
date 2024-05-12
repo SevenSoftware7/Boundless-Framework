@@ -27,7 +27,7 @@ public abstract partial class Weapon : Loadable3D, IWeapon, ISkeletonAdaptable {
 
 	// public virtual void HandleStyleInput(Player.InputInfo inputInfo) { }
 
-	public virtual void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice) { }
+	public virtual void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice, HudManager hud) { }
 
 	public abstract ISaveData<Weapon> Save();
 

@@ -28,8 +28,8 @@ public abstract partial class ChargeAttack : Attack {
 	protected abstract void UnchargedAttack(Entity entity);
 
 
-	public override void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice) {
-		base.HandleInput(entity, cameraController, inputDevice);
+	public override void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice, HudManager hud) {
+		base.HandleInput(entity, cameraController, inputDevice, hud);
 
 		if (!isDone && chargeTime.IsDone) {
 			isDone = true;

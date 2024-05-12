@@ -8,7 +8,7 @@ using SevenGame.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class Entity : LoadableCharacterBody3D, IInputReader, IUIObject {
+public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject {
 	[Export] public Godot.Collections.Array<AttributeModifier> Attributes { get; private set; } = [];
 	public EntityAction? CurrentAction { get; private set; }
 	public EntityBehaviour? CurrentBehaviour { get; private set; }
@@ -25,11 +25,12 @@ public partial class Entity : LoadableCharacterBody3D, IInputReader, IUIObject {
 	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
 	[Export] public string DisplayName { get; private set; } = string.Empty;
 	[Export] public Handedness Handedness { get; private set; }
-	[Export] public CharacterStats Stats { get; private set; } = new();
+	[Export] public EntityStats Stats { get; private set; } = new();
+	[Export] public HudPack HudPack { get; private set; } = new();
 
 
 	[ExportGroup("Costume")]
-	[Export] public CharacterCostume? Costume {
+	[Export] public EntityCostume? Costume {
 		get => _costume;
 		private set {
 			if (this.IsInitializationSetterCall()) {
@@ -40,7 +41,7 @@ public partial class Entity : LoadableCharacterBody3D, IInputReader, IUIObject {
 			SetCostume(value);
 		}
 	}
-	private CharacterCostume? _costume;
+	private EntityCostume? _costume;
 
 	[Export] protected Model? Model {
 		get => _model;
@@ -151,8 +152,8 @@ public partial class Entity : LoadableCharacterBody3D, IInputReader, IUIObject {
 
 
 
-	public void SetCostume(CharacterCostume? newCostume) {
-		CharacterCostume? oldCostume = _costume;
+	public void SetCostume(EntityCostume? newCostume) {
+		EntityCostume? oldCostume = _costume;
 		if (newCostume == oldCostume)
 			return;
 
@@ -355,7 +356,7 @@ public partial class Entity : LoadableCharacterBody3D, IInputReader, IUIObject {
 		GD.Print($"Entity {Name} died.");
 	}
 
-	public void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice) {
+	public void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice, HudManager hud) {
 		cameraController.SetEntityAsSubject(this);
 		cameraController.MoveCamera(
 			inputDevice.GetVector("look_left", "look_right", "look_down", "look_up") * inputDevice.Sensitivity
@@ -372,14 +373,7 @@ public partial class Entity : LoadableCharacterBody3D, IInputReader, IUIObject {
 				_weapon.Style = 2;
 			}
 		}
-
-		Interactable? interactionCandidate = CurrentBehaviour?.GetInteractionCandidate();
-		if (inputDevice.IsActionJustPressed("interact") && interactionCandidate is not null && interactionCandidate.IsInteractable(entity)) {
-			interactionCandidate.Interact(entity);
-		}
 	}
-
-	public Interactable? GetInteractionCandidate() => CurrentBehaviour?.GetInteractionCandidate();
 
 
 	public override void _Process(double delta) {

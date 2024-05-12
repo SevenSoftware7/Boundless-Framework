@@ -1,17 +1,21 @@
-[gd_scene load_steps=2 format=3 uid="uid://br8bdv51nxt4p"]
+[gd_scene load_steps=3 format=3 uid="uid://br8bdv51nxt4p"]
 
 [ext_resource type="Script" path="res://Scripts/Core/UI/PromptControl.cs" id="1_hpr37"]
 
-[node name="Prompt" type="PanelContainer" node_paths=PackedStringArray("Label")]
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_q8jhr"]
+
+[node name="Prompt" type="PanelContainer" node_paths=PackedStringArray("Label", "Prompt")]
 auto_translate_mode = 1
-visible = false
 self_modulate = Color(1, 1, 1, 0)
+clip_contents = true
 custom_minimum_size = Vector2(200, 0)
-offset_left = -200.0
+offset_left = -214.0
 offset_bottom = 26.0
+scale = Vector2(1, 1.54976e-06)
 mouse_filter = 2
 script = ExtResource("1_hpr37")
-Label = NodePath("MarginContainer/RichTextLabel")
+Label = NodePath("MarginContainer/HBoxContainer/Interact Label")
+Prompt = NodePath("MarginContainer/HBoxContainer/Prompt Texture")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 auto_translate_mode = 1
@@ -23,10 +27,21 @@ color = Color(0.273438, 0.273438, 0.273438, 1)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="RichTextLabel" type="RichTextLabel" parent="MarginContainer"]
-auto_translate_mode = 1
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
+
+[node name="Prompt Texture" type="TextureRect" parent="MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+texture = SubResource("PlaceholderTexture2D_q8jhr")
+expand_mode = 1
+
+[node name="Interact Label" type="RichTextLabel" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
 text = "Text"
-fit_content = true
+scroll_active = false
+autowrap_mode = 0
 shortcut_keys_enabled = false
 text_direction = 2

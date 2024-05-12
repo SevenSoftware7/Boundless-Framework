@@ -46,6 +46,9 @@ public abstract partial class InputDevice : Node {
 		: Vector2.Zero;
 
 
+	public Texture2D GetActionSymbol(StringName action) =>
+		InputManager.ActionSymbol; // TODO
+
 	protected static void RebindInput(StringName actionName, float deadzone = 0.5f, params InputEvent[] events) {
 		if (actionName.IsEmpty)
 			return;

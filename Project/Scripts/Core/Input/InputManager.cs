@@ -7,6 +7,12 @@ using Godot;
 // [Tool]
 [GlobalClass]
 public partial class InputManager : Node {
+	[Export] private Texture2D _actionSymbol {
+		get => ActionSymbol;
+		set => ActionSymbol = value;
+	}
+	public static Texture2D ActionSymbol { get; private set; } = null!;
+
 	public static readonly StringName[] BaseActions = [.. InputMap.GetActions()];
 
 	public static InputDevice CurrentDevice { get; private set; } = null!;

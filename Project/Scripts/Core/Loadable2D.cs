@@ -56,7 +56,8 @@ public abstract partial class Loadable2D : ExtendedNode2D, ILoadable {
 
 	public override void _Ready() {
 		base._Ready();
-		Callable.From(AsILoadable().Load).CallDeferred();
+		if (! IsNodeReady())
+			Callable.From(AsILoadable().Load).CallDeferred();
 	}
 
 	public override void _Notification(int what) {
@@ -64,6 +65,9 @@ public abstract partial class Loadable2D : ExtendedNode2D, ILoadable {
 		switch ((ulong)what) {
 			case NotificationPredelete:
 				Callable.From(AsILoadable().Unload).CallDeferred();
+				break;
+			case NotificationSceneInstantiated:
+				Callable.From(AsILoadable().Load).CallDeferred();
 				break;
 		}
 	}

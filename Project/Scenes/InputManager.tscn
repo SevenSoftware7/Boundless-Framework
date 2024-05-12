@@ -1,6 +1,12 @@
-[gd_scene load_steps=2 format=3 uid="uid://da8v28qix84tl"]
+[gd_scene load_steps=4 format=3 uid="uid://da8v28qix84tl"]
 
 [ext_resource type="Script" path="res://Scripts/Core/Input/InputManager.cs" id="1_rvys6"]
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_b7h0p"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_leloj"]
+noise = SubResource("FastNoiseLite_b7h0p")
+
 [node name="InputManager" type="Node"]
 script = ExtResource("1_rvys6")
+_actionSymbol = SubResource("NoiseTexture2D_leloj")

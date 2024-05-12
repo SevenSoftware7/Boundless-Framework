@@ -42,8 +42,8 @@ public partial class FloatingCompanion : Companion {
 
 		return curve;
 	}
-	public override void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice) {
-		base.HandleInput(entity, cameraController, inputDevice);
+	public override void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice, HudManager hud) {
+		base.HandleInput(entity, cameraController, inputDevice, hud);
 
 		Callable.From(() => {
 			Subject = entity.GlobalTransform;

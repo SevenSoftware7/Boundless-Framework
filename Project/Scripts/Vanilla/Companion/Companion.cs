@@ -7,7 +7,7 @@ using SevenGame.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class Companion : Loadable3D, IUIObject, IInputReader, ICustomizable {
+public partial class Companion : Loadable3D, IUIObject, IInputHandler, ICustomizable {
 	[Export] public string DisplayName { get; private set; } = string.Empty;
 	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
 
@@ -71,7 +71,7 @@ public partial class Companion : Loadable3D, IUIObject, IInputReader, ICustomiza
 
 
 
-	public virtual void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice) { }
+	public virtual void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice, HudManager hud) { }
 
 
 	protected override bool LoadBehaviour() {

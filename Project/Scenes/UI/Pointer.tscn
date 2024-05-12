@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3 uid="uid://dr77fv5m8yjck"]
+
+[ext_resource type="Script" path="res://Scripts/Core/UI/PointerControl.cs" id="1_rmldb"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_1klvy"]
+size = Vector2(30, 30)
+
+[node name="Interact Pointer" type="CenterContainer" node_paths=PackedStringArray("ProjectorCamera")]
+auto_translate_mode = 1
+visible = false
+mouse_filter = 2
+use_top_left = true
+script = ExtResource("1_rmldb")
+ProjectorCamera = NodePath("")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+auto_translate_mode = 1
+layout_mode = 2
+mouse_filter = 2
+texture = SubResource("PlaceholderTexture2D_1klvy")

@@ -25,8 +25,8 @@ public sealed partial class NemesisWeapon : SingleWeapon {
 	}
 
 
-	public override void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice) {
-		base.HandleInput(entity, cameraController, inputDevice);
+	public override void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice, HudManager hud) {
+		base.HandleInput(entity, cameraController, inputDevice, hud);
 
 		if (!CanProcess()) {
 			return;

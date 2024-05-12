@@ -14,7 +14,9 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 	private TimeDuration coyoteTimer = new(150);
 	private TimeDuration jumpCooldown = new(500);
 	private Interactable? lastInteractCandidate;
-	private ulong lastInteractUpdateFrame;
+
+	private PromptControl interactPrompt = null!;
+	private PointerControl interactPointer = null!;
 
 	public override void Start(EntityBehaviour? previousBehaviour) {
 		base.Start(previousBehaviour);
@@ -23,8 +25,8 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 	}
 
 
-	public override void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice) {
-		base.HandleInput(entity, cameraController, inputDevice);
+	public override void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice, HudManager hud) {
+		base.HandleInput(entity, cameraController, inputDevice, hud);
 
 		if (inputDevice.IsActionPressed("jump")) {
 			Jump();
@@ -44,15 +46,38 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 
 
 		Move(groundedMovement.Normalized());
+		HandleInteraction(entity, inputDevice, hud);
 	}
 
-	public override Interactable? GetInteractionCandidate() {
-		ulong currentFrame = Engine.GetProcessFrames();
-		if (lastInteractUpdateFrame == currentFrame)
-			return lastInteractCandidate;
+	private void HandleInteraction(Entity entity, InputDevice inputDevice, HudManager hud) {
+		InteractTarget? target = Interactable.GetNearestCandidate(Entity, 7.5f, 0.5f);
 
-		lastInteractUpdateFrame = currentFrame;
-		return lastInteractCandidate = Interactable.GetNearestCandidate(Entity, 7.5f, 0.5f);
+		if (target is not null) {
+			if (inputDevice.IsActionJustPressed("interact") && target.Value.interactable.IsInteractable(entity)) {
+				target.Value.interactable.Interact(entity);
+			}
+		}
+
+		if (interactPrompt is null) {
+			if (entity.HudPack.InteractPrompt is null)
+				return;
+			interactPrompt = hud.AddPrompt(entity.HudPack.InteractPrompt);
+		}
+		if (interactPointer is null) {
+			if (entity.HudPack.InteractPointer is null)
+				return;
+			interactPointer = hud.AddPointer(entity.HudPack.InteractPointer);
+		}
+
+			lastInteractCandidate = target?.interactable;
+
+			interactPrompt.IsVisible = target.HasValue;
+			if (target.HasValue) {
+				interactPrompt.SetText(target.Value.interactable.InteractLabel);
+				interactPrompt.SetPrompt(/* "E" */inputDevice.GetActionSymbol("interact")); // TODO
+			}
+
+		interactPointer.Target = target?.shapeTransform;
 	}
 
 	public override bool SetSpeed(MovementType speed) {
@@ -168,5 +193,12 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 			jumpBuffer.End();
 			jumpCooldown.Start();
 		}
+	}
+
+
+	public override void _ExitTree() {
+		base._ExitTree();
+		interactPrompt?.QueueFree();
+		interactPointer?.QueueFree();
 	}
 }
