@@ -36,8 +36,6 @@ public abstract partial class Interactable : Area3D {
 			float distanceSquared = entity.GlobalPosition.DistanceSquaredTo(shapeTransform.Origin);
 			float incidence = direction.Dot(entity.AbsoluteForward);
 
-			GD.Print(incidence);
-
 			if ( distanceSquared > maxDistanceSquared || incidence < minIncidence && distanceSquared < 0.125f ) return best;
 			if ( distanceSquared > best.DistanceSquared || incidence < best.Incidence ) return best;
 
