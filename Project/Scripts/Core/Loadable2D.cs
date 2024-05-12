@@ -56,8 +56,7 @@ public abstract partial class Loadable2D : ExtendedNode2D, ILoadable {
 
 	public override void _Ready() {
 		base._Ready();
-		if (! IsNodeReady())
-			Callable.From(AsILoadable().Load).CallDeferred();
+		Callable.From(AsILoadable().Load).CallDeferred();
 	}
 
 	public override void _Notification(int what) {
