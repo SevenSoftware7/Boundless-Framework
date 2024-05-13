@@ -54,7 +54,7 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 
 		if (target is not null) {
 			if (inputDevice.IsActionJustPressed("interact") && target.Value.interactable.IsInteractable(entity)) {
-				target.Value.interactable.Interact(entity);
+				target.Value.interactable.Interact(entity, target.Value.shapeIndex);
 			}
 		}
 

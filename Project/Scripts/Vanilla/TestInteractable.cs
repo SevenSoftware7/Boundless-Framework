@@ -6,10 +6,10 @@ using LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public partial class TestInteractable : Interactable {
-	public override string InteractLabel { get; protected set; } = "Test";
+	public override string InteractLabel => "Test";
 
-	public override void Interact(Entity entity) {
-		GD.Print($"Entity {entity.Name} interacted with {Name}");
+	public override void Interact(Entity entity, int shapeIndex = 0) {
+		GD.Print($"Entity {entity.Name} interacted with {Name}, shape {GetShape3D(shapeIndex)?.Name} (index {shapeIndex})");
 	}
 
 	public override bool IsInteractable(Entity entity) {

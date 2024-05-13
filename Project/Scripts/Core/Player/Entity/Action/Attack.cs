@@ -3,6 +3,8 @@ namespace LandlessSkies.Core;
 using System;
 using System.Collections.Generic;
 using Godot;
+using SevenDev.Utility;
+
 
 public abstract partial class Attack(SingleWeapon Weapon) : EntityAction() {
 	protected SingleWeapon Weapon { get; private set; } = Weapon;
@@ -38,16 +40,8 @@ public static class AttackExtensions {
 
 
 	public static class Priorities {
-		public static readonly IComparer<AttackInfo> PureDamage = new ComparisonComparer(
+		public static readonly IComparer<AttackInfo> PureDamage = new ComparisonComparer<AttackInfo>(
 			(a, b) => a?.PotentialDamage.CompareTo(b?.PotentialDamage ?? 0) ?? 0
 		);
-
-
-
-		private class ComparisonComparer(Comparison<AttackInfo?> Comparison) : IComparer<AttackInfo> {
-			public int Compare(AttackInfo? x, AttackInfo? y) {
-				return Comparison(x, y);
-			}
-		}
 	}
 }
