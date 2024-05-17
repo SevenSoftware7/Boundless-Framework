@@ -1,5 +1,3 @@
-global using InteractTarget = (LandlessSkies.Core.Interactable interactable, Godot.Transform3D shapeTransform, int shapeIndex);
-
 namespace LandlessSkies.Core;
 
 using System.Linq;
@@ -7,13 +5,14 @@ using Godot;
 using SevenDev.Utility;
 using System.Collections.Generic;
 using System;
-
+using static SevenDev.Utility.MathUtility;
 
 public abstract partial class Interactable : Area3D {
 	public abstract string InteractLabel { get; }
+	public virtual float? MinLookIncidence => null;
 
 	public Interactable() : base() {
-		CollisionLayer = MathUtility.InteractableCollisionLayer;
+		CollisionLayer = InteractableCollisionLayer;
 		CollisionMask = 0;
 	}
 
@@ -21,16 +20,43 @@ public abstract partial class Interactable : Area3D {
 	public abstract void Interact(Entity entity, int shapeIndex = 0);
 
 
-	public static InteractTarget? GetNearestCandidate(Entity entity, float maxDistance, float minIncidence) {
+	public CollisionShape3D? GetShape3D(int shapeIndex) {
+		return ShapeOwnerGetOwner(ShapeFindOwner(shapeIndex)) as CollisionShape3D;
+	}
+}
+
+public sealed class InteractTarget(Interactable interactable, int shapeIndex) : Tuple<Interactable, int>(interactable, shapeIndex) {
+	public Interactable Interactable => Item1;
+	public int ShapeIndex => Item2;
+
+	public static InteractTarget? GetBestTarget(Entity entity, float maxDistance) {
+		return InteractCandidate.GetNearCandidates(entity, maxDistance)?
+			.OrderBy(x => x.DistanceSquared)
+			.ThenByDescending(x => x.Incidence)
+			.Select(x => x.Target)
+			.FirstOrDefault();
+	}
+}
+
+public sealed class InteractCandidate(InteractTarget target, float distanceSquared, float incidence) : Tuple<InteractTarget, float, float>(target, distanceSquared, incidence) {
+	public InteractTarget Target => Item1;
+	public float DistanceSquared => Item2;
+	public float Incidence => Item3;
+
+
+	public static IEnumerable<InteractCandidate> GetNearCandidates(Entity entity, float maxDistance) {
 		SphereShape3D sphere = new() {
 			Radius = maxDistance,
 		};
+		MathUtility.IntersectShape3D(entity.GetWorld3D(), entity.GlobalTransform, out IntersectShape3DResult[] collisions, sphere, InteractableCollisionLayer);
+
+		return GetCandidates(collisions, entity, maxDistance);
+	}
+	public static IEnumerable<InteractCandidate> GetCandidates(IEnumerable<IntersectShape3DResult> collisions, Entity entity, float maxDistance) {
 		float maxDistanceSquared = maxDistance * maxDistance;
 		const float leniancyRangeSquared = 0.5f * 0.5f;
 
-		bool anyCandidates = MathUtility.IntersectShape3D(entity.GetWorld3D(), entity.GlobalTransform, out MathUtility.IntersectShape3DResult[] collisions, sphere, MathUtility.InteractableCollisionLayer);
-
-		var res = collisions
+		IEnumerable<InteractCandidate> res = collisions
 			// .AsParallel()
 			.Where(x => x.Collider is Interactable)
 			.Select(x => {
@@ -40,26 +66,15 @@ public abstract partial class Interactable : Area3D {
 				Transform3D collisionShape = PhysicsServer3D.AreaGetShapeTransform(x.Rid, x.Shape);
 				Transform3D shapeTransform = interactable.GlobalTransform * collisionShape;
 
-				Vector3 flattenedVector = entity.GlobalPosition.DirectionToUnormalized(shapeTransform.Origin).Slide(entity.UpDirection);
+				float distanceSquared = entity.GlobalPosition.To(shapeTransform.Origin).Slide(entity.UpDirection).LengthSquared();
 
-				Vector3 direction = flattenedVector.Normalized();
-				float distanceSquared = flattenedVector.LengthSquared();
+				Vector3 direction = entity.GlobalPosition.To(interactable.GlobalPosition).Slide(entity.UpDirection).Normalized();
 				float incidence = direction.Dot(entity.AbsoluteForward);
 
-				(InteractTarget target, float distanceSquared, float incidence) res = ((interactable, shapeTransform, x.Shape), distanceSquared, incidence);
-				return res;
+				return new InteractCandidate(new InteractTarget(interactable, x.Shape), distanceSquared, incidence);
 			})
-			.Where(x => x.distanceSquared < maxDistanceSquared && x.incidence > minIncidence || x.distanceSquared < leniancyRangeSquared)
-			.OrderBy(x => - x.incidence)
-			.ThenBy(x => x.distanceSquared)
-			.Select(x => x.target);
+			.Where(x => x.DistanceSquared < maxDistanceSquared && x.Target.Interactable.MinLookIncidence is null || x.Incidence > x.Target.Interactable.MinLookIncidence || x.DistanceSquared < leniancyRangeSquared);
 
-
-		return res.Any() ? res.First() : null;
-	}
-
-
-	public CollisionShape3D? GetShape3D(int shapeIndex) {
-		return ShapeOwnerGetOwner(ShapeFindOwner(shapeIndex)) as CollisionShape3D;
+		return res;
 	}
 }

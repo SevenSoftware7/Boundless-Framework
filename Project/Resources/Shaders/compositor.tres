@@ -1,17 +1,3 @@
-[gd_resource type="Compositor" load_steps=4 format=3 uid="uid://dwtv47w5dgtou"]
-
-[ext_resource type="Script" path="res://Scripts/Core/Rendering/TestCompositorEffect.cs" id="1_b4xxc"]
-[ext_resource type="RDShaderFile" uid="uid://u5ye707m2ck6" path="res://Scripts/Core/Rendering/TestBlit.glsl" id="1_qc081"]
-
-[sub_resource type="CompositorEffect" id="CompositorEffect_n2t8j"]
-resource_local_to_scene = false
-resource_name = ""
-enabled = false
-effect_callback_type = 4
-needs_motion_vectors = false
-needs_normal_roughness = false
-script = ExtResource("1_b4xxc")
-ShaderFile = ExtResource("1_qc081")
+[gd_resource type="Compositor" format=3 uid="uid://dwtv47w5dgtou"]
 
 [resource]
-compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_n2t8j")])

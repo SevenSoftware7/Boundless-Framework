@@ -149,6 +149,26 @@ public static class NodeExtensions {
 		return false;
 	}
 
+	public static void ReconnectSignal<T>(this T node, StringName signalName, Callable method, GodotObject.ConnectFlags flags) where T : Node {
+		if (node is null) return;
+
+		if (node.IsConnected(signalName, method)) {
+			node.Disconnect(signalName, method);
+		}
+
+		node?.Connect(signalName, method, (uint)flags);
+	}
+
+	public static void SwapSignalEmitter<T>(ref T? emitter, T? newEmitter, StringName signalName, Callable method, GodotObject.ConnectFlags flags) where T : Node {
+		if (emitter is not null && emitter.IsConnected(signalName, method)) {
+			emitter.Disconnect(signalName, method);
+		}
+
+		emitter = newEmitter;
+		emitter?.Connect(signalName, method, (uint)flags);
+	}
+
+
 	public static void MakeLocal(this Node node, Node owner) {
 		node.SceneFilePath = string.Empty;
 		node.Owner = owner;

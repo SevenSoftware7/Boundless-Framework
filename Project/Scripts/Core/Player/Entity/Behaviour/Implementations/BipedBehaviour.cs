@@ -13,10 +13,9 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 	private TimeDuration jumpBuffer = new(125);
 	private TimeDuration coyoteTimer = new(150);
 	private TimeDuration jumpCooldown = new(500);
-	private Interactable? lastInteractCandidate;
 
-	private PromptControl interactPrompt = null!;
-	private PointerControl interactPointer = null!;
+	private PromptControl? interactPrompt;
+	private PointerControl? interactPointer;
 
 	public override void Start(EntityBehaviour? previousBehaviour) {
 		base.Start(previousBehaviour);
@@ -50,34 +49,25 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 	}
 
 	private void HandleInteraction(Entity entity, InputDevice inputDevice, HudManager hud) {
-		InteractTarget? target = Interactable.GetNearestCandidate(Entity, 3.25f, 0.5f);
+		InteractTarget? target = InteractTarget.GetBestTarget(Entity, 3.25f);
 
 		if (target is not null) {
-			if (inputDevice.IsActionJustPressed("interact") && target.Value.interactable.IsInteractable(entity)) {
-				target.Value.interactable.Interact(entity, target.Value.shapeIndex);
+			if (inputDevice.IsActionJustPressed("interact") && target.Interactable.IsInteractable(entity)) {
+				target.Interactable.Interact(entity, target.ShapeIndex);
 			}
 		}
 
-		if (interactPrompt is null) {
-			if (entity.HudPack.InteractPrompt is null)
-				return;
-			interactPrompt = hud.AddPrompt(entity.HudPack.InteractPrompt);
-		}
-		if (interactPointer is null) {
-			if (entity.HudPack.InteractPointer is null)
-				return;
-			interactPointer = hud.AddPointer(entity.HudPack.InteractPointer);
+
+		interactPrompt ??= hud.AddPrompt(entity.HudPack.InteractPrompt);
+		if (interactPrompt is not null) {
+			interactPrompt.Update(target);
+			interactPrompt.SetKey(inputDevice.GetActionSymbol("interact"));
 		}
 
-		lastInteractCandidate = target?.interactable;
-
-		interactPrompt.IsVisible = target.HasValue;
-		if (target.HasValue) {
-			interactPrompt.SetText(target.Value.interactable.InteractLabel);
-			interactPrompt.SetPrompt(/* "E" */inputDevice.GetActionSymbol("interact")); // TODO
+		interactPointer ??= hud.AddPointer(entity.HudPack.InteractPointer);
+		if (interactPointer is not null) {
+			interactPointer.Target = target?.Interactable.GlobalTransform;
 		}
-
-		interactPointer.Target = target?.shapeTransform;
 	}
 
 	public override bool SetSpeed(MovementType speed) {

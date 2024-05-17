@@ -57,8 +57,8 @@ libraries = {
 
 [node name="Health" type="Node" parent="."]
 script = ExtResource("3_r2tw0")
-MaxAmount = 1.0
-Amount = 1.0
+MaxAmount = 25.0
+Amount = 25.0
 
 [node name="Skeleton" parent="." instance=ExtResource("5_j1koo")]
 

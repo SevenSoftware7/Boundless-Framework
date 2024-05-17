@@ -1,4 +1,4 @@
-[gd_scene load_steps=93 format=4 uid="uid://b505xodur2iff"]
+[gd_scene load_steps=94 format=4 uid="uid://b505xodur2iff"]
 
 [ext_resource type="Environment" uid="uid://cly878e1j23yy" path="res://Resources/Shaders/environment.tres" id="1_l7i5q"]
 [ext_resource type="Compositor" uid="uid://dwtv47w5dgtou" path="res://Resources/Shaders/compositor.tres" id="2_w2ny8"]
@@ -10,16 +10,16 @@
 [ext_resource type="PackedScene" uid="uid://b7rhbgw2dujty" path="res://Resources/Characters/Eos/Eos.tscn" id="9_0jt21"]
 [ext_resource type="Script" path="res://Scripts/Core/UI/HudManager.cs" id="9_6h6ya"]
 [ext_resource type="PackedScene" uid="uid://cck2wboppochk" path="res://Scenes/UI/Bar.tscn" id="10_31hnh"]
+[ext_resource type="Script" path="res://Scripts/Core/UI/TestContainer.cs" id="10_70agi"]
 [ext_resource type="PackedScene" uid="uid://fbs6dr24ss3g" path="res://Resources/Weapons/Epiphron/Epiphron.tscn" id="12_1jl3t"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/MultiWeapon.cs" id="13_d6cna"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Implementation/BoneMeshModel.cs" id="13_s17ba"]
-[ext_resource type="Resource" uid="uid://c376t1le83xwr" path="res://Resources/Weapons/Epiphron/Costumes/Base/Epiphron_base.tres" id="14_6dhx7"]
 [ext_resource type="PackedScene" uid="uid://b7b17ebmgtrfy" path="res://Resources/Weapons/Nemesis/Nemesis.tscn" id="15_x4bcq"]
-[ext_resource type="Resource" uid="uid://ctyrw08y4svjk" path="res://Resources/Weapons/Nemesis/Costumes/Base/Nemesis_Base.tres" id="16_vujtq"]
 [ext_resource type="PackedScene" uid="uid://bp1e6thwkkcrr" path="res://Resources/Weapons/Eleos/Eleos.tscn" id="17_jhoyp"]
-[ext_resource type="Resource" uid="uid://q68mneifjek2" path="res://Resources/Weapons/Eleos/Costumes/Base/Eleos_base.tres" id="18_jb8a1"]
+[ext_resource type="Resource" uid="uid://ctyrw08y4svjk" path="res://Resources/Weapons/Nemesis/Costumes/Base/Nemesis_Base.tres" id="22_mqagl"]
 [ext_resource type="PackedScene" uid="uid://cwllghypqnhne" path="res://Resources/Characters/Eos/Costumes/Base/Eos_base.tscn" id="24_12m4j"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Implementation/SkeletonModel.cs" id="25_63n7m"]
+[ext_resource type="Resource" uid="uid://q68mneifjek2" path="res://Resources/Weapons/Eleos/Costumes/Base/Eleos_base.tres" id="25_bt68h"]
 [ext_resource type="Resource" uid="uid://caqyvip0olism" path="res://Resources/Companions/Erebos/Costumes/Base/Erebos_base.tres" id="26_2rpu5"]
 [ext_resource type="PackedScene" uid="uid://cdrk073syqpbj" path="res://Resources/Weapons/Epiphron/Costumes/Base/Epiphron_base.tscn" id="26_cj2h6"]
 [ext_resource type="PackedScene" uid="uid://b7hcoc81x5g0i" path="res://Resources/Companions/Erebos.tscn" id="26_ds8t8"]
@@ -543,7 +543,7 @@ active_edge = -1
 active_face = -1
 active_face_vertex = 0
 
-[sub_resource type="Resource" id="Resource_n2yse"]
+[sub_resource type="Resource" id="Resource_xw20i"]
 script = ExtResource("5_vmujk")
 selected = false
 active = false
@@ -557,18 +557,18 @@ face_material_indices = PackedInt32Array(-1, -1, -1, -1, -1, -1)
 face_uv_transform = Array[Transform2D]([Transform2D(1, 0, 0, 1, 0, 0), Transform2D(1, 0, 0, 1, 0, 0), Transform2D(1, 0, 0, 1, 0, 0), Transform2D(1, 0, 0, 1, 0, 0), Transform2D(1, 0, 0, 1, 0, 0), Transform2D(1, 0, 0, 1, 0, 0)])
 face_visible = PackedByteArray("AQEBAQEB")
 face_color = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
-face_selected = PackedByteArray("AAABAAAA")
-face_vertex_face_index = PackedInt32Array()
-face_vertex_vertex_index = PackedInt32Array()
-face_vertex_normal = PackedVector3Array()
-face_vertex_color = PackedColorArray()
+face_selected = PackedByteArray("AAAAAAEA")
+face_vertex_face_index = PackedInt32Array(0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5)
+face_vertex_vertex_index = PackedInt32Array(0, 1, 2, 3, 4, 3, 2, 5, 6, 5, 2, 1, 0, 3, 4, 7, 6, 7, 4, 5, 0, 7, 6, 1)
+face_vertex_normal = PackedVector3Array(0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0.992278, -0.124035, 0, 0.992278, -0.124035, 0, 0.992278, -0.124035, 0, 0.992278, -0.124035)
+face_vertex_color = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 edge_vertex_indices = PackedInt32Array(0, 1, 1, 2, 2, 3, 3, 0, 4, 3, 2, 5, 5, 4, 6, 5, 1, 6, 4, 7, 7, 0, 6, 7)
 edge_face_indices = PackedInt32Array(0, 5, 0, 2, 0, 1, 0, 3, 1, 3, 1, 2, 1, 4, 2, 4, 2, 5, 3, 4, 3, 5, 4, 5)
 face_vertex_count = PackedInt32Array(4, 4, 4, 4, 4, 4)
 face_vertex_indices = PackedInt32Array(0, 1, 2, 3, 4, 3, 2, 5, 6, 5, 2, 1, 0, 3, 4, 7, 6, 7, 4, 5, 0, 7, 6, 1)
 active_vertex = -1
 active_edge = -1
-active_face = -1
+active_face = 4
 active_face_vertex = 0
 
 [sub_resource type="Resource" id="Resource_v2nih"]
@@ -1103,6 +1103,34 @@ active_edge = -1
 active_face = -1
 active_face_vertex = 0
 
+[sub_resource type="Resource" id="Resource_jhkky"]
+script = ExtResource("5_vmujk")
+selected = false
+active = false
+collsion = true
+physics_layer = 0
+physics_mask = 0
+vertex_points = PackedVector3Array(0, 3, 0, 0, 3, 16, 0, 0, 16, 0, 0, 0, 24, 3, 0, 24, 3, 16, 24, 0, 16, 24, 0, 0)
+vertex_selected = PackedByteArray("AAAAAAAAAAA=")
+edge_selected = PackedByteArray("AAAAAAAAAAAAAAAA")
+face_material_indices = PackedInt32Array(-1, -1, -1, -1, -1, -1)
+face_uv_transform = Array[Transform2D]([Transform2D(1, 0, 0, 1, 0, 0), Transform2D(1, 0, 0, 1, 0, 0), Transform2D(1, 0, 0, 1, 0, 0), Transform2D(1, 0, 0, 1, 0, 0), Transform2D(1, 0, 0, 1, 0, 0), Transform2D(1, 0, 0, 1, 0, 0)])
+face_visible = PackedByteArray("AQEBAQEB")
+face_color = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+face_selected = PackedByteArray("AAAAAAAA")
+face_vertex_face_index = PackedInt32Array(0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5)
+face_vertex_vertex_index = PackedInt32Array(0, 1, 2, 3, 7, 6, 5, 4, 1, 0, 4, 5, 2, 1, 5, 6, 3, 2, 6, 7, 0, 3, 7, 4)
+face_vertex_normal = PackedVector3Array(-1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1)
+face_vertex_color = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+edge_vertex_indices = PackedInt32Array(0, 1, 1, 2, 2, 3, 3, 0, 7, 6, 6, 5, 5, 4, 4, 7, 0, 4, 5, 1, 6, 2, 7, 3)
+edge_face_indices = PackedInt32Array(0, 2, 0, 3, 0, 4, 0, 5, 1, 4, 1, 3, 1, 2, 1, 5, 2, 5, 2, 3, 3, 4, 4, 5)
+face_vertex_count = PackedInt32Array(4, 4, 4, 4, 4, 4)
+face_vertex_indices = PackedInt32Array(0, 1, 2, 3, 7, 6, 5, 4, 1, 0, 4, 5, 2, 1, 5, 6, 3, 2, 6, 7, 0, 3, 7, 4)
+active_vertex = -1
+active_edge = -1
+active_face = -1
+active_face_vertex = 0
+
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_n387p"]
 
 [sub_resource type="Curve3D" id="Curve3D_1g2j1"]
@@ -1121,7 +1149,9 @@ size = Vector3(3, 1, 6)
 [sub_resource type="SphereShape3D" id="SphereShape3D_ycdom"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_k6yo1"]
-albedo_color = Color(0.75339, 2.38247e-06, 5.77569e-07, 1)
+transparency = 4
+depth_draw_mode = 1
+albedo_color = Color(0.752941, 0, 0, 0.498039)
 
 [sub_resource type="SphereMesh" id="SphereMesh_nkuww"]
 material = SubResource("StandardMaterial3D_k6yo1")
@@ -1614,7 +1644,7 @@ block_data = SubResource("Resource_thvx1")
 [node name="Block_0" type="Node3D" parent="Environment/StaticBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, -1, 8)
 script = ExtResource("4_xwxtm")
-block_data = SubResource("Resource_n2yse")
+block_data = SubResource("Resource_xw20i")
 
 [node name="Block_17" type="Node3D" parent="Environment/StaticBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -16)
@@ -1711,6 +1741,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -10)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_dxejf")
 
+[node name="Block_37" type="Node3D" parent="Environment/StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, -1, 24)
+script = ExtResource("4_xwxtm")
+block_data = SubResource("Resource_jhkky")
+
 [node name="EntityVoidoutTrigger" type="Area3D" parent="Environment"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10.8385, 0)
 collision_layer = 0
@@ -1726,7 +1761,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30201, -4.81285)
 curve = SubResource("Curve3D_1g2j1")
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Environment/Path3D"]
-transform = Transform3D(-0.0922569, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97164e-07, 0.995733, 8.27696e-08, -0.0922569, -1.98959, 0, 2.30373)
+transform = Transform3D(-0.0922568, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97163e-07, 0.995733, 8.27696e-08, -0.0922568, -1.98959, 0, 2.30373)
 script = ExtResource("36_x7xeh")
 
 [node name="AnimatableBody3D" type="AnimatableBody3D" parent="Environment/Path3D/PathFollow3D"]
@@ -1757,97 +1792,109 @@ verticalSmoothTime = 0.16
 CollisionMask = 4294967289
 Subject = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
-[node name="HUD" type="Control" parent="Player" node_paths=PackedStringArray("ProjectorCamera", "PromptContainer", "PointerContainer")]
+[node name="HUD" type="Control" parent="Player" node_paths=PackedStringArray("ProjectorCamera", "PointerContainer", "InfoContainer", "PromptContainer")]
 layout_mode = 3
-anchors_preset = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("9_6h6ya")
 ProjectorCamera = NodePath("../CameraController3D")
-PromptContainer = NodePath("Prompt Container")
 PointerContainer = NodePath("Pointer Container")
-
-[node name="Prompt Container" type="VBoxContainer" parent="Player/HUD"]
-layout_mode = 0
-offset_top = 100.0
-offset_bottom = 100.0
-mouse_filter = 2
+InfoContainer = NodePath("Top Half/Top Left Quadrant/Info Container")
+PromptContainer = NodePath("Top Half/Top Left Quadrant/Prompt Container")
 
 [node name="Pointer Container" type="Control" parent="Player/HUD"]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="Health Bar" parent="Player/HUD" node_paths=PackedStringArray("Value", "Bar", "DamagedBar") instance=ExtResource("10_31hnh")]
+[node name="Top Half" type="HBoxContainer" parent="Player/HUD"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Top Left Quadrant" type="VBoxContainer" parent="Player/HUD/Top Half"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+theme_override_constants/separation = 20
+
+[node name="Info Container" type="VBoxContainer" parent="Player/HUD/Top Half/Top Left Quadrant"]
+layout_mode = 2
+
+[node name="Health Bar" parent="Player/HUD/Top Half/Top Left Quadrant/Info Container" node_paths=PackedStringArray("Value", "Bar", "DamagedBar") instance=ExtResource("10_31hnh")]
+layout_mode = 2
+size_flags_horizontal = 0
 DamageDelay = 0.75
-Value = NodePath("../../../Eos/Health")
+Value = NodePath("../../../../../../Eos/Health")
 Bar = NodePath("Progress")
 DamagedBar = NodePath("Damaged")
 
+[node name="Prompt Container" type="Container" parent="Player/HUD/Top Half/Top Left Quadrant"]
+layout_mode = 2
+script = ExtResource("10_70agi")
+
+[node name="Top Right Quadrant" type="VBoxContainer" parent="Player/HUD/Top Half"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 2
+
 [node name="TestInteractable" type="Area3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.4715, 1.82309, 2.88449)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 2.5, 32)
 collision_layer = 8
 collision_mask = 0
 script = ExtResource("35_lrkn5")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="TestInteractable"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 0)
 shape = SubResource("SphereShape3D_ycdom")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="TestInteractable"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="TestInteractable/CollisionShape3D"]
 mesh = SubResource("SphereMesh_nkuww")
+skeleton = NodePath("../..")
 
 [node name="CollisionShape3D_2" type="CollisionShape3D" parent="TestInteractable"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3.82811)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
 shape = SubResource("SphereShape3D_ycdom")
 
-[node name="MeshInstance3D_2" type="MeshInstance3D" parent="TestInteractable"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3.82811)
+[node name="MeshInstance3D_2" type="MeshInstance3D" parent="TestInteractable/CollisionShape3D_2"]
 mesh = SubResource("SphereMesh_nkuww")
-skeleton = NodePath("../MeshInstance3D")
+skeleton = NodePath("../../CollisionShape3D/MeshInstance3D")
 
 [node name="CollisionShape3D_3" type="CollisionShape3D" parent="TestInteractable"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.89984, 0, 2.3319)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
 shape = SubResource("SphereShape3D_ycdom")
 
-[node name="MeshInstance3D_3" type="MeshInstance3D" parent="TestInteractable"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.89984, 0, 2.3319)
+[node name="MeshInstance3D_3" type="MeshInstance3D" parent="TestInteractable/CollisionShape3D_3"]
 mesh = SubResource("SphereMesh_nkuww")
-skeleton = NodePath("../MeshInstance3D")
+skeleton = NodePath("../../CollisionShape3D/MeshInstance3D")
 
 [node name="CollisionShape3D_4" type="CollisionShape3D" parent="TestInteractable"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.16102, 0, 3.38529)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 0)
 shape = SubResource("SphereShape3D_ycdom")
 
-[node name="MeshInstance3D_4" type="MeshInstance3D" parent="TestInteractable"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.16102, 0, 3.38529)
+[node name="MeshInstance3D_4" type="MeshInstance3D" parent="TestInteractable/CollisionShape3D_4"]
 mesh = SubResource("SphereMesh_nkuww")
-skeleton = NodePath("../MeshInstance3D")
-
-[node name="CollisionShape3D_5" type="CollisionShape3D" parent="TestInteractable"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.37354, 0, 3.20241)
-shape = SubResource("SphereShape3D_ycdom")
-
-[node name="MeshInstance3D_5" type="MeshInstance3D" parent="TestInteractable"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.37354, 0, 3.20241)
-mesh = SubResource("SphereMesh_nkuww")
-skeleton = NodePath("../MeshInstance3D")
+skeleton = NodePath("../../CollisionShape3D/MeshInstance3D")
 
 [node name="Eos" parent="." node_paths=PackedStringArray("Model", "Weapon", "AnimationPlayer", "Skeleton", "Health") instance=ExtResource("9_0jt21")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 3.56445)
 Model = NodePath("Model - Eos (base)")
 Weapon = NodePath("Weapon")
 AnimationPlayer = NodePath("AnimationPlayer")
 Skeleton = NodePath("Skeleton")
 Health = NodePath("Health")
 IsLoaded = true
-
-[node name="Health" parent="Eos" index="1"]
-MaxAmount = 100.0
-Amount = 100.0
 
 [node name="Model - Eos (base)" type="Node3D" parent="Eos" node_paths=PackedStringArray("Skeleton", "Model")]
 script = ExtResource("27_qsvfi")
@@ -1876,12 +1923,9 @@ Skeleton = NodePath("../../Skeleton")
 Handedness = 0
 IsLoaded = true
 
-[node name="Model - Epiphron (base)" type="Node3D" parent="Eos/Weapon/Epiphron" node_paths=PackedStringArray("Skeleton", "Model")]
+[node name="Model - Epiphron (base)" type="Node3D" parent="Eos/Weapon/Epiphron" node_paths=PackedStringArray("Skeleton")]
 script = ExtResource("13_s17ba")
 Skeleton = NodePath("../../../Skeleton")
-Model = NodePath("Costume - Epiphron (base)")
-Costume = ExtResource("14_6dhx7")
-IsLoaded = true
 IsEnabled = true
 
 [node name="Costume - Epiphron (base)" parent="Eos/Weapon/Epiphron/Model - Epiphron (base)" instance=ExtResource("26_cj2h6")]
@@ -1903,12 +1947,14 @@ visible = false
 script = ExtResource("13_s17ba")
 Skeleton = NodePath("../../../Skeleton")
 Model = NodePath("Costume - Nemesis (base)")
-Costume = ExtResource("16_vujtq")
+Costume = ExtResource("22_mqagl")
 IsLoaded = true
 
-[node name="Costume - Nemesis (base)" parent="Eos/Weapon/Nemesis/Model - Nemesis (base)" instance=ExtResource("31_n76ma")]
+[node name="Costume - Nemesis (base)" type="MeshInstance3D" parent="Eos/Weapon/Nemesis/Model - Nemesis (base)" instance=ExtResource("31_n76ma")]
 process_mode = 4
+transform = Transform3D(0, -1, 0, 0, 0, -1, 1, 0, 0, 1.11649, 2.61582, 0.185957)
 visible = false
+layers = 2
 mesh = SubResource("BoxMesh_tb6pr")
 skeleton = NodePath("../../../../Skeleton")
 surface_material_override/0 = SubResource("StandardMaterial3D_55qpj")
@@ -1928,12 +1974,14 @@ visible = false
 script = ExtResource("13_s17ba")
 Skeleton = NodePath("../../../Skeleton")
 Model = NodePath("Costume - Eleos (base)")
-Costume = ExtResource("18_jb8a1")
+Costume = ExtResource("25_bt68h")
 IsLoaded = true
 
-[node name="Costume - Eleos (base)" parent="Eos/Weapon/Eleos/Model - Eleos (base)" instance=ExtResource("32_eo1r4")]
+[node name="Costume - Eleos (base)" type="MeshInstance3D" parent="Eos/Weapon/Eleos/Model - Eleos (base)" instance=ExtResource("32_eo1r4")]
 process_mode = 4
+transform = Transform3D(0, -1, 0, 0, 0, -1, 1, 0, 0, 1.11649, 2.61582, 0.185957)
 visible = false
+layers = 2
 mesh = SubResource("BoxMesh_2kvh4")
 skeleton = NodePath("../../../../Skeleton")
 surface_material_override/0 = SubResource("StandardMaterial3D_g4lnn")
@@ -1951,7 +1999,3 @@ IsLoaded = true
 IsEnabled = true
 
 [node name="Costume - Erebos (base)" parent="Eos/Erebos/Model - Erebos (base)" instance=ExtResource("27_pa18i")]
-
-[connection signal="HealthChange" from="Eos/Health" to="Player/HUD/Health Bar" method="OnValueChanged"]
-
-[editable path="Eos"]

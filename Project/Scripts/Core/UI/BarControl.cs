@@ -10,20 +10,17 @@ public partial class BarControl : Control {
 		get => _damagedTimer.DurationMsec / 1000f;
 		set => _damagedTimer.DurationMsec = (ulong)(value * 1000);
 	}
-	[Export] public Health Value {
+	[Export] public Health? Value {
 		get => _value;
 		private set {
-			if (_value == value) return;
+			// if (_value == value) return;
 			if (this.IsInitializationSetterCall()) {
 				_value = value;
 				return;
 			}
 
 			Callable onValueChanged = new(this, MethodName.OnValueChanged);
-			_value?.Disconnect(Health.SignalName.HealthChange, onValueChanged);
-
-			_value = value;
-			_value?.Connect(Health.SignalName.HealthChange, onValueChanged, (uint)ConnectFlags.Persist);
+			NodeExtensions.SwapSignalEmitter(ref _value, value, Health.SignalName.HealthChange, onValueChanged, ConnectFlags.Persist);
 
 			if (Value is null)
 				return;
@@ -38,7 +35,7 @@ public partial class BarControl : Control {
 			}
 		}
 	}
-	private Health _value = null!;
+	private Health? _value = null!;
 
 	private TimeDuration _damagedTimer = new(1000);
 	private float _damagedVelocity;
@@ -51,11 +48,20 @@ public partial class BarControl : Control {
 		_damagedTimer.Start();
 	}
 
+	public override void _Ready() {
+		base._Ready();
+
+		Callable onValueChanged = new(this, MethodName.OnValueChanged);
+		_value?.ReconnectSignal(Health.SignalName.HealthChange, onValueChanged, ConnectFlags.Persist);
+	}
+
 	public override void _Process(double delta) {
 		base._Process(delta);
 
 		if (Value is null || Bar is null)
 			return;
+
+		Size = new Vector2(Value.MaxAmount * 8f, GetCombinedMinimumSize().Y);
 
 		Bar.MaxValue = Value.MaxAmount;
 		Bar.Value = Mathf.Lerp(Value.Amount, Value.Amount, 2f * (float)delta);

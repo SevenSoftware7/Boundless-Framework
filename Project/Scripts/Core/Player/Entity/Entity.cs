@@ -9,10 +9,6 @@ using SevenDev.Utility;
 [Tool]
 [GlobalClass]
 public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject {
-	[Export] public Godot.Collections.Array<AttributeModifier> Attributes { get; private set; } = [];
-	public EntityAction? CurrentAction { get; private set; }
-	public EntityBehaviour? CurrentBehaviour { get; private set; }
-
 	public override bool IsLoaded {
 		get => _isLoaded;
 		set => this.BackingFieldLoadUnload(ref _isLoaded, value);
@@ -100,14 +96,21 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 			}
 
 			Callable onKill = new(this, MethodName.OnKill);
-			_health?.Disconnect(Health.SignalName.Death, onKill);
+			NodeExtensions.SwapSignalEmitter(ref _health, value, Health.SignalName.Death, onKill, ConnectFlags.Persist);
 
-			_health = value;
-			_health?.Connect(Health.SignalName.Death, onKill, (uint)ConnectFlags.Persist);
+			if (_health is not null) {
+				_health.MaxAmount = Stats.MaxHealth;
+			}
 		}
 	}
 	private Health? _health;
 
+
+
+	[ExportGroup("State")]
+	[Export] public EntityAction? CurrentAction { get; private set; }
+	[Export] public EntityBehaviour? CurrentBehaviour { get; private set; }
+	[Export] public Godot.Collections.Array<AttributeModifier> AttributeModifiers { get; private set; } = [];
 
 
 	[ExportGroup("Movement")]
@@ -203,7 +206,7 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 
 
 	public MultiAttributeModifier GetModifiers(StringName attributeName) {
-		return new(Attributes.Where(a => a.Name == attributeName));
+		return new(AttributeModifiers.Where(a => a.Name == attributeName));
 	}
 
 
@@ -393,6 +396,10 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 		if (Engine.IsEditorHint())
 			return;
 
+		if (_health is not null) {
+			_health.MaxAmount = GetModifiers(Attributes.MaxHealth).Apply(Stats.MaxHealth);
+		}
+
 		Move(delta);
 	}
 
@@ -402,7 +409,8 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 		if (Engine.IsEditorHint())
 			return;
 
-
-		SetBehaviour(new BipedBehaviour(this));
+		if (CurrentBehaviour is null) {
+			SetBehaviour(new BipedBehaviour(this));
+		}
 	}
 }

@@ -100,10 +100,10 @@ public static class MathUtility {
 	public static Vector3 SlideOnFace(this Vector3 vector, Vector3 normal) =>
 		vector + normal * Mathf.Max(vector.Project(-normal).Dot(-normal), 0);
 
-	public static Vector3 DirectionToUnormalized(this Vector3 vector, Vector3 to)
+	public static Vector3 To(this Vector3 vector, Vector3 to)
 		=> new(to.X - vector.X, to.Y - vector.Y, to.Z - vector.Z);
 
-	public static double SmoothDamp(double current, double target, ref double currentVelocity, double smoothTime, double maxSpeed, double deltaTime) {
+	public static double SmoothDamp(this double current, double target, ref double currentVelocity, double smoothTime, double maxSpeed, double deltaTime) {
 		smoothTime = Math.Max(0.0001, smoothTime);
 		double num1 = 2.0 / smoothTime;
 		double num2 = num1 * deltaTime;
