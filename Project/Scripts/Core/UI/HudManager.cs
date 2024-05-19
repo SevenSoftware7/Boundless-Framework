@@ -15,15 +15,15 @@ public partial class HudManager : Control {
 	public HudManager() { }
 
 
-	public BarControl? AddInfo(PackedScene? info) {
+	public GaugeControl? AddInfo(PackedScene? info) {
 		if (info is null)
 			return null;
 
-		return AddInfo(info.Instantiate<BarControl>());
+		return AddInfo(info.Instantiate<GaugeControl>());
 	}
-	public BarControl AddInfo(BarControl info) {
-		info.ParentTo(PromptContainer);
-		PromptContainer.MoveChild(info, 0);
+	public GaugeControl AddInfo(GaugeControl info) {
+		info.ParentTo(InfoContainer);
+		InfoContainer.MoveChild(info, 0);
 		return info;
 	}
 

@@ -3,29 +3,25 @@ namespace LandlessSkies.Core;
 using Godot;
 
 [Tool]
+[GlobalClass]
 public partial class BoneMeshModel : MeshModel {
 
 	protected BoneMeshModel() : base() { }
-	public BoneMeshModel(Costume costume) : base(costume) { }
 
 
+	protected override void HandleSkeleton() {
+		if (Skeleton is not null) {
+			string boneName = Handedness switch {
+				Handedness.Left => "LeftHand",
+				Handedness.Right or _ => "RightHand",
+			};
 
-	public override void _Process(double delta) {
-		base._Process(delta);
-
-		if (Model is null || !Model.IsInsideTree())
-			return;
-
-		string boneName = Handedness switch {
-			Handedness.Left => "LeftHand",
-			Handedness.Right or _ => "RightHand",
-		};
-
-		if (Skeleton is not null && Skeleton.TryGetBoneTransform(boneName, out Transform3D handTransform)) {
-			Model.GlobalTransform = handTransform;
+			GlobalTransform = Skeleton.TryGetBoneTransform(boneName, out Transform3D handTransform)
+				? handTransform
+				: Skeleton.GlobalTransform;
 		}
 		else {
-			Model.Transform = Transform3D.Identity;
+			Transform = Transform3D.Identity;
 		}
 	}
 }

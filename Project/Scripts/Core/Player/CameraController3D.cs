@@ -21,7 +21,7 @@ public partial class CameraController3D : Camera3D {
 	[Export] public CameraStyle Style = CameraStyle.ThirdPersonGrounded;
 	[Export] public Transform3D Subject { get; private set; }
 
-	[Export] public Basis LocalRotation { get; private set; } = Basis.Identity;
+	[Export] public Basis LocalRotation = Basis.Identity;
 
 
 	private float distanceToSubject = -1f;
@@ -34,9 +34,6 @@ public partial class CameraController3D : Camera3D {
 	private float distanceVelocity;
 
 	private float verticalTime;
-
-
-	public Basis AbsoluteRotation => Subject.Basis * LocalRotation;
 
 
 
@@ -75,7 +72,7 @@ public partial class CameraController3D : Camera3D {
 	}
 
 	public void RawInputToGroundedMovement(Entity entity, Vector2 moveInput, out Basis camRotation, out Vector3 groundedMovement) {
-		Vector3 camRight = AbsoluteRotation.X;
+		Vector3 camRight = Subject.Basis * LocalRotation.X;
 		float localAlignment = Mathf.Ceil(entity.Transform.Basis.Y.Dot(LocalRotation.Y));
 		Vector3 entityUp = entity.Transform.Basis.Y * (localAlignment * 2f - 1f);
 		Vector3 groundedCamForward = entityUp.Cross(camRight).Normalized();
@@ -86,7 +83,7 @@ public partial class CameraController3D : Camera3D {
 	}
 
 	public void RawInputToCameraRelativeMovement(Vector2 moveInput, out Basis camRotation, out Vector3 cameraRelativeMovement) {
-		camRotation = AbsoluteRotation;
+		camRotation = Subject.Basis * LocalRotation;
 
 		cameraRelativeMovement = camRotation * new Vector3(moveInput.X, 0, moveInput.Y);
 	}
@@ -102,7 +99,7 @@ public partial class CameraController3D : Camera3D {
 		// subjectSpaceOffset = subjectSpaceOffset.Slerp(targetSubjectSpaceOffset, 3f * floatDelta);
 
 
-		Basis TargetBasis = AbsoluteRotation;
+		Basis TargetBasis = Subject.Basis * LocalRotation;
 
 		float targetDistance = cameraOriginPosition.Length();
 		Vector3 absoluteOffset = TargetBasis * (cameraOriginPosition / targetDistance);
@@ -179,14 +176,15 @@ public partial class CameraController3D : Camera3D {
 	public override void _Process(double delta) {
 		base._Process(delta);
 
-		if (Engine.IsEditorHint())
-			return;
+		if (Engine.IsEditorHint()) return;
 
 		ComputeCamera(delta);
 	}
 
 	public override void _Ready() {
 		base._Ready();
+		LocalRotation = GlobalBasis;
+
 		distanceToSubject = cameraOriginPosition.Length();
 		verticalTime = horizontalSmoothTime;
 	}

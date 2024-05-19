@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="CharacterMeshCostume" load_steps=3 format=3 uid="uid://dvcjw3gon7rak"]
+[gd_resource type="Resource" script_class="EntityCostume" load_steps=3 format=3 uid="uid://dvcjw3gon7rak"]
 
-[ext_resource type="PackedScene" uid="uid://cwllghypqnhne" path="res://Resources/Characters/Eos/Costumes/Base/Eos_base.tscn" id="1_svquk"]
-[ext_resource type="Script" path="res://Scripts/Core/Player/Entity/Implementations/EntityMeshCostume.cs" id="2_cek2x"]
+[ext_resource type="PackedScene" uid="uid://hje36y5wrdyu" path="res://Resources/Characters/Eos/Costumes/Base/Eos_base.tscn" id="1_hwbj6"]
+[ext_resource type="Script" path="res://Scripts/Core/Player/Entity/EntityCostume.cs" id="2_tibbh"]
 
 [resource]
-script = ExtResource("2_cek2x")
-_displayName = "Eos (base)"
-ModelScene = ExtResource("1_svquk")
+script = ExtResource("2_tibbh")
+ModelScene = ExtResource("1_hwbj6")
+DisplayName = "Eos (base)"

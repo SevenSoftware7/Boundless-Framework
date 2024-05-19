@@ -48,8 +48,7 @@ public abstract partial class InputDevice : Node {
 		InputManager.ActionSymbol; // TODO
 
 	protected static void RebindInput(StringName actionName, float deadzone = 0.5f, params InputEvent[] events) {
-		if (actionName.IsEmpty)
-			return;
+		if (actionName.IsEmpty) return;
 
 		if (InputMap.HasAction(actionName)) {
 			InputMap.ActionEraseEvents(actionName);
@@ -64,8 +63,7 @@ public abstract partial class InputDevice : Node {
 	}
 
 	protected static void BindInput(StringName actionName, float deadzone = 0.5f, params InputEvent[] events) {
-		if (actionName.IsEmpty)
-			return;
+		if (actionName.IsEmpty) return;
 
 		if (!InputMap.HasAction(actionName)) {
 			InputMap.AddAction(actionName, deadzone);
@@ -77,8 +75,7 @@ public abstract partial class InputDevice : Node {
 	}
 
 	protected static void UnbindInput(StringName actionName) {
-		if (actionName.IsEmpty)
-			return;
+		if (actionName.IsEmpty) return;
 
 		if (InputMap.HasAction(actionName)) {
 			InputMap.EraseAction(actionName);
@@ -86,8 +83,7 @@ public abstract partial class InputDevice : Node {
 	}
 
 	public virtual void Connect() {
-		if (DeviceConnected)
-			return;
+		if (DeviceConnected) return;
 
 		foreach (StringName action in InputManager.BaseActions) {
 			StringName newAction = GetActionName(action);
@@ -99,8 +95,7 @@ public abstract partial class InputDevice : Node {
 	}
 
 	public virtual void Disconnect() {
-		if (!DeviceConnected)
-			return;
+		if (!DeviceConnected) return;
 
 		foreach (StringName action in InputManager.BaseActions) {
 			StringName newAction = GetActionName(action);

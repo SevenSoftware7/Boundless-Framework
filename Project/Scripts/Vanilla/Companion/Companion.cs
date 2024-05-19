@@ -7,12 +7,12 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class Companion : Loadable3D, IUIObject, IInputHandler, ICustomizable {
+public partial class Companion : Loadable3D, IUIObject, IPlayerHandler, ICustomizable {
 	[Export] public string DisplayName { get; private set; } = string.Empty;
 	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
 
 	public virtual IUIObject UIObject => this;
-	public virtual ICustomizable[] Children => Model is Model model ? [model] : [];
+	public virtual ICustomizable[] Children => [];
 	public virtual ICustomizationParameter[] Customizations => [];
 
 	public override bool IsLoaded {
@@ -36,11 +36,7 @@ public partial class Companion : Loadable3D, IUIObject, IInputHandler, ICustomiz
 	}
 	private CompanionCostume? _costume;
 
-	[Export] protected Model? Model {
-		get => _model;
-		private set => _model = value;
-	}
-	private Model? _model;
+	[Export] protected Model? Model { get; private set; }
 
 	public Basis CompanionRotation { get; private set; } = Basis.Identity;
 
@@ -59,8 +55,7 @@ public partial class Companion : Loadable3D, IUIObject, IInputHandler, ICustomiz
 
 	public void SetCostume(CompanionCostume? newCostume, bool forceLoad = false) {
 		CompanionCostume? oldCostume = _costume;
-		if (newCostume == oldCostume)
-			return;
+		if (newCostume == oldCostume) return;
 
 		_costume = newCostume;
 
@@ -71,25 +66,27 @@ public partial class Companion : Loadable3D, IUIObject, IInputHandler, ICustomiz
 
 
 
-	public virtual void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice, HudManager hud) { }
+	public virtual void HandlePlayer(Player player) { }
 
 
 	protected override bool LoadBehaviour() {
-		new LoadableUpdater<Model>(ref _model, () => Costume?.Instantiate())
-			.BeforeLoad(m => {
-				m.SafeReparentEditor(this);
-				m.AsIEnablable().EnableDisable(IsEnabled);
-			})
-			.Execute();
+		if (! base.LoadBehaviour()) return false;
+
+		Model?.QueueFree();
+		Model = Costume?.Instantiate();
+
+		if (Model is null) return false;
+
+		Model.SetOwnerAndParent(this);
+		Model.AsIEnablable().EnableDisable(IsEnabled);
 
 		_isLoaded = true;
 
 		return true;
 	}
 	protected override void UnloadBehaviour() {
-		new LoadableDestructor<Model>(ref _model)
-			.AfterUnload(w => w.QueueFree())
-			.Execute();
+		Model?.QueueFree();
+		Model = null;
 
 		_isLoaded = false;
 	}

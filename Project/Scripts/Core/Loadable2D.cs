@@ -8,8 +8,7 @@ public abstract partial class Loadable2D : ExtendedNode2D, ILoadable {
 	[Export] public virtual bool IsEnabled {
 		get => ProcessMode != ProcessModeEnum.Disabled;
 		set {
-			if (this.IsInitializationSetterCall())
-				return;
+			if (this.IsInitializationSetterCall()) return;
 
 			AsIEnablable().EnableDisable(value);
 		}

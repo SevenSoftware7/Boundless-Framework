@@ -31,8 +31,7 @@ public partial class TestCompositorEffect : CompositorEffect {
 
 	private void Construct() {
 		renderingDevice = RenderingServer.GetRenderingDevice();
-		if (renderingDevice is null)
-			return;
+		if (renderingDevice is null) return;
 
 		nearestSampler = renderingDevice.SamplerCreate(new() {
 			MinFilter = RenderingDevice.SamplerFilter.Nearest,
@@ -50,8 +49,7 @@ public partial class TestCompositorEffect : CompositorEffect {
 		}
 	}
 	private void Destruct() {
-		if (renderingDevice is null)
-			return;
+		if (renderingDevice is null) return;
 
 		if (nearestSampler.IsValid) {
 			renderingDevice.FreeRid(nearestSampler);
@@ -67,19 +65,15 @@ public partial class TestCompositorEffect : CompositorEffect {
 
 	public override void _RenderCallback(int effectCallbackType, RenderData renderData) {
 		base._RenderCallback(effectCallbackType, renderData);
-		if (renderingDevice is null || ShaderFile is null)
-			return;
+		if (renderingDevice is null || ShaderFile is null) return;
 
-		if (effectCallbackType != (long)EffectCallbackTypeEnum.PostTransparent)
-			return;
+		if (effectCallbackType != (long)EffectCallbackTypeEnum.PostTransparent) return;
 
 		RenderSceneBuffers renderSceneBuffers = renderData.GetRenderSceneBuffers();
-		if (renderSceneBuffers is not RenderSceneBuffersRD sceneBuffers)
-			return;
+		if (renderSceneBuffers is not RenderSceneBuffersRD sceneBuffers) return;
 
 		Vector2I renderSize = sceneBuffers.GetInternalSize();
-		if (renderSize.X == 0.0 && renderSize.Y == 0.0)
-			return;
+		if (renderSize.X == 0.0 && renderSize.Y == 0.0) return;
 
 		uint xGroups = (uint)((renderSize.X - 1) / 8) + 1;
 		uint yGroups = (uint)((renderSize.Y - 1) / 8) + 1;

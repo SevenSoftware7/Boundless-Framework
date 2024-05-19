@@ -28,20 +28,20 @@ public abstract partial class ChargeAttack : Attack {
 	protected abstract void UnchargedAttack(Entity entity);
 
 
-	public override void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice, HudManager hud) {
-		base.HandleInput(entity, cameraController, inputDevice, hud);
+	public override void HandlePlayer(Player player) {
+		base.HandlePlayer(player);
 
 		if (!isDone && chargeTime.IsDone) {
 			isDone = true;
-			ChargeDone(entity);
+			ChargeDone(player.Entity);
 		}
 
-		if (IsChargeStopped(inputDevice)) {
+		if (IsChargeStopped(player.InputDevice)) {
 			if (chargeTime.IsDone) {
-				ChargedAttack(entity);
+				ChargedAttack(player.Entity);
 			}
 			else {
-				UnchargedAttack(entity);
+				UnchargedAttack(player.Entity);
 			}
 
 			QueueFree();

@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.CompilerServices;
 using Godot;
 
@@ -16,19 +17,13 @@ public static class NodeExtensions {
 #endif
 
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static bool JustBuilt(this Node node) =>
-#if TOOLS
-		node.IsNodeReady() && Engine.GetProcessFrames() == buildFrame;
-#else
-		false;
-#endif
-
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool IsInitializationSetterCall(this Node node) =>
 #if TOOLS
-		!node.IsNodeReady() || Engine.GetProcessFrames() == buildFrame;
+		Engine.IsEditorHint()
+			? ! node.IsNodeReady() || Engine.GetProcessFrames() == buildFrame
+			: ! node.IsNodeReady();
 #else
 		false;
 #endif
@@ -57,13 +52,10 @@ public static class NodeExtensions {
 	public static T SafeReparentEditor<T>(this T child, Node? newParent, bool keepGlobalTransform = true) where T : Node {
 		child.SafeReparent(newParent, keepGlobalTransform);
 
-		if (!Engine.IsEditorHint())
-			return child;
+		if (!Engine.IsEditorHint()) return child;
+		if (child.Owner == newParent?.Owner) return child;
 
-		if (child.Owner == newParent?.Owner)
-			return child;
-
-		Reown(child, newParent?.Owner);
+		Reown(child, newParent?.Owner ?? newParent);
 
 		static void Reown(Node childNode, Node? newOwner) {
 			childNode.Owner = newOwner;
@@ -77,7 +69,7 @@ public static class NodeExtensions {
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static T SafeReparentAndSetOwner<T>(this T child, Node? newParent, bool keepGlobalTransform = true) where T : Node {
 		child.SafeReparent(newParent, keepGlobalTransform);
-		child.Owner = newParent?.Owner;
+		child.Owner = newParent?.Owner ?? newParent;
 		return child;
 	}
 
@@ -102,7 +94,7 @@ public static class NodeExtensions {
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static T AddChildAndSetOwner<T>(this T obj, Node child, bool forceReadableName = false) where T : Node {
 		obj.AddChild(child, forceReadableName);
-		child.Owner = obj.Owner;
+		child.Owner = obj.Owner ?? obj;
 		return obj;
 	}
 
@@ -166,6 +158,20 @@ public static class NodeExtensions {
 
 		emitter = newEmitter;
 		emitter?.Connect(signalName, method, (uint)flags);
+	}
+
+	public static void PropagateAction<T>(this Node parent, Action<T>? action, bool parentFirst = false) {
+		if (parentFirst && parent is T tParent1) {
+			action?.Invoke(tParent1);
+		}
+
+		foreach (Node child in parent.GetChildren()) {
+			child.PropagateAction(action, parentFirst);
+		}
+
+		if (!parentFirst && parent is T tParent2) {
+			action?.Invoke(tParent2);
+		}
 	}
 
 

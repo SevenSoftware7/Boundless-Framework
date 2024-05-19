@@ -3,7 +3,7 @@ namespace LandlessSkies.Core;
 using Godot;
 using SevenDev.Utility;
 
-public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
+public partial class BipedBehaviour(Entity Entity) : EntityBehaviour(Entity) {
 	private Vector3 _inputDirection;
 	private float _moveSpeed;
 	private MovementType _movementType;
@@ -24,47 +24,47 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 	}
 
 
-	public override void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice, HudManager hud) {
-		base.HandleInput(entity, cameraController, inputDevice, hud);
+	public override void HandlePlayer(Player player) {
+		base.HandlePlayer(player);
 
-		if (inputDevice.IsActionPressed("jump")) {
+		if (player.InputDevice.IsActionPressed("jump")) {
 			Jump();
 		}
 
-		Vector2 movement = inputDevice.GetVector("move_left", "move_right", "move_forward", "move_backward").ClampMagnitude(1f);
-		cameraController.RawInputToGroundedMovement(Entity, movement, out _, out Vector3 groundedMovement);
+		Vector2 movement = player.InputDevice.GetVector("move_left", "move_right", "move_forward", "move_backward").ClampMagnitude(1f);
+		player.CameraController.RawInputToGroundedMovement(Entity, movement, out _, out Vector3 groundedMovement);
 
 		float speedSquared = groundedMovement.LengthSquared();
 		MovementType speed = speedSquared switch {
 			_ when Mathf.IsZeroApprox(speedSquared) => MovementType.Idle,
-			_ when speedSquared <= 0.25f || inputDevice.IsActionPressed("walk") => MovementType.Walk,
-			_ when inputDevice.IsActionPressed("evade") => MovementType.Sprint,
+			_ when speedSquared <= 0.25f || player.InputDevice.IsActionPressed("walk") => MovementType.Walk,
+			_ when player.InputDevice.IsActionPressed("evade") => MovementType.Sprint,
 			_ => MovementType.Run
 		};
 		SetSpeed(speed);
 
 
 		Move(groundedMovement.Normalized());
-		HandleInteraction(entity, inputDevice, hud);
+		HandleInteraction(player.InputDevice, player.HudManager);
 	}
 
-	private void HandleInteraction(Entity entity, InputDevice inputDevice, HudManager hud) {
+	private void HandleInteraction(InputDevice inputDevice, HudManager hud) {
 		InteractTarget? target = InteractTarget.GetBestTarget(Entity, 3.25f);
 
 		if (target is not null) {
-			if (inputDevice.IsActionJustPressed("interact") && target.Interactable.IsInteractable(entity)) {
-				target.Interactable.Interact(entity, target.ShapeIndex);
+			if (inputDevice.IsActionJustPressed("interact") && target.Interactable.IsInteractable(Entity)) {
+				target.Interactable.Interact(Entity, target.ShapeIndex);
 			}
 		}
 
 
-		interactPrompt ??= hud.AddPrompt(entity.HudPack.InteractPrompt);
+		interactPrompt ??= hud.AddPrompt(Entity.HudPack.InteractPrompt);
 		if (interactPrompt is not null) {
 			interactPrompt.Update(target);
 			interactPrompt.SetKey(inputDevice.GetActionSymbol("interact"));
 		}
 
-		interactPointer ??= hud.AddPointer(entity.HudPack.InteractPointer);
+		interactPointer ??= hud.AddPointer(Entity.HudPack.InteractPointer);
 		if (interactPointer is not null) {
 			interactPointer.Target = target?.Interactable.GlobalTransform;
 		}
@@ -120,21 +120,23 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 		}
 		else {
 			const float fallSpeed = 32f;
-			float targetSpeed = fallSpeed;
+			const float floatReductionFactor = 0.65f;
+			const float fallIncreaseFactor = 1.75f;
+
 			float fallInertia = verticalInertia.Dot(-Entity.UpDirection);
 
 			// Float more if player is holding jump key & rising
 
-			float isFloating = jumpBuffer.IsDone ? 0f : 1f;
-			const float floatReductionFactor = 0.85f;
-			float floatFactor = Mathf.Lerp(1f, floatReductionFactor, isFloating * Mathf.Clamp(1f - fallInertia, 0f, 1f));
+			float isFloating = jumpBuffer.IsDone
+				? 0f
+				: (1f - fallInertia).Clamp01();
+			float floatFactor = Mathf.Lerp(1f, floatReductionFactor, isFloating);
 
 			// Slightly ramp up inertia when falling
 
-			const float fallIncreaseFactor = 1.75f;
-			float inertiaRampFactor = Mathf.Lerp(1f, fallIncreaseFactor, Mathf.Clamp((1f + fallInertia) * 0.5f, 0f, 1f));
+			float inertiaRampFactor = Mathf.Lerp(1f, fallIncreaseFactor, ((1f + fallInertia) * 0.5f).Clamp01());
 
-			Vector3 targetInertia = -Entity.UpDirection * Mathf.Max(targetSpeed, fallInertia);
+			Vector3 targetInertia = -Entity.UpDirection * Mathf.Max(fallSpeed, fallInertia);
 			verticalInertia = verticalInertia.MoveToward(targetInertia, 45f * floatFactor * inertiaRampFactor * floatDelta);
 		}
 
@@ -147,7 +149,7 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 			MovementType.Sprint => Entity.Stats.SprintSpeed,
 			_ => 0f
 		};
-		newSpeed = Entity.GetModifiers(Attributes.MoveSpeed).Apply(newSpeed);
+		newSpeed = Entity.GetModifiers(Attributes.GenericMoveSpeed).Apply(newSpeed);
 
 		Basis newRotation = Basis.LookingAt(Entity.AbsoluteForward, Vector3.Up);
 		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * Entity.Stats.RotationSpeed);
@@ -177,7 +179,7 @@ public partial class BipedBehaviour(Entity entity) : EntityBehaviour(entity) {
 		// ----- Jump Instruction -----
 
 		if (!jumpBuffer.IsDone && jumpCooldown.IsDone && !coyoteTimer.IsDone) {
-			float jumpHeight = Entity.GetModifiers(Attributes.jumpHeight).Apply(Entity.Stats.JumpHeight);
+			float jumpHeight = Entity.GetModifiers(Attributes.GenericjumpHeight).Apply(Entity.Stats.JumpHeight);
 
 			Entity.Inertia = Entity.Inertia.SlideOnFace(Entity.UpDirection) + Entity.UpDirection * jumpHeight;
 			jumpBuffer.End();

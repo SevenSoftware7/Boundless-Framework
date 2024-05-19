@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://cck2wboppochk"]
 
-[ext_resource type="Script" path="res://Scripts/Core/UI/BarControl.cs" id="1_s2kjl"]
+[ext_resource type="Script" path="res://Scripts/Core/UI/GaugeControl.cs" id="1_aoysh"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_sx0on"]
 
@@ -14,8 +14,8 @@ offset_right = 500.0
 offset_bottom = 15.0
 scale = Vector2(1.222, 1)
 size_flags_horizontal = 3
-script = ExtResource("1_s2kjl")
-DamageDelay = 1.0
+script = ExtResource("1_aoysh")
+DamageDelay = 0.75
 Bar = NodePath("Progress")
 DamagedBar = NodePath("Damaged")
 

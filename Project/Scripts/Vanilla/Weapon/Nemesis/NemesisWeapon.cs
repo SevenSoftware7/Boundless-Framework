@@ -25,18 +25,15 @@ public sealed partial class NemesisWeapon : SingleWeapon {
 	}
 
 
-	public override void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice, HudManager hud) {
-		base.HandleInput(entity, cameraController, inputDevice, hud);
+	public override void HandlePlayer(Player player) {
+		base.HandlePlayer(player);
 
-		if (!CanProcess()) {
-			return;
-		}
+		if (! CanProcess()) return;
 
-		if (entity is null)
-			return;
+		if (player.Entity is null) return;
 
-		if (inputDevice.IsActionJustPressed("attack_light")) {
-			entity.ExecuteAction(slashAttack with { });
+		if (player.InputDevice.IsActionJustPressed("attack_light")) {
+			player.Entity.ExecuteAction(slashAttack with { });
 		}
 	}
 

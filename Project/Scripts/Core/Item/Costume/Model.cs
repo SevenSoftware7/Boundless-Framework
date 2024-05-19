@@ -4,24 +4,33 @@ using System;
 namespace LandlessSkies.Core;
 
 [Tool]
-public abstract partial class Model : Loadable3D, ICustomizable {
+public abstract partial class Model : Node3D, IEnablable {
+	[Export] public virtual bool IsEnabled {
+		get => ProcessMode != ProcessModeEnum.Disabled;
+		set {
+			if (this.IsInitializationSetterCall()) return;
 
-	[Export] public Costume Costume { get; protected set; } = null!;
+			AsIEnablable().EnableDisable(value);
+		}
+	}
 
-	public virtual IUIObject UIObject => Costume;
-	public virtual ICustomizable[] Children => [];
-	public virtual ICustomizationParameter[] Customizations => [];
+	public IEnablable AsIEnablable() => this;
 
 
 
 	protected Model() : base() { }
-	public Model(Costume costume) : this() {
-		ArgumentNullException.ThrowIfNull(costume);
 
-		Costume = costume;
-		Name = $"{nameof(Model)} - {Costume.DisplayName}";
+	void IEnablable.EnableBehaviour() {
+		ProcessMode = ProcessModeEnum.Inherit;
+		EnableBehaviour();
 	}
+	protected virtual void EnableBehaviour() { }
 
+	void IEnablable.DisableBehaviour() {
+		ProcessMode = ProcessModeEnum.Disabled;
+		DisableBehaviour();
+	}
+	protected virtual void DisableBehaviour() { }
 
 	public abstract Aabb GetAabb();
 }

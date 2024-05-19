@@ -22,17 +22,18 @@ public abstract partial class Weapon : Loadable3D, IWeapon, ISkeletonAdaptable {
 
 
 	public abstract IEnumerable<AttackInfo> GetAttacks(Entity target);
-	public virtual void Inject(Entity? entity) { }
+	public void Inject(Entity? entity) {
+		SetParentSkeleton(entity?.Skeleton);
+		SetHandedness(entity?.Handedness ?? Handedness.Right);
+	}
 
 
 	// public virtual void HandleStyleInput(Player.InputInfo inputInfo) { }
 
-	public virtual void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice, HudManager hud) { }
+	public virtual void HandlePlayer(Player player) { }
 
 	public abstract ISaveData<Weapon> Save();
 
 	public virtual void SetParentSkeleton(Skeleton3D? skeleton) => Skeleton = skeleton;
-
 	public virtual void SetHandedness(Handedness handedness) => Handedness = handedness;
-
 }

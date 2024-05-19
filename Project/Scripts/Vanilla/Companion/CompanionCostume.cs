@@ -1,17 +1,16 @@
 namespace LandlessSkies.Vanilla;
 
-using System;
-using System.ComponentModel;
-using System.Diagnostics;
 using Godot;
 using LandlessSkies.Core;
 using static LandlessSkies.Core.IPortraitProvider;
-using static LandlessSkies.Core.IPortraitProvider.CharacterEmotion;
 
 [Tool]
 [GlobalClass]
-public abstract partial class CompanionCostume : Costume, IPortraitProvider {
-	public override Texture2D? DisplayPortrait => PortraitNeutral;
+public partial class CompanionCostume : Costume, IPortraitProvider {
+	[Export] public PackedScene? ModelScene { get; private set; }
+
+	[Export] public override string DisplayName { get; protected set; } = string.Empty;
+	[Export] public override Texture2D? DisplayPortrait { get; protected set; }
 
 	[Export] public Texture2D? PortraitNeutral { get; private set; }
 	[Export] public Texture2D? PortraitDetermined { get; private set; }
@@ -21,18 +20,16 @@ public abstract partial class CompanionCostume : Costume, IPortraitProvider {
 	[Export] public Texture2D? PortraitMelancholic { get; private set; }
 	[Export] public Texture2D? PortraitJoyous { get; private set; }
 
-	public Texture2D? GetPortrait(CharacterEmotion emotion) => emotion switch {
-		Neutral => PortraitNeutral,
-		Determined => PortraitDetermined,
-		Hesitant => PortraitHesitant,
-		Shocked => PortraitShocked,
-		Disgusted => PortraitDisgusted,
-		Melancholic => PortraitMelancholic,
-		Joyous => PortraitJoyous,
-		_ when Enum.IsDefined(emotion) => throw new UnreachableException($"Case for {nameof(CharacterEmotion)} {emotion} not implemented."),
-		_ => throw new InvalidEnumArgumentException()
-	};
 
+	public override Model? Instantiate() => ModelScene?.Instantiate<Model>();
 
-	public abstract override Model Instantiate();
+	public Texture2D? GetPortrait(CharacterEmotion emotion) => Select(emotion,
+		neutral: PortraitNeutral,
+		determined: PortraitDetermined,
+		hesitant: PortraitHesitant,
+		shocked: PortraitShocked,
+		disgusted: PortraitDisgusted,
+		melancholic: PortraitMelancholic,
+		joyous: PortraitJoyous
+	);
 }

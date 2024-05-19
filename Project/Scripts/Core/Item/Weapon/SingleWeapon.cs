@@ -34,11 +34,7 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 	}
 	private WeaponCostume? _costume;
 
-	[Export] protected Model? Model {
-		get => _model;
-		private set => _model = value;
-	}
-	private Model? _model;
+	[Export] protected Model? Model { get; private set; }
 
 
 	[ExportGroup("Dependencies")]
@@ -47,8 +43,7 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 		protected set {
 			_skeleton = value;
 
-			if (this.IsInitializationSetterCall())
-				return;
+			if (this.IsInitializationSetterCall()) return;
 
 			if (Model is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(value);
 		}
@@ -60,8 +55,7 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 		protected set {
 			_handedness = value;
 
-			if (this.IsInitializationSetterCall())
-				return;
+			if (this.IsInitializationSetterCall()) return;
 
 			if (Model is IHandAdaptable mHanded) mHanded.SetHandedness(value);
 		}
@@ -89,8 +83,7 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 
 	public void SetCostume(WeaponCostume? newCostume, bool forceLoad = false) {
 		WeaponCostume? oldCostume = _costume;
-		if (newCostume == oldCostume)
-			return;
+		if (newCostume == oldCostume) return;
 
 		_costume = newCostume;
 
@@ -101,39 +94,34 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 
 
 
-	// private void OnCharacterLoadedUnloaded(bool isLoaded) {
-	// 	Skeleton3D? result = isLoaded ? Skeleton : null;
-	// 	WeaponModel?.Inject(result);
-	// }
-
 	public override void SetParentSkeleton(Skeleton3D? skeleton) {
 		base.SetParentSkeleton(skeleton);
-		if (skeleton is null) {
-			AsILoadable().Unload();
-		}
-		else {
-			AsILoadable().Load();
-		}
+		if (Model is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(skeleton);
+	}
+	public override void SetHandedness(Handedness handedness) {
+		base.SetHandedness(handedness);
+		if (Model is IHandAdaptable mHand) mHand.SetHandedness(handedness);
 	}
 
 	protected override bool LoadBehaviour() {
-		new LoadableUpdater<Model>(ref _model, () => Costume?.Instantiate())
-			.BeforeLoad(m => {
-				if (m is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(Skeleton);
-				if (m is IHandAdaptable mHanded) mHanded.SetHandedness(Handedness);
-				m.SafeReparentEditor(this);
-				m.AsIEnablable().EnableDisable(IsEnabled);
-			})
-			.Execute();
+		if (!base.LoadBehaviour()) return false;
+
+		Model?.QueueFree();
+		Model = Costume?.Instantiate()?.SetOwnerAndParent(this);
+
+		if (Model is null) return false;
+
+		if (Model is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(Skeleton);
+		if (Model is IHandAdaptable mHanded) mHanded.SetHandedness(Handedness);
+		Model.AsIEnablable().EnableDisable(IsEnabled);
 
 		_isLoaded = true;
 
 		return true;
 	}
 	protected override void UnloadBehaviour() {
-		new LoadableDestructor<Model>(ref _model)
-			.AfterUnload(w => w.QueueFree())
-			.Execute();
+		Model?.QueueFree();
+		Model = null;
 
 		_isLoaded = false;
 	}

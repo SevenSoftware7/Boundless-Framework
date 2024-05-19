@@ -8,7 +8,7 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject {
+public partial class Entity : LoadableCharacterBody3D, IPlayerHandler, IUIObject {
 	public override bool IsLoaded {
 		get => _isLoaded;
 		set => this.BackingFieldLoadUnload(ref _isLoaded, value);
@@ -20,7 +20,7 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 
 	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
 	[Export] public string DisplayName { get; private set; } = string.Empty;
-	[Export] public Handedness Handedness { get; private set; }
+	[Export] public Handedness Handedness { get; private set; } = Handedness.Right;
 	[Export] public EntityStats Stats { get; private set; } = new();
 	[Export] public HudPack HudPack { get; private set; } = new();
 
@@ -39,11 +39,7 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 	}
 	private EntityCostume? _costume;
 
-	[Export] protected Model? Model {
-		get => _model;
-		private set => _model = value;
-	}
-	private Model? _model;
+	[Export] protected Model? Model { get; private set; }
 
 
 	[ExportGroup("Weapon")]
@@ -56,11 +52,10 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 			}
 
 			_weapon?.Inject(null);
+
 			_weapon = value;
 			if (_weapon is not null) {
 				_weapon.Inject(this);
-				_weapon.SetParentSkeleton(Skeleton);
-				_weapon.SetHandedness(Handedness);
 				_weapon.Name = PropertyName.Weapon;
 			}
 		}
@@ -74,8 +69,7 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 		private set {
 			_animationPlayer = value;
 
-			if (this.IsInitializationSetterCall())
-				return;
+			if (this.IsInitializationSetterCall()) return;
 
 			if (_animationPlayer is not null) {
 				_animationPlayer.RootNode = _animationPlayer.GetPathTo(this);
@@ -86,7 +80,7 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 
 	[Export] public Skeleton3D? Skeleton { get; private set; }
 
-	[Export] public Health? Health {
+	[Export] public Gauge? Health {
 		get => _health;
 		set {
 			if (_health == value) return;
@@ -96,14 +90,10 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 			}
 
 			Callable onKill = new(this, MethodName.OnKill);
-			NodeExtensions.SwapSignalEmitter(ref _health, value, Health.SignalName.Death, onKill, ConnectFlags.Persist);
-
-			if (_health is not null) {
-				_health.MaxAmount = Stats.MaxHealth;
-			}
+			NodeExtensions.SwapSignalEmitter(ref _health, value, Gauge.SignalName.Emptied, onKill, ConnectFlags.Persist);
 		}
 	}
-	private Health? _health;
+	private Gauge? _health;
 
 
 
@@ -111,6 +101,7 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 	[Export] public EntityAction? CurrentAction { get; private set; }
 	[Export] public EntityBehaviour? CurrentBehaviour { get; private set; }
 	[Export] public Godot.Collections.Array<AttributeModifier> AttributeModifiers { get; private set; } = [];
+	private GaugeControl? healthBar;
 
 
 	[ExportGroup("Movement")]
@@ -145,6 +136,7 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 	}
 
 
+	[Signal] public delegate void DeathEventHandler(float fromHealth);
 
 
 	public Entity() : base() {
@@ -157,8 +149,7 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 
 	public void SetCostume(EntityCostume? newCostume) {
 		EntityCostume? oldCostume = _costume;
-		if (newCostume == oldCostume)
-			return;
+		if (newCostume == oldCostume) return;
 
 		_costume = newCostume;
 
@@ -172,8 +163,7 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 	}
 
 	public void ExecuteAction(EntityActionInfo action, bool forceExecute = false) {
-		if (!forceExecute && !CanCancelAction())
-			return;
+		if (!forceExecute && !CanCancelAction()) return;
 
 		CurrentAction?.QueueFree();
 		CurrentAction = null;
@@ -198,15 +188,14 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 
 	public void SetBehaviour<TBehaviour>(NodePath behaviourPath, Func<TBehaviour>? creator = null) where TBehaviour : EntityBehaviour {
 		TBehaviour? behaviour = GetNodeOrNull<TBehaviour>(behaviourPath);
-		if (behaviour is null && creator is null)
-			return;
+		if (behaviour is null && creator is null) return;
 
 		SetBehaviour(creator?.Invoke());
 	}
 
 
 	public MultiAttributeModifier GetModifiers(StringName attributeName) {
-		return new(AttributeModifiers.Where(a => a.Name == attributeName));
+		return new(AttributeModifiers.Where(a => a is not null && a.Name == attributeName));
 	}
 
 
@@ -310,14 +299,14 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 		if (!base.LoadBehaviour())
 			return false;
 
-		new LoadableUpdater<Model>(ref _model, () => Costume?.Instantiate())
-			.BeforeLoad(m => {
-				if (m is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(Skeleton);
-				if (m is IHandAdaptable mHanded) mHanded.SetHandedness(Handedness.Right); // TODO: get handedness
-				m.SafeReparentEditor(this);
-				m.AsIEnablable().EnableDisable(IsEnabled);
-			})
-			.Execute();
+		Model?.QueueFree();
+		Model = Costume?.Instantiate()?.SetOwnerAndParent(this);
+
+		if (Model is null) return false;
+
+		if (Model is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(Skeleton);
+		if (Model is IHandAdaptable mHanded) mHanded.SetHandedness(Handedness); // TODO: Get Handedness
+		Model.AsIEnablable().EnableDisable(IsEnabled);
 
 		OnLoadedUnloaded(true);
 		_isLoaded = true;
@@ -329,9 +318,8 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 
 		OnLoadedUnloaded(false);
 
-		new LoadableDestructor<Model>(ref _model)
-			.AfterUnload(w => w.QueueFree())
-			.Execute();
+		Model?.QueueFree();
+		Model = null;
 
 		_isLoaded = false;
 	}
@@ -340,28 +328,24 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 	private void OnLoadedUnloaded(bool isLoaded) {
 		// EmitSignal(SignalName.CharacterLoadedUnloaded, isLoaded);
 
-		// We don't use PropagateCall here because we need to Call Deferredly.
-		SetParentRecursive(this, isLoaded ? Skeleton : null);
+		Skeleton3D? skel = isLoaded ? Skeleton : null;
 
-		void SetParentRecursive(Node parent, Skeleton3D? skeleton) {
-			foreach (Node child in parent.GetChildren()) {
-				SetParentRecursive(child, skeleton);
-			}
-
-			if (parent is ISkeletonAdaptable skeletonAdaptable) {
-				Callable.From(() => skeletonAdaptable.SetParentSkeleton(skeleton)).CallDeferred();
-			}
-		}
+		this.PropagateAction<ISkeletonAdaptable>(skeletonAdaptable => Callable.From(() => skeletonAdaptable.SetParentSkeleton(skel)).CallDeferred());
 	}
 
 	private void OnKill(float fromHealth) {
+		EmitSignal(SignalName.Death, fromHealth);
 	}
 
 	public void VoidOut() {
-		if (lastStandableSurfaces.Count == 0)
+		if (lastStandableSurfaces.Count == 0) {
+			GD.PushError("Could not Void out Properly");
 			return;
+		}
 
-		GlobalPosition = lastStandableSurfaces[0];
+		int delay = Math.Min(3, lastStandableSurfaces.Count);
+		GlobalPosition = lastStandableSurfaces[delay];
+		lastStandableSurfaces.RemoveRange(0, delay - 1);
 
 		GD.Print($"Entity {Name} Voided out.");
 
@@ -370,35 +354,44 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 		}
 	}
 
-	public void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice, HudManager hud) {
-		cameraController.SetEntityAsSubject(this);
-		cameraController.MoveCamera(
-			inputDevice.GetVector("look_left", "look_right", "look_down", "look_up") * inputDevice.Sensitivity
+	public void HandlePlayer(Player player) {
+		player.CameraController.SetEntityAsSubject(this);
+		player.CameraController.MoveCamera(
+			player.InputDevice.GetVector("look_left", "look_right", "look_down", "look_up") * player.InputDevice.Sensitivity
 		);
 
+		if (Health is null) {
+			healthBar?.QueueFree();
+		}
+		else {
+			healthBar ??= player.HudManager.AddInfo(HudPack.HealthBar);
+			healthBar!.Value = Health;
+		}
+
 		if (_weapon is not null) {
-			if (inputDevice.IsActionJustPressed("switch_weapon_primary")) {
+			if (player.InputDevice.IsActionJustPressed("switch_weapon_primary")) {
 				_weapon.Style = 0;
 			}
-			else if (inputDevice.IsActionJustPressed("switch_weapon_secondary")) {
+			else if (player.InputDevice.IsActionJustPressed("switch_weapon_secondary")) {
 				_weapon.Style = 1;
 			}
-			else if (inputDevice.IsActionJustPressed("switch_weapon_ternary")) {
+			else if (player.InputDevice.IsActionJustPressed("switch_weapon_ternary")) {
 				_weapon.Style = 2;
 			}
 		}
+	}
+
+	private void UpdateHealth(bool keepRation) {
+		_health?.SetMaximum(GetModifiers(Attributes.GenericMaxHealth).Apply(Stats.MaxHealth), keepRation);
 	}
 
 
 	public override void _Process(double delta) {
 		base._Process(delta);
 
-		if (Engine.IsEditorHint())
-			return;
+		UpdateHealth(false);
 
-		if (_health is not null) {
-			_health.MaxAmount = GetModifiers(Attributes.MaxHealth).Apply(Stats.MaxHealth);
-		}
+		if (Engine.IsEditorHint()) return;
 
 		Move(delta);
 	}
@@ -406,8 +399,13 @@ public partial class Entity : LoadableCharacterBody3D, IInputHandler, IUIObject 
 	public override void _Ready() {
 		base._Ready();
 
-		if (Engine.IsEditorHint())
-			return;
+		UpdateHealth(true);
+
+		if (_absoluteForward == Vector3.Zero) {
+			_absoluteForward = GlobalBasis.Forward();
+		}
+
+		if (Engine.IsEditorHint()) return;
 
 		if (CurrentBehaviour is null) {
 			SetBehaviour(new BipedBehaviour(this));

@@ -1,0 +1,76 @@
+[gd_scene load_steps=7 format=3 uid="uid://7ic4jncm8p1a"]
+
+[ext_resource type="Script" path="res://Scripts/Core/Player/Player.cs" id="1_mxve3"]
+[ext_resource type="Environment" uid="uid://cly878e1j23yy" path="res://Resources/Shaders/environment.tres" id="2_0fgdf"]
+[ext_resource type="Compositor" uid="uid://dwtv47w5dgtou" path="res://Resources/Shaders/compositor.tres" id="3_0t2r7"]
+[ext_resource type="Script" path="res://Scripts/Core/Player/CameraController3D.cs" id="4_8b0k0"]
+[ext_resource type="Script" path="res://Scripts/Core/UI/HudManager.cs" id="5_oov52"]
+[ext_resource type="Script" path="res://Scripts/Core/UI/TestContainer.cs" id="7_v7vwx"]
+
+[node name="Player" type="Node" node_paths=PackedStringArray("CameraController", "HudManager")]
+process_priority = 10
+script = ExtResource("1_mxve3")
+CameraController = NodePath("CameraController3D")
+HudManager = NodePath("HUD")
+
+[node name="CameraController3D" type="Camera3D" parent="."]
+transform = Transform3D(-0.730305, 0, -0.683121, 0, 1, 0, 0.683121, 0, -0.730305, 0, 3.01904, 3.4167)
+environment = ExtResource("2_0fgdf")
+compositor = ExtResource("3_0t2r7")
+fov = 90.0
+script = ExtResource("4_8b0k0")
+cameraOriginPosition = Vector3(1, -0.12, 5.2)
+horizontalSmoothTime = 0.065
+verticalSmoothTime = 0.16
+CollisionMask = 4294967289
+Subject = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+LocalRotation = Basis(-0.730305, 0, -0.683121, 0, 1, 0, 0.683121, 0, -0.730305)
+
+[node name="HUD" type="Control" parent="." node_paths=PackedStringArray("ProjectorCamera", "PointerContainer", "InfoContainer", "PromptContainer")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("5_oov52")
+ProjectorCamera = NodePath("../CameraController3D")
+PointerContainer = NodePath("Pointer Container")
+InfoContainer = NodePath("Top Half/Top Left Quadrant/Info Container")
+PromptContainer = NodePath("Top Half/Top Left Quadrant/Prompt Container")
+
+[node name="Pointer Container" type="Control" parent="HUD"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Top Half" type="HBoxContainer" parent="HUD"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Top Left Quadrant" type="VBoxContainer" parent="HUD/Top Half"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+theme_override_constants/separation = 20
+
+[node name="Info Container" type="VBoxContainer" parent="HUD/Top Half/Top Left Quadrant"]
+layout_mode = 2
+
+[node name="Prompt Container" type="Container" parent="HUD/Top Half/Top Left Quadrant"]
+layout_mode = 2
+script = ExtResource("7_v7vwx")
+
+[node name="Top Right Quadrant" type="VBoxContainer" parent="HUD/Top Half"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 2

@@ -29,8 +29,7 @@ public sealed partial class KMInputDevice : InputDevice {
 	public override void _Process(double delta) {
 		base._Process(delta);
 
-		if (Engine.IsEditorHint())
-			return;
+		if (Engine.IsEditorHint()) return;
 
 		Callable.From(() => {
 			mouseMotion = new();
@@ -40,8 +39,7 @@ public sealed partial class KMInputDevice : InputDevice {
 	public override void _UnhandledInput(InputEvent @event) {
 		base._UnhandledInput(@event);
 
-		if (Engine.IsEditorHint())
-			return;
+		if (Engine.IsEditorHint()) return;
 
 		if (@event is InputEventMouseMotion mouseMotion) {
 			KMInputDevice.mouseMotion = mouseMotion;

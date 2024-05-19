@@ -42,18 +42,24 @@ public partial class FloatingCompanion : Companion {
 
 		return curve;
 	}
-	public override void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice, HudManager hud) {
-		base.HandleInput(entity, cameraController, inputDevice, hud);
+	public override void HandlePlayer(Player player) {
+		base.HandlePlayer(player);
 
-		Callable.From(() => {
-			Subject = entity.GlobalTransform;
+		if (player.Entity is not null) {
+			Callable.From(() => {
+				Subject = player.Entity.GlobalTransform;
 
-			if (entity.Skeleton is not null && entity.Skeleton.TryGetBoneTransform("Head", out var boneTransform)) {
-				Head = boneTransform;
-			}
-		}).CallDeferred();
+				if (player.Entity.Skeleton is not null && player.Entity.Skeleton.TryGetBoneTransform("Head", out Transform3D boneTransform)) {
+					Head = boneTransform;
+				}
+			}).CallDeferred();
+		}
 
-		OnFace |= inputDevice.IsActionPressed("focus");
+		OnFace |= player.InputDevice.IsActionPressed("focus");
+
+		// if (OnFace && entity.Health is not null) {
+		// 	entity.Health.Amount += (float)delta;
+		// }
 	}
 
 
@@ -70,13 +76,9 @@ public partial class FloatingCompanion : Companion {
 	public override void _Process(double delta) {
 		base._Process(delta);
 
-		if (Engine.IsEditorHint()) {
-			return;
-		}
+		if (Engine.IsEditorHint()) return;
 
-		if (Subject == Transform3D.Identity) {
-			return;
-		}
+		if (Subject == Transform3D.Identity) return;
 
 		Callable.From(() => {
 			float floatDelta = (float)delta;

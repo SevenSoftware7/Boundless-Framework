@@ -33,8 +33,7 @@ public sealed partial class MultiWeapon : Weapon {
 			}
 
 			// If nothing changed
-			if (_weapons.SequenceEqual(value))
-				return;
+			if (_weapons.SequenceEqual(value)) return;
 
 			// If the items were only moved
 			if (_weapons.Count == value.Count && _weapons.Intersect(value).Count() == value.Count) {
@@ -108,8 +107,7 @@ public sealed partial class MultiWeapon : Weapon {
 		protected set {
 			_skeleton = value;
 
-			if (this.IsInitializationSetterCall())
-				return;
+			if (this.IsInitializationSetterCall()) return;
 
 			_weapons.ForEach(w => {
 				if (w is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(value);
@@ -123,8 +121,7 @@ public sealed partial class MultiWeapon : Weapon {
 		protected set {
 			_handedness = value;
 
-			if (this.IsInitializationSetterCall())
-				return;
+			if (this.IsInitializationSetterCall()) return;
 
 			_weapons.ForEach(w => {
 				if (w is IHandAdaptable mHanded) mHanded.SetHandedness(value);
@@ -185,11 +182,6 @@ public sealed partial class MultiWeapon : Weapon {
 		UpdateCurrent();
 	}
 
-	private void InjectWeapon(Weapon weapon) {
-		weapon.SetHandedness(Handedness);
-		weapon.SetParentSkeleton(Skeleton);
-	}
-
 
 	public void AddWeapon(Weapon? weapon) {
 		_weapons.Add(null!);
@@ -198,14 +190,14 @@ public sealed partial class MultiWeapon : Weapon {
 	}
 
 	public void SetWeapon(int index, Weapon? weapon) {
-		if (!IndexInBounds(index))
-			return;
+		if (!IndexInBounds(index)) return;
 
-		if (weapon is null)
-			return;
+		if (weapon is null) return;
 
 		weapon.SafeReparentEditor(this);
-		InjectWeapon(weapon);
+		weapon.SetHandedness(Handedness);
+		weapon.SetParentSkeleton(Skeleton);
+
 		_weapons[index] = weapon;
 
 		UpdateCurrent();
@@ -214,8 +206,7 @@ public sealed partial class MultiWeapon : Weapon {
 
 
 	public void RemoveWeapon(int index) {
-		if (!IndexInBounds(index))
-			return;
+		if (!IndexInBounds(index)) return;
 
 		_weapons.RemoveAt(index);
 
@@ -244,6 +235,19 @@ public sealed partial class MultiWeapon : Weapon {
 				}
 				return a;
 			});
+	}
+
+	public override void SetParentSkeleton(Skeleton3D? skeleton) {
+		base.SetParentSkeleton(skeleton);
+		foreach (Weapon? weapon in Weapons) {
+			weapon?.SetParentSkeleton(skeleton);
+		}
+	}
+	public override void SetHandedness(Handedness handedness) {
+		base.SetHandedness(handedness);
+		foreach (Weapon? weapon in Weapons) {
+			weapon?.SetHandedness(handedness);
+		}
 	}
 
 

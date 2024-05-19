@@ -24,8 +24,7 @@ public ref struct LoadableDestructor<TLoadable> where TLoadable : ILoadable {
 
 
 	public readonly void Execute() {
-		if (loadable is null)
-			return;
+		if (loadable is null) return;
 
 		onBeforeUnload?.Invoke(loadable);
 
@@ -75,8 +74,7 @@ public ref struct LoadableUpdater<TLoadable> where TLoadable : ILoadable {
 			loadable = instantiated;
 		}
 
-		if (loadable is null)
-			return;
+		if (loadable is null) return;
 
 		onBeforeLoad?.Invoke(loadable);
 

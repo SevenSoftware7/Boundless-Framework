@@ -8,8 +8,7 @@ public abstract partial class LoadableCharacterBody3D : CharacterBody3D, ILoadab
 	[Export] public virtual bool IsEnabled {
 		get => ProcessMode != ProcessModeEnum.Disabled;
 		set {
-			if (this.IsInitializationSetterCall())
-				return;
+			if (this.IsInitializationSetterCall()) return;
 
 			AsIEnablable().EnableDisable(value);
 		}

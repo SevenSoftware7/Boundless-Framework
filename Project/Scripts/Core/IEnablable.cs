@@ -10,14 +10,12 @@ public interface IEnablable {
 	}
 
 	public sealed void Enable() {
-		if (IsEnabled)
-			return;
+		if (IsEnabled) return;
 
 		EnableBehaviour();
 	}
 	public sealed void Disable() {
-		if (!IsEnabled)
-			return;
+		if (!IsEnabled) return;
 
 		DisableBehaviour();
 	}

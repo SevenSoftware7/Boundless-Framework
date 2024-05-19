@@ -1,10 +1,9 @@
 namespace LandlessSkies.Core;
 
-using System.Linq;
 using Godot;
-using Godot.Collections;
 
 [Tool]
+[GlobalClass]
 public partial class SkeletonModel : Model {
 
 	[ExportGroup("Dependencies")]
@@ -13,16 +12,9 @@ public partial class SkeletonModel : Model {
 
 	[Export] protected Skeleton3D Model { get; private set; } = null!;
 
-	public override bool IsLoaded {
-		get => _isLoaded;
-		set => this.BackingFieldLoadUnload(ref _isLoaded, value);
-	}
-	private bool _isLoaded;
-
 
 
 	protected SkeletonModel() : base() { }
-	public SkeletonModel(Costume costume) : base(costume) { }
 
 
 
@@ -35,45 +27,8 @@ public partial class SkeletonModel : Model {
 
 	private void UpdateAabb() {
 		_aabb = new();
-		MergeChildrenAabb(Model);
 
-		void MergeChildrenAabb(Node parent) {
-			if (parent is GeometryInstance3D mesh) _aabb = _aabb.Merge(mesh.GetAabb());
-
-			foreach (Node child in parent.GetChildren()) {
-				MergeChildrenAabb(child);
-			}
-		}
-	}
-
-	protected override bool LoadBehaviour() {
-		if (!base.LoadBehaviour())
-			return false;
-		if (Costume is not IMeshCostume meshCostume)
-			return false;
-
-		if (meshCostume.ModelScene?.Instantiate() is not Skeleton3D model)
-			return false;
-
-		Model = model.SafeReparentAndSetOwner(this);
-		Model.ProcessMode = ProcessMode;
-		Model.Visible = Visible;
-		Model.Name = $"{nameof(Costume)} - {Costume.DisplayName}";
-
-		UpdateAabb();
-
-		_isLoaded = true;
-
-		return true;
-	}
-	protected override void UnloadBehaviour() {
-		base.UnloadBehaviour();
-		Model?.UnparentAndQueueFree();
-		Model = null!;
-
-		_aabb = new();
-
-		_isLoaded = false;
+		this.PropagateAction<GeometryInstance3D>(geom => _aabb = _aabb.Merge(geom.GetAabb()));
 	}
 
 	protected override void EnableBehaviour() {

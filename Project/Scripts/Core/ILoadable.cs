@@ -15,8 +15,7 @@ public interface ILoadable : IEnablable {
 		return LoadBehaviour();
 	}
 	sealed void Unload() {
-		if (!IsLoaded)
-			return;
+		if (!IsLoaded) return;
 
 		UnloadBehaviour();
 	}

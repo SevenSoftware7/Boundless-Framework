@@ -26,22 +26,19 @@ public sealed partial class EleosWeapon : SingleWeapon {
 	}
 
 
-	public override void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice, HudManager hud) {
-		base.HandleInput(entity, cameraController, inputDevice, hud);
+	public override void HandlePlayer(Player player) {
+		base.HandlePlayer(player);
 
-		if (!CanProcess()) {
-			return;
+		if (!CanProcess()) return;
+
+		if (player.Entity is null) return;
+
+		if (player.InputDevice.IsActionJustPressed("attack_light")) {
+			player.Entity.ExecuteAction(slashAttack with { });
 		}
 
-		if (entity is null)
-			return;
-
-		if (inputDevice.IsActionJustPressed("attack_light")) {
-			entity.ExecuteAction(slashAttack with { });
-		}
-
-		if (inputDevice.IsActionJustPressed("attack_heavy")) {
-			entity.ExecuteAction(chargeAttack);
+		if (player.InputDevice.IsActionJustPressed("attack_heavy")) {
+			player.Entity.ExecuteAction(chargeAttack);
 		}
 	}
 

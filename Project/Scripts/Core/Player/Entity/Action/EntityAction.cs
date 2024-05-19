@@ -3,7 +3,7 @@ namespace LandlessSkies.Core;
 using System;
 using Godot;
 
-public abstract partial class EntityAction : Node, IInputHandler {
+public abstract partial class EntityAction : Node, IPlayerHandler {
 	public event Action? OnDestroy;
 
 
@@ -12,7 +12,7 @@ public abstract partial class EntityAction : Node, IInputHandler {
 
 
 
-	public virtual void HandleInput(Entity entity, CameraController3D cameraController, InputDevice inputDevice, HudManager hud) { }
+	public virtual void HandlePlayer(Player player) { }
 
 
 	public override void _Notification(int what) {
