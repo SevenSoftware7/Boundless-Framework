@@ -12,7 +12,7 @@ public partial class Entity {
 		StringName name = property["name"].AsStringName();
 
 
-		if (name == PropertyName.RelativeForward) {
+		if (name == PropertyName.Forward) {
 			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
 		}
 	}
