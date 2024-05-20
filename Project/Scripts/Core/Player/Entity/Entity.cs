@@ -104,26 +104,26 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 	[Export] public Vector3 Movement = Vector3.Zero;
 
 	/// <summary>
-	/// The forward direction in absolute space of the Entity.
+	/// The forward direction in global space of the Entity.
 	/// </summary>
 	/// <remarks>
-	/// Editing this value also changes <see cref="RelativeForward"/> to match.
+	/// Editing this value also changes <see cref="Forward"/> to match.
 	/// </remarks>
-	[Export] public Vector3 AbsoluteForward {
-		get => _absoluteForward;
-		set => _absoluteForward = value.Normalized();
+	[Export] public Vector3 GlobalForward {
+		get => _globalForward;
+		set => _globalForward = value.Normalized();
 	}
-	private Vector3 _absoluteForward = Vector3.Forward;
+	private Vector3 _globalForward = Vector3.Forward;
 
 	/// <summary>
 	/// The forward direction in relative space of the Entity.
 	/// </summary>
 	/// <remarks>
-	/// Editing this value also changes <see cref="AbsoluteForward"/> to match.
+	/// Editing this value also changes <see cref="GlobalForward"/> to match.
 	/// </remarks>
-	[Export] public Vector3 RelativeForward {
-		get => Transform.Basis.Inverse() * _absoluteForward;
-		set => _absoluteForward = Transform.Basis * value;
+	[Export] public Vector3 Forward {
+		get => Transform.Basis.Inverse() * _globalForward;
+		set => _globalForward = Transform.Basis * value;
 	}
 
 
@@ -134,7 +134,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 	public Entity() : base() {
 		CollisionLayer = Collisions.EntityCollisionLayer;
 
-		RelativeForward = Vector3.Forward;
+		Forward = Vector3.Forward;
 	}
 
 
@@ -380,8 +380,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 
 		UpdateHealth(true);
 
-		if (_absoluteForward == Vector3.Zero) {
-			_absoluteForward = GlobalBasis.Forward();
+		if (_globalForward == Vector3.Zero) {
+			_globalForward = GlobalBasis.Forward();
 		}
 
 		if (Engine.IsEditorHint()) return;

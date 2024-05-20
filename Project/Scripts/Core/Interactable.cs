@@ -69,7 +69,7 @@ public sealed class InteractCandidate(InteractTarget target, float distanceSquar
 				float distanceSquared = entity.GlobalPosition.To(shapeTransform.Origin).Slide(entity.UpDirection).LengthSquared();
 
 				Vector3 direction = entity.GlobalPosition.To(interactable.GlobalPosition).Slide(entity.UpDirection).Normalized();
-				float incidence = direction.Dot(entity.AbsoluteForward);
+				float incidence = direction.Dot(entity.GlobalForward);
 
 				return new InteractCandidate(new InteractTarget(interactable, x.Shape), distanceSquared, incidence);
 			})

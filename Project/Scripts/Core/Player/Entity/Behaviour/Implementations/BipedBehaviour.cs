@@ -151,7 +151,7 @@ public partial class BipedBehaviour(Entity Entity) : EntityBehaviour(Entity) {
 		};
 		newSpeed = Entity.GetModifiers(Attributes.GenericMoveSpeed).Apply(newSpeed);
 
-		Basis newRotation = Basis.LookingAt(Entity.AbsoluteForward, Vector3.Up);
+		Basis newRotation = Basis.LookingAt(Entity.GlobalForward, Vector3.Up);
 		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * Entity.Stats.RotationSpeed);
 
 		// ---- Speed Calculation ----
@@ -165,13 +165,13 @@ public partial class BipedBehaviour(Entity Entity) : EntityBehaviour(Entity) {
 			Vector3 normalizedInput = _inputDirection.Normalized();
 
 			_lastDirection = _lastDirection.Lerp(normalizedInput, Entity.Stats.RotationSpeed * floatDelta);
-			Entity.AbsoluteForward = Entity.AbsoluteForward.SafeSlerp(normalizedInput, Entity.Stats.RotationSpeed * floatDelta);
+			Entity.GlobalForward = Entity.GlobalForward.SafeSlerp(normalizedInput, Entity.Stats.RotationSpeed * floatDelta);
 
 			// Vector3 groundedMovement = _moveDirection;
 			// if (Entity.IsOnFloor()) {
 			//     groundedMovement = Entity.UpDirection.FromToBasis(Entity.GetFloorNormal()) * groundedMovement;
 			// }
-			Entity.Movement = _lastDirection * _moveSpeed * Mathf.Clamp(_lastDirection.Dot(Entity.AbsoluteForward), 0f, 1f);
+			Entity.Movement = _lastDirection * _moveSpeed * Mathf.Clamp(_lastDirection.Dot(Entity.GlobalForward), 0f, 1f);
 		} else {
 			Entity.Movement = _lastDirection * _moveSpeed;
 		}
