@@ -1,4 +1,4 @@
-[gd_scene load_steps=78 format=3 uid="uid://b505xodur2iff"]
+[gd_scene load_steps=70 format=3 uid="uid://b505xodur2iff"]
 
 [ext_resource type="Environment" uid="uid://cly878e1j23yy" path="res://Resources/Shaders/environment.tres" id="1_l7i5q"]
 [ext_resource type="Compositor" uid="uid://dwtv47w5dgtou" path="res://Resources/Shaders/compositor.tres" id="2_w2ny8"]
@@ -6,20 +6,12 @@
 [ext_resource type="Script" path="res://Scripts/Core/EntityVoidoutTrigger.cs" id="5_aiymr"]
 [ext_resource type="Script" path="res://addons/cyclops_level_builder/resources/convex_block_data.gd" id="5_vmujk"]
 [ext_resource type="PackedScene" uid="uid://b7rhbgw2dujty" path="res://Resources/Characters/Eos/Eos.tscn" id="9_0jt21"]
-[ext_resource type="PackedScene" uid="uid://ceqxywrq7p5l3" path="res://Resources/Weapons/Epiphron/Costumes/Base/Epiphron_base.tscn" id="11_lwvah"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Implementation/BoneMeshModel.cs" id="12_1d024"]
 [ext_resource type="PackedScene" uid="uid://fbs6dr24ss3g" path="res://Resources/Weapons/Epiphron/Epiphron.tscn" id="12_1jl3t"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/Implementations/MultiWeapon.cs" id="13_d6cna"]
 [ext_resource type="PackedScene" uid="uid://b7b17ebmgtrfy" path="res://Resources/Weapons/Nemesis/Nemesis.tscn" id="15_x4bcq"]
 [ext_resource type="PackedScene" uid="uid://bp1e6thwkkcrr" path="res://Resources/Weapons/Eleos/Eleos.tscn" id="17_jhoyp"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Implementation/MeshModel.cs" id="20_km5xc"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Implementation/SkeletonModel.cs" id="21_3gmj7"]
-[ext_resource type="PackedScene" uid="uid://hje36y5wrdyu" path="res://Resources/Characters/Eos/Costumes/Base/Eos_base.tscn" id="24_12m4j"]
 [ext_resource type="PackedScene" uid="uid://b7hcoc81x5g0i" path="res://Resources/Companions/Erebos.tscn" id="26_ds8t8"]
 [ext_resource type="PackedScene" uid="uid://7ic4jncm8p1a" path="res://Scenes/Player.tscn" id="26_rkn04"]
-[ext_resource type="PackedScene" uid="uid://r6yqclqm3ubp" path="res://Resources/Companions/Erebos/Costumes/Base/Erebos_base.tscn" id="27_pa18i"]
-[ext_resource type="PackedScene" uid="uid://cbkv4cstjgb7i" path="res://Resources/Weapons/Nemesis/Costumes/Base/Nemesis_Base.tscn" id="31_n76ma"]
-[ext_resource type="PackedScene" uid="uid://chsj82irsedw6" path="res://Resources/Weapons/Eleos/Costumes/Base/Eleos_base.tscn" id="32_eo1r4"]
 [ext_resource type="Script" path="res://Scripts/Vanilla/TestInteractable.cs" id="35_lrkn5"]
 [ext_resource type="Script" path="res://Scripts/Vanilla/TrainEngine.cs" id="36_x7xeh"]
 
@@ -1459,83 +1451,43 @@ shape = SubResource("SphereShape3D_ycdom")
 mesh = SubResource("SphereMesh_nkuww")
 skeleton = NodePath("../../CollisionShape3D/MeshInstance3D")
 
-[node name="Eos" parent="." node_paths=PackedStringArray("Model", "Weapon", "AnimationPlayer", "Skeleton", "Health") instance=ExtResource("9_0jt21")]
+[node name="Eos" parent="." node_paths=PackedStringArray("Model", "Weapon", "Skeleton", "AnimationPlayer", "Health") instance=ExtResource("9_0jt21")]
 process_priority = -10
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.0914431, 1.19209e-07, 1.55818)
-Handedness = 0
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.98336, 2, 27.7771)
 Model = NodePath("Model - Eos (base)")
 Weapon = NodePath("Weapon")
-AnimationPlayer = NodePath("AnimationPlayer")
 Skeleton = NodePath("Skeleton")
+AnimationPlayer = NodePath("AnimationPlayer")
 Health = NodePath("Health")
-IsLoaded = true
 
 [node name="Weapon" type="Node3D" parent="Eos" node_paths=PackedStringArray("Weapons", "Skeleton")]
+transform = Transform3D(8.74228e-08, -7.64274e-15, -1, 1, -8.74228e-08, 8.74228e-08, -8.74228e-08, -1, 0, 1.11649, 2.61582, 0.185957)
 script = ExtResource("13_d6cna")
 Weapons = [NodePath("Epiphron"), NodePath("Nemesis"), NodePath("Eleos")]
 Skeleton = NodePath("../Skeleton")
-IsLoaded = true
-IsEnabled = true
 
 [node name="Epiphron" parent="Eos/Weapon" node_paths=PackedStringArray("Model", "Skeleton") instance=ExtResource("12_1jl3t")]
+transform = Transform3D(1, 0, 0, -7.10543e-15, 1, 0, 7.10543e-15, 0, 1, 0, 0, 0)
 Model = NodePath("Model - Epiphron (base)")
 Skeleton = NodePath("../../Skeleton")
-Handedness = 0
-IsLoaded = true
-
-[node name="Model - Epiphron (base)" type="Node3D" parent="Eos/Weapon/Epiphron" node_paths=PackedStringArray("Skeleton", "Model") instance=ExtResource("11_lwvah")]
-transform = Transform3D(0, -1, 0, 0, 0, -1, 1, 0, 0, 1.11649, 2.61582, 0.185957)
-script = ExtResource("12_1d024")
-Skeleton = NodePath("../../../Skeleton")
-Model = NodePath("Model")
-IsEnabled = true
 
 [node name="Nemesis" parent="Eos/Weapon" node_paths=PackedStringArray("Model", "Skeleton") instance=ExtResource("15_x4bcq")]
 process_mode = 4
+transform = Transform3D(1, 0, 0, -7.10543e-15, 1, 0, 7.10543e-15, 0, 1, 0, 0, 0)
 visible = false
 Model = NodePath("Model - Nemesis (base)shModel")
 Skeleton = NodePath("../../Skeleton")
-Handedness = 0
-IsLoaded = true
-IsEnabled = false
-
-[node name="Model - Nemesis (base)shModel" type="Node3D" parent="Eos/Weapon/Nemesis" node_paths=PackedStringArray("Skeleton", "Model") instance=ExtResource("31_n76ma")]
-process_mode = 4
-script = ExtResource("12_1d024")
-Skeleton = NodePath("../../../Skeleton")
-Model = NodePath("Model")
 
 [node name="Eleos" parent="Eos/Weapon" node_paths=PackedStringArray("Model", "Skeleton") instance=ExtResource("17_jhoyp")]
 process_mode = 4
+transform = Transform3D(1, -3.0154e-15, -7.10543e-15, 4.09003e-15, 1, 0, 0, 7.10543e-15, 1, 0, 0, 0)
 visible = false
 Model = NodePath("Model - Eleos (base)")
 Skeleton = NodePath("../../Skeleton")
-Handedness = 0
-IsLoaded = true
-IsEnabled = false
-
-[node name="Model - Eleos (base)" type="Node3D" parent="Eos/Weapon/Eleos" node_paths=PackedStringArray("Skeleton", "Model") instance=ExtResource("32_eo1r4")]
-process_mode = 4
-script = ExtResource("12_1d024")
-Skeleton = NodePath("../../../Skeleton")
-Model = NodePath("Model")
 
 [node name="Erebos" parent="Eos" node_paths=PackedStringArray("Model") instance=ExtResource("26_ds8t8")]
-CollisionMask = 4294967295
 Curve = SubResource("Curve3D_1n68a")
 Model = NodePath("Model - Erebos (base)")
-IsLoaded = true
-
-[node name="Model - Erebos (base)" type="Node3D" parent="Eos/Erebos" node_paths=PackedStringArray("Model") instance=ExtResource("27_pa18i")]
-script = ExtResource("21_3gmj7")
-Model = NodePath("ErebosBase")
-IsEnabled = true
-
-[node name="Model - Eos (base)" type="Node3D" parent="Eos" node_paths=PackedStringArray("Skeleton", "Model") instance=ExtResource("24_12m4j")]
-script = ExtResource("20_km5xc")
-Skeleton = NodePath("../Skeleton")
-Model = NodePath("Costume - Eos (base)")
-IsEnabled = true
 
 [node name="Player" parent="." node_paths=PackedStringArray("CameraController", "HudManager", "Entity") instance=ExtResource("26_rkn04")]
 CameraController = NodePath("CameraController3D")

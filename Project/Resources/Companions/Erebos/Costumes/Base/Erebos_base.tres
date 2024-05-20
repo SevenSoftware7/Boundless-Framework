@@ -5,5 +5,5 @@
 
 [resource]
 script = ExtResource("1_u5ko6")
+_displayName = "Erebos (base)"
 ModelScene = ExtResource("1_uykhd")
-DisplayName = "Erebos (base)"

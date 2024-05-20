@@ -1,24 +1,17 @@
 namespace LandlessSkies.Core;
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
 public abstract partial class SingleWeapon : Weapon, IUIObject {
-
-	[Export] public string DisplayName { get; private set; } = string.Empty;
-	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
-	public override IUIObject UIObject => this;
-
-
-
-	public override bool IsLoaded {
-		get => _isLoaded;
-		set => this.BackingFieldLoadUnload(ref _isLoaded, value);
-	}
-	private bool _isLoaded = false;
+	[Export] private string _displayName = string.Empty;
+	public override string DisplayName => _displayName;
+	public override Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
 
 
 	[ExportGroup("Costume")]
@@ -71,6 +64,8 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 	}
 	private int _style;
 
+	public override ICustomizable[] Customizables => [.. new List<ICustomizable?>(){Model}.OfType<ICustomizable>()];
+
 
 	[Signal] public delegate void CostumeChangedEventHandler(WeaponCostume? newCostume, WeaponCostume? oldCostume);
 
@@ -82,13 +77,13 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 
 
 
-	public void SetCostume(WeaponCostume? newCostume, bool forceLoad = false) {
+	public void SetCostume(WeaponCostume? newCostume) {
 		WeaponCostume? oldCostume = _costume;
 		if (newCostume == oldCostume) return;
 
 		_costume = newCostume;
 
-		AsILoadable().Reload(forceLoad);
+		Load(true);
 
 		EmitSignal(SignalName.CostumeChanged, newCostume!, oldCostume!);
 	}
@@ -104,36 +99,29 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 		if (Model is IHandAdaptable mHand) mHand.SetHandedness(handedness);
 	}
 
-	protected override bool LoadBehaviour() {
-		if (!base.LoadBehaviour()) return false;
+	protected void Load(bool forceReload = false) {
+		if (Model is not null && !forceReload) return;
 
 		Model?.QueueFree();
-		Model = Costume?.Instantiate()?.SetOwnerAndParent(this);
+		Model = Costume?.Instantiate()?.SetParentToSceneInstance(this);
 
-		if (Model is null) return false;
+		if (Model is null) return;
 
 		if (Model is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(Skeleton);
 		if (Model is IHandAdaptable mHanded) mHanded.SetHandedness(Handedness);
-		Model.AsIEnablable().EnableDisable(IsEnabled);
-
-		_isLoaded = true;
-
-		return true;
 	}
-	protected override void UnloadBehaviour() {
+	protected void Unload() {
 		Model?.QueueFree();
 		Model = null;
-
-		_isLoaded = false;
 	}
 
-	protected override void EnableBehaviour() {
-		base.EnableBehaviour();
-		Model?.AsIEnablable().Enable();
-	}
-	protected override void DisableBehaviour() {
-		base.DisableBehaviour();
-		Model?.AsIEnablable().Disable();
+	public override void _Notification(int what) {
+		base._Notification(what);
+		switch ((ulong)what) {
+			case NotificationSceneInstantiated:
+				Callable.From(() => Load()).CallDeferred();
+				break;
+		}
 	}
 
 	public override ISaveData<Weapon> Save() {
@@ -146,11 +134,5 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 		public Weapon Load() {
 			return null!;
 		}
-	}
-
-
-	public override void _Parented() {
-		base._Parented();
-		Callable.From(() => Model?.SafeReparentAndSetOwner(this)).CallDeferred();
 	}
 }

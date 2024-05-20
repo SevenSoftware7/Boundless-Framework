@@ -11,20 +11,6 @@ using SevenDev.Utility;
 [Tool]
 [GlobalClass]
 public sealed partial class MultiWeapon : Weapon {
-	public override bool IsLoaded {
-		get => CurrentWeapon?.IsLoaded ?? false;
-		set => CurrentWeapon?.AsILoadable().SetLoaded(value);
-	}
-
-	public override bool IsEnabled {
-		get => base.IsEnabled;
-		set {
-			base.IsEnabled = value;
-			UpdateCurrent();
-		}
-	}
-
-
 	[Export] private Array<Weapon?> Weapons {
 		get => [.. _weapons];
 		set {
@@ -132,10 +118,10 @@ public sealed partial class MultiWeapon : Weapon {
 	private Handedness _handedness;
 
 
-	public Texture2D? DisplayPortrait => CurrentWeapon?.UIObject.DisplayPortrait;
+	public override string DisplayName => CurrentWeapon?.DisplayName ?? string.Empty;
+	public override Texture2D? DisplayPortrait => CurrentWeapon?.DisplayPortrait;
 
-	public override IUIObject UIObject => null!;
-	public override ICustomizable[] Children => [.. _weapons.Cast<ICustomizable>()];
+	public override ICustomizable[] Customizables => [.. _weapons];
 
 	public override IWeapon.Type WeaponType => CurrentWeapon?.WeaponType ?? 0;
 	public override IWeapon.Usage WeaponUsage => CurrentWeapon?.WeaponUsage ?? 0;
@@ -159,8 +145,8 @@ public sealed partial class MultiWeapon : Weapon {
 		if (!IndexInBounds(_currentIndex)) {
 			_currentIndex = 0;
 		}
-		_weapons.ForEach((w) => w?.AsIEnablable().Disable());
-		CurrentWeapon?.AsIEnablable().SetEnabled(IsEnabled);
+		_weapons.ForEach((w) => w?.Disable());
+		CurrentWeapon?.Enable();
 	}
 
 	public void SwitchTo(Weapon? weapon) =>
@@ -252,21 +238,6 @@ public sealed partial class MultiWeapon : Weapon {
 	}
 
 
-	protected override void EnableBehaviour() {
-		base.EnableBehaviour();
-		CurrentWeapon?.AsIEnablable().Enable();
-	}
-	protected override void DisableBehaviour() {
-		_weapons.ForEach(w => w?.AsIEnablable().Disable());
-		base.DisableBehaviour();
-	}
-
-	protected override bool LoadBehaviour() => CurrentWeapon?.AsILoadable().Load() ?? false;
-	protected override void UnloadBehaviour() => CurrentWeapon?.AsILoadable().Unload();
-	public void ReloadModel(bool forceLoad = false) => CurrentWeapon?.AsILoadable().Reload(forceLoad);
-
-
-
 	public ISaveData<MultiWeapon> SaveMulti() {
 		return new MultiWeaponSaveData([.. _weapons]);
 	}
@@ -280,6 +251,15 @@ public sealed partial class MultiWeapon : Weapon {
 
 		public MultiWeapon Load() {
 			return new MultiWeapon([.. WeaponSaves]);
+		}
+	}
+
+	public override void _Notification(int what) {
+		base._Notification(what);
+		switch ((ulong)what) {
+			case NotificationChildOrderChanged:
+				Callable.From(() => Weapons = [.. GetChildren().OfType<Weapon>()]).CallDeferred();
+				break;
 		}
 	}
 }

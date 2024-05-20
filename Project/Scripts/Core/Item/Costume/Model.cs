@@ -5,33 +5,19 @@ using SevenDev.Utility;
 
 
 [Tool]
-public abstract partial class Model : Node3D, IEnablable {
-	[Export] public virtual bool IsEnabled {
-		get => ProcessMode != ProcessModeEnum.Disabled;
-		set {
-			if (this.IsInitializationSetterCall()) return;
+[GlobalClass]
+public partial class Model : Node3D, ICustomizable {
+	public Costume? Costume;
 
-			AsIEnablable().EnableDisable(value);
-		}
-	}
+	public string DisplayName => Costume?.DisplayName ?? string.Empty;
+	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
 
-	public IEnablable AsIEnablable() => this;
-
+	public virtual ICustomizable[] Customizables => [];
+	public virtual ICustomization[] Customizations => [];
 
 
 	protected Model() : base() { }
 
-	void IEnablable.EnableBehaviour() {
-		ProcessMode = ProcessModeEnum.Inherit;
-		EnableBehaviour();
-	}
-	protected virtual void EnableBehaviour() { }
 
-	void IEnablable.DisableBehaviour() {
-		ProcessMode = ProcessModeEnum.Disabled;
-		DisableBehaviour();
-	}
-	protected virtual void DisableBehaviour() { }
-
-	public abstract Aabb GetAabb();
+	public virtual Aabb GetAabb() => default;
 }

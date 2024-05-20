@@ -1,20 +1,19 @@
 [gd_scene load_steps=4 format=3 uid="uid://ceqxywrq7p5l3"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Implementation/BoneMeshModel.cs" id="1_58ydk"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Model.cs" id="1_n56sf"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_8gkqy"]
-size = Vector3(2.5, 0.25, 0.25)
+size = Vector3(0.25, 2.5, 0.25)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lw4eq"]
 albedo_color = Color(0.501961, 1, 0.85098, 1)
 
-[node name="Model - Epiphron (base)" type="Node3D" node_paths=PackedStringArray("Model")]
-script = ExtResource("1_58ydk")
-Model = NodePath("Model")
+[node name="Model - Epiphron (base)" type="Node3D"]
+script = ExtResource("1_n56sf")
 IsEnabled = true
 
 [node name="Model" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.05, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
 layers = 2
 mesh = SubResource("BoxMesh_8gkqy")
 skeleton = NodePath("")

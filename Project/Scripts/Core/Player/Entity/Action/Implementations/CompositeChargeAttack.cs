@@ -1,7 +1,5 @@
 namespace LandlessSkies.Core;
 
-using Godot;
-
 public partial class CompositeChargeAttack(SingleWeapon weapon, CompositeChargeAttackInfo info) : ChargeAttack(weapon) {
 	public override ulong ChargeDuration => info.ChargeDuration;
 

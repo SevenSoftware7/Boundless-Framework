@@ -1,6 +1,5 @@
 namespace LandlessSkies.Core;
 
-using System;
 using Godot;
 
 public abstract partial class EntityTrigger : Area3D {

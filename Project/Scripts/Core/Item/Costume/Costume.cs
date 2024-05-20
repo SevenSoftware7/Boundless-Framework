@@ -2,13 +2,21 @@ namespace LandlessSkies.Core;
 
 using Godot;
 
-
 [Tool]
 [GlobalClass]
 public abstract partial class Costume : Resource, IUIObject {
-	public abstract string DisplayName { get; protected set; }
-	public abstract Texture2D? DisplayPortrait { get; protected set; }
+	[Export] public PackedScene? ModelScene { get; private set; }
+
+	public abstract string DisplayName { get; }
+	public abstract Texture2D? DisplayPortrait { get; }
 
 
-	public abstract Model? Instantiate();
+	public virtual Model? Instantiate() {
+		Model? model = ModelScene?.Instantiate<Model>();
+		if (model is not null) {
+			model.Costume = this;
+		}
+
+		return model;
+	}
 }

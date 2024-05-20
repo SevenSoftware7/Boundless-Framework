@@ -1,9 +1,7 @@
 namespace LandlessSkies.Core;
 
-using System.Linq;
 using Godot;
 using SevenDev.Utility;
-
 
 [Tool]
 [GlobalClass]

@@ -3,7 +3,6 @@ namespace LandlessSkies.Core;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
-
 public static class WeaponExtensions {
 	public static Weapon? Bundle(this IEnumerable<SingleWeapon> weapons) =>
 		weapons.ToImmutableArray() switch {

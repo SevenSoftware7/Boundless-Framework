@@ -5,5 +5,5 @@
 
 [resource]
 script = ExtResource("2_gwqkm")
+_displayName = "Nemesis (base)"
 ModelScene = ExtResource("1_opthf")
-DisplayName = "Nemesis (base)"

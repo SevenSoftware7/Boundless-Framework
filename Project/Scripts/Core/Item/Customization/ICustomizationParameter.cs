@@ -1,5 +1,7 @@
 namespace LandlessSkies.Core;
 
-public interface ICustomizationParameter {
-	void Construct();
+using Godot;
+
+public interface ICustomization {
+	Control? Build(HudPack hud);
 }

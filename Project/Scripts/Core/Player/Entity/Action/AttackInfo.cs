@@ -1,9 +1,5 @@
 namespace LandlessSkies.Core;
 
-using System;
-using Godot;
-
-
 public abstract record class AttackInfo(SingleWeapon Weapon) : EntityActionInfo() {
 	// [Export] public SingleWeapon Weapon { get; private set; } = Weapon;
 

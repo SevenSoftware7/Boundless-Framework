@@ -2,24 +2,17 @@ namespace LandlessSkies.Vanilla;
 
 using LandlessSkies.Core;
 using Godot;
-using System;
 using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class Companion : Loadable3D, IUIObject, IPlayerHandler, ICustomizable {
+public partial class Companion : Node3D, IUIObject, IPlayerHandler, ICustomizable {
 	[Export] public string DisplayName { get; private set; } = string.Empty;
 	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
 
 	public virtual IUIObject UIObject => this;
-	public virtual ICustomizable[] Children => [];
-	public virtual ICustomizationParameter[] Customizations => [];
-
-	public override bool IsLoaded {
-		get => _isLoaded;
-		set => this.BackingFieldLoadUnload(ref _isLoaded, value);
-	}
-	private bool _isLoaded = false;
+	public virtual ICustomizable[] Customizables => [];
+	public virtual ICustomization[] Customizations => [];
 
 
 	[ExportGroup("Costume")]
@@ -38,8 +31,6 @@ public partial class Companion : Loadable3D, IUIObject, IPlayerHandler, ICustomi
 
 	[Export] protected Model? Model { get; private set; }
 
-	public Basis CompanionRotation { get; private set; } = Basis.Identity;
-
 
 	[Signal] public delegate void CostumeChangedEventHandler(CompanionCostume? newCostume, CompanionCostume? oldCostume);
 
@@ -53,13 +44,13 @@ public partial class Companion : Loadable3D, IUIObject, IPlayerHandler, ICustomi
 
 
 
-	public void SetCostume(CompanionCostume? newCostume, bool forceLoad = false) {
+	public void SetCostume(CompanionCostume? newCostume) {
 		CompanionCostume? oldCostume = _costume;
 		if (newCostume == oldCostume) return;
 
 		_costume = newCostume;
 
-		AsILoadable().Reload(forceLoad);
+		Load(true);
 
 		EmitSignal(SignalName.CostumeChanged, newCostume!, oldCostume!);
 	}
@@ -69,40 +60,23 @@ public partial class Companion : Loadable3D, IUIObject, IPlayerHandler, ICustomi
 	public virtual void HandlePlayer(Player player) { }
 
 
-	protected override bool LoadBehaviour() {
-		if (! base.LoadBehaviour()) return false;
+	protected void Load(bool forceReload = false) {
+		if (Model is not null && !forceReload) return;
 
 		Model?.QueueFree();
-		Model = Costume?.Instantiate();
-
-		if (Model is null) return false;
-
-		Model.SetOwnerAndParent(this);
-		Model.AsIEnablable().EnableDisable(IsEnabled);
-
-		_isLoaded = true;
-
-		return true;
+		Model = Costume?.Instantiate()?.SetParentToSceneInstance(this);
 	}
-	protected override void UnloadBehaviour() {
+	protected void Unload() {
 		Model?.QueueFree();
 		Model = null;
-
-		_isLoaded = false;
 	}
 
-	protected override void EnableBehaviour() {
-		base.EnableBehaviour();
-		Model?.AsIEnablable().Enable();
-	}
-	protected override void DisableBehaviour() {
-		base.DisableBehaviour();
-		Model?.AsIEnablable().Disable();
-	}
-
-
-	public override void _Parented() {
-		base._Parented();
-		Callable.From(() => Model?.SafeReparentAndSetOwner(this)).CallDeferred();
+	public override void _Notification(int what) {
+		base._Notification(what);
+		switch ((ulong)what) {
+			case NotificationSceneInstantiated:
+				Callable.From(() => Load()).CallDeferred();
+				break;
+		}
 	}
 }

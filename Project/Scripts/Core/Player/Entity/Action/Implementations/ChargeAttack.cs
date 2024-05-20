@@ -1,6 +1,5 @@
 namespace LandlessSkies.Core;
 
-using Godot;
 using SevenDev.Utility;
 
 public abstract partial class ChargeAttack : Attack {
@@ -9,7 +8,7 @@ public abstract partial class ChargeAttack : Attack {
 
 	public abstract ulong ChargeDuration { get; }
 
-	private TimeDuration chargeTime;
+	private readonly TimeDuration chargeTime;
 	private bool isDone;
 
 

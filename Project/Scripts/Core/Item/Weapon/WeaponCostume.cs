@@ -5,11 +5,9 @@ using Godot;
 [Tool]
 [GlobalClass]
 public partial class WeaponCostume : Costume {
-	[Export] public PackedScene? ModelScene { get; private set; }
+	[Export] private string _displayName = string.Empty;
+	public override string DisplayName => _displayName;
 
-	[Export] public override string DisplayName { get; protected set; } = string.Empty;
-	[Export] public override Texture2D? DisplayPortrait { get; protected set; }
-
-
-	public override Model? Instantiate() => ModelScene?.Instantiate<Model>();
+	[Export] private Texture2D? _displayPortrait = null;
+	public override Texture2D? DisplayPortrait => _displayPortrait;
 }

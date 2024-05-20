@@ -5,13 +5,13 @@ using Godot;
 /// <summary>
 /// TimeDuration is used to check whether a specific time duration has passed or not
 /// </summary>
-public struct TimeDuration(ulong durationMsec = 1000) {
+public class TimeDuration(ulong durationMsec = 1000) {
 	public ulong DurationMsec = durationMsec;
 	public ulong StopTime { get; private set; } = 0;
 
-	public readonly bool IsDone => Time.GetTicksMsec() >= StopTime;
-	public readonly ulong RemainingDuration => IsDone ? 0 : StopTime - Time.GetTicksMsec();
-	public readonly ulong Overtime => IsDone ? Time.GetTicksMsec() - StopTime : 0;
+	public bool IsDone => Time.GetTicksMsec() >= StopTime;
+	public ulong TimeLeft => IsDone ? 0 : StopTime - Time.GetTicksMsec();
+	public ulong Overtime => IsDone ? Time.GetTicksMsec() - StopTime : 0;
 
 
 	public void End() {
@@ -22,6 +22,6 @@ public struct TimeDuration(ulong durationMsec = 1000) {
 	}
 
 
-	public static implicit operator float(TimeDuration timeUntil) => timeUntil.RemainingDuration;
+	public static implicit operator float(TimeDuration timeUntil) => timeUntil.TimeLeft;
 	public static implicit operator bool(TimeDuration timeUntil) => timeUntil.IsDone;
 }

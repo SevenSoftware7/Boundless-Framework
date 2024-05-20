@@ -5,5 +5,5 @@
 
 [resource]
 script = ExtResource("2_tibbh")
+_displayName = "Eos (base)"
 ModelScene = ExtResource("1_hwbj6")
-DisplayName = "Eos (base)"

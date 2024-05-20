@@ -8,18 +8,15 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class Entity : LoadableCharacterBody3D, IPlayerHandler, IUIObject {
-	public override bool IsLoaded {
-		get => _isLoaded;
-		set => this.BackingFieldLoadUnload(ref _isLoaded, value);
-	}
-	private bool _isLoaded = false;
-
-
+public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 	private readonly List<Vector3> lastStandableSurfaces = [];
+	private GaugeControl? healthBar;
 
-	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
 	[Export] public string DisplayName { get; private set; } = string.Empty;
+	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
+	public virtual ICustomizable[] Customizables => [.. new List<ICustomizable?>(){Model, Weapon}.OfType<ICustomizable>()];
+	public virtual ICustomization[] Customizations => [];
+
 	[Export] public Handedness Handedness { get; private set; } = Handedness.Right;
 	[Export] public EntityStats Stats { get; private set; } = new();
 	[Export] public HudPack HudPack { get; private set; } = new();
@@ -64,6 +61,8 @@ public partial class Entity : LoadableCharacterBody3D, IPlayerHandler, IUIObject
 
 
 	[ExportGroup("Dependencies")]
+	[Export] public Skeleton3D? Skeleton { get; private set; }
+
 	[Export] public AnimationPlayer? AnimationPlayer {
 		get => _animationPlayer;
 		private set {
@@ -77,8 +76,6 @@ public partial class Entity : LoadableCharacterBody3D, IPlayerHandler, IUIObject
 		}
 	}
 	private AnimationPlayer? _animationPlayer;
-
-	[Export] public Skeleton3D? Skeleton { get; private set; }
 
 	[Export] public Gauge? Health {
 		get => _health;
@@ -96,20 +93,15 @@ public partial class Entity : LoadableCharacterBody3D, IPlayerHandler, IUIObject
 	private Gauge? _health;
 
 
-
 	[ExportGroup("State")]
 	[Export] public EntityAction? CurrentAction { get; private set; }
 	[Export] public EntityBehaviour? CurrentBehaviour { get; private set; }
 	[Export] public Godot.Collections.Array<AttributeModifier> AttributeModifiers { get; private set; } = [];
-	private GaugeControl? healthBar;
 
 
 	[ExportGroup("Movement")]
 	[Export] public Vector3 Inertia = Vector3.Zero;
 	[Export] public Vector3 Movement = Vector3.Zero;
-
-
-
 
 	/// <summary>
 	/// The forward direction in absolute space of the Entity.
@@ -122,7 +114,6 @@ public partial class Entity : LoadableCharacterBody3D, IPlayerHandler, IUIObject
 		set => _absoluteForward = value.Normalized();
 	}
 	private Vector3 _absoluteForward = Vector3.Forward;
-
 
 	/// <summary>
 	/// The forward direction in relative space of the Entity.
@@ -139,6 +130,7 @@ public partial class Entity : LoadableCharacterBody3D, IPlayerHandler, IUIObject
 	[Signal] public delegate void DeathEventHandler(float fromHealth);
 
 
+
 	public Entity() : base() {
 		CollisionLayer = Collisions.EntityCollisionLayer;
 
@@ -153,9 +145,7 @@ public partial class Entity : LoadableCharacterBody3D, IPlayerHandler, IUIObject
 
 		_costume = newCostume;
 
-		AsILoadable().Reload();
-
-		EmitSignal(SignalName.LoadedUnloaded, newCostume!, oldCostume!);
+		Load(true);
 	}
 
 	public bool CanCancelAction() {
@@ -295,33 +285,24 @@ public partial class Entity : LoadableCharacterBody3D, IPlayerHandler, IUIObject
 		MoveAndSlide();
 	}
 
-	protected override bool LoadBehaviour() {
-		if (!base.LoadBehaviour())
-			return false;
+	protected void Load(bool forceReload = false) {
+		if (Model is not null && !forceReload) return;
 
 		Model?.QueueFree();
-		Model = Costume?.Instantiate()?.SetOwnerAndParent(this);
+		Model = Costume?.Instantiate()?.SetParentToSceneInstance(this);
 
-		if (Model is null) return false;
+		if (Model is null) return;
 
 		if (Model is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(Skeleton);
 		if (Model is IHandAdaptable mHanded) mHanded.SetHandedness(Handedness); // TODO: Get Handedness
-		Model.AsIEnablable().EnableDisable(IsEnabled);
 
 		OnLoadedUnloaded(true);
-		_isLoaded = true;
-
-		return true;
 	}
-	protected override void UnloadBehaviour() {
-		base.UnloadBehaviour();
-
+	protected void Unload() {
 		OnLoadedUnloaded(false);
 
 		Model?.QueueFree();
 		Model = null;
-
-		_isLoaded = false;
 	}
 
 
@@ -407,6 +388,15 @@ public partial class Entity : LoadableCharacterBody3D, IPlayerHandler, IUIObject
 
 		if (CurrentBehaviour is null) {
 			SetBehaviour(new BipedBehaviour(this));
+		}
+	}
+
+	public override void _Notification(int what) {
+		base._Notification(what);
+		switch ((ulong)what) {
+			case NotificationSceneInstantiated:
+				Callable.From(() => Load()).CallDeferred();
+				break;
 		}
 	}
 }

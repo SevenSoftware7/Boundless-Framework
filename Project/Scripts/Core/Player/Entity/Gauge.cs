@@ -4,7 +4,6 @@ using Godot;
 using Godot.Collections;
 using SevenDev.Utility;
 
-
 [Tool]
 [GlobalClass]
 public partial class Gauge : Node {

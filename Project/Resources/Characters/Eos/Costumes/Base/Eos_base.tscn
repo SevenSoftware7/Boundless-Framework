@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=4 uid="uid://hje36y5wrdyu"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Implementation/MeshModel.cs" id="1_dq2h5"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Implementation/SkinnedModel.cs" id="1_ut7ww"]
 
 [sub_resource type="Curve" id="Curve_nmbca"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.97556, 0), 0.0, 0.0, 0, 0]
@@ -344,8 +344,7 @@ bind/97/bone = -1
 bind/97/pose = Transform3D(1, 3.81842e-08, -7.1479e-08, -7.89296e-08, -2.98023e-08, 1, 8.14907e-08, -1, 1.49012e-08, -0.181663, 0.0798429, 0.0106785)
 
 [node name="Model - Eos (base)" type="Node3D" node_paths=PackedStringArray("Model")]
-script = ExtResource("1_dq2h5")
-Handedness = 1
+script = ExtResource("1_ut7ww")
 Model = NodePath("Costume - Eos (base)")
 IsEnabled = true
 

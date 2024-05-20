@@ -5,22 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using Godot;
 
-
 public interface IPortraitProvider {
-	Texture2D? GetPortrait(CharacterEmotion emotion);
-
-
-
-	public enum CharacterEmotion {
-		Neutral,
-		Determined,
-		Hesitant,
-		Shocked,
-		Disgusted,
-		Melancholic,
-		Joyous
-	}
-
 	public static Texture2D? Select(
 		CharacterEmotion emotion,
 		Texture2D? neutral = null,
@@ -41,4 +26,19 @@ public interface IPortraitProvider {
 		_ when Enum.IsDefined(emotion) => throw new UnreachableException($"Case for {nameof(CharacterEmotion)} {emotion} not implemented."),
 		_ => throw new InvalidEnumArgumentException()
 	};
+
+
+	Texture2D? GetPortrait(CharacterEmotion emotion);
+
+
+
+	public enum CharacterEmotion {
+		Neutral,
+		Determined,
+		Hesitant,
+		Shocked,
+		Disgusted,
+		Melancholic,
+		Joyous
+	}
 }

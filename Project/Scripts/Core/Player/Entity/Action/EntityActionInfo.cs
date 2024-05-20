@@ -1,8 +1,6 @@
 namespace LandlessSkies.Core;
 
 using System;
-using Godot;
-
 
 public abstract record class EntityActionInfo() {
 	public Action? BeforeExecute { get; set; }

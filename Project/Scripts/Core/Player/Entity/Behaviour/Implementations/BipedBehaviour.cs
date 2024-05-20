@@ -10,9 +10,9 @@ public partial class BipedBehaviour(Entity Entity) : EntityBehaviour(Entity) {
 
 	private Vector3 _lastDirection;
 
-	private TimeDuration jumpBuffer = new(125);
-	private TimeDuration coyoteTimer = new(150);
-	private TimeDuration jumpCooldown = new(500);
+	private readonly TimeDuration jumpBuffer = new(125);
+	private readonly TimeDuration coyoteTimer = new(150);
+	private readonly TimeDuration jumpCooldown = new(500);
 
 	private PromptControl? interactPrompt;
 	private PointerControl? interactPointer;

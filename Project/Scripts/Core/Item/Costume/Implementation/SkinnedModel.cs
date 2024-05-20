@@ -4,17 +4,16 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public partial class MeshModel : Model, ISkeletonAdaptable {
+public partial class SkinnedModel : Model, ISkeletonAdaptable {
+	[Export] protected GeometryInstance3D Model { get; private set; } = null!;
+
 	[ExportGroup("Dependencies")]
 	[Export] public Skeleton3D? Skeleton;
 	[Export] public Handedness Handedness { get; private set; }
-	[ExportGroup("")]
-
-	[Export] protected GeometryInstance3D Model { get; private set; } = null!;
 
 
 
-	protected MeshModel() : base() { }
+	protected SkinnedModel() : base() { }
 
 
 
@@ -46,20 +45,7 @@ public partial class MeshModel : Model, ISkeletonAdaptable {
 		ParentToSkeleton();
 	}
 
-	protected override void EnableBehaviour() {
-		base.EnableBehaviour();
-		if (Model is not null) {
-			Model.ProcessMode = ProcessModeEnum.Inherit;
-			Model.Visible = true;
-		}
-	}
-	protected override void DisableBehaviour() {
-		base.DisableBehaviour();
-		if (Model is not null) {
-			Model.ProcessMode = ProcessModeEnum.Disabled;
-			Model.Visible = false;
-		}
-	}
+
 
 	public override void _Process(double delta) {
 		base._Process(delta);

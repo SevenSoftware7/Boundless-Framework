@@ -5,5 +5,5 @@
 
 [resource]
 script = ExtResource("2_a2w3r")
+_displayName = "Epiphron (base)"
 ModelScene = ExtResource("1_1afxg")
-DisplayName = "Epiphron (base)"

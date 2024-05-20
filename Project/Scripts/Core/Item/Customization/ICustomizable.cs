@@ -1,7 +1,6 @@
 namespace LandlessSkies.Core;
 
-public interface ICustomizable {
-	IUIObject UIObject { get; }
-	ICustomizable[] Children { get; }
-	ICustomizationParameter[] Customizations { get; }
+public interface ICustomizable : IUIObject {
+	ICustomizable[] Customizables { get; }
+	ICustomization[] Customizations { get; }
 }

@@ -6,10 +6,11 @@ using static LandlessSkies.Core.IPortraitProvider;
 [Tool]
 [GlobalClass]
 public partial class EntityCostume : Costume, IPortraitProvider {
-	[Export] public PackedScene? ModelScene { get; private set; }
+	[Export] private string _displayName = string.Empty;
+	public override string DisplayName => _displayName;
 
-	[Export] public override string DisplayName { get; protected set; } = string.Empty;
-	[Export] public override Texture2D? DisplayPortrait { get; protected set; }
+	[Export] private Texture2D? _displayPortrait = null;
+	public override Texture2D? DisplayPortrait => _displayPortrait;
 
 	[Export] public Texture2D? PortraitDetermined { get; private set; }
 	[Export] public Texture2D? PortraitHesitant { get; private set; }
@@ -18,8 +19,6 @@ public partial class EntityCostume : Costume, IPortraitProvider {
 	[Export] public Texture2D? PortraitMelancholic { get; private set; }
 	[Export] public Texture2D? PortraitJoyous { get; private set; }
 
-
-	public override Model? Instantiate() => ModelScene?.Instantiate<Model>();
 
 	public Texture2D? GetPortrait(CharacterEmotion emotion) => Select(emotion,
 		neutral: DisplayPortrait,

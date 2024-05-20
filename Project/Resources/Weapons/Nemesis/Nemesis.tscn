@@ -1,10 +1,15 @@
-[gd_scene load_steps=3 format=3 uid="uid://b7b17ebmgtrfy"]
+[gd_scene load_steps=5 format=3 uid="uid://b7b17ebmgtrfy"]
 
 [ext_resource type="Script" path="res://Scripts/Vanilla/Weapon/Nemesis/NemesisWeapon.cs" id="1_vy2ad"]
 [ext_resource type="Resource" uid="uid://ctyrw08y4svjk" path="res://Resources/Weapons/Nemesis/Costumes/Base/Nemesis_Base.tres" id="2_snlmi"]
+[ext_resource type="PackedScene" uid="uid://cbkv4cstjgb7i" path="res://Resources/Weapons/Nemesis/Costumes/Base/Nemesis_Base.tscn" id="3_0qcsl"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Model.cs" id="4_tnwyn"]
 
-[node name="Nemesis" type="Node3D"]
+[node name="Nemesis" type="Node3D" node_paths=PackedStringArray("Model")]
 script = ExtResource("1_vy2ad")
-DisplayName = "Nemesis"
+_displayName = "Nemesis"
 Costume = ExtResource("2_snlmi")
-IsEnabled = true
+Model = NodePath("Model - Nemesis (base)shModel")
+
+[node name="Model - Nemesis (base)shModel" type="Node3D" parent="." instance=ExtResource("3_0qcsl")]
+script = ExtResource("4_tnwyn")

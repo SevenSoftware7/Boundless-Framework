@@ -1,15 +1,19 @@
 namespace LandlessSkies.Core;
 
 using System;
+using Godot;
 
-public readonly struct CustomizationToggle(Span<string> options, Action<string> onUpdate) : ICustomizationParameter {
-	readonly string[] Options = [.. options];
-	readonly Action<string> OnUpdate = onUpdate;
+public readonly struct CustomizationToggle(string name, Action<bool> onUpdate) : ICustomization {
+	public readonly string Name = name;
 
-	public void Construct() {
-		for (int i = 0; i < Options.Length; i++) {
+	private readonly Action<bool> OnUpdate = onUpdate;
 
+	public Control? Build(HudPack hud) {
+		Control? optionControl = hud.ToggleButton?.Instantiate<Control>();
+		// optionControl.SetText(Name);
 
-		}
+		// optionControl.Pressed += OnUpdate;
+
+		return optionControl;
 	}
 }

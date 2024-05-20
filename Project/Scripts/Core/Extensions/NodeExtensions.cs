@@ -46,7 +46,27 @@ public static class NodeExtensions {
 		false;
 #endif
 
+	public static bool IsEnabled(this Node node) => node.ProcessMode == Node.ProcessModeEnum.Inherit || node.ProcessMode == Node.ProcessModeEnum.Always;
 
+	public static void Enable(this Node3D node) {
+		node.Visible = true;
+		if (node.ProcessMode == Node.ProcessModeEnum.Disabled) {
+			node.ProcessMode = Node.ProcessModeEnum.Inherit;
+		}
+	}
+	public static void Disable(this Node3D node) {
+		node.Visible = false;
+		node.ProcessMode = Node.ProcessModeEnum.Disabled;
+	}
+
+	public static void SetEnabled(this Node3D node, bool enabled) {
+		if (enabled) {
+			node.Enable();
+		}
+		else {
+			node.Disable();
+		}
+	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static T SafeReparentEditor<T>(this T child, Node? newParent, bool keepGlobalTransform = true) where T : Node {
@@ -75,15 +95,15 @@ public static class NodeExtensions {
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static T SafeReparent<T>(this T child, Node? newParent, bool keepGlobalTransform = true) where T : Node {
+		if (child.GetParent() == newParent) return child;
+
 		if (!child.IsInsideTree()) {
 			child.Unparent();
 		}
-		if (child.GetParent() is not Node parent) {
+		if (child.GetParent() is null) {
 			newParent?.AddChild(child);
 			return child;
 		}
-		if (parent == newParent)
-			return child;
 
 		if (newParent is not null) {
 			child.Reparent(newParent, keepGlobalTransform);
@@ -99,16 +119,36 @@ public static class NodeExtensions {
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static TNode ParentTo<TNode>(this TNode child, Node parent) where TNode : Node {
-		parent.AddChild(child);
+	public static T AddSceneInstanceChild<T>(this T obj, Node child, bool forceReadableName = false) where T : Node {
+		obj.AddChild(child, forceReadableName);
+		if (obj.SceneFilePath.Length != 0) {
+			child.Owner = obj;
+		}
+		else {
+			child.Owner = obj.Owner ?? obj;
+		}
+		return obj;
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static TNode ParentTo<TNode>(this TNode child, Node parent, bool forceReadableName = false) where TNode : Node {
+		parent.AddChild(child, forceReadableName);
 		return child;
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static TNode SetOwnerAndParent<TNode>(this TNode child, Node parent) where TNode : Node {
-		parent.AddChildAndSetOwner(child);
+	public static TNode SetOwnerAndParent<TNode>(this TNode child, Node parent, bool forceReadableName = false) where TNode : Node {
+		parent.AddChildAndSetOwner(child, forceReadableName);
 		return child;
 	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static TNode SetParentToSceneInstance<TNode>(this TNode child, Node parent, bool forceReadableName = false) where TNode : Node {
+		parent.AddSceneInstanceChild(child, forceReadableName);
+		return child;
+	}
+
+
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static TNode Unparent<TNode>(this TNode child) where TNode : Node {
 		child.Owner = null;
@@ -121,6 +161,7 @@ public static class NodeExtensions {
 		obj.QueueFree();
 		obj.GetParent()?.RemoveChild(obj);
 	}
+
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static T? GetNodeByTypeName<T>(this Node obj) where T : Node {
