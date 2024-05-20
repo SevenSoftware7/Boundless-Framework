@@ -2,8 +2,7 @@ namespace LandlessSkies.Core;
 
 using Godot;
 using SevenDev.Utility;
-using static SevenDev.Utility.MathUtility;
-
+using static SevenDev.Utility.Collisions;
 
 [Tool]
 [GlobalClass]
@@ -46,7 +45,7 @@ public partial class CameraController3D : Camera3D {
 		}
 
 		Subject = transform with {
-			Basis = Subject.Basis * MathUtility.FromToBasis(Subject.Basis.Y, transform.Basis.Y),
+			Basis = Subject.Basis * BasisExtensions.FromToBasis(Subject.Basis.Y, transform.Basis.Y),
 			Origin = origin
 		};
 	}

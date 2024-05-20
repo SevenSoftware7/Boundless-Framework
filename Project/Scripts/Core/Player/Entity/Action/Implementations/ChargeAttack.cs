@@ -31,6 +31,8 @@ public abstract partial class ChargeAttack : Attack {
 	public override void HandlePlayer(Player player) {
 		base.HandlePlayer(player);
 
+		if (player.Entity is null) return;
+
 		if (!isDone && chargeTime.IsDone) {
 			isDone = true;
 			ChargeDone(player.Entity);

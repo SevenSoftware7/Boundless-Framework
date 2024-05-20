@@ -6,6 +6,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using Godot;
 using Godot.Collections;
+using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]

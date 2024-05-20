@@ -1,7 +1,9 @@
+namespace LandlessSkies.Core;
+
 using System;
 using Godot;
+using SevenDev.Utility;
 
-namespace LandlessSkies.Core;
 
 public ref struct LoadableDestructor<TLoadable> where TLoadable : ILoadable {
 	private ref TLoadable? loadable;

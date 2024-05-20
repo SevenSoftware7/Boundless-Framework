@@ -1,7 +1,8 @@
 namespace LandlessSkies.Core;
 
-using Godot;
 using System;
+using Godot;
+using SevenDev.Utility;
 
 [GlobalClass]
 public abstract partial class EntityBehaviour : Node, IPlayerHandler {

@@ -5,7 +5,7 @@ using Godot;
 using SevenDev.Utility;
 using System.Collections.Generic;
 using System;
-using static SevenDev.Utility.MathUtility;
+using static SevenDev.Utility.Collisions;
 
 public abstract partial class Interactable : Area3D {
 	public abstract string InteractLabel { get; }
@@ -48,7 +48,7 @@ public sealed class InteractCandidate(InteractTarget target, float distanceSquar
 		SphereShape3D sphere = new() {
 			Radius = maxDistance,
 		};
-		MathUtility.IntersectShape3D(entity.GetWorld3D(), entity.GlobalTransform, out IntersectShape3DResult[] collisions, sphere, InteractableCollisionLayer);
+		Collisions.IntersectShape3D(entity.GetWorld3D(), entity.GlobalTransform, out IntersectShape3DResult[] collisions, sphere, InteractableCollisionLayer);
 
 		return GetCandidates(collisions, entity, maxDistance);
 	}

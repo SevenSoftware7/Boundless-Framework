@@ -7,20 +7,22 @@ using Godot;
 // [Tool]
 [GlobalClass]
 public partial class InputManager : Node {
+	private static readonly List<JoypadInputDevice> _joypadDevices = [];
+	public static ReadOnlyCollection<JoypadInputDevice> JoypadDevices => _joypadDevices.AsReadOnly();
+
+	public static readonly StringName[] BaseActions = [.. InputMap.GetActions()];
+
+
+	public static InputDevice CurrentDevice { get; private set; } = null!;
+	public static KMInputDevice KeyboardMouseDevice { get; private set; } = null!;
+
+
+	public static Texture2D ActionSymbol { get; private set; } = null!;
+
 	[Export] private Texture2D _actionSymbol {
 		get => ActionSymbol;
 		set => ActionSymbol = value;
 	}
-	public static Texture2D ActionSymbol { get; private set; } = null!;
-
-	public static readonly StringName[] BaseActions = [.. InputMap.GetActions()];
-
-	public static InputDevice CurrentDevice { get; private set; } = null!;
-
-	public static KMInputDevice KeyboardMouseDevice { get; private set; } = null!;
-
-	public static ReadOnlyCollection<JoypadInputDevice> JoypadDevices => _joypadDevices.AsReadOnly();
-	private static readonly List<JoypadInputDevice> _joypadDevices = [];
 
 
 	public InputManager() : base() { }

@@ -1,4 +1,4 @@
-namespace LandlessSkies.Core;
+namespace SevenDev.Utility;
 
 using System.Collections.Generic;
 using System.Linq;

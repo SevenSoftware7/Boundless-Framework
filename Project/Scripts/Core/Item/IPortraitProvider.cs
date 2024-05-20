@@ -1,9 +1,10 @@
+namespace LandlessSkies.Core;
+
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using Godot;
 
-namespace LandlessSkies.Core;
 
 public interface IPortraitProvider {
 	Texture2D? GetPortrait(CharacterEmotion emotion);

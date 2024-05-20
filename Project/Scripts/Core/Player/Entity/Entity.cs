@@ -140,7 +140,7 @@ public partial class Entity : LoadableCharacterBody3D, IPlayerHandler, IUIObject
 
 
 	public Entity() : base() {
-		CollisionLayer = MathUtility.EntityCollisionLayer;
+		CollisionLayer = Collisions.EntityCollisionLayer;
 
 		RelativeForward = Vector3.Forward;
 	}
@@ -326,8 +326,6 @@ public partial class Entity : LoadableCharacterBody3D, IPlayerHandler, IUIObject
 
 
 	private void OnLoadedUnloaded(bool isLoaded) {
-		// EmitSignal(SignalName.CharacterLoadedUnloaded, isLoaded);
-
 		Skeleton3D? skel = isLoaded ? Skeleton : null;
 
 		this.PropagateAction<ISkeletonAdaptable>(skeletonAdaptable => Callable.From(() => skeletonAdaptable.SetParentSkeleton(skel)).CallDeferred());

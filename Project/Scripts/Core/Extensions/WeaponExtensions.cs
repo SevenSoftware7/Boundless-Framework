@@ -1,7 +1,8 @@
+namespace LandlessSkies.Core;
+
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
-namespace LandlessSkies.Core;
 
 public static class WeaponExtensions {
 	public static Weapon? Bundle(this IEnumerable<SingleWeapon> weapons) =>

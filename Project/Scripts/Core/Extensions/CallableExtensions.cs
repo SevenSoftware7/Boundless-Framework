@@ -1,8 +1,8 @@
+namespace SevenDev.Utility;
+
 using System;
 using System.Runtime.CompilerServices;
 using Godot;
-
-namespace LandlessSkies.Core;
 
 public static class CallableExtensions {
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]

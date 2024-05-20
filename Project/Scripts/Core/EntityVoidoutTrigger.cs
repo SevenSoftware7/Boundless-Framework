@@ -1,6 +1,7 @@
+namespace LandlessSkies.Core;
+
 using Godot;
 
-namespace LandlessSkies.Core;
 
 [GlobalClass]
 public partial class EntityVoidoutTrigger : EntityTrigger {

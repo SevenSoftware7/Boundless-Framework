@@ -1,7 +1,9 @@
+namespace LandlessSkies.Core;
+
 using Godot;
 using Godot.Collections;
+using SevenDev.Utility;
 
-namespace LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]

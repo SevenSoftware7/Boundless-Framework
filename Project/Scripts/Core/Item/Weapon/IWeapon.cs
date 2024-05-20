@@ -1,4 +1,3 @@
-
 namespace LandlessSkies.Core;
 
 using System;

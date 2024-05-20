@@ -1,7 +1,7 @@
+namespace LandlessSkies.Core;
+
 using System;
 using Godot;
-
-namespace LandlessSkies.Core;
 
 
 public abstract record class EntityActionInfo() {

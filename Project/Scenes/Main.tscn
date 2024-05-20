@@ -9,7 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://ceqxywrq7p5l3" path="res://Resources/Weapons/Epiphron/Costumes/Base/Epiphron_base.tscn" id="11_lwvah"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Implementation/BoneMeshModel.cs" id="12_1d024"]
 [ext_resource type="PackedScene" uid="uid://fbs6dr24ss3g" path="res://Resources/Weapons/Epiphron/Epiphron.tscn" id="12_1jl3t"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/MultiWeapon.cs" id="13_d6cna"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/Implementations/MultiWeapon.cs" id="13_d6cna"]
 [ext_resource type="PackedScene" uid="uid://b7b17ebmgtrfy" path="res://Resources/Weapons/Nemesis/Nemesis.tscn" id="15_x4bcq"]
 [ext_resource type="PackedScene" uid="uid://bp1e6thwkkcrr" path="res://Resources/Weapons/Eleos/Eleos.tscn" id="17_jhoyp"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Implementation/MeshModel.cs" id="20_km5xc"]
