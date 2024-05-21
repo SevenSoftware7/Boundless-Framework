@@ -20,10 +20,13 @@ public partial class TextureGaugeControl : GaugeControl {
 
 		Bar.MaxValue = Value.MaxAmount;
 
-		if (Bar.Value > Value.Amount) {
+		if (Bar.Value <= Value.Amount) {
+			Bar.Value = Value.Amount;
 			DamagedTimer.Start();
 		}
-		Bar.Value = Value.Amount;
+		else if (Bar.Value > Value.Amount) {
+			Bar.Value = Mathf.Lerp(Bar.Value, Value.Amount, 25 * delta);
+		}
 
 
 		if (DamagedBar is null) return;
