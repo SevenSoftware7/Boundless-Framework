@@ -1,5 +1,5 @@
-namespace LandlessSkies.Core;
+// namespace LandlessSkies.Core;
 
-public abstract record class EvadeActionInfo() : EntityActionInfo() {
-	public abstract override EvadeAction Build();
-}
+// public abstract record class EvadeActionBuilder() {
+// 	public abstract EvadeAction Build();
+// }

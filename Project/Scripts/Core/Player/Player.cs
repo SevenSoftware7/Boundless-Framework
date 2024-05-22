@@ -17,13 +17,11 @@ public sealed partial class Player : Node {
 		get => _entity;
 		set {
 			if (_entity == value) return;
-			if (this.IsInitializationSetterCall()) {
-				_entity = value;
-				return;
-			}
 
-			Callable onKill = new(this, MethodName.OnEntityDeath);
-			NodeExtensions.SwapSignalEmitter(ref _entity, value, Entity.SignalName.Death, onKill, ConnectFlags.Persist);
+			Callable.From(() => _entity?.PropagateAction<IPlayerHandler>(x => x.DisavowPlayer(this))).CallDeferred(); // Wait for Player Handling to be done
+
+			Callable onKill = Callable.From<float>(OnEntityDeath);
+			NodeExtensions.SwapSignalEmitter(ref _entity, value, Entity.SignalName.Death, onKill);
 		}
 	}
 	private Entity? _entity;

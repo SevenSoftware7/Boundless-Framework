@@ -1,9 +1,7 @@
-[gd_scene load_steps=6 format=3 uid="uid://b7hcoc81x5g0i"]
+[gd_scene load_steps=4 format=3 uid="uid://b7hcoc81x5g0i"]
 
 [ext_resource type="Script" path="res://Scripts/Vanilla/Companion/Implementations/FloatingCompanion.cs" id="1_1r20i"]
-[ext_resource type="PackedScene" uid="uid://r6yqclqm3ubp" path="res://Resources/Companions/Erebos/Costumes/Base/Erebos_base.tscn" id="3_2cj4b"]
 [ext_resource type="Resource" uid="uid://caqyvip0olism" path="res://Resources/Companions/Erebos/Costumes/Base/Erebos_base.tres" id="3_gqdmn"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Implementation/SkeletonModel.cs" id="4_6gnjg"]
 
 [sub_resource type="Curve3D" id="Curve3D_m3m6a"]
 _data = {
@@ -13,14 +11,9 @@ _data = {
 point_count = 2
 up_vector_enabled = false
 
-[node name="Erebos" type="Node3D" node_paths=PackedStringArray("Model")]
+[node name="Erebos" type="Node3D"]
 script = ExtResource("1_1r20i")
 CollisionMask = 4294967289
 Curve = SubResource("Curve3D_m3m6a")
 DisplayName = "Erebos"
 Costume = ExtResource("3_gqdmn")
-Model = NodePath("Model - Erebos (base)")
-
-[node name="Model - Erebos (base)" type="Node3D" parent="." node_paths=PackedStringArray("Model") instance=ExtResource("3_2cj4b")]
-script = ExtResource("4_6gnjg")
-Model = NodePath("ErebosBase")

@@ -6,45 +6,6 @@ using Godot;
 
 
 public static class NodeExtensions {
-#if TOOLS
-	private static readonly ulong buildFrame;
-
-
-
-	static NodeExtensions() {
-		buildFrame = Engine.GetProcessFrames();
-	}
-#endif
-
-
-
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static bool IsInitializationSetterCall(this Node node) =>
-#if TOOLS
-		Engine.IsEditorHint()
-			? ! node.IsNodeReady() || Engine.GetProcessFrames() == buildFrame
-			: ! node.IsNodeReady();
-#else
-		false;
-#endif
-
-
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static bool IsEditorEnterTree(this Node node) =>
-#if TOOLS
-		node.IsNodeReady() || Engine.GetProcessFrames() == buildFrame; // TODO: Make this return true when switching scene
-#else
-		false;
-#endif
-
-
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static bool IsEditorExitTree(this Node node) =>
-#if TOOLS
-		!node.IsNodeReady() || Engine.GetProcessFrames() == buildFrame; // TODO: Make this return true when switching scene
-#else
-		false;
-#endif
 
 	public static bool IsEnabled(this Node node) => node.ProcessMode == Node.ProcessModeEnum.Inherit || node.ProcessMode == Node.ProcessModeEnum.Always;
 
@@ -192,13 +153,16 @@ public static class NodeExtensions {
 		node?.Connect(signalName, method, (uint)flags);
 	}
 
-	public static void SwapSignalEmitter<T>(ref T? emitter, T? newEmitter, StringName signalName, Callable method, GodotObject.ConnectFlags flags) where T : Node {
+	public static void SwapSignalEmitter<T>(ref T? emitter, T? newEmitter, StringName signalName, Callable method, GodotObject.ConnectFlags flags = 0) where T : Node {
 		if (emitter is not null && emitter.IsConnected(signalName, method)) {
 			emitter.Disconnect(signalName, method);
 		}
 
 		emitter = newEmitter;
-		emitter?.Connect(signalName, method, (uint)flags);
+
+		if (emitter is not null && !emitter.IsConnected(signalName, method)) { // IsConnected() sometimes does not work, not my fault https://github.com/godotengine/godot/issues/76690
+			emitter.Connect(signalName, method, (uint)flags);
+		}
 	}
 
 	public static void PropagateAction<T>(this Node parent, Action<T>? action, bool parentFirst = false) {

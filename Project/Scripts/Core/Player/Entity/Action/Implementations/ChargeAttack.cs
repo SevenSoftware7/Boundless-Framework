@@ -2,21 +2,12 @@ namespace LandlessSkies.Core;
 
 using SevenDev.Utility;
 
-public abstract partial class ChargeAttack : Attack {
+public abstract partial class ChargeAttack(SingleWeapon weapon, ulong chargeDuration = 1000) : Attack(weapon) {
 	public override bool IsCancellable => true;
 	public override bool IsKnockable => true;
 
-	public abstract ulong ChargeDuration { get; }
-
-	private readonly TimeDuration chargeTime;
+	private readonly TimeDuration chargeTime = new(chargeDuration);
 	private bool isDone;
-
-
-
-	private ChargeAttack() : this(null!) { }
-	public ChargeAttack(SingleWeapon weapon) : base(weapon) {
-		chargeTime = new(ChargeDuration);
-	}
 
 
 

@@ -8,9 +8,8 @@ size = Vector3(0.25, 3.4, 0.6)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_55qpj"]
 albedo_color = Color(0.580392, 0.219608, 0.219608, 1)
 
-[node name="Model - Nemesis (base)shModel" type="Node3D"]
+[node name="Model - Nemesis (base)" type="Node3D"]
 script = ExtResource("1_puhnw")
-IsEnabled = true
 
 [node name="Model" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)

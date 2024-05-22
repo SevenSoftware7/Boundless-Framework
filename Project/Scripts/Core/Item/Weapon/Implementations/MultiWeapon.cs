@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text.Json.Serialization;
 using Godot;
 using Godot.Collections;
 using SevenDev.Utility;
@@ -14,11 +15,6 @@ public sealed partial class MultiWeapon : Weapon {
 	[Export] private Array<Weapon?> Weapons {
 		get => [.. _weapons];
 		set {
-			if (this.IsInitializationSetterCall()) {
-				_weapons = [.. value];
-				return;
-			}
-
 			// If nothing changed
 			if (_weapons.SequenceEqual(value)) return;
 
@@ -65,15 +61,8 @@ public sealed partial class MultiWeapon : Weapon {
 
 	[ExportGroup("Current Weapon")]
 	[Export] private int CurrentIndex {
-		get => _currentIndex;
-		set {
-			if (this.IsInitializationSetterCall()) {
-				_currentIndex = value;
-				return;
-			}
-
-			SwitchTo(value);
-		}
+		get => Style;
+		set => Style = value;
 	}
 	private int _currentIndex;
 
@@ -94,8 +83,6 @@ public sealed partial class MultiWeapon : Weapon {
 		protected set {
 			_skeleton = value;
 
-			if (this.IsInitializationSetterCall()) return;
-
 			_weapons.ForEach(w => {
 				if (w is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(value);
 			});
@@ -107,8 +94,6 @@ public sealed partial class MultiWeapon : Weapon {
 		get => CurrentWeapon?.Handedness ?? 0;
 		protected set {
 			_handedness = value;
-
-			if (this.IsInitializationSetterCall()) return;
 
 			_weapons.ForEach(w => {
 				if (w is IHandAdaptable mHanded) mHanded.SetHandedness(value);
@@ -181,7 +166,7 @@ public sealed partial class MultiWeapon : Weapon {
 
 		if (weapon is null) return;
 
-		weapon.SafeReparentEditor(this);
+		weapon.SafeReparent(this);
 		weapon.SetHandedness(Handedness);
 		weapon.SetParentSkeleton(Skeleton);
 
@@ -211,7 +196,7 @@ public sealed partial class MultiWeapon : Weapon {
 	}
 
 
-	public override IEnumerable<AttackInfo> GetAttacks(Entity target) {
+	public override IEnumerable<AttackActionInfo> GetAttacks(Entity target) {
 		Weapon? currentWeapon = CurrentWeapon;
 		return _weapons
 			.SelectMany((w) => w?.GetAttacks(target) ?? [])
@@ -238,28 +223,31 @@ public sealed partial class MultiWeapon : Weapon {
 	}
 
 
-	public ISaveData<MultiWeapon> SaveMulti() {
-		return new MultiWeaponSaveData([.. _weapons]);
-	}
-	public override ISaveData<Weapon> Save() => (ISaveData<Weapon>)SaveMulti();
-
-
-	public readonly struct MultiWeaponSaveData(IEnumerable<Weapon> weapons) : ISaveData<MultiWeapon> {
-		private readonly ISaveData<Weapon>[] WeaponSaves = weapons
-			.Select(w => w.Save())
-			.ToArray();
-
-		public MultiWeapon Load() {
-			return new MultiWeapon([.. WeaponSaves]);
-		}
-	}
-
 	public override void _Notification(int what) {
 		base._Notification(what);
 		switch ((ulong)what) {
 			case NotificationChildOrderChanged:
-				Callable.From(() => Weapons = [.. GetChildren().OfType<Weapon>()]).CallDeferred();
+				Callable.From(() => Weapons = [.. GetChildren().OfType<Weapon>()]).CallDeferred(); // Modifying the Hierarchy is locked because of the Notification
 				break;
+		}
+	}
+
+
+	public override MultiWeaponSaveData Save() {
+		return new MultiWeaponSaveData([.. _weapons]);
+	}
+
+
+
+	[Serializable]
+	public class MultiWeaponSaveData(IEnumerable<Weapon> weapons) : ISaveData<Weapon> {
+		private readonly ISaveData<Weapon>[] WeaponSaves = weapons
+			.Select(w => w.Save())
+			.ToArray();
+
+		Weapon? ISaveData<Weapon>.Load() => Load();
+		public MultiWeapon Load() {
+			return new MultiWeapon([.. WeaponSaves]);
 		}
 	}
 }

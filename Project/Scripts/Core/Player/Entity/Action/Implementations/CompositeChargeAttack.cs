@@ -1,8 +1,8 @@
+using Godot;
+
 namespace LandlessSkies.Core;
 
-public partial class CompositeChargeAttack(SingleWeapon weapon, CompositeChargeAttackInfo info) : ChargeAttack(weapon) {
-	public override ulong ChargeDuration => info.ChargeDuration;
-
+public partial class CompositeChargeAttack(SingleWeapon weapon, CompositeChargeAttackBuilder info) : ChargeAttack(weapon, info.ChargeDuration) {
 
 
 	protected override bool IsChargeStopped(InputDevice inputDevice) {
@@ -10,13 +10,17 @@ public partial class CompositeChargeAttack(SingleWeapon weapon, CompositeChargeA
 	}
 
 
-	protected override void ChargeDone(Entity entity) { }
+	protected override void ChargeDone(Entity entity) {
+		GD.Print("Charged Up");
+	}
 
 	protected override void ChargedAttack(Entity entity) {
-		entity.ExecuteAction(info.ChargedAttack with { }, true);
+		QueueFree();
+		entity.ExecuteAction(new AttackActionInfo(Weapon, info.ChargedAttack), true);
 	}
 
 	protected override void UnchargedAttack(Entity entity) {
-		entity.ExecuteAction(info.UnchargedAttack with { }, true);
+		QueueFree();
+		entity.ExecuteAction(new AttackActionInfo(Weapon, info.UnchargedAttack), true);
 	}
 }

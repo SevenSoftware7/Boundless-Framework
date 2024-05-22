@@ -45,26 +45,34 @@ public partial class BipedBehaviour(Entity Entity) : EntityBehaviour(Entity) {
 
 
 		Move(groundedMovement.Normalized());
-		HandleInteraction(player.InputDevice, player.HudManager);
+		HandleInteraction(player);
+	}
+	public override void DisavowPlayer(Player player) {
+		base.DisavowPlayer(player);
+		interactPrompt?.QueueFree();
+		interactPrompt = null;
+
+		interactPointer?.QueueFree();
+		interactPointer = null;
 	}
 
-	private void HandleInteraction(InputDevice inputDevice, HudManager hud) {
+	private void HandleInteraction(Player player) {
 		InteractTarget? target = InteractTarget.GetBestTarget(Entity, 3.25f);
 
 		if (target is not null) {
-			if (inputDevice.IsActionJustPressed("interact") && target.Interactable.IsInteractable(Entity)) {
-				target.Interactable.Interact(Entity, target.ShapeIndex);
+			if (player.InputDevice.IsActionJustPressed("interact") && target.Interactable.IsInteractable(Entity)) {
+				target.Interactable.Interact(Entity, player, target.ShapeIndex);
 			}
 		}
 
 
-		interactPrompt ??= hud.AddPrompt(Entity.HudPack.InteractPrompt);
+		interactPrompt ??= player.HudManager.AddPrompt(Entity.HudPack.InteractPrompt);
 		if (interactPrompt is not null) {
 			interactPrompt.Update(target);
-			interactPrompt.SetKey(inputDevice.GetActionSymbol("interact"));
+			interactPrompt.SetKey(player.InputDevice.GetActionSymbol("interact"));
 		}
 
-		interactPointer ??= hud.AddPointer(Entity.HudPack.InteractPointer);
+		interactPointer ??= player.HudManager.AddPointer(Entity.HudPack.InteractPointer);
 		if (interactPointer is not null) {
 			interactPointer.Target = target?.Interactable.GlobalTransform;
 		}
@@ -112,7 +120,7 @@ public partial class BipedBehaviour(Entity Entity) : EntityBehaviour(Entity) {
 
 		// ----- Inertia Calculations -----
 
-		Entity.SplitInertia(out Vector3 verticalInertia, out Vector3 horizontalInertia);
+		Entity.Inertia.Split(Entity.UpDirection, out Vector3 verticalInertia, out Vector3 horizontalInertia);
 
 		if (Entity.IsOnFloor()) {
 			coyoteTimer.Start();
@@ -149,7 +157,7 @@ public partial class BipedBehaviour(Entity Entity) : EntityBehaviour(Entity) {
 			MovementType.Sprint => Entity.Stats.SprintSpeed,
 			_ => 0f
 		};
-		newSpeed = Entity.GetModifiers(Attributes.GenericMoveSpeed).Apply(newSpeed);
+		newSpeed = Entity.AttributeModifiers.Get(Attributes.GenericMoveSpeed).Apply(newSpeed);
 
 		Basis newRotation = Basis.LookingAt(Entity.GlobalForward, Vector3.Up);
 		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * Entity.Stats.RotationSpeed);
@@ -179,7 +187,7 @@ public partial class BipedBehaviour(Entity Entity) : EntityBehaviour(Entity) {
 		// ----- Jump Instruction -----
 
 		if (!jumpBuffer.IsDone && jumpCooldown.IsDone && !coyoteTimer.IsDone) {
-			float jumpHeight = Entity.GetModifiers(Attributes.GenericjumpHeight).Apply(Entity.Stats.JumpHeight);
+			float jumpHeight = Entity.AttributeModifiers.Get(Attributes.GenericjumpHeight).Apply(Entity.Stats.JumpHeight);
 
 			Entity.Inertia = Entity.Inertia.SlideOnFace(Entity.UpDirection) + Entity.UpDirection * jumpHeight;
 			jumpBuffer.End();

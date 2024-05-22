@@ -17,7 +17,7 @@ public abstract partial class Interactable : Area3D {
 	}
 
 	public abstract bool IsInteractable(Entity entity);
-	public abstract void Interact(Entity entity, int shapeIndex = 0);
+	public abstract void Interact(Entity entity, Player? player = null, int shapeIndex = 0);
 
 
 	public CollisionShape3D? GetShape3D(int shapeIndex) {

@@ -11,7 +11,7 @@ public interface IWeapon : IPlayerHandler, ICustomizable {
 
 
 
-	IEnumerable<AttackInfo> GetAttacks(Entity target);
+	IEnumerable<AttackActionInfo> GetAttacks(Entity target);
 
 
 	[Flags]

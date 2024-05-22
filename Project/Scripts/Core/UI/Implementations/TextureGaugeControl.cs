@@ -11,37 +11,49 @@ public partial class TextureGaugeControl : GaugeControl {
 
 	protected double _damagedVelocity;
 
+	protected float _maximumProgress;
+	protected float _progress;
+
+	protected override void OnMaximumChanged(float maximum) {
+		base.OnMaximumChanged(maximum);
+		_maximumProgress = maximum;
+	}
+	protected override void OnValueChanged(float value) {
+		base.OnValueChanged(value);
+		_progress = value;
+		DamagedTimer.Start();
+	}
+
 
 	public override void _Process(double delta) {
 		base._Process(delta);
+		if (Bar is null) return;
 
-		if (Value is null || Bar is null) return;
-		Size = new Vector2(Value.MaxAmount * 8f, GetCombinedMinimumSize().Y);
+		Size = new Vector2(_maximumProgress * 8f, GetCombinedMinimumSize().Y);
 
-		Bar.MaxValue = Value.MaxAmount;
+		Bar.MaxValue = _maximumProgress;
 
-		if (Bar.Value <= Value.Amount) {
-			Bar.Value = Value.Amount;
-			DamagedTimer.Start();
+		if (Bar.Value <= _progress) {
+			Bar.Value = _progress;
 		}
-		else if (Bar.Value > Value.Amount) {
-			Bar.Value = Mathf.Lerp(Bar.Value, Value.Amount, 25 * delta);
+		else if (Bar.Value > _progress) {
+			Bar.Value = Mathf.Lerp(Bar.Value, _progress, 25 * delta);
 		}
 
 
 		if (DamagedBar is null) return;
 
 
-		DamagedBar.MaxValue = Value.MaxAmount;
+		DamagedBar.MaxValue = _maximumProgress;
 
-		if (DamagedBar.Value < Value.Amount) {
-			DamagedBar.Value = Value.Amount;
+		if (DamagedBar.Value < _progress) {
+			DamagedBar.Value = _progress;
 		}
 		else if (! DamagedTimer) {
 			_damagedVelocity = 0f;
 		}
 		else {
-			DamagedBar.Value = DamagedBar.Value.SmoothDamp(Value.Amount, ref _damagedVelocity, 0.15f, Mathf.Inf, delta);
+			DamagedBar.Value = DamagedBar.Value.SmoothDamp(_progress, ref _damagedVelocity, 0.15f, Mathf.Inf, delta);
 		}
 	}
 }

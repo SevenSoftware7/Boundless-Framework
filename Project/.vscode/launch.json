@@ -1,16 +1,61 @@
 {
-    "version": "0.2.0",
+    "version": "2.0.0",
     "configurations": [
         {
-            "name": "Run Godot Run",
+            "name": "Launch",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program":"D:/Software/Godot_v4.2-stable_mono_win64/Godot_v4.2-stable_mono_win64.exe",
-            "cwd":"${workspaceFolder}",
+            "program": "D:/Software/Godot_v4.3-dev6_mono_win64/Godot_v4.3-dev6_mono_win64.exe",
+            "cwd": "${workspaceFolder}",
             "console": "internalConsole",
             "stopAtEntry": false,
-            "args": ["--path","${workspaceRoot}"]
+            "args": [
+				"--path",
+                "${workspaceRoot}",
+				"--debug-collisions",
+				"--debug-paths",
+				"--debug-navigation",
+				"--verbose",
+            ]
+        },
+        {
+            "name": "Launch (Select Scene)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "D:/Software/Godot_v4.3-dev6_mono_win64/Godot_v4.3-dev6_mono_win64.exe",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopAtEntry": false,
+            "args": [
+                "--path",
+                "${workspaceRoot}",
+                "${command:godot.csharp.getLaunchScene}",
+				"--debug-collisions",
+				"--verbose",
+            ]
+        },
+        {
+            "name": "Attach",
+            "type": "coreclr",
+            "request": "attach",
+			"processId":"${command:pickProcess}"
+        },
+        {
+            "name": "Launch Editor",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "D:/Software/Godot_v4.3-dev6_mono_win64/Godot_v4.3-dev6_mono_win64.exe",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopAtEntry": false,
+            "args": [
+                "--path",
+                "${workspaceRoot}",
+                "--editor"
+            ]
         }
     ]
 }

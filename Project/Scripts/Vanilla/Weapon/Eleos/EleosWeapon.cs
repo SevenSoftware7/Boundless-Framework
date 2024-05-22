@@ -7,21 +7,20 @@ using Godot;
 [Tool]
 [GlobalClass]
 public sealed partial class EleosWeapon : SingleWeapon {
-	private SlashAttackInfo slashAttack = null!;
-	private CompositeChargeAttackInfo chargeAttack = null!;
+	private readonly CompositeChargeAttackBuilder chargeAttack = new(SlashAttackBuilder.Instance, SlashAttackBuilder.Instance, "attack_heavy");
 
 	public override IWeapon.Type WeaponType => IWeapon.Type.Sword;
 	public override IWeapon.Usage WeaponUsage => IWeapon.Usage.Slash | IWeapon.Usage.Thrust;
-	public override IWeapon.Size WeaponSize => IWeapon.Size.OneHanded |IWeapon.Size.TwoHanded;
+	public override IWeapon.Size WeaponSize => IWeapon.Size.OneHanded | IWeapon.Size.TwoHanded;
 
 
 	public EleosWeapon(WeaponCostume? costume = null) : base(costume) { }
 	private EleosWeapon() : base() { }
 
-	public override IEnumerable<AttackInfo> GetAttacks(Entity target) {
+	public override IEnumerable<AttackActionInfo> GetAttacks(Entity target) {
 		return [
-			slashAttack,
-			chargeAttack
+			SlashAttackBuilder.Instance.GetInfo(this),
+			chargeAttack.GetInfo(this)
 		];
 	}
 
@@ -34,19 +33,11 @@ public sealed partial class EleosWeapon : SingleWeapon {
 		if (player.Entity is null) return;
 
 		if (player.InputDevice.IsActionJustPressed("attack_light")) {
-			player.Entity.ExecuteAction(slashAttack with { });
+			player.Entity.ExecuteAction(SlashAttackBuilder.Instance.GetInfo(this));
 		}
 
 		if (player.InputDevice.IsActionJustPressed("attack_heavy")) {
-			player.Entity.ExecuteAction(chargeAttack);
+			player.Entity.ExecuteAction(chargeAttack.GetInfo(this));
 		}
-	}
-
-
-	public override void _Ready() {
-		base._Ready();
-
-		slashAttack = new(this);
-		chargeAttack = new(this, slashAttack, slashAttack, "attack_heavy");
 	}
 }

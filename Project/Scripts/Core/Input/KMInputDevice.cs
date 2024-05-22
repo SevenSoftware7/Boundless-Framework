@@ -33,7 +33,7 @@ public sealed partial class KMInputDevice : InputDevice {
 
 		Callable.From(() => {
 			mouseMotion = new();
-		}).CallDeferred();
+		}).CallDeferred(); // Do at the end of the Frame
 	}
 
 	public override void _UnhandledInput(InputEvent @event) {

@@ -1,6 +1,7 @@
 namespace LandlessSkies.Core;
 
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Godot;
 using SevenDev.Utility;
 
@@ -31,7 +32,7 @@ public abstract partial class Weapon : Node3D, IWeapon, ISkeletonAdaptable {
 	public virtual ICustomization[] Customizations => [];
 
 
-	public abstract IEnumerable<AttackInfo> GetAttacks(Entity target);
+	public abstract IEnumerable<AttackActionInfo> GetAttacks(Entity target);
 	public void Inject(Entity? entity) {
 		SetParentSkeleton(entity?.Skeleton);
 		SetHandedness(entity?.Handedness ?? Handedness.Right);
@@ -39,6 +40,7 @@ public abstract partial class Weapon : Node3D, IWeapon, ISkeletonAdaptable {
 
 
 	public virtual void HandlePlayer(Player player) { }
+	public virtual void DisavowPlayer(Player player) { }
 
 	public abstract ISaveData<Weapon> Save();
 

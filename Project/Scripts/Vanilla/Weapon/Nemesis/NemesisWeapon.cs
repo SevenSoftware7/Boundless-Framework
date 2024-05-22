@@ -7,8 +7,6 @@ using Godot;
 [Tool]
 [GlobalClass]
 public sealed partial class NemesisWeapon : SingleWeapon {
-	private SlashAttackInfo slashAttack = null!;
-
 	public override IWeapon.Type WeaponType => IWeapon.Type.Sword;
 	public override IWeapon.Usage WeaponUsage => IWeapon.Usage.Slash | IWeapon.Usage.Strike;
 	public override IWeapon.Size WeaponSize => IWeapon.Size.TwoHanded;
@@ -18,9 +16,9 @@ public sealed partial class NemesisWeapon : SingleWeapon {
 	public NemesisWeapon(WeaponCostume? costume = null) : base(costume) { }
 
 
-	public override IEnumerable<AttackInfo> GetAttacks(Entity target) {
+	public override IEnumerable<AttackActionInfo> GetAttacks(Entity target) {
 		return [
-			slashAttack,
+			SlashAttackBuilder.Instance.GetInfo(this),
 		];
 	}
 
@@ -33,13 +31,7 @@ public sealed partial class NemesisWeapon : SingleWeapon {
 		if (player.Entity is null) return;
 
 		if (player.InputDevice.IsActionJustPressed("attack_light")) {
-			player.Entity.ExecuteAction(slashAttack with { });
+			player.Entity.ExecuteAction(SlashAttackBuilder.Instance.GetInfo(this));
 		}
-	}
-
-	public override void _Ready() {
-		base._Ready();
-
-		slashAttack = new(this);
 	}
 }

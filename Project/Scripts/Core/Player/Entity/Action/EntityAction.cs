@@ -13,6 +13,7 @@ public abstract partial class EntityAction : Node, IPlayerHandler {
 
 
 	public virtual void HandlePlayer(Player player) { }
+	public virtual void DisavowPlayer(Player player) { }
 
 
 	public override void _Notification(int what) {

@@ -57,4 +57,10 @@ public static class Vector3Extensions {
 		}
 		return vector3_5;
 	}
+
+
+	public static void Split(this Vector3 vector3, Vector3 upDirection, out Vector3 vertical, out Vector3 horizontal) {
+		vertical = vector3.Project(upDirection);
+		horizontal = vector3 - vertical;
+	}
 }

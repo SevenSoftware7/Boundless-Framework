@@ -1451,10 +1451,9 @@ shape = SubResource("SphereShape3D_ycdom")
 mesh = SubResource("SphereMesh_nkuww")
 skeleton = NodePath("../../CollisionShape3D/MeshInstance3D")
 
-[node name="Eos" parent="." node_paths=PackedStringArray("Model", "Weapon", "Skeleton", "AnimationPlayer", "Health") instance=ExtResource("9_0jt21")]
+[node name="Eos" parent="." node_paths=PackedStringArray("Weapon", "Skeleton", "AnimationPlayer", "Health") instance=ExtResource("9_0jt21")]
 process_priority = -10
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.98336, 2, 27.7771)
-Model = NodePath("Model - Eos (base)")
 Weapon = NodePath("Weapon")
 Skeleton = NodePath("Skeleton")
 AnimationPlayer = NodePath("AnimationPlayer")
@@ -1466,32 +1465,27 @@ script = ExtResource("13_d6cna")
 Weapons = [NodePath("Epiphron"), NodePath("Nemesis"), NodePath("Eleos")]
 Skeleton = NodePath("../Skeleton")
 
-[node name="Epiphron" parent="Eos/Weapon" node_paths=PackedStringArray("Model", "Skeleton") instance=ExtResource("12_1jl3t")]
+[node name="Epiphron" parent="Eos/Weapon" node_paths=PackedStringArray("Skeleton") instance=ExtResource("12_1jl3t")]
 transform = Transform3D(1, 0, 0, -7.10543e-15, 1, 0, 7.10543e-15, 0, 1, 0, 0, 0)
-Model = NodePath("Model - Epiphron (base)")
 Skeleton = NodePath("../../Skeleton")
 
-[node name="Nemesis" parent="Eos/Weapon" node_paths=PackedStringArray("Model", "Skeleton") instance=ExtResource("15_x4bcq")]
+[node name="Nemesis" parent="Eos/Weapon" node_paths=PackedStringArray("Skeleton") instance=ExtResource("15_x4bcq")]
 process_mode = 4
 transform = Transform3D(1, 0, 0, -7.10543e-15, 1, 0, 7.10543e-15, 0, 1, 0, 0, 0)
 visible = false
-Model = NodePath("Model - Nemesis (base)shModel")
 Skeleton = NodePath("../../Skeleton")
 
-[node name="Eleos" parent="Eos/Weapon" node_paths=PackedStringArray("Model", "Skeleton") instance=ExtResource("17_jhoyp")]
+[node name="Eleos" parent="Eos/Weapon" node_paths=PackedStringArray("Skeleton") instance=ExtResource("17_jhoyp")]
 process_mode = 4
-transform = Transform3D(1, -3.0154e-15, -7.10543e-15, 4.09003e-15, 1, 0, 0, 7.10543e-15, 1, 0, 0, 0)
+transform = Transform3D(1, 0, 0, -7.10543e-15, 1, 0, 7.10543e-15, 0, 1, 0, 0, 0)
 visible = false
-Model = NodePath("Model - Eleos (base)")
 Skeleton = NodePath("../../Skeleton")
 
-[node name="Erebos" parent="Eos" node_paths=PackedStringArray("Model") instance=ExtResource("26_ds8t8")]
+[node name="Erebos" parent="Eos" node_paths=PackedStringArray("Entity") instance=ExtResource("26_ds8t8")]
+Entity = NodePath("..")
 Curve = SubResource("Curve3D_1n68a")
-Model = NodePath("Model - Erebos (base)")
 
 [node name="Player" parent="." node_paths=PackedStringArray("CameraController", "HudManager", "Entity") instance=ExtResource("26_rkn04")]
 CameraController = NodePath("CameraController3D")
 HudManager = NodePath("HUD")
 Entity = NodePath("../Eos")
-
-[connection signal="Death" from="Eos" to="Player" method="OnEntityDeath"]

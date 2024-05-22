@@ -1,15 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://bp1e6thwkkcrr"]
+[gd_scene load_steps=3 format=3 uid="uid://bp1e6thwkkcrr"]
 
 [ext_resource type="Script" path="res://Scripts/Vanilla/Weapon/Eleos/EleosWeapon.cs" id="1_pwvbn"]
 [ext_resource type="Resource" uid="uid://q68mneifjek2" path="res://Resources/Weapons/Eleos/Costumes/Base/Eleos_base.tres" id="2_ft1fa"]
-[ext_resource type="PackedScene" uid="uid://chsj82irsedw6" path="res://Resources/Weapons/Eleos/Costumes/Base/Eleos_base.tscn" id="3_iy1mi"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Model.cs" id="4_qr81o"]
 
-[node name="Eleos" type="Node3D" node_paths=PackedStringArray("Model")]
+[node name="Eleos" type="Node3D"]
 script = ExtResource("1_pwvbn")
 _displayName = "Eleos"
 Costume = ExtResource("2_ft1fa")
-Model = NodePath("Model - Eleos (base)")
-
-[node name="Model - Eleos (base)" type="Node3D" parent="." instance=ExtResource("3_iy1mi")]
-script = ExtResource("4_qr81o")

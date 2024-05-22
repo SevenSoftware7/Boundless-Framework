@@ -23,7 +23,7 @@ public partial class Gauge : Node {
 				EmitSignal(SignalName.Emptied, oldAmount);
 			}
 
-			EmitSignal(SignalName.HealthChange, _amount - oldAmount);
+			EmitSignal(SignalName.ValueChanged, _amount);
 		}
 	}
 	private float _amount;
@@ -35,7 +35,8 @@ public partial class Gauge : Node {
 	[Export] public bool StaticRatio = false;
 
 
-	[Signal] public delegate void HealthChangeEventHandler(float amount);
+	[Signal] public delegate void MaximumChangedEventHandler(float amount);
+	[Signal] public delegate void ValueChangedEventHandler(float amount);
 	[Signal] public delegate void EmptiedEventHandler(float fromAmount);
 
 
@@ -52,11 +53,12 @@ public partial class Gauge : Node {
 
 		float oldMaxAmount = _maxAmount;
 		_maxAmount = Mathf.Max(max, 0f);
-		if (this.IsInitializationSetterCall()) return;
 
 		Amount = keepAmountRatio
 			? Mathf.Clamp(_amount / oldMaxAmount, 0f, 1f) * _maxAmount
 			: Mathf.Min(Amount, _maxAmount);
+
+		EmitSignal(SignalName.MaximumChanged, _maxAmount);
 
 		NotifyPropertyListChanged();
 	}

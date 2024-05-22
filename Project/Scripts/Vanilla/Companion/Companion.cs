@@ -18,18 +18,11 @@ public partial class Companion : Node3D, IUIObject, IPlayerHandler, ICustomizabl
 	[ExportGroup("Costume")]
 	[Export] public CompanionCostume? Costume {
 		get => _costume;
-		private set {
-			if (this.IsInitializationSetterCall()) {
-				_costume = value;
-				return;
-			}
-
-			SetCostume(value);
-		}
+		private set => SetCostume(value);
 	}
 	private CompanionCostume? _costume;
 
-	[Export] protected Model? Model { get; private set; }
+	protected Model? Model { get; private set; }
 
 
 	[Signal] public delegate void CostumeChangedEventHandler(CompanionCostume? newCostume, CompanionCostume? oldCostume);
@@ -49,34 +42,38 @@ public partial class Companion : Node3D, IUIObject, IPlayerHandler, ICustomizabl
 		if (newCostume == oldCostume) return;
 
 		_costume = newCostume;
-
-		Load(true);
-
 		EmitSignal(SignalName.CostumeChanged, newCostume!, oldCostume!);
+
+		if (Engine.IsEditorHint()) {
+			Callable.From<bool>(Load).CallDeferred(true);
+		} else {
+			Load(true);
+		}
 	}
 
 
 
 	public virtual void HandlePlayer(Player player) { }
+	public virtual void DisavowPlayer(Player player) { }
 
 
 	protected void Load(bool forceReload = false) {
 		if (Model is not null && !forceReload) return;
 
 		Model?.QueueFree();
-		Model = Costume?.Instantiate()?.SetParentToSceneInstance(this);
+		Model = Costume?.Instantiate()?.ParentTo(this);
 	}
 	protected void Unload() {
 		Model?.QueueFree();
 		Model = null;
 	}
 
-	public override void _Notification(int what) {
-		base._Notification(what);
-		switch ((ulong)what) {
-			case NotificationSceneInstantiated:
-				Callable.From(() => Load()).CallDeferred();
-				break;
-		}
+	public override void _ExitTree() {
+		base._ExitTree();
+		Unload();
+	}
+	public override void _EnterTree() {
+		base._EnterTree();
+		Load();
 	}
 }

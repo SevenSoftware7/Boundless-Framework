@@ -7,7 +7,7 @@ using Godot;
 /// </summary>
 public class TimeDuration(ulong durationMsec = 1000) {
 	public ulong DurationMsec = durationMsec;
-	public ulong StopTime { get; private set; } = 0;
+	public ulong StopTime { get; private set; } = Time.GetTicksMsec() + durationMsec;
 
 	public bool IsDone => Time.GetTicksMsec() >= StopTime;
 	public ulong TimeLeft => IsDone ? 0 : StopTime - Time.GetTicksMsec();

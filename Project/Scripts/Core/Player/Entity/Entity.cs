@@ -9,7 +9,8 @@ using SevenDev.Utility;
 [Tool]
 [GlobalClass]
 public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
-	private readonly List<Vector3> lastStandableSurfaces = [];
+	private List<Vector3> standableSurfaceBuffer = [];
+	private const int STANDABLE_SURFACE_BUFFER_SIZE = 20;
 	private GaugeControl? healthBar;
 
 	[Export] public string DisplayName { get; private set; } = string.Empty;
@@ -25,29 +26,17 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 	[ExportGroup("Costume")]
 	[Export] public EntityCostume? Costume {
 		get => _costume;
-		private set {
-			if (this.IsInitializationSetterCall()) {
-				_costume = value;
-				return;
-			}
-
-			SetCostume(value);
-		}
+		private set => SetCostume(value);
 	}
 	private EntityCostume? _costume;
 
-	[Export] protected Model? Model { get; private set; }
+	protected Model? Model { get; private set; }
 
 
 	[ExportGroup("Weapon")]
 	[Export] public Weapon? Weapon {
 		get => _weapon;
 		set {
-			if (this.IsInitializationSetterCall()) {
-				_weapon = value;
-				return;
-			}
-
 			_weapon?.Inject(null);
 
 			_weapon = value;
@@ -68,8 +57,6 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 		private set {
 			_animationPlayer = value;
 
-			if (this.IsInitializationSetterCall()) return;
-
 			if (_animationPlayer is not null) {
 				_animationPlayer.RootNode = _animationPlayer.GetPathTo(this);
 			}
@@ -81,13 +68,9 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 		get => _health;
 		set {
 			if (_health == value) return;
-			if (this.IsInitializationSetterCall()) {
-				_health = value;
-				return;
-			}
 
-			Callable onKill = new(this, MethodName.OnKill);
-			NodeExtensions.SwapSignalEmitter(ref _health, value, Gauge.SignalName.Emptied, onKill, ConnectFlags.Persist);
+			Callable onKill = Callable.From<float>(OnKill);
+			NodeExtensions.SwapSignalEmitter(ref _health, value, Gauge.SignalName.Emptied, onKill);
 		}
 	}
 	private Gauge? _health;
@@ -145,15 +128,16 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 
 		_costume = newCostume;
 
-		Load(true);
-	}
 
-	public bool CanCancelAction() {
-		return CurrentAction is null || CurrentAction.IsCancellable;
+		if (Engine.IsEditorHint()) {
+			Callable.From<bool>(Load).CallDeferred(true);
+		} else {
+			Load(true);
+		}
 	}
 
 	public void ExecuteAction(EntityActionInfo action, bool forceExecute = false) {
-		if (!forceExecute && !CanCancelAction()) return;
+		if (!forceExecute && !ActionExtensions.CanCancel(CurrentAction)) return;
 
 		CurrentAction?.QueueFree();
 		CurrentAction = null;
@@ -161,7 +145,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 		action.AfterExecute += () => CurrentAction = null;
 		CurrentAction = action.Execute();
 
-		Callable.From(() => CurrentAction.ParentTo(this)).CallDeferred();
+		CurrentAction.ParentTo(this);
 	}
 
 
@@ -170,28 +154,6 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 		CurrentBehaviour?.Stop();
 
 		CurrentBehaviour = behaviour;
-	}
-
-	public void SetBehaviour<TBehaviour>(Func<TBehaviour>? creator = null) where TBehaviour : EntityBehaviour {
-		SetBehaviour(typeof(TBehaviour).Name, creator);
-	}
-
-	public void SetBehaviour<TBehaviour>(NodePath behaviourPath, Func<TBehaviour>? creator = null) where TBehaviour : EntityBehaviour {
-		TBehaviour? behaviour = GetNodeOrNull<TBehaviour>(behaviourPath);
-		if (behaviour is null && creator is null) return;
-
-		SetBehaviour(creator?.Invoke());
-	}
-
-
-	public MultiAttributeModifier GetModifiers(StringName attributeName) {
-		return new(AttributeModifiers.Where(a => a is not null && a.Name == attributeName));
-	}
-
-
-	public void SplitInertia(out Vector3 vertical, out Vector3 horizontal) {
-		vertical = Inertia.Project(UpDirection);
-		horizontal = Inertia - vertical;
 	}
 
 
@@ -257,15 +219,15 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 	private void Move(double delta) {
 		if (MotionMode == MotionModeEnum.Grounded) {
 
-			if (/* surfaceTimer.IsDone &&  */IsOnFloor() && GetPlatformVelocity().IsZeroApprox()) {
-				lastStandableSurfaces.Add(GlobalPosition);
-				if (lastStandableSurfaces.Count >= 20) {
-					lastStandableSurfaces.RemoveRange(0, lastStandableSurfaces.Count - 20);
-				}
-				// surfaceTimer.Start();
+			if (
+				IsOnFloor() && GetPlatformVelocity().IsZeroApprox()
+				// && (lastStandableSurfaces.Count == 0 || GlobalPosition.DistanceSquaredTo(lastStandableSurfaces[^1]) > 0.25f)
+			) {
+				if (standableSurfaceBuffer.Count >= STANDABLE_SURFACE_BUFFER_SIZE) standableSurfaceBuffer.RemoveRange(0, standableSurfaceBuffer.Count - STANDABLE_SURFACE_BUFFER_SIZE);
+				standableSurfaceBuffer.Add(GlobalPosition);
 			}
 
-			SplitInertia(out Vector3 verticalInertia, out Vector3 horizontalInertia);
+			Inertia.Split(UpDirection, out Vector3 verticalInertia, out Vector3 horizontalInertia);
 
 			if (IsOnFloor()) {
 				verticalInertia = verticalInertia.SlideOnFace(UpDirection);
@@ -285,46 +247,19 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 		MoveAndSlide();
 	}
 
-	protected void Load(bool forceReload = false) {
-		if (Model is not null && !forceReload) return;
-
-		Model?.QueueFree();
-		Model = Costume?.Instantiate()?.SetParentToSceneInstance(this);
-
-		if (Model is null) return;
-
-		if (Model is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(Skeleton);
-		if (Model is IHandAdaptable mHanded) mHanded.SetHandedness(Handedness); // TODO: Get Handedness
-
-		OnLoadedUnloaded(true);
-	}
-	protected void Unload() {
-		OnLoadedUnloaded(false);
-
-		Model?.QueueFree();
-		Model = null;
-	}
-
-
-	private void OnLoadedUnloaded(bool isLoaded) {
-		Skeleton3D? skel = isLoaded ? Skeleton : null;
-
-		this.PropagateAction<ISkeletonAdaptable>(skeletonAdaptable => Callable.From(() => skeletonAdaptable.SetParentSkeleton(skel)).CallDeferred());
-	}
 
 	private void OnKill(float fromHealth) {
 		EmitSignal(SignalName.Death, fromHealth);
 	}
 
 	public void VoidOut() {
-		if (lastStandableSurfaces.Count == 0) {
+		if (standableSurfaceBuffer.Count == 0) {
 			GD.PushError("Could not Void out Properly");
 			return;
 		}
 
-		int delay = Math.Min(3, lastStandableSurfaces.Count);
-		GlobalPosition = lastStandableSurfaces[delay];
-		lastStandableSurfaces.RemoveRange(0, delay - 1);
+		GlobalPosition = standableSurfaceBuffer[0];
+		standableSurfaceBuffer = [standableSurfaceBuffer[0]];
 
 		GD.Print($"Entity {Name} Voided out.");
 
@@ -333,7 +268,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 		}
 	}
 
-	public void HandlePlayer(Player player) {
+	public virtual void HandlePlayer(Player player) {
 		player.CameraController.SetEntityAsSubject(this);
 		player.CameraController.MoveCamera(
 			player.InputDevice.GetVector("look_left", "look_right", "look_down", "look_up") * player.InputDevice.Sensitivity
@@ -360,10 +295,31 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 		}
 	}
 
-	private void UpdateHealth(bool keepRation) {
-		_health?.SetMaximum(GetModifiers(Attributes.GenericMaxHealth).Apply(Stats.MaxHealth), keepRation);
+	public virtual void DisavowPlayer(Player player) {
+		healthBar?.QueueFree();
+		healthBar = null;
 	}
 
+	protected void Load(bool forceReload = false) {
+		if (Model is not null && !forceReload) return;
+
+		Model?.QueueFree();
+		Model = Costume?.Instantiate()?.ParentTo(this);
+
+		if (Model is null) return;
+
+		if (Model is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(Skeleton);
+		if (Model is IHandAdaptable mHanded) mHanded.SetHandedness(Handedness); // TODO: Get Handedness
+	}
+	protected void Unload() {
+		Model?.QueueFree();
+		Model = null;
+	}
+
+
+	private void UpdateHealth(bool keepRatio) {
+		_health?.SetMaximum(AttributeModifiers.Get(Attributes.GenericMaxHealth).Apply(Stats.MaxHealth), keepRatio);
+	}
 
 	public override void _Process(double delta) {
 		base._Process(delta);
@@ -391,12 +347,41 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 		}
 	}
 
-	public override void _Notification(int what) {
-		base._Notification(what);
-		switch ((ulong)what) {
-			case NotificationSceneInstantiated:
-				Callable.From(() => Load()).CallDeferred();
-				break;
+	public override void _ExitTree() {
+		base._ExitTree();
+		Unload();
+		healthBar?.QueueFree();
+	}
+
+	public override void _EnterTree() {
+		base._EnterTree();
+		Load();
+	}
+
+
+
+	public EntitySaveData Save() {
+		return new EntitySaveData(this);
+	}
+
+	[Serializable]
+	public class EntitySaveData(Entity entity) : SceneSaveData<Entity>(entity) {
+		public ISaveData<Weapon>? WeaponData { get; set; } = entity.Weapon?.Save();
+
+		public string? CostumePath { get; set; } = entity.Costume?.ResourcePath;
+
+
+		public override Entity? Load() {
+			if (base.Load() is not Entity entity) return null;
+
+			entity.Weapon = WeaponData?.Load()?.ParentTo(entity);
+
+			if (CostumePath is not null) {
+				EntityCostume? costume = ResourceLoader.Load<EntityCostume>(CostumePath);
+				entity.SetCostume(costume);
+			}
+
+			return entity;
 		}
 	}
 }
