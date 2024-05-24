@@ -7,7 +7,13 @@ using Godot;
 [Tool]
 [GlobalClass]
 public sealed partial class EleosWeapon : SingleWeapon {
-	private readonly CompositeChargeAttackBuilder chargeAttack = new(SlashAttackBuilder.Instance, SlashAttackBuilder.Instance, "attack_heavy");
+	private readonly CompositeChargeAttackBuilder chargeAttack = new(
+		SlashAttackBuilder.Instance,
+		SlashAttackBuilder.Instance,
+		"attack_heavy",
+		750,
+		[new PercentileModifier(Attributes.GenericMoveSpeed, -0.7f), new PercentileModifier(Attributes.GenericjumpHeight, -0.5f)]
+	);
 
 	public override IWeapon.Type WeaponType => IWeapon.Type.Sword;
 	public override IWeapon.Usage WeaponUsage => IWeapon.Usage.Slash | IWeapon.Usage.Thrust;

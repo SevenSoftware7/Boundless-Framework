@@ -1,9 +1,6 @@
 namespace LandlessSkies.Vanilla;
 
-using System;
 using System.IO;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Godot;
 using KGySoft.Serialization.Binary;
 using LandlessSkies.Core;
@@ -21,18 +18,18 @@ public partial class TestInteractable : Interactable {
 
 		if (player is null) return;
 
-		EntitySaveData? savedEntity = entity.Save();
+		ISaveData<Entity>? savedEntity = entity.Save();
 
 
-		// string path = @$"{OS.GetUserDataDir()}/SaveData1.dat";
-		// BinarySerializationFormatter formatter = new(BinarySerializationOptions.CompactSerializationOfStructures);
+		string path = @$"{OS.GetUserDataDir()}/SaveData1.dat";
+		BinarySerializationFormatter formatter = new(BinarySerializationOptions.CompactSerializationOfStructures);
 
-		// using (FileStream stream = new(path, FileMode.Create)) {
-        //     formatter.SerializeToStream(stream, savedEntity);
-		// }
-		// using (FileStream stream = new(path, FileMode.Open)) {
-        //     savedEntity = formatter.DeserializeFromStream<EntitySaveData?>(stream);
-        // }
+		using (FileStream stream = new(path, FileMode.Create)) {
+            formatter.SerializeToStream(stream, savedEntity);
+		}
+		using (FileStream stream = new(path, FileMode.Open)) {
+            savedEntity = formatter.DeserializeFromStream<ISaveData<Entity>?>(stream);
+        }
 
 
 		Entity? clonedEntity = savedEntity?.Load()?.SetOwnerAndParent(this);

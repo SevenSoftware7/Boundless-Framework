@@ -1,7 +1,6 @@
-namespace LandlessSkies.Vanilla;
+namespace LandlessSkies.Core;
 
 using Godot;
-using LandlessSkies.Core;
 using static LandlessSkies.Core.IPortraitProvider;
 
 [Tool]

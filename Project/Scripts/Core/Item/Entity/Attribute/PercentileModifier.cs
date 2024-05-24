@@ -14,7 +14,20 @@ public sealed partial class PercentileModifier : AttributeModifier {
 	}
 	private float _percentile;
 
-	public override float Apply(float baseValue) {
+	[Export] public bool _isStacking = false;
+	public override bool IsStacking => _isStacking;
+
+
+
+	public PercentileModifier(StringName name, float percentile, bool isStacking = false) : base(name) {
+		_percentile = percentile;
+		_isStacking = isStacking;
+	}
+	private PercentileModifier() : base() {}
+
+
+
+	public override float ApplyTo(float baseValue) {
 		return baseValue * (1f + _percentile);
 	}
 

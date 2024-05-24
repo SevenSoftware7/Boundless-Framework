@@ -7,7 +7,7 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public abstract partial class Weapon : Node3D, IWeapon, ISkeletonAdaptable {
+public abstract partial class Weapon : Node3D, IWeapon, ISkeletonAdaptable, ISaveable<Weapon> {
 	public static readonly Basis rightHandBoneBasis = Basis.FromEuler(new(Mathfs.Deg2Rad(-90f), 0f, Mathfs.Deg2Rad(90f)));
 	public static readonly Basis leftHandBoneBasis = Basis.FromEuler(new(Mathfs.Deg2Rad(-90f), 0f, Mathfs.Deg2Rad(-90f)));
 
@@ -79,6 +79,17 @@ public abstract partial class Weapon : Node3D, IWeapon, ISkeletonAdaptable {
 
 		if (OnHand) {
 			StickToSkeletonBone();
+		}
+	}
+
+	public override void _Notification(int what) {
+		base._Notification(what);
+		switch ((ulong)what) {
+			case NotificationParented:
+				if (GetParent() is Entity entityParent && entityParent.Weapon is null) {
+					entityParent.Weapon = this;
+				}
+				break;
 		}
 	}
 }

@@ -4,12 +4,12 @@ using System;
 using Godot;
 
 public abstract class SceneSaveData<T> : ISaveData<T> where T : Node {
-	public string ScenePath { get; set; } = string.Empty;
-	public string? TypeName { get; set; }
+	public string ScenePath = string.Empty;
+	public string? TypeName;
 
 
 	public SceneSaveData(T data) {
-		Type baseType = typeof(Entity);
+		Type baseType = typeof(T);
 		ScenePath = data.SceneFilePath;
 
 		if (ScenePath.Length == 0) {
@@ -20,7 +20,7 @@ public abstract class SceneSaveData<T> : ISaveData<T> where T : Node {
 	}
 
 	public virtual T? Load() {
-		Type baseType = typeof(Entity);
+		Type baseType = typeof(T);
 		T? entity;
 
 		if (ScenePath.Length == 0) {

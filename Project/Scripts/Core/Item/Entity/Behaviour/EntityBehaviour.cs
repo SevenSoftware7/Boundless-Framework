@@ -22,7 +22,7 @@ public abstract partial class EntityBehaviour : Node, IPlayerHandler {
 	public virtual void HandlePlayer(Player player) { }
 	public virtual void DisavowPlayer(Player player) { }
 
-	public virtual bool SetSpeed(MovementType speed) => true;
+	public virtual bool SetMovementType(MovementType speed) => true;
 	public virtual bool Move(Vector3 direction) => true;
 	public virtual bool Jump(Vector3? target = null) => true;
 

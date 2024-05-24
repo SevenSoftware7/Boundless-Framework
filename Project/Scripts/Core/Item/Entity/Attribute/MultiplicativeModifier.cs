@@ -14,7 +14,20 @@ public sealed partial class MultiplicativeModifier : AttributeModifier {
 	}
 	private float _multiplier;
 
-	public override float Apply(float baseValue) {
+	[Export] public bool _isStacking = false;
+	public override bool IsStacking => _isStacking;
+
+
+
+	public MultiplicativeModifier(StringName name, float multiplier, bool isStacking = false) : base(name) {
+		_multiplier = multiplier;
+		_isStacking = isStacking;
+	}
+	private MultiplicativeModifier() : base() {}
+
+
+
+	public override float ApplyTo(float baseValue) {
 		return baseValue * _multiplier;
 	}
 

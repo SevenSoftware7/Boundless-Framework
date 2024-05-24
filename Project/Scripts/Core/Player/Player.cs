@@ -18,13 +18,13 @@ public sealed partial class Player : Node {
 		set {
 			if (_entity == value) return;
 
-			Callable.From(() => _entity?.PropagateAction<IPlayerHandler>(x => x.DisavowPlayer(this))).CallDeferred(); // Wait for Player Handling to be done
-
 			Callable onKill = Callable.From<float>(OnEntityDeath);
 			NodeExtensions.SwapSignalEmitter(ref _entity, value, Entity.SignalName.Death, onKill);
 		}
 	}
 	private Entity? _entity;
+	private Entity? _lastEntity;
+
 	public InputDevice InputDevice => InputManager.CurrentDevice;
 
 
@@ -60,10 +60,16 @@ public sealed partial class Player : Node {
 
 		if (Engine.IsEditorHint()) return;
 
-		if (Entity is null || CameraController is null) return;
+		if (_entity is null || CameraController is null) return;
 
 		// TODO: actual Device Management
-		Entity.PropagateAction<IPlayerHandler>(x => x.HandlePlayer(this));
+
+		if (_lastEntity != _entity) {
+			_lastEntity?.PropagateAction<IPlayerHandler>(x => x.DisavowPlayer(this));
+			_lastEntity = _entity;
+		}
+
+		_entity.PropagateAction<IPlayerHandler>(x => x.HandlePlayer(this));
 	}
 
 	public override void _Ready() {

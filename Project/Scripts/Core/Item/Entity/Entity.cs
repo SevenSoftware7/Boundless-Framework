@@ -4,12 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using KGySoft.CoreLibraries;
 using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
-	private List<Vector3> standableSurfaceBuffer = [];
+public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<EntityCostume>, ICustomizable, ISaveable<Entity> {
+	private readonly List<Vector3> standableSurfaceBuffer = [];
 	private const int STANDABLE_SURFACE_BUFFER_SIZE = 20;
 	private GaugeControl? healthBar;
 
@@ -18,7 +19,14 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 	public virtual ICustomizable[] Customizables => [.. new List<ICustomizable?>(){Model, Weapon}.OfType<ICustomizable>()];
 	public virtual ICustomization[] Customizations => [];
 
-	[Export] public Handedness Handedness { get; private set; } = Handedness.Right;
+	[Export] public Handedness Handedness {
+		get => _handedness;
+		private set {
+			_handedness = value;
+			_weapon?.Inject(this);
+		}
+	}
+	private Handedness _handedness = Handedness.Right;
 	[Export] public EntityStats Stats { get; private set; } = new();
 	[Export] public HudPack HudPack { get; private set; } = new();
 
@@ -26,11 +34,12 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 	[ExportGroup("Costume")]
 	[Export] public EntityCostume? Costume {
 		get => _costume;
-		private set => SetCostume(value);
+		set => SetCostume(value);
 	}
 	private EntityCostume? _costume;
 
 	protected Model? Model { get; private set; }
+	public bool IsLoaded { get; }
 
 
 	[ExportGroup("Weapon")]
@@ -50,7 +59,14 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 
 
 	[ExportGroup("Dependencies")]
-	[Export] public Skeleton3D? Skeleton { get; private set; }
+	[Export] public Skeleton3D? Skeleton {
+		get => _skeleton;
+		private set {
+			_skeleton = value;
+			_weapon?.Inject(this);
+		}
+	}
+	private Skeleton3D? _skeleton;
 
 	[Export] public AnimationPlayer? AnimationPlayer {
 		get => _animationPlayer;
@@ -109,7 +125,6 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 		set => _globalForward = Transform.Basis * value;
 	}
 
-
 	[Signal] public delegate void DeathEventHandler(float fromHealth);
 
 
@@ -128,12 +143,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 
 		_costume = newCostume;
 
-
-		if (Engine.IsEditorHint()) {
-			Callable.From<bool>(Load).CallDeferred(true);
-		} else {
-			Load(true);
-		}
+		Load(true);
 	}
 
 	public void ExecuteAction(EntityActionInfo action, bool forceExecute = false) {
@@ -258,8 +268,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 			return;
 		}
 
+		standableSurfaceBuffer.RemoveRange(1, standableSurfaceBuffer.Count - 1);
 		GlobalPosition = standableSurfaceBuffer[0];
-		standableSurfaceBuffer = [standableSurfaceBuffer[0]];
 
 		GD.Print($"Entity {Name} Voided out.");
 
@@ -300,25 +310,27 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 		healthBar = null;
 	}
 
-	protected void Load(bool forceReload = false) {
-		if (Model is not null && !forceReload) return;
 
-		Model?.QueueFree();
+	public void Load(bool forceReload = false) {
+		if (IsLoaded && !forceReload) return;
+
+		Unload();
+
 		Model = Costume?.Instantiate()?.ParentTo(this);
 
 		if (Model is null) return;
 
 		if (Model is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(Skeleton);
-		if (Model is IHandAdaptable mHanded) mHanded.SetHandedness(Handedness); // TODO: Get Handedness
+		if (Model is IHandAdaptable mHanded) mHanded.SetHandedness(Handedness);
 	}
-	protected void Unload() {
+	public void Unload() {
 		Model?.QueueFree();
 		Model = null;
 	}
 
 
 	private void UpdateHealth(bool keepRatio) {
-		_health?.SetMaximum(AttributeModifiers.Get(Attributes.GenericMaxHealth).Apply(Stats.MaxHealth), keepRatio);
+		_health?.SetMaximum(AttributeModifiers.Get(Attributes.GenericMaxHealth).ApplyTo(Stats.MaxHealth), keepRatio);
 	}
 
 	public override void _Process(double delta) {
@@ -353,33 +365,18 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable {
 		healthBar?.QueueFree();
 	}
 
-	public override void _EnterTree() {
-		base._EnterTree();
-		Load();
-	}
 
 
-
-	public EntitySaveData Save() {
-		return new EntitySaveData(this);
-	}
+	public ISaveData<Entity> Save() => new EntitySaveData<Entity>(this);
 
 	[Serializable]
-	public class EntitySaveData(Entity entity) : SceneSaveData<Entity>(entity) {
-		public ISaveData<Weapon>? WeaponData { get; set; } = entity.Weapon?.Save();
+	public class EntitySaveData<T>(T data) : CostumableSaveData<Entity, T, EntityCostume>(data) where T : Entity {
+		public ISaveData[] MiscData = [.. data.GetChildren().OfType<ISaveable>().Select(d => d.Save())];
 
-		public string? CostumePath { get; set; } = entity.Costume?.ResourcePath;
+		public override T? Load() {
+			if (base.Load() is not T entity) return null;
 
-
-		public override Entity? Load() {
-			if (base.Load() is not Entity entity) return null;
-
-			entity.Weapon = WeaponData?.Load()?.ParentTo(entity);
-
-			if (CostumePath is not null) {
-				EntityCostume? costume = ResourceLoader.Load<EntityCostume>(CostumePath);
-				entity.SetCostume(costume);
-			}
+			MiscData.ForEach(d => d.Load()?.ParentTo(entity));
 
 			return entity;
 		}

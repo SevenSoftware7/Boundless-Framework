@@ -9,9 +9,19 @@ public abstract partial class AttributeModifier : Resource, IAttributeModifier {
 	public static readonly StringName AttributeValue = "AttributeValue";
 
 
-	[Export] public StringName Name { get; private set; } = "";
+	[Export] public StringName Name { get; private set; } = string.Empty;
+	public virtual bool IsStacking => false;
 
-	public abstract float Apply(float baseValue);
+
+
+	public AttributeModifier(StringName name) : base() {
+		Name = name;
+	}
+	protected AttributeModifier() : base() { }
+
+
+
+	public abstract float ApplyTo(float baseValue);
 	public void UpdateName() {
 		if (! Engine.IsEditorHint()) return;
 

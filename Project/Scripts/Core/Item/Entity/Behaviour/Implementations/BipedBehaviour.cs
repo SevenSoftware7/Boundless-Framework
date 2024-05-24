@@ -41,7 +41,7 @@ public partial class BipedBehaviour(Entity Entity) : EntityBehaviour(Entity) {
 			_ when player.InputDevice.IsActionPressed("evade") => MovementType.Sprint,
 			_ => MovementType.Run
 		};
-		SetSpeed(speed);
+		SetMovementType(speed);
 
 
 		Move(groundedMovement.Normalized());
@@ -49,6 +49,7 @@ public partial class BipedBehaviour(Entity Entity) : EntityBehaviour(Entity) {
 	}
 	public override void DisavowPlayer(Player player) {
 		base.DisavowPlayer(player);
+
 		interactPrompt?.QueueFree();
 		interactPrompt = null;
 
@@ -78,8 +79,8 @@ public partial class BipedBehaviour(Entity Entity) : EntityBehaviour(Entity) {
 		}
 	}
 
-	public override bool SetSpeed(MovementType speed) {
-		if (!base.SetSpeed(speed))
+	public override bool SetMovementType(MovementType speed) {
+		if (!base.SetMovementType(speed))
 			return false;
 		if (speed == _movementType)
 			return false;
@@ -157,7 +158,7 @@ public partial class BipedBehaviour(Entity Entity) : EntityBehaviour(Entity) {
 			MovementType.Sprint => Entity.Stats.SprintSpeed,
 			_ => 0f
 		};
-		newSpeed = Entity.AttributeModifiers.Get(Attributes.GenericMoveSpeed).Apply(newSpeed);
+		newSpeed = Entity.AttributeModifiers.Get(Attributes.GenericMoveSpeed).ApplyTo(newSpeed);
 
 		Basis newRotation = Basis.LookingAt(Entity.GlobalForward, Vector3.Up);
 		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * Entity.Stats.RotationSpeed);
@@ -187,12 +188,15 @@ public partial class BipedBehaviour(Entity Entity) : EntityBehaviour(Entity) {
 		// ----- Jump Instruction -----
 
 		if (!jumpBuffer.IsDone && jumpCooldown.IsDone && !coyoteTimer.IsDone) {
-			float jumpHeight = Entity.AttributeModifiers.Get(Attributes.GenericjumpHeight).Apply(Entity.Stats.JumpHeight);
+			float jumpHeight = Entity.AttributeModifiers.Get(Attributes.GenericjumpHeight).ApplyTo(Entity.Stats.JumpHeight);
 
 			Entity.Inertia = Entity.Inertia.SlideOnFace(Entity.UpDirection) + Entity.UpDirection * jumpHeight;
 			jumpBuffer.End();
 			jumpCooldown.Start();
 		}
+
+		_movementType = MovementType.Idle;
+		_inputDirection = Vector3.Zero;
 	}
 
 

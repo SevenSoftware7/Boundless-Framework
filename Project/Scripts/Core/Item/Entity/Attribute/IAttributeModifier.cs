@@ -1,5 +1,6 @@
 namespace LandlessSkies.Core;
 
 public interface IAttributeModifier {
-	float Apply(float baseValue);
+	bool IsStacking { get; }
+	float ApplyTo(float baseValue);
 }

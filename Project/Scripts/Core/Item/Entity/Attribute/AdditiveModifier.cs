@@ -14,7 +14,16 @@ public sealed partial class AdditiveModifier : AttributeModifier {
 	}
 	private float _adder;
 
-	public override float Apply(float baseValue) {
+
+
+	public AdditiveModifier(StringName name, float adder) : base(name) {
+		_adder = adder;
+	}
+	private AdditiveModifier() : base() {}
+
+
+
+	public override float ApplyTo(float baseValue) {
 		return baseValue + _adder;
 	}
 

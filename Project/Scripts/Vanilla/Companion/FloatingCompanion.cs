@@ -12,7 +12,7 @@ public partial class FloatingCompanion : Companion {
 	public Transform3D Subject { get; private set; } = Transform3D.Identity;
 	public Transform3D Head { get; private set; } = Transform3D.Identity;
 
-	[Export] public Entity Entity { get; private set; } = null!;
+	[Export] public Entity? Entity { get; private set; }
 
 	[Export] public float T { get; private set; }
 	[Export] public float TFace { get; private set; }
@@ -106,5 +106,14 @@ public partial class FloatingCompanion : Companion {
 
 		float GetCurveT() => OnRight ? 1f : 0f;
 		Vector3 GetPosition(float t) => Head.Origin + Head.Basis * Curve.Sample(0, t);
+	}
+
+	public override void _Notification(int what) {
+		base._Notification(what);
+		switch ((ulong)what) {
+			case NotificationParented:
+				Entity ??= GetParent() as Entity;
+				break;
+		}
 	}
 }

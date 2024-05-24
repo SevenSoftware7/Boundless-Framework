@@ -3,13 +3,12 @@ namespace LandlessSkies.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
 using Godot;
 using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public abstract partial class SingleWeapon : Weapon, IUIObject {
+public abstract partial class SingleWeapon : Weapon, ICostumable<WeaponCostume>, IUIObject {
 	[Export] private string _displayName = string.Empty;
 	public override string DisplayName => _displayName;
 	public override Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
@@ -18,11 +17,12 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 	[ExportGroup("Costume")]
 	[Export] public WeaponCostume? Costume {
 		get => _costume;
-		private set => SetCostume(value);
+		set => SetCostume(value);
 	}
 	private WeaponCostume? _costume;
 
 	protected Model? Model { get; private set; }
+	public bool IsLoaded => Model is not null;
 
 
 	[ExportGroup("Dependencies")]
@@ -74,12 +74,7 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 		_costume = newCostume;
 		EmitSignal(SignalName.CostumeChanged, newCostume!, oldCostume!);
 
-
-		if (Engine.IsEditorHint()) {
-			Callable.From<bool>(Load).CallDeferred(true);
-		} else {
-			Load(true);
-		}
+		Load(true);
 	}
 
 
@@ -93,10 +88,11 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 		if (Model is IHandAdaptable mHand) mHand.SetHandedness(handedness);
 	}
 
-	protected void Load(bool forceReload = false) {
-		if (Model is not null && !forceReload) return;
+	public void Load(bool forceReload = false) {
+		if (IsLoaded && !forceReload) return;
 
-		Model?.QueueFree();
+		Unload();
+
 		Model = Costume?.Instantiate()?.ParentTo(this);
 
 		if (Model is null) return;
@@ -104,7 +100,7 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 		if (Model is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(Skeleton);
 		if (Model is IHandAdaptable mHanded) mHanded.SetHandedness(Handedness);
 	}
-	protected void Unload() {
+	public void Unload() {
 		Model?.QueueFree();
 		Model = null;
 	}
@@ -113,32 +109,21 @@ public abstract partial class SingleWeapon : Weapon, IUIObject {
 		base._ExitTree();
 		Unload();
 	}
-	public override void _EnterTree() {
-		base._EnterTree();
-		Load();
 
-	}
-
-	public override SingleWeaponSaveData Save() {
-		return new SingleWeaponSaveData(this);
-	}
+	public override ISaveData<Weapon> Save() => new SingleWeaponSaveData<SingleWeapon>(this);
 
 
 
 	[Serializable]
-	public class SingleWeaponSaveData(SingleWeapon weapon) : SceneSaveData<Weapon>(weapon) {
-		public string? CostumePath { get; set; } = weapon.Costume?.ResourcePath;
+	public class SingleWeaponSaveData<T>(T weapon) : CostumableSaveData<Weapon, T, WeaponCostume>(weapon) where T : SingleWeapon {
+		// protected override WeaponCostume? GetCostume(T data) => data.Costume;
+		// protected override void SetCostume(T data, WeaponCostume? costume) => data.Costume = costume;
 
 
-		public override SingleWeapon? Load() {
-			if (base.Load() is not SingleWeapon weapon) return null;
+		// public override SingleWeapon? Load() {
+		// 	if (base.Load() is not SingleWeapon weapon) return null;
 
-			if (CostumePath is not null) {
-				WeaponCostume? costume = ResourceLoader.Load<WeaponCostume>(CostumePath);
-				weapon.SetCostume(costume);
-			}
-
-			return weapon;
-		}
+		// 	return base.Load();
+		// }
 	}
 }

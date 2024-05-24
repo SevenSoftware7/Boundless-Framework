@@ -1192,195 +1192,195 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = 4
 material = SubResource("FogMaterial_2f08y")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Environment"]
+[node name="Geometry" type="Node3D" parent="Environment"]
 
-[node name="Block_1" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_1" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -16)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_7w584")
 
-[node name="Block_2" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_2" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -15.5)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_o7js0")
 
-[node name="Block_3" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_3" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -15)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_qj8my")
 
-[node name="Block_4" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_4" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -14.5)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_5vy63")
 
-[node name="Block_5" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_5" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -14)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_rqrvx")
 
-[node name="Block_6" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_6" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -13.5)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_j1up8")
 
-[node name="Block_7" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_7" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -13)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_645y6")
 
-[node name="Block_8" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_8" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -12.5)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_64ahj")
 
-[node name="Block_9" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_9" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -12)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_4j4a5")
 
-[node name="Block_10" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_10" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -11.5)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_k73ej")
 
-[node name="Block_11" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_11" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -11)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_qhhiu")
 
-[node name="Block_12" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_12" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10.5)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_g74si")
 
-[node name="Block_13" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_13" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_evfrp")
 
-[node name="Block_14" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_14" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -9.5)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_nytoc")
 
-[node name="Block_15" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_15" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -9)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_ck7kb")
 
-[node name="Block_16" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_16" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -8.5)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_lgics")
 collision_mask = 0
 
-[node name="Block_34" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_34" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, -16)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_thvx1")
 
-[node name="Block_0" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_0" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, -1, 8)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_xw20i")
 
-[node name="Block_17" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_17" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -16)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_v2nih")
 
-[node name="Block_19" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_19" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -15)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_5lp8u")
 
-[node name="Block_20" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_20" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -14)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_0oobb")
 
-[node name="Block_21" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_21" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -13)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_efya6")
 
-[node name="Block_22" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_22" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -12)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_4rsqx")
 
-[node name="Block_23" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_23" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -11)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_62cc7")
 
-[node name="Block_24" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_24" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -10)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_uo6rx")
 
-[node name="Block_25" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_25" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -9)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_diajh")
 
-[node name="Block_28" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_28" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 5, 4, -19)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_rgsgx")
 
-[node name="Block_27" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_27" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 6, 4, -24)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_lhsxd")
 
-[node name="Block_26" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_26" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 2, 4, -28)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_jl2iu")
 
-[node name="Block_29" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_29" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -4, 6, -30)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_imwm5")
 
-[node name="Block_30" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_30" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -10, 8, -28)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_7xdkl")
 
-[node name="Block_31" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_31" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -14, 10, -24)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_ryfet")
 
-[node name="Block_32" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_32" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, -1, -22)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_g7c6q")
 
-[node name="Block_18" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_18" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -16)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_en70j")
 
-[node name="Block_33" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_33" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -14)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_5i3x7")
 
-[node name="Block_35" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_35" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -12)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_8kn7d")
 
-[node name="Block_36" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_36" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -10)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_dxejf")
 
-[node name="Block_37" type="Node3D" parent="Environment/StaticBody3D"]
+[node name="Block_37" type="Node3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, -1, 24)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_jhkky")

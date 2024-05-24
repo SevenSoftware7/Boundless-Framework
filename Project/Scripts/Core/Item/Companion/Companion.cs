@@ -1,12 +1,12 @@
-namespace LandlessSkies.Vanilla;
+namespace LandlessSkies.Core;
 
-using LandlessSkies.Core;
+using System;
 using Godot;
 using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class Companion : Node3D, IUIObject, IPlayerHandler, ICustomizable {
+public partial class Companion : Node3D, IUIObject, IPlayerHandler, ICostumable<CompanionCostume>, ICustomizable, ISaveable<Companion> {
 	[Export] public string DisplayName { get; private set; } = string.Empty;
 	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
 
@@ -18,12 +18,12 @@ public partial class Companion : Node3D, IUIObject, IPlayerHandler, ICustomizabl
 	[ExportGroup("Costume")]
 	[Export] public CompanionCostume? Costume {
 		get => _costume;
-		private set => SetCostume(value);
+		set => SetCostume(value);
 	}
 	private CompanionCostume? _costume;
 
 	protected Model? Model { get; private set; }
-
+	public bool IsLoaded => Model is not null;
 
 	[Signal] public delegate void CostumeChangedEventHandler(CompanionCostume? newCostume, CompanionCostume? oldCostume);
 
@@ -44,11 +44,7 @@ public partial class Companion : Node3D, IUIObject, IPlayerHandler, ICustomizabl
 		_costume = newCostume;
 		EmitSignal(SignalName.CostumeChanged, newCostume!, oldCostume!);
 
-		if (Engine.IsEditorHint()) {
-			Callable.From<bool>(Load).CallDeferred(true);
-		} else {
-			Load(true);
-		}
+		Load(true);
 	}
 
 
@@ -57,13 +53,14 @@ public partial class Companion : Node3D, IUIObject, IPlayerHandler, ICustomizabl
 	public virtual void DisavowPlayer(Player player) { }
 
 
-	protected void Load(bool forceReload = false) {
-		if (Model is not null && !forceReload) return;
+	public void Load(bool forceReload = false) {
+		if (IsLoaded && !forceReload) return;
 
-		Model?.QueueFree();
+		Unload();
+
 		Model = Costume?.Instantiate()?.ParentTo(this);
 	}
-	protected void Unload() {
+	public void Unload() {
 		Model?.QueueFree();
 		Model = null;
 	}
@@ -72,8 +69,17 @@ public partial class Companion : Node3D, IUIObject, IPlayerHandler, ICustomizabl
 		base._ExitTree();
 		Unload();
 	}
-	public override void _EnterTree() {
-		base._EnterTree();
-		Load();
+
+	public virtual ISaveData<Companion> Save() => new CompanionSaveData<Companion>(this);
+
+
+	[Serializable]
+	public class CompanionSaveData<T>(T companion) : CostumableSaveData<Companion, T, CompanionCostume>(companion) where T : Companion {
+
+		// public override Companion? Load() {
+		// 	if (base.Load() is not Companion weapon) return null;
+
+		// 	return base.Load();
+		// }
 	}
 }
