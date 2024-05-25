@@ -51,9 +51,8 @@ enabled=PackedStringArray("res://addons/cyclops_level_builder/plugin.cfg")
 
 folder_colors={
 "res://Resources/Animations/": "green",
-"res://Resources/Characters/": "purple",
 "res://Resources/Companions/": "blue",
-"res://Resources/Costumes/": "purple",
+"res://Resources/Entities/": "purple",
 "res://Resources/Weapons/": "red"
 }
 

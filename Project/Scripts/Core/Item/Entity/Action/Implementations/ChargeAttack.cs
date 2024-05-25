@@ -2,7 +2,7 @@ namespace LandlessSkies.Core;
 
 using SevenDev.Utility;
 
-public abstract partial class ChargeAttack(SingleWeapon weapon, ulong chargeDuration = 1000) : Attack(weapon) {
+public abstract partial class ChargeAttack(Entity entity, SingleWeapon weapon, ulong chargeDuration = 1000) : Attack(entity, weapon), IPlayerHandler {
 	public override bool IsCancellable => true;
 	public override bool IsKnockable => true;
 
@@ -13,30 +13,28 @@ public abstract partial class ChargeAttack(SingleWeapon weapon, ulong chargeDura
 
 	protected abstract bool IsChargeStopped(InputDevice inputDevice);
 
-	protected abstract void ChargeDone(Entity entity);
-	protected abstract void ChargedAttack(Entity entity);
-	protected abstract void UnchargedAttack(Entity entity);
+	protected abstract void ChargeDone();
+	protected abstract void ChargedAttack();
+	protected abstract void UnchargedAttack();
 
 
-	public override void HandlePlayer(Player player) {
-		base.HandlePlayer(player);
-
-		if (player.Entity is null) return;
-
+	public virtual void SetupPlayer(Player player) { }
+	public virtual void HandlePlayer(Player player) {
 		if (!isDone && chargeTime.IsDone) {
 			isDone = true;
-			ChargeDone(player.Entity);
+			ChargeDone();
 		}
 
 		if (IsChargeStopped(player.InputDevice)) {
 			if (chargeTime.IsDone) {
-				ChargedAttack(player.Entity);
+				ChargedAttack();
 			}
 			else {
-				UnchargedAttack(player.Entity);
+				UnchargedAttack();
 			}
 
 			QueueFree();
 		}
 	}
+	public virtual void DisavowPlayer(Player player) { }
 }

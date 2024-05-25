@@ -38,8 +38,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 	}
 	private EntityCostume? _costume;
 
-	protected Model? Model { get; private set; }
-	public bool IsLoaded { get; }
+	public Model? Model { get; private set; }
+	public bool IsLoaded => Model is not null;
 
 
 	[ExportGroup("Weapon")]
@@ -129,10 +129,13 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 
 
 
-	public Entity() : base() {
+	protected Entity() : base() {
 		CollisionLayer = Collisions.EntityCollisionLayer;
 
 		Forward = Vector3.Forward;
+	}
+	public Entity(EntityCostume? costume) : this() {
+		SetCostume(costume);
 	}
 
 
@@ -143,7 +146,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 
 		_costume = newCostume;
 
-		Load(true);
+		Callable.From<bool>(Load).CallDeferred(true);
 	}
 
 	public void ExecuteAction(EntityActionInfo action, bool forceExecute = false) {
@@ -153,17 +156,20 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 		CurrentAction = null;
 
 		action.AfterExecute += () => CurrentAction = null;
-		CurrentAction = action.Execute();
+		CurrentAction = action.Execute(this);
 
 		CurrentAction.ParentTo(this);
 	}
 
 
 	public void SetBehaviour<TBehaviour>(TBehaviour? behaviour) where TBehaviour : EntityBehaviour {
-		behaviour?.Start(CurrentBehaviour);
-		CurrentBehaviour?.Stop();
+		if (CurrentBehaviour?.Stop() ?? false) {
+			CurrentBehaviour.QueueFree();
+			CurrentBehaviour = null;
+		}
 
-		CurrentBehaviour = behaviour;
+		behaviour?.Start(CurrentBehaviour);
+		CurrentBehaviour = behaviour?.SafeReparent(this);
 	}
 
 
@@ -278,19 +284,20 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 		}
 	}
 
+	public virtual void SetupPlayer(Player player) {
+		if (Health is null) return;
+
+		healthBar ??= player.HudManager.AddInfo(HudPack.HealthBar);
+		if (healthBar is null) return;
+
+		healthBar!.Value = Health;
+	}
+
 	public virtual void HandlePlayer(Player player) {
 		player.CameraController.SetEntityAsSubject(this);
 		player.CameraController.MoveCamera(
 			player.InputDevice.GetVector("look_left", "look_right", "look_down", "look_up") * player.InputDevice.Sensitivity
 		);
-
-		if (Health is null) {
-			healthBar?.QueueFree();
-		}
-		else {
-			healthBar ??= player.HudManager.AddInfo(HudPack.HealthBar);
-			healthBar!.Value = Health;
-		}
 
 		if (_weapon is not null) {
 			if (player.InputDevice.IsActionJustPressed("switch_weapon_primary")) {
@@ -361,8 +368,16 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 
 	public override void _ExitTree() {
 		base._ExitTree();
-		Unload();
 		healthBar?.QueueFree();
+	}
+
+	public override void _Notification(int what) {
+		base._Notification(what);
+		switch ((ulong)what) {
+			case NotificationChildOrderChanged:
+				Weapon ??= GetChildren().OfType<Weapon>().FirstOrDefault();
+				break;
+		}
 	}
 
 

@@ -9,6 +9,44 @@ public static class NodeExtensions {
 
 	public static bool IsEnabled(this Node node) => node.ProcessMode == Node.ProcessModeEnum.Inherit || node.ProcessMode == Node.ProcessModeEnum.Always;
 
+	public static void Enable(this Node node) {
+		if (node.ProcessMode == Node.ProcessModeEnum.Disabled) {
+			node.ProcessMode = Node.ProcessModeEnum.Inherit;
+		}
+	}
+	public static void Disable(this Node node) {
+		node.ProcessMode = Node.ProcessModeEnum.Disabled;
+	}
+
+	public static void SetEnabled(this Node node, bool enabled) {
+		if (enabled) {
+			node.Enable();
+		}
+		else {
+			node.Disable();
+		}
+	}
+
+	public static void Enable(this Node2D node) {
+		node.Visible = true;
+		if (node.ProcessMode == Node.ProcessModeEnum.Disabled) {
+			node.ProcessMode = Node.ProcessModeEnum.Inherit;
+		}
+	}
+	public static void Disable(this Node2D node) {
+		node.Visible = false;
+		node.ProcessMode = Node.ProcessModeEnum.Disabled;
+	}
+
+	public static void SetEnabled(this Node2D node, bool enabled) {
+		if (enabled) {
+			node.Enable();
+		}
+		else {
+			node.Disable();
+		}
+	}
+
 	public static void Enable(this Node3D node) {
 		node.Visible = true;
 		if (node.ProcessMode == Node.ProcessModeEnum.Disabled) {
@@ -21,6 +59,26 @@ public static class NodeExtensions {
 	}
 
 	public static void SetEnabled(this Node3D node, bool enabled) {
+		if (enabled) {
+			node.Enable();
+		}
+		else {
+			node.Disable();
+		}
+	}
+
+	public static void Enable(this Control node) {
+		node.Visible = true;
+		if (node.ProcessMode == Node.ProcessModeEnum.Disabled) {
+			node.ProcessMode = Node.ProcessModeEnum.Inherit;
+		}
+	}
+	public static void Disable(this Control node) {
+		node.Visible = false;
+		node.ProcessMode = Node.ProcessModeEnum.Disabled;
+	}
+
+	public static void SetEnabled(this Control node, bool enabled) {
 		if (enabled) {
 			node.Enable();
 		}

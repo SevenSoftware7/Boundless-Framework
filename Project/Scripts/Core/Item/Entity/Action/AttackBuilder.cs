@@ -6,5 +6,5 @@ public abstract class AttackBuilder {
 
 
 	public AttackActionInfo GetInfo(SingleWeapon weapon) => new(weapon, this);
-	public abstract Attack Build(SingleWeapon weapon);
+	public abstract Attack Build(Entity entity, SingleWeapon weapon);
 }

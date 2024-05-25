@@ -5,8 +5,7 @@ using SevenDev.Utility;
 
 namespace LandlessSkies.Core;
 
-public partial class CompositeChargeAttack(SingleWeapon weapon, CompositeChargeAttackBuilder info, IEnumerable<AttributeModifier> modifiers) : ChargeAttack(weapon, info.ChargeDuration) {
-	private Entity? attributesTarget;
+public partial class CompositeChargeAttack(Entity entity, SingleWeapon weapon, CompositeChargeAttackBuilder info, IEnumerable<AttributeModifier> modifiers) : ChargeAttack(entity, weapon, info.ChargeDuration) {
 
 
 	protected override bool IsChargeStopped(InputDevice inputDevice) {
@@ -14,30 +13,30 @@ public partial class CompositeChargeAttack(SingleWeapon weapon, CompositeChargeA
 	}
 
 
-	protected override void ChargeDone(Entity entity) {
+	protected override void ChargeDone() {
 		GD.Print("Charged Up");
 	}
 
-	protected override void ChargedAttack(Entity entity) {
+	protected override void ChargedAttack() {
 		QueueFree();
-		entity.ExecuteAction(new AttackActionInfo(Weapon, info.ChargedAttack), true);
+		Entity.ExecuteAction(new AttackActionInfo(Weapon, info.ChargedAttack), true);
 	}
 
-	protected override void UnchargedAttack(Entity entity) {
+	protected override void UnchargedAttack() {
 		QueueFree();
-		entity.ExecuteAction(new AttackActionInfo(Weapon, info.UnchargedAttack), true);
+		Entity.ExecuteAction(new AttackActionInfo(Weapon, info.UnchargedAttack), true);
 	}
 
-	public override void HandlePlayer(Player player) {
-		if (attributesTarget is null && player.Entity is Entity entity) {
-			entity.AttributeModifiers.AddRange(modifiers);
-			attributesTarget = entity;
-		}
-		base.HandlePlayer(player);
+
+	public override void _Ready() {
+		base._Ready();
+
+		Entity.AttributeModifiers.AddRange(modifiers);
 	}
 
 	public override void _ExitTree() {
 		base._ExitTree();
-		attributesTarget?.AttributeModifiers.RemoveRange(modifiers);
+
+		Entity.AttributeModifiers.RemoveRange(modifiers);
 	}
 }

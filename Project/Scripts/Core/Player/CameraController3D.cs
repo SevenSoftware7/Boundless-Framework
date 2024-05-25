@@ -45,7 +45,7 @@ public partial class CameraController3D : Camera3D {
 		}
 
 		Subject = transform with {
-			Basis = Subject.Basis * BasisExtensions.FromToBasis(Subject.Basis.Y, transform.Basis.Y),
+			Basis = Subject.Basis * BasisExtensions.FromToBasis(Subject.Basis.Y, entity.UpDirection),
 			Origin = origin
 		};
 	}

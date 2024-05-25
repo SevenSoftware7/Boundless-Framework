@@ -21,7 +21,7 @@ public abstract partial class SingleWeapon : Weapon, ICostumable<WeaponCostume>,
 	}
 	private WeaponCostume? _costume;
 
-	protected Model? Model { get; private set; }
+	public Model? Model { get; private set; }
 	public bool IsLoaded => Model is not null;
 
 
@@ -74,7 +74,7 @@ public abstract partial class SingleWeapon : Weapon, ICostumable<WeaponCostume>,
 		_costume = newCostume;
 		EmitSignal(SignalName.CostumeChanged, newCostume!, oldCostume!);
 
-		Load(true);
+		Callable.From<bool>(Load).CallDeferred(true);
 	}
 
 
@@ -103,11 +103,6 @@ public abstract partial class SingleWeapon : Weapon, ICostumable<WeaponCostume>,
 	public void Unload() {
 		Model?.QueueFree();
 		Model = null;
-	}
-
-	public override void _ExitTree() {
-		base._ExitTree();
-		Unload();
 	}
 
 	public override ISaveData<Weapon> Save() => new SingleWeaponSaveData<SingleWeapon>(this);

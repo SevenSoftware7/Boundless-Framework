@@ -3,17 +3,19 @@ namespace LandlessSkies.Core;
 using System;
 using Godot;
 
-public abstract partial class EntityAction : Node, IPlayerHandler {
+public abstract partial class EntityAction : Node {
+	[Export] public Entity Entity;
 	public event Action? OnDestroy;
+
+
+	protected EntityAction() : this(null!) { }
+	public EntityAction(Entity entity) {
+		Entity = entity;
+	}
 
 
 	public abstract bool IsCancellable { get; }
 	public abstract bool IsKnockable { get; }
-
-
-
-	public virtual void HandlePlayer(Player player) { }
-	public virtual void DisavowPlayer(Player player) { }
 
 
 	public override void _Notification(int what) {

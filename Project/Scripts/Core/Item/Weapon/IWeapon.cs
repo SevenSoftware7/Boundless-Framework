@@ -3,7 +3,7 @@ namespace LandlessSkies.Core;
 using System;
 using System.Collections.Generic;
 
-public interface IWeapon : IPlayerHandler, ICustomizable {
+public interface IWeapon : /* IPlayerHandler,  */ICustomizable {
 	Type WeaponType { get; }
 	Usage WeaponUsage { get; }
 	Size WeaponSize { get; }

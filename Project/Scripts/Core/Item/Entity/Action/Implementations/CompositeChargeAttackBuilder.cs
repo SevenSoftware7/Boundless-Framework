@@ -24,7 +24,14 @@ public class CompositeChargeAttackBuilder(AttackBuilder UnchargedAttack, AttackB
 
 
 
-	public override CompositeChargeAttack Build(SingleWeapon weapon) {
-		return new CompositeChargeAttack(weapon, this, AttributeModifiers);
+	public void ExecuteOnKeyJustPressed(Player player, SingleWeapon weapon) {
+		if (player.InputDevice.IsActionJustPressed(ActionKey)) {
+			player?.Entity?.ExecuteAction(GetInfo(weapon));
+		}
+	}
+
+
+	public override CompositeChargeAttack Build(Entity entity, SingleWeapon weapon) {
+		return new CompositeChargeAttack(entity, weapon, this, AttributeModifiers);
 	}
 }

@@ -5,22 +5,15 @@ using Godot;
 using SevenDev.Utility;
 
 [GlobalClass]
-public abstract partial class EntityBehaviour : Node, IPlayerHandler {
-	[Export] public Entity Entity = null!;
+public abstract partial class EntityBehaviour : Node {
+	[Export] public Entity Entity;
 
 
-
-	public EntityBehaviour() : base() { }
-	public EntityBehaviour(Entity entity) : base() {
-		ArgumentNullException.ThrowIfNull(entity);
-
+	protected EntityBehaviour() : this(null!) { }
+	public EntityBehaviour(Entity entity) {
 		Entity = entity;
-		Entity.AddChildAndSetOwner(this);
 	}
 
-
-	public virtual void HandlePlayer(Player player) { }
-	public virtual void DisavowPlayer(Player player) { }
 
 	public virtual bool SetMovementType(MovementType speed) => true;
 	public virtual bool Move(Vector3 direction) => true;
@@ -29,8 +22,9 @@ public abstract partial class EntityBehaviour : Node, IPlayerHandler {
 	public virtual void Start(EntityBehaviour? previousBehaviour) {
 		ProcessMode = ProcessModeEnum.Inherit;
 	}
-	public virtual void Stop() {
+	public virtual bool Stop() {
 		ProcessMode = ProcessModeEnum.Disabled;
+		return false;
 	}
 
 

@@ -22,17 +22,17 @@ public partial class Companion : Node3D, IUIObject, IPlayerHandler, ICostumable<
 	}
 	private CompanionCostume? _costume;
 
-	protected Model? Model { get; private set; }
+	public Model? Model { get; private set; }
 	public bool IsLoaded => Model is not null;
+
 
 	[Signal] public delegate void CostumeChangedEventHandler(CompanionCostume? newCostume, CompanionCostume? oldCostume);
 
 
 
-	public Companion() : base() { }
+	protected Companion() : base() { }
 	public Companion(CompanionCostume? costume) : this() {
 		SetCostume(costume);
-		Name = $"{nameof(Companion)} - {DisplayName}";
 	}
 
 
@@ -44,11 +44,12 @@ public partial class Companion : Node3D, IUIObject, IPlayerHandler, ICostumable<
 		_costume = newCostume;
 		EmitSignal(SignalName.CostumeChanged, newCostume!, oldCostume!);
 
-		Load(true);
+		Callable.From<bool>(Load).CallDeferred(true);
 	}
 
 
 
+	public virtual void SetupPlayer(Player player) { }
 	public virtual void HandlePlayer(Player player) { }
 	public virtual void DisavowPlayer(Player player) { }
 
@@ -65,10 +66,6 @@ public partial class Companion : Node3D, IUIObject, IPlayerHandler, ICostumable<
 		Model = null;
 	}
 
-	public override void _ExitTree() {
-		base._ExitTree();
-		Unload();
-	}
 
 	public virtual ISaveData<Companion> Save() => new CompanionSaveData<Companion>(this);
 

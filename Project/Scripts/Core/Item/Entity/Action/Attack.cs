@@ -5,11 +5,8 @@ using System.Collections.Generic;
 using Godot;
 using SevenDev.Utility;
 
-public abstract partial class Attack(SingleWeapon Weapon) : EntityAction() {
+public abstract partial class Attack(Entity entity, SingleWeapon Weapon) : EntityAction(entity) {
 	protected SingleWeapon Weapon { get; private set; } = Weapon;
-
-
-	private Attack() : this(null!) { }
 
 
 	[Flags]

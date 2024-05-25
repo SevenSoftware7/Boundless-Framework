@@ -6,7 +6,7 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public sealed partial class EleosWeapon : SingleWeapon {
+public sealed partial class EleosWeapon : SingleWeapon, IPlayerHandler {
 	private readonly CompositeChargeAttackBuilder chargeAttack = new(
 		SlashAttackBuilder.Instance,
 		SlashAttackBuilder.Instance,
@@ -30,10 +30,8 @@ public sealed partial class EleosWeapon : SingleWeapon {
 		];
 	}
 
-
-	public override void HandlePlayer(Player player) {
-		base.HandlePlayer(player);
-
+	public void SetupPlayer(Player player) { }
+	public void HandlePlayer(Player player) {
 		if (!CanProcess()) return;
 
 		if (player.Entity is null) return;
@@ -42,8 +40,7 @@ public sealed partial class EleosWeapon : SingleWeapon {
 			player.Entity.ExecuteAction(SlashAttackBuilder.Instance.GetInfo(this));
 		}
 
-		if (player.InputDevice.IsActionJustPressed("attack_heavy")) {
-			player.Entity.ExecuteAction(chargeAttack.GetInfo(this));
-		}
+		chargeAttack.ExecuteOnKeyJustPressed(player, this);
 	}
+	public void DisavowPlayer(Player player) { }
 }

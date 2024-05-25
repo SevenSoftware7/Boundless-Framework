@@ -38,10 +38,6 @@ public abstract partial class Weapon : Node3D, IWeapon, ISkeletonAdaptable, ISav
 		SetHandedness(entity?.Handedness ?? Handedness.Right);
 	}
 
-
-	public virtual void HandlePlayer(Player player) { }
-	public virtual void DisavowPlayer(Player player) { }
-
 	public abstract ISaveData<Weapon> Save();
 
 	public virtual void SetParentSkeleton(Skeleton3D? skeleton) => Skeleton = skeleton;
@@ -79,17 +75,6 @@ public abstract partial class Weapon : Node3D, IWeapon, ISkeletonAdaptable, ISav
 
 		if (OnHand) {
 			StickToSkeletonBone();
-		}
-	}
-
-	public override void _Notification(int what) {
-		base._Notification(what);
-		switch ((ulong)what) {
-			case NotificationParented:
-				if (GetParent() is Entity entityParent && entityParent.Weapon is null) {
-					entityParent.Weapon = this;
-				}
-				break;
 		}
 	}
 }

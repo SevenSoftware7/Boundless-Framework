@@ -3,7 +3,7 @@ namespace LandlessSkies.Core;
 public interface ICostumable {
 	Costume? Costume { get; set; }
 
-	bool IsLoaded { get; }
+	abstract bool IsLoaded { get; }
 
 	void Reload(bool forceReload = false) {
 		bool wasLoaded = IsLoaded;

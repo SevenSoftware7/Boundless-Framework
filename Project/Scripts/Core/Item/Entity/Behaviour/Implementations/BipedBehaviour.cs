@@ -3,7 +3,9 @@ namespace LandlessSkies.Core;
 using Godot;
 using SevenDev.Utility;
 
-public partial class BipedBehaviour(Entity Entity) : EntityBehaviour(Entity) {
+[Tool]
+[GlobalClass]
+public partial class BipedBehaviour : EntityBehaviour, IPlayerHandler {
 	private Vector3 _inputDirection;
 	private float _moveSpeed;
 	private MovementType _movementType;
@@ -17,16 +19,38 @@ public partial class BipedBehaviour(Entity Entity) : EntityBehaviour(Entity) {
 	private PromptControl? interactPrompt;
 	private PointerControl? interactPointer;
 
+	public bool HasSetupPlayer => interactPrompt is not null && interactPointer is not null;
+
+
+	protected BipedBehaviour() : this(null!) { }
+	public BipedBehaviour(Entity entity) : base(entity) { }
+
+
 	public override void Start(EntityBehaviour? previousBehaviour) {
 		base.Start(previousBehaviour);
 
 		Entity.MotionMode = CharacterBody3D.MotionModeEnum.Grounded;
+
+		interactPrompt?.Enable();
+		interactPointer?.Enable();
+
+	}
+	public override bool Stop() {
+		bool res = base.Stop();
+
+		interactPrompt?.Disable();
+		interactPointer?.Disable();
+
+		return res;
 	}
 
 
-	public override void HandlePlayer(Player player) {
-		base.HandlePlayer(player);
+	public void SetupPlayer(Player player) {
+		interactPrompt ??= player.HudManager.AddPrompt(Entity.HudPack.InteractPrompt);
+		interactPointer ??= player.HudManager.AddPointer(Entity.HudPack.InteractPointer);
+	}
 
+	public void HandlePlayer(Player player) {
 		if (player.InputDevice.IsActionPressed("jump")) {
 			Jump();
 		}
@@ -47,9 +71,8 @@ public partial class BipedBehaviour(Entity Entity) : EntityBehaviour(Entity) {
 		Move(groundedMovement.Normalized());
 		HandleInteraction(player);
 	}
-	public override void DisavowPlayer(Player player) {
-		base.DisavowPlayer(player);
 
+	public void DisavowPlayer(Player player) {
 		interactPrompt?.QueueFree();
 		interactPrompt = null;
 
@@ -67,13 +90,11 @@ public partial class BipedBehaviour(Entity Entity) : EntityBehaviour(Entity) {
 		}
 
 
-		interactPrompt ??= player.HudManager.AddPrompt(Entity.HudPack.InteractPrompt);
 		if (interactPrompt is not null) {
 			interactPrompt.Update(target);
 			interactPrompt.SetKey(player.InputDevice.GetActionSymbol("interact"));
 		}
 
-		interactPointer ??= player.HudManager.AddPointer(Entity.HudPack.InteractPointer);
 		if (interactPointer is not null) {
 			interactPointer.Target = target?.Interactable.GlobalTransform;
 		}
@@ -117,6 +138,10 @@ public partial class BipedBehaviour(Entity Entity) : EntityBehaviour(Entity) {
 
 	public override void _Process(double delta) {
 		base._Process(delta);
+
+		if (Engine.IsEditorHint()) return;
+
+
 		float floatDelta = (float)delta;
 
 		// ----- Inertia Calculations -----
@@ -160,7 +185,7 @@ public partial class BipedBehaviour(Entity Entity) : EntityBehaviour(Entity) {
 		};
 		newSpeed = Entity.AttributeModifiers.Get(Attributes.GenericMoveSpeed).ApplyTo(newSpeed);
 
-		Basis newRotation = Basis.LookingAt(Entity.GlobalForward, Vector3.Up);
+		Basis newRotation = Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection);
 		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * Entity.Stats.RotationSpeed);
 
 		// ---- Speed Calculation ----

@@ -25,7 +25,7 @@ public sealed partial class Player : Node {
 	private Entity? _entity;
 	private Entity? _lastEntity;
 
-	public InputDevice InputDevice => InputManager.CurrentDevice;
+	public InputDevice InputDevice => InputManager.CurrentDevice; // TODO: actual Device Management
 
 
 
@@ -60,16 +60,20 @@ public sealed partial class Player : Node {
 
 		if (Engine.IsEditorHint()) return;
 
-		if (_entity is null || CameraController is null) return;
-
-		// TODO: actual Device Management
 
 		if (_lastEntity != _entity) {
 			_lastEntity?.PropagateAction<IPlayerHandler>(x => x.DisavowPlayer(this));
 			_lastEntity = _entity;
+
+			_entity?.PropagateAction<IPlayerHandler>(x => x.SetupPlayer(this));
 		}
 
-		_entity.PropagateAction<IPlayerHandler>(x => x.HandlePlayer(this));
+		_entity?.PropagateAction<IPlayerHandler>(x => {
+			if (! x.HasSetupPlayer) {
+				x.SetupPlayer(this);
+			}
+			x.HandlePlayer(this);
+		});
 	}
 
 	public override void _Ready() {

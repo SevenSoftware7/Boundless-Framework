@@ -6,7 +6,7 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public sealed partial class EpiphronWeapon : SingleWeapon {
+public sealed partial class EpiphronWeapon : SingleWeapon, IPlayerHandler {
 	public override IWeapon.Type WeaponType => IWeapon.Type.Sword;
 	public override IWeapon.Usage WeaponUsage => IWeapon.Usage.Slash | IWeapon.Usage.Thrust;
 	public override IWeapon.Size WeaponSize => IWeapon.Size.OneHanded;
@@ -23,8 +23,8 @@ public sealed partial class EpiphronWeapon : SingleWeapon {
 	}
 
 
-	public override void HandlePlayer(Player player) {
-		base.HandlePlayer(player);
+	public void SetupPlayer(Player player) { }
+	public void HandlePlayer(Player player) {
 
 		if (!CanProcess()) return;
 
@@ -34,4 +34,5 @@ public sealed partial class EpiphronWeapon : SingleWeapon {
 			player.Entity.ExecuteAction(SlashAttackBuilder.Instance.GetInfo(this));
 		}
 	}
+	public void DisavowPlayer(Player player) { }
 }
