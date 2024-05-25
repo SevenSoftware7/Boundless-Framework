@@ -1,0 +1,72 @@
+[gd_scene load_steps=12 format=3 uid="uid://bxcpbr13uyeh1"]
+
+[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Entity.cs" id="1_46ioo"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/EntityStats.cs" id="2_4vcxx"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/HudPack.cs" id="3_aosnt"]
+[ext_resource type="Resource" uid="uid://bb3xo4pwx7g3y" path="res://Resources/Entities/Bike/Costumes/Bike_base.tres" id="4_yfh4w"]
+[ext_resource type="Script" path="res://Scripts/Vanilla/Entities/VehicleBehaviour.cs" id="5_6pb3w"]
+[ext_resource type="Script" path="res://Scripts/Vanilla/SeatInteractable.cs" id="5_kaq40"]
+
+[sub_resource type="Resource" id="Resource_jjk82"]
+script = ExtResource("2_4vcxx")
+MaxHealth = 1.0
+StepHeight = 0.3
+Weight = 12.0
+JumpHeight = 15.0
+Acceleration = 50.0
+Deceleration = 35.0
+RotationSpeed = 20.0
+BaseSpeed = 22.0
+SprintSpeed = 28.0
+SlowSpeed = 12.0
+
+[sub_resource type="Resource" id="Resource_bd6gb"]
+script = ExtResource("3_aosnt")
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_uqauy"]
+radius = 0.8
+height = 2.75
+
+[sub_resource type="SeparationRayShape3D" id="SeparationRayShape3D_84phh"]
+length = 2.3
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_sxgiv"]
+
+[node name="Bike" type="CharacterBody3D" node_paths=PackedStringArray("CurrentBehaviour")]
+collision_layer = 2
+script = ExtResource("1_46ioo")
+DisplayName = "Bike"
+Stats = SubResource("Resource_jjk82")
+HudPack = SubResource("Resource_bd6gb")
+Costume = ExtResource("4_yfh4w")
+CurrentBehaviour = NodePath("VehicleBehaviour")
+Inertia = Vector3(0, -32, 0)
+
+[node name="VehicleBehaviour" type="Node" parent="." node_paths=PackedStringArray("Entity")]
+script = ExtResource("5_6pb3w")
+Entity = NodePath("..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.8, 0.45)
+shape = SubResource("CapsuleShape3D_uqauy")
+
+[node name="SeparationShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -1, 8.74228e-08, 0, -8.74228e-08, -1, 0, 1, 0.45)
+shape = SubResource("SeparationRayShape3D_84phh")
+
+[node name="SeparationShape3D_2" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0.45)
+shape = SubResource("SeparationRayShape3D_84phh")
+
+[node name="SeatInteractable" type="Area3D" parent="." node_paths=PackedStringArray("vehicle")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -0.2)
+script = ExtResource("5_kaq40")
+vehicle = NodePath("../VehicleBehaviour")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SeatInteractable"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0, 1)
+shape = SubResource("SphereShape3D_sxgiv")
+
+[node name="CollisionShape3D_2" type="CollisionShape3D" parent="SeatInteractable"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0, 1)
+shape = SubResource("SphereShape3D_sxgiv")

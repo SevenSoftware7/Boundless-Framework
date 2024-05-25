@@ -36,5 +36,5 @@ public abstract partial class ChargeAttack(Entity entity, SingleWeapon weapon, u
 			QueueFree();
 		}
 	}
-	public virtual void DisavowPlayer(Player player) { }
+	public virtual void DisavowPlayer() { }
 }

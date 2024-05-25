@@ -25,13 +25,11 @@ public sealed partial class NemesisWeapon : SingleWeapon, IPlayerHandler {
 
 	public void SetupPlayer(Player player) { }
 	public void HandlePlayer(Player player) {
-		if (! CanProcess()) return;
-
 		if (player.Entity is null) return;
 
 		if (player.InputDevice.IsActionJustPressed("attack_light")) {
 			player.Entity.ExecuteAction(SlashAttackBuilder.Instance.GetInfo(this));
 		}
 	}
-	public void DisavowPlayer(Player player) { }
+	public void DisavowPlayer() { }
 }

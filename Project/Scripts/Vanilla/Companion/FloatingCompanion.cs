@@ -6,18 +6,25 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class FloatingCompanion : Companion {
+public partial class FloatingCompanion : Companion, IPlayerHandler {
+	private static Vector3 rightPosition = new(1.2f, 0.3f, 0.2f);
+	private static Vector3 leftPosition = rightPosition * new Vector3(-1f, 1f, 1f);
+
+
 	public bool OnFace { get; private set; }
 	public bool OnRight { get; private set; } = true;
 	public Transform3D Subject { get; private set; } = Transform3D.Identity;
 	public Transform3D Head { get; private set; } = Transform3D.Identity;
+
+	public Vector3 HoveringPosition { get; private set; }
+	public Basis HoveringRotation { get; private set; } = Basis.Identity;
+
 
 	[Export] public Entity? Entity { get; private set; }
 
 	[Export] public float T { get; private set; }
 	[Export] public float TFace { get; private set; }
 
-	public Vector3 HoveringPosition { get; private set; }
 	[Export(PropertyHint.Layers3DPhysics)] private uint CollisionMask = uint.MaxValue;
 
 	[Export] public Curve3D Curve { get; private set; }
@@ -45,11 +52,11 @@ public partial class FloatingCompanion : Companion {
 
 		return curve;
 	}
-	public override void HandlePlayer(Player player) {
-		base.HandlePlayer(player);
-
+	public void SetupPlayer(Player player) { }
+	public void HandlePlayer(Player player) {
 		OnFace |= player.InputDevice.IsActionPressed("focus");
 	}
+	public void DisavowPlayer() { }
 
 
 
@@ -82,30 +89,42 @@ public partial class FloatingCompanion : Companion {
 			Entity.Health.Amount += floatDelta;
 		}
 
-		OnFace |= PositionBlocked(GetPosition(0f)) && PositionBlocked(GetPosition(1f));
+		OnFace |= PositionBlocked(GetLocalPosition(rightPosition)) && PositionBlocked(GetLocalPosition(leftPosition));
 
 		if (!OnFace && PositionBlocked(GetPosition(GetCurveT())))
 			OnRight = !OnRight;
 
 
-		T = Mathf.MoveToward(T, OnFace ? 0.5f : GetCurveT(), 6f * floatDelta);
-		TFace = Mathf.MoveToward(TFace, OnFace ? 1f : 0f, 8f * floatDelta);
+		T = Mathf.MoveToward(T, /* OnFace ? 0.5f :  */GetCurveT(), 6f * floatDelta);
+		TFace = Mathf.Lerp(TFace, OnFace ? 1f : 0f, 12f * floatDelta);
+
+		Vector3 tPosition = GetPosition(T);
+
+		HoveringPosition = HoveringPosition.Lerp(tPosition, 8.5f * floatDelta);
+		HoveringRotation = HoveringRotation.SafeSlerp(Subject.Basis, 12f * floatDelta);
 
 
-		HoveringPosition = HoveringPosition.Lerp(GetPosition(T), 10f * floatDelta);
-		Vector3 finalPosition = HoveringPosition.Lerp(Head.Origin, TFace);
-		Basis finalRotation = Subject.Basis.SafeSlerp(Head.Basis, TFace);
+		// Curve to Face
+		float RLT = T * 2f - 1f;
+		float distance = HoveringPosition.DistanceTo(Head.Origin);
+
+		Curve.SetPointPosition(0, HoveringPosition);
+		Curve.SetPointOut(0, Head.Basis * new Vector3(0, 0, -0.1f));
+
+		Curve.SetPointIn(1, Head.Basis * new Vector3(RLT * distance * 0.3f, 0, -0.2f));
+		Curve.SetPointPosition(1, Head.Origin);
 
 
 		GlobalTransform = GlobalTransform with {
-			Origin = finalPosition,
-			Basis = finalRotation,
+			Origin = Curve.Sample(0, TFace),
+			Basis = HoveringRotation.Slerp(Head.Basis, TFace),
 		};
 
 		OnFace = false;
 
 		float GetCurveT() => OnRight ? 1f : 0f;
-		Vector3 GetPosition(float t) => Head.Origin + Head.Basis * Curve.Sample(0, t);
+		Vector3 GetLocalPosition(Vector3 position) => Head.Origin + Head.Basis * position/* Curve.Sample(0, t) */;
+		Vector3 GetPosition(float t) => GetLocalPosition(leftPosition.Lerp(rightPosition, t))/* Curve.Sample(0, t) */;
 	}
 
 	public override void _Notification(int what) {

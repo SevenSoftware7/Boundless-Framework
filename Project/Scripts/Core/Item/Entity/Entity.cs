@@ -163,13 +163,12 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 
 
 	public void SetBehaviour<TBehaviour>(TBehaviour? behaviour) where TBehaviour : EntityBehaviour {
-		if (CurrentBehaviour?.Stop() ?? false) {
-			CurrentBehaviour.QueueFree();
-			CurrentBehaviour = null;
-		}
+		Callable.From(() =>{
+			CurrentBehaviour?.Stop();
 
-		behaviour?.Start(CurrentBehaviour);
-		CurrentBehaviour = behaviour?.SafeReparent(this);
+			behaviour?.Start(CurrentBehaviour?.IsQueuedForDeletion() ?? true ? null : CurrentBehaviour);
+			CurrentBehaviour = behaviour?.SafeReparent(this);
+		}).CallDeferred();
 	}
 
 
@@ -312,7 +311,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 		}
 	}
 
-	public virtual void DisavowPlayer(Player player) {
+	public virtual void DisavowPlayer() {
 		healthBar?.QueueFree();
 		healthBar = null;
 	}

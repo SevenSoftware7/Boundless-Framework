@@ -32,8 +32,6 @@ public sealed partial class EleosWeapon : SingleWeapon, IPlayerHandler {
 
 	public void SetupPlayer(Player player) { }
 	public void HandlePlayer(Player player) {
-		if (!CanProcess()) return;
-
 		if (player.Entity is null) return;
 
 		if (player.InputDevice.IsActionJustPressed("attack_light")) {
@@ -42,5 +40,5 @@ public sealed partial class EleosWeapon : SingleWeapon, IPlayerHandler {
 
 		chargeAttack.ExecuteOnKeyJustPressed(player, this);
 	}
-	public void DisavowPlayer(Player player) { }
+	public void DisavowPlayer() { }
 }

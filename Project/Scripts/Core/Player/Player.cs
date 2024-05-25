@@ -62,7 +62,7 @@ public sealed partial class Player : Node {
 
 
 		if (_lastEntity != _entity) {
-			_lastEntity?.PropagateAction<IPlayerHandler>(x => x.DisavowPlayer(this));
+			_lastEntity?.PropagateAction<IPlayerHandler>(x => x.DisavowPlayer());
 			_lastEntity = _entity;
 
 			_entity?.PropagateAction<IPlayerHandler>(x => x.SetupPlayer(this));
@@ -72,7 +72,9 @@ public sealed partial class Player : Node {
 			if (! x.HasSetupPlayer) {
 				x.SetupPlayer(this);
 			}
-			x.HandlePlayer(this);
+			if (x is not Node node || node.CanProcess()) {
+				x.HandlePlayer(this);
+			}
 		});
 	}
 

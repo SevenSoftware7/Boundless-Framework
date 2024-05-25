@@ -22,9 +22,8 @@ public abstract partial class EntityBehaviour : Node {
 	public virtual void Start(EntityBehaviour? previousBehaviour) {
 		ProcessMode = ProcessModeEnum.Inherit;
 	}
-	public virtual bool Stop() {
+	public virtual void Stop() {
 		ProcessMode = ProcessModeEnum.Disabled;
-		return false;
 	}
 
 

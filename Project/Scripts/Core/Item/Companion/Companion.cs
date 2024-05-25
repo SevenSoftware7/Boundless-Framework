@@ -6,7 +6,7 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class Companion : Node3D, IUIObject, IPlayerHandler, ICostumable<CompanionCostume>, ICustomizable, ISaveable<Companion> {
+public partial class Companion : Node3D, IUIObject, ICostumable<CompanionCostume>, ICustomizable, ISaveable<Companion> {
 	[Export] public string DisplayName { get; private set; } = string.Empty;
 	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
 
@@ -46,12 +46,6 @@ public partial class Companion : Node3D, IUIObject, IPlayerHandler, ICostumable<
 
 		Callable.From<bool>(Load).CallDeferred(true);
 	}
-
-
-
-	public virtual void SetupPlayer(Player player) { }
-	public virtual void HandlePlayer(Player player) { }
-	public virtual void DisavowPlayer(Player player) { }
 
 
 	public void Load(bool forceReload = false) {
