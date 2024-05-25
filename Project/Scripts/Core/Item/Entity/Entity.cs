@@ -172,66 +172,9 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 	}
 
 
-	private bool MoveStep(double delta) {
-		if (Mathf.IsZeroApprox(Movement.LengthSquared()) || !IsOnFloor())
-			return false;
-
-		Vector3 movement = Movement * (float)delta;
-		Vector3 destination = GlobalTransform.Origin + movement;
-
-		KinematicCollision3D? stepObstacleCollision = MoveAndCollide(movement, true);
-
-		float margin = Mathf.Epsilon;
-
-		// // Down Step
-		// if (stepObstacleCollision is null) {
-		// 	margin += 4.5f;
-		// }
-
-		Vector3 sweepStart = destination;
-		Vector3 sweepMotion = (Stats.StepHeight + margin) * -UpDirection;
-
-		// Up Step
-		if (stepObstacleCollision is not null) {
-			sweepStart -= sweepMotion;
-		}
-
-		PhysicsTestMotionResult3D stepTestResult = new();
-		bool findStep = PhysicsServer3D.BodyTestMotion(
-			GetRid(),
-			new() {
-				From = GlobalTransform with { Origin = sweepStart },
-				Motion = sweepMotion,
-			},
-			stepTestResult
-		);
-
-		if (!findStep)
-			return false;
-
-		if (stepObstacleCollision is not null && stepTestResult.GetColliderRid() != stepObstacleCollision.GetColliderRid())
-			return false;
-
-
-		Vector3 point = stepTestResult.GetCollisionPoint();
-
-		Vector3 destinationHeight = destination.Project(UpDirection);
-		Vector3 pointHeight = point.Project(UpDirection);
-
-		float stepHeightSquared = destinationHeight.DistanceSquaredTo(pointHeight);
-		if (stepHeightSquared >= sweepMotion.LengthSquared())
-			return false;
-
-
-		GlobalTransform = GlobalTransform with { Origin = destination - destinationHeight + pointHeight };
-		// if (stepHeightSquared >= Mathf.Pow(stepHeight, 2f) / 4f) {
-		// 	GD.Print("Step Found");
-		// }
-
-		return true;
-	}
-
 	private void Move(double delta) {
+		if ((Inertia + Movement).IsEqualApprox(Vector3.Zero)) return;
+
 		if (MotionMode == MotionModeEnum.Grounded) {
 
 			if (
@@ -259,7 +202,69 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 		}
 
 		Velocity = Inertia + Movement;
+		if (Velocity.IsEqualApprox(Vector3.Zero)) return;
+
 		MoveAndSlide();
+
+
+
+		bool MoveStep(double delta) {
+			if (Mathf.IsZeroApprox(Movement.LengthSquared())) return false;
+
+			Vector3 movement = Movement * (float)delta;
+			Vector3 destination = GlobalTransform.Origin + movement;
+
+			KinematicCollision3D? stepObstacleCollision = MoveAndCollide(movement, true);
+
+			float margin = Mathf.Epsilon;
+
+			// // Down Step
+			// if (stepObstacleCollision is null) {
+			// 	margin += 4.5f;
+			// }
+
+			Vector3 sweepStart = destination;
+			Vector3 sweepMotion = (Stats.StepHeight + margin) * -UpDirection;
+
+			// Up Step
+			if (stepObstacleCollision is not null) {
+				sweepStart -= sweepMotion;
+			}
+
+			PhysicsTestMotionResult3D stepTestResult = new();
+			bool findStep = PhysicsServer3D.BodyTestMotion(
+				GetRid(),
+				new() {
+					From = GlobalTransform with { Origin = sweepStart },
+					Motion = sweepMotion,
+				},
+				stepTestResult
+			);
+
+			if (!findStep)
+				return false;
+
+			if (stepObstacleCollision is not null && stepTestResult.GetColliderRid() != stepObstacleCollision.GetColliderRid())
+				return false;
+
+
+			Vector3 point = stepTestResult.GetCollisionPoint();
+
+			Vector3 destinationHeight = destination.Project(UpDirection);
+			Vector3 pointHeight = point.Project(UpDirection);
+
+			float stepHeightSquared = destinationHeight.DistanceSquaredTo(pointHeight);
+			if (stepHeightSquared >= sweepMotion.LengthSquared())
+				return false;
+
+
+			GlobalTransform = GlobalTransform with { Origin = destination - destinationHeight + pointHeight };
+			// if (stepHeightSquared >= Mathf.Pow(stepHeight, 2f) / 4f) {
+			// 	GD.Print("Step Found");
+			// }
+
+			return true;
+		}
 	}
 
 

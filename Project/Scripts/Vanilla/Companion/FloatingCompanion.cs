@@ -123,8 +123,8 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 		OnFace = false;
 
 		float GetCurveT() => OnRight ? 1f : 0f;
-		Vector3 GetLocalPosition(Vector3 position) => Head.Origin + Head.Basis * position/* Curve.Sample(0, t) */;
-		Vector3 GetPosition(float t) => GetLocalPosition(leftPosition.Lerp(rightPosition, t))/* Curve.Sample(0, t) */;
+		Vector3 GetLocalPosition(Vector3 position) => Head.Origin + Head.Basis * position;
+		Vector3 GetPosition(float t) => GetLocalPosition(leftPosition.Lerp(rightPosition, t));
 	}
 
 	public override void _Notification(int what) {

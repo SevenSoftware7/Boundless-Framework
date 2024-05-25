@@ -15,23 +15,12 @@ public abstract partial class EntityBehaviour : Node {
 	}
 
 
-	public virtual bool SetMovementType(MovementType speed) => true;
 	public virtual bool Move(Vector3 direction) => true;
-	public virtual bool Jump(Vector3? target = null) => true;
 
 	public virtual void Start(EntityBehaviour? previousBehaviour) {
 		ProcessMode = ProcessModeEnum.Inherit;
 	}
 	public virtual void Stop() {
 		ProcessMode = ProcessModeEnum.Disabled;
-	}
-
-
-
-	public enum MovementType {
-		Idle = 0,
-		Walk = 1,
-		Run = 2,
-		Sprint = 3
 	}
 }

@@ -28,7 +28,6 @@ public partial class SliderPromptControl : PromptControl {
 		Vector2 targetPosition = Position with {
 			X = Enabled ? 0 : - Size.X
 		};
-		Position = Position.Lerp(targetPosition, 15f * floatDelta);
 
 		Vector2 targetScale = Scale with {
 			Y = ! Enabled && (shrinkInView || Position.IsEqualApprox(targetPosition)) ? Mathf.Epsilon : 1f
@@ -41,6 +40,10 @@ public partial class SliderPromptControl : PromptControl {
 		if (Visible && wasNotVisible) {
 			GetParent()?.MoveChild(this, 0);
 		}
+
+		if (! Visible) return;
+
+		Position = Position.Lerp(targetPosition, 15f * floatDelta);
 
 		UpdateMinimumSize();
 	}

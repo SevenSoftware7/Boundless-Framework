@@ -35,16 +35,6 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 	}
 
 	public virtual void HandlePlayer(Player player) {
-		if (player.InputDevice.IsActionPressed("jump")) {
-			Jump();
-		}
-
-		Vector2 movement = player.InputDevice.GetVector("move_left", "move_right", "move_forward", "move_backward").ClampMagnitude(1f);
-		player.CameraController.RawInputToGroundedMovement(Entity, movement, out _, out Vector3 groundedMovement);
-
-
-		Move(groundedMovement.Normalized());
-
 		dismountPrompt?.Update(true, "Dismount", player.InputDevice.GetActionSymbol("interact"));
 		if (player.InputDevice.IsActionJustPressed("interact")) {
 			Dismount();
@@ -52,8 +42,6 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 	}
 
 	public virtual void DisavowPlayer() {
-		dismountPrompt?.SetText("Fuck Face");
-
 		dismountPrompt?.QueueFree();
 		dismountPrompt = null;
 	}

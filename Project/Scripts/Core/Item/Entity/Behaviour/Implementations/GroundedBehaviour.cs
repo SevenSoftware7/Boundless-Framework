@@ -44,15 +44,15 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 	}
 
 
+
+	public virtual bool SetMovementType(MovementType speed) => true;
 	public override bool Move(Vector3 direction) {
 		if (!base.Move(direction)) return false;
 
 		_inputDirection = direction;
 		return true;
 	}
-	public override bool Jump(Vector3? target = null) {
-		if (!base.Jump(target)) return false;
-
+	public virtual bool Jump(Vector3? target = null) {
 		jumpBuffer.Start();
 		return true;
 	}
@@ -70,6 +70,8 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 	}
 
 	private void HandleInertia(double delta) {
+		if (Entity.Inertia.IsEqualApprox(Vector3.Zero)) return;
+
 		Entity.Inertia.Split(Entity.UpDirection, out Vector3 verticalInertia, out Vector3 horizontalInertia);
 
 		horizontalInertia = ProcessHorizontalInertia(delta, horizontalInertia);
@@ -79,6 +81,9 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 	}
 
 	protected virtual Vector3 ProcessHorizontalInertia(double delta, Vector3 horizontalInertia) {
+		if (horizontalInertia.IsEqualApprox(Vector3.Zero)) return horizontalInertia;
+
+
 		horizontalInertia = horizontalInertia.MoveToward(
 			Vector3.Zero,
 			Entity.IsOnFloor()
@@ -92,11 +97,15 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 		if (Entity.IsOnFloor()) return verticalInertia;
 
 		const float fallSpeed = 32f;
-		const float floatReductionFactor = 0.65f;
-		const float fallIncreaseFactor = 1.75f;
 
 		float fallInertia = verticalInertia.Dot(-Entity.UpDirection);
+		Vector3 targetInertia = -Entity.UpDirection * Mathf.Max(fallSpeed, fallInertia);
 
+		if (verticalInertia.IsEqualApprox(targetInertia)) return verticalInertia;
+
+
+		const float floatReductionFactor = 0.65f;
+		const float fallIncreaseFactor = 1.75f;
 
 		// Float more if player is holding jump key & rising
 		float isFloating = jumpBuffer.IsDone
@@ -106,9 +115,6 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 
 		// Slightly ramp up inertia when falling
 		float inertiaRampFactor = Mathf.Lerp(1f, fallIncreaseFactor, ((1f + fallInertia) * 0.5f).Clamp01());
-
-
-		Vector3 targetInertia = -Entity.UpDirection * Mathf.Max(fallSpeed, fallInertia);
 
 		return verticalInertia.MoveToward(targetInertia, 45f * floatFactor * inertiaRampFactor * (float)delta);
 	}
@@ -125,5 +131,13 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 			jumpBuffer.End();
 			jumpCooldown.Start();
 		}
+	}
+
+
+	public enum MovementType {
+		Idle = 0,
+		Walk = 1,
+		Run = 2,
+		Sprint = 3
 	}
 }

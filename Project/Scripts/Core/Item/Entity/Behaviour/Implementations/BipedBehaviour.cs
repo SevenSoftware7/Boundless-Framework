@@ -93,16 +93,6 @@ public partial class BipedBehaviour : GroundedBehaviour, IPlayerHandler {
 		if (!base.SetMovementType(speed)) return false;
 		if (speed == _movementType) return false;
 
-		// if (Entity.IsOnFloor() && Entity.CurrentAction is not EvadeAction) {
-		// 	if ( speed == MovementSpeed.Idle ) {
-		// 		MovementStopAnimation();
-		// 	}
-		// 	else if ( (int)speed > (int)_movementSpeed ) {
-		// 		MovementStartAnimation(speed);
-		// 	}
-		// }
-
-
 		_movementType = speed;
 		return true;
 	}
@@ -117,7 +107,9 @@ public partial class BipedBehaviour : GroundedBehaviour, IPlayerHandler {
 
 		float floatDelta = (float)delta;
 
-		// Select the speed based on the movement type
+
+		// ---- Speed Calculation ----
+
 		float newSpeed = _movementType switch {
 			MovementType.Walk => Entity.Stats.SlowSpeed,
 			MovementType.Run => Entity.Stats.BaseSpeed,
@@ -126,14 +118,9 @@ public partial class BipedBehaviour : GroundedBehaviour, IPlayerHandler {
 		};
 		newSpeed = Entity.AttributeModifiers.Get(Attributes.GenericMoveSpeed).ApplyTo(newSpeed);
 
-		Basis newRotation = Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection);
-		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * Entity.Stats.RotationSpeed);
-
-
-		// ---- Speed Calculation ----
-
 		float speedDelta = _moveSpeed < newSpeed ? Entity.Stats.Acceleration : Entity.Stats.Deceleration;
 		_moveSpeed = Mathf.MoveToward(_moveSpeed, newSpeed, speedDelta * floatDelta);
+
 
 		// ----- Rotation & Movement -----
 
@@ -143,14 +130,14 @@ public partial class BipedBehaviour : GroundedBehaviour, IPlayerHandler {
 			_lastDirection = _lastDirection.Lerp(normalizedInput, Entity.Stats.RotationSpeed * floatDelta);
 			Entity.GlobalForward = Entity.GlobalForward.SafeSlerp(normalizedInput, Entity.Stats.RotationSpeed * floatDelta);
 
-			// Vector3 groundedMovement = _moveDirection;
-			// if (Entity.IsOnFloor()) {
-			//     groundedMovement = Entity.UpDirection.FromToBasis(Entity.GetFloorNormal()) * groundedMovement;
-			// }
 			Entity.Movement = _lastDirection * _moveSpeed * Mathf.Clamp(_lastDirection.Dot(Entity.GlobalForward), 0f, 1f);
 		} else {
 			Entity.Movement = _lastDirection * _moveSpeed;
 		}
+
+
+		Basis newRotation = Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection);
+		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * Entity.Stats.RotationSpeed);
 
 		_movementType = MovementType.Idle;
 	}

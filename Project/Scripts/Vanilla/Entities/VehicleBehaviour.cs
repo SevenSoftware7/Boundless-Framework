@@ -16,20 +16,21 @@ public partial class VehicleBehaviour : GroundedBehaviour, IPlayerHandler {
 		base._Process(delta);
 
 		if (Engine.IsEditorHint()) return;
-
-
 		float floatDelta = (float) delta;
 
+		bool inputIsZero = _inputDirection.IsEqualApprox(Vector3.Zero);
+		if (inputIsZero && Mathf.IsZeroApprox(_moveSpeed)) {
+			Vector3 direction = _inputDirection.Normalized();
 
-		float newSpeed = Entity.GlobalForward.Dot(_inputDirection) * Entity.AttributeModifiers.Get(Attributes.GenericMoveSpeed).ApplyTo(Entity.Stats.BaseSpeed);
-		float speedDelta = newSpeed > _moveSpeed ? 1f : 0.25f;
-		_moveSpeed = Mathf.MoveToward(_moveSpeed, newSpeed, speedDelta * Entity.Stats.Acceleration * floatDelta);
+			float newSpeed = Entity.GlobalForward.Dot(direction) * Entity.AttributeModifiers.Get(Attributes.GenericMoveSpeed).ApplyTo(Entity.Stats.BaseSpeed);
+			float speedDelta = newSpeed > _moveSpeed ? 1f : 0.25f;
+			_moveSpeed = Mathf.MoveToward(_moveSpeed, newSpeed, speedDelta * Entity.Stats.Acceleration * floatDelta);
 
-		if (_inputDirection.LengthSquared() != 0f)
-			Entity.GlobalForward = Entity.GlobalForward.Slerp(_inputDirection.Normalized(), floatDelta * 3f).Normalized();
+			if (inputIsZero)
+				Entity.GlobalForward = Entity.GlobalForward.Slerp(direction, floatDelta * 3f);
 
+		}
 		Entity.Movement = Entity.GlobalForward * _moveSpeed;
-
 
 
 		float groundFlatness = Entity.GetFloorNormal().Dot(Entity.UpDirection);
