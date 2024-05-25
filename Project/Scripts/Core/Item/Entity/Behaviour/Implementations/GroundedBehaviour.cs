@@ -70,8 +70,6 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 	}
 
 	private void HandleInertia(double delta) {
-		if (Entity.Inertia.IsEqualApprox(Vector3.Zero)) return;
-
 		Entity.Inertia.Split(Entity.UpDirection, out Vector3 verticalInertia, out Vector3 horizontalInertia);
 
 		horizontalInertia = ProcessHorizontalInertia(delta, horizontalInertia);
@@ -83,18 +81,16 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 	protected virtual Vector3 ProcessHorizontalInertia(double delta, Vector3 horizontalInertia) {
 		if (horizontalInertia.IsEqualApprox(Vector3.Zero)) return horizontalInertia;
 
-
-		horizontalInertia = horizontalInertia.MoveToward(
+		return horizontalInertia.MoveToward(
 			Vector3.Zero,
 			Entity.IsOnFloor()
 				? 1.5f
 				: 0.5f * (float)delta
 		);
-		return horizontalInertia;
 	}
 
 	protected virtual Vector3 ProcessVerticalInertia(double delta, Vector3 verticalInertia) {
-		if (Entity.IsOnFloor()) return verticalInertia;
+		if (Entity.IsOnFloor()) return verticalInertia.SlideOnFace(Entity.UpDirection);
 
 		const float fallSpeed = 32f;
 
@@ -115,6 +111,7 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 
 		// Slightly ramp up inertia when falling
 		float inertiaRampFactor = Mathf.Lerp(1f, fallIncreaseFactor, ((1f + fallInertia) * 0.5f).Clamp01());
+
 
 		return verticalInertia.MoveToward(targetInertia, 45f * floatFactor * inertiaRampFactor * (float)delta);
 	}

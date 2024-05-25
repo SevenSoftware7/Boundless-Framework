@@ -1585,6 +1585,7 @@ mesh = SubResource("SphereMesh_nkuww")
 skeleton = NodePath("../../CollisionShape3D/MeshInstance3D")
 
 [node name="Bike" parent="." node_paths=PackedStringArray("CurrentBehaviour") instance=ExtResource("1_pikp0")]
+process_mode = 4
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.49402, 2, 26.3616)
 CurrentBehaviour = NodePath("VehicleBehaviour")
 
