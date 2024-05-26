@@ -27,14 +27,35 @@ public partial class ArmedEntity : Entity {
 		base.HandlePlayer(player);
 
 		if (_weapon is not null) {
-			if (player.InputDevice.IsActionJustPressed("switch_weapon_primary")) {
+			if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponPrimary)) {
 				_weapon.Style = 0;
 			}
-			else if (player.InputDevice.IsActionJustPressed("switch_weapon_secondary")) {
+			else if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponSecondary)) {
 				_weapon.Style = 1;
 			}
-			else if (player.InputDevice.IsActionJustPressed("switch_weapon_ternary")) {
+			else if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponTertiary)) {
 				_weapon.Style = 2;
+			}
+			else if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponQuaternary)) {
+				_weapon.Style = 3;
+			}
+			else if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponQuinary)) {
+				_weapon.Style = 4;
+			}
+			else if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponSenary)) {
+				_weapon.Style = 5;
+			}
+			else if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponSeptenary)) {
+				_weapon.Style = 6;
+			}
+			else if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponOctonary)) {
+				_weapon.Style = 7;
+			}
+			else if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponNonary)) {
+				_weapon.Style = 8;
+			}
+			else if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponDenary)) {
+				_weapon.Style = 9;
 			}
 		}
 	}
@@ -43,9 +64,9 @@ public partial class ArmedEntity : Entity {
 	public override void _Notification(int what) {
 		base._Notification(what);
 		switch ((ulong)what) {
-			case NotificationChildOrderChanged:
-				Weapon ??= GetChildren().OfType<Weapon>().FirstOrDefault();
-				break;
+		case NotificationChildOrderChanged:
+			Weapon ??= GetChildren().OfType<Weapon>().FirstOrDefault();
+			break;
 		}
 	}
 }

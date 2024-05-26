@@ -1,6 +1,7 @@
 namespace LandlessSkies.Core;
 
 using System;
+using System.Collections.Generic;
 using Godot;
 using SevenDev.Utility;
 
@@ -22,17 +23,13 @@ public partial class Companion : Node3D, IUIObject, ICostumable<CompanionCostume
 	public Skeleton3D? Inject() => Skeleton;
 
 
-	public virtual IUIObject UIObject => this;
-	public virtual ICustomizable[] Customizables => [];
-	public virtual ICustomization[] Customizations => [];
-
-
 	[ExportGroup("Costume")]
 	[Export] public CompanionCostume? Costume {
 		get => _costume;
 		set => SetCostume(value);
 	}
 	private CompanionCostume? _costume;
+
 
 	public Model? Model { get; private set; }
 	public bool IsLoaded => Model is not null;
@@ -48,6 +45,9 @@ public partial class Companion : Node3D, IUIObject, ICostumable<CompanionCostume
 	}
 
 
+	public virtual List<ICustomizable> GetSubCustomizables() => [];
+	public virtual List<ICustomization> GetCustomizations() => [];
+
 
 	public void SetCostume(CompanionCostume? newCostume) {
 		CompanionCostume? oldCostume = _costume;
@@ -58,7 +58,6 @@ public partial class Companion : Node3D, IUIObject, ICostumable<CompanionCostume
 
 		Callable.From<bool>(Load).CallDeferred(true);
 	}
-
 
 	public void Load(bool forceReload = false) {
 		if (IsLoaded && ! forceReload) return;

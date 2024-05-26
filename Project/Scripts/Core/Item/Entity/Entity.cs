@@ -16,8 +16,10 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 
 	[Export] public string DisplayName { get; private set; } = string.Empty;
 	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
-	public virtual ICustomizable[] Customizables => Model is null ? [] : [Model];
-	public virtual ICustomization[] Customizations => [];
+
+	public virtual List<ICustomization> GetCustomizations() => [];
+	public virtual List<ICustomizable> GetSubCustomizables() => [.. GetChildren().OfType<ICustomizable>()];
+
 
 	[Export] public EntityStats Stats { get; private set; } = new();
 	[Export] public HudPack HudPack { get; private set; } = new();
@@ -26,7 +28,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 		get => _handedness;
 		protected set {
 			_handedness = value;
-			this.PropagateInject(_handedness);
+			this.PropagateInject(_handedness, stopAtInjector: true, passThroughThisInjector: true);
 		}
 	}
 	private Handedness _handedness = Handedness.Right;
@@ -48,7 +50,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 		get => _skeleton;
 		protected set {
 			_skeleton = value;
-			this.PropagateInject(_skeleton);
+			this.PropagateInject(_skeleton, stopAtInjector: true, passThroughThisInjector: true);
 		}
 	}
 	private Skeleton3D? _skeleton;
@@ -298,7 +300,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 
 		if (Model is null) return;
 
-		Model?.PropagateInject(Skeleton);
+		Model?.PropagateInject(Skeleton, stopAtInjector: true, passThroughThisInjector: true);
 	}
 	public void Unload() {
 		Model?.QueueFree();

@@ -1,5 +1,6 @@
 namespace LandlessSkies.Core;
 
+using System.Collections.Generic;
 using Godot;
 
 [Tool]
@@ -10,8 +11,8 @@ public partial class Model : Node3D, ICustomizable {
 	public string DisplayName => Costume?.DisplayName ?? string.Empty;
 	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
 
-	public virtual ICustomizable[] Customizables => [];
-	public virtual ICustomization[] Customizations => [];
+	public virtual List<ICustomizable> GetSubCustomizables() => [];
+	public virtual List<ICustomization> GetCustomizations() => [];
 
 
 	protected Model() : base() { }

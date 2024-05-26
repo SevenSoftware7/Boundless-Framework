@@ -99,9 +99,9 @@ public sealed partial class Player : Node {
 	public override void _Notification(int what) {
 		base._Notification(what);
 		switch ((ulong)what) {
-			case NotificationPredelete:
-				UnsetPlayerId();
-				break;
+		case NotificationPredelete:
+			UnsetPlayerId();
+			break;
 		}
 	}
 }

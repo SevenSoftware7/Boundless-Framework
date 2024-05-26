@@ -35,8 +35,8 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 	}
 
 	public virtual void HandlePlayer(Player player) {
-		dismountPrompt?.Update(true, "Dismount", player.InputDevice.GetActionSymbol("interact"));
-		if (player.InputDevice.IsActionJustPressed("interact")) {
+		dismountPrompt?.Update(true, "Dismount", player.InputDevice.GetActionSymbol(Inputs.Interact));
+		if (player.InputDevice.IsActionJustPressed(Inputs.Interact)) {
 			Dismount();
 		}
 	}

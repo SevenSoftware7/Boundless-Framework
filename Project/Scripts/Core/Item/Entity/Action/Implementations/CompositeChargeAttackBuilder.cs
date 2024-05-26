@@ -3,25 +3,18 @@ namespace LandlessSkies.Core;
 using System.Collections.Generic;
 using Godot;
 
-public class CompositeChargeAttackBuilder(AttackBuilder UnchargedAttack, AttackBuilder ChargedAttack) : ChargeAttackBuilder {
-	public StringName ActionKey { get; init; } = "attack_light";
-	public ulong ChargeDuration { get; init; } = 1000;
-	public IEnumerable<AttributeModifier> AttributeModifiers { get; init; } = [];
+public class CompositeChargeAttackBuilder(
+	AttackBuilder UnchargedAttack, AttackBuilder ChargedAttack,
+	StringName? actionKey = null, ulong? chargeDuration = null, IEnumerable<AttributeModifier>? attributes = null
+) : ChargeAttackBuilder {
 
 	public AttackBuilder UnchargedAttack { get; init; } = UnchargedAttack;
 	public AttackBuilder ChargedAttack { get; init; } = ChargedAttack;
 
 
-
-	public CompositeChargeAttackBuilder(
-		AttackBuilder unchargedAttack,
-		AttackBuilder chargedAttack,
-		string actionKey = "attack_light",
-		ulong chargeDuration = 1000,
-		IEnumerable<AttributeModifier> modifiers = null!
-	) : this(unchargedAttack, chargedAttack) {
-		(ActionKey, ChargeDuration, AttributeModifiers) = (actionKey, chargeDuration, modifiers ?? []);
-	}
+	public StringName ActionKey { get; init; } = actionKey ?? Inputs.AttackLight;
+	public ulong ChargeDuration { get; init; } = chargeDuration ?? 1000;
+	public IEnumerable<AttributeModifier> AttributeModifiers { get; init; } = attributes ?? [];
 
 
 

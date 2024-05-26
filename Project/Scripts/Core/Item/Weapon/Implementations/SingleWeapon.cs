@@ -27,24 +27,22 @@ public abstract partial class SingleWeapon : Weapon, ICostumable<WeaponCostume>,
 
 	[ExportGroup("Dependencies")]
 	[Export] public override Skeleton3D? Skeleton {
-		get => _skeleton;
+		get => base.Skeleton;
 		protected set {
-			_skeleton = value;
+			base.Skeleton = value;
 
 			if (Model is IInjectable<Skeleton3D?> mSkeleton) mSkeleton.Inject(value);
 		}
 	}
-	private Skeleton3D? _skeleton;
 
 	[Export] public override Handedness Handedness {
-		get => _handedness;
+		get => base.Handedness;
 		protected set {
-			_handedness = value;
+			base.Handedness = value;
 
 			if (Model is IInjectable<Handedness> mHanded) mHanded.Inject(value);
 		}
 	}
-	private Handedness _handedness = Handedness.Right;
 
 
 
@@ -54,7 +52,11 @@ public abstract partial class SingleWeapon : Weapon, ICostumable<WeaponCostume>,
 	}
 	private int _style;
 
-	public override ICustomizable[] Customizables => [.. new List<ICustomizable?>(){Model}.OfType<ICustomizable>()];
+	public override List<ICustomizable> GetSubCustomizables() {
+		List<ICustomizable> list = base.GetSubCustomizables();
+		if (Model is not null) list.Add(Model);
+		return list;
+	}
 
 
 	[Signal] public delegate void CostumeChangedEventHandler(WeaponCostume? newCostume, WeaponCostume? oldCostume);

@@ -22,4 +22,35 @@ public static class PackedSceneExtensions {
 			original.Key.Owner = original.Value;
 		}
 	}
+
+	public static T GetNodeProperty<[MustBeVariant] T>(this PackedScene scene, StringName propertyName, int nodeIndex = 0) {
+		return scene.GetNodeProperty(propertyName, nodeIndex).As<T>();
+	}
+	public static T GetNodePropertyRecursive<[MustBeVariant] T>(this PackedScene scene, StringName propertyName) {
+		return scene.GetNodePropertyRecursive(propertyName).As<T>();
+	}
+	public static Variant GetNodeProperty(this PackedScene scene, StringName propertyName, int nodeIndex = 0) {
+		SceneState state = scene.GetState();
+
+		for (int propIndex = 0; propIndex < state.GetNodePropertyCount(nodeIndex); propIndex++) {
+			StringName propName = state.GetNodePropertyName(nodeIndex, propIndex);
+
+			if (propName == propertyName) return state.GetNodePropertyValue(nodeIndex, propIndex);
+		}
+
+		return default;
+	}
+	public static Variant GetNodePropertyRecursive(this PackedScene scene, StringName propertyName) {
+		SceneState state = scene.GetState();
+		for (int nodeIndex = 0; nodeIndex < state.GetNodeCount(); nodeIndex++) {
+			for (int propIndex = 0; propIndex < state.GetNodePropertyCount(nodeIndex); propIndex++) {
+				StringName propName = state.GetNodePropertyName(nodeIndex, propIndex);
+
+				if (propName == propertyName) return state.GetNodePropertyValue(nodeIndex, propIndex);
+			}
+
+		}
+
+		return default;
+	}
 }

@@ -6,7 +6,6 @@
     <Nullable>enable</Nullable>
     <!-- <PublishAot>true</PublishAot> -->
     <!-- <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild> -->
-    <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
   </PropertyGroup>
   <ItemGroup>
     <TrimmerRootAssembly Include="GodotSharp" />

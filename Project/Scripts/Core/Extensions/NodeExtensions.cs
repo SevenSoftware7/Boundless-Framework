@@ -253,9 +253,14 @@ public static class NodeExtensions {
 	}
 
 
-	public static void PropagateInject<T>(this Node parent, T value, bool parentFirst = false, bool stopAtInjector = true) {
+	public static void PropagateInjectToChildren<T>(this Node parent, T value) {
+		foreach (IInjectable<T> child in parent.GetChildren().OfType<IInjectable<T>>()) {
+			child.Inject(value);
+		}
+	}
+	public static void PropagateInject<T>(this Node parent, T value, bool parentFirst = false, bool stopAtInjector = false, bool passThroughThisInjector = false) {
 		IInjectable<T>? injectableParent = parent as IInjectable<T>;
-		if (stopAtInjector) {
+		if (stopAtInjector && ! passThroughThisInjector && parent is IInjector<T>) {
 			injectableParent?.Inject(value);
 			return;
 		}
@@ -266,7 +271,7 @@ public static class NodeExtensions {
 		}
 
 		foreach (Node child in parent.GetChildren()) {
-			child.PropagateInject(value, parentFirst, stopAtInjector);
+			child.PropagateInject(value, parentFirst, stopAtInjector, false);
 		}
 
 		if (! parentFirst) {

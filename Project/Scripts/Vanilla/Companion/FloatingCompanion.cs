@@ -51,7 +51,7 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 	}
 	public void SetupPlayer(Player player) { }
 	public void HandlePlayer(Player player) {
-		OnFace |= player.InputDevice.IsActionPressed("focus");
+		OnFace |= player.InputDevice.IsActionPressed(Inputs.Focus);
 	}
 	public void DisavowPlayer() { }
 
@@ -127,9 +127,9 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 	public override void _Notification(int what) {
 		base._Notification(what);
 		switch ((ulong)what) {
-			case NotificationParented:
-				Entity ??= GetParent() as Entity;
-				break;
+		case NotificationParented:
+			Entity ??= GetParent() as Entity;
+			break;
 		}
 	}
 }

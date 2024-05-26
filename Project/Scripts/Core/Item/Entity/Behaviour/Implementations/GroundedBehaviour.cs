@@ -31,11 +31,14 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 	public virtual void HandlePlayer(Player player) {
 		if (Entity is null) return;
 
-		if (player.InputDevice.IsActionPressed("jump")) {
+		if (player.InputDevice.IsActionPressed(Inputs.Jump)) {
 			Jump();
 		}
 
-		Vector2 movement = player.InputDevice.GetVector("move_left", "move_right", "move_forward", "move_backward").ClampMagnitude(1f);
+		Vector2 movement = player.InputDevice.GetVector(
+			Inputs.MoveLeft, Inputs.MoveRight,
+			Inputs.MoveForward, Inputs.MoveBackward
+		).ClampMagnitude(1f);
 		player.CameraController.RawInputToGroundedMovement(Entity, movement, out _, out Vector3 groundedMovement);
 
 

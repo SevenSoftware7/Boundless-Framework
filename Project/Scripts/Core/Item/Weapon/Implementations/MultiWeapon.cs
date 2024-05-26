@@ -30,20 +30,20 @@ public sealed partial class MultiWeapon : Weapon {
 			int minLength = Math.Min(value.Count, _weapons.Count);
 			for (int i = 0; i < Math.Max(value.Count, _weapons.Count); i++) {
 				switch (i) {
-					// If an item was modified
-					case int index when index < minLength && _weapons[index] != value[index]:
-						SetWeapon(index, value[index]);
-						break;
+				// If an item was modified
+				case int index when index < minLength && _weapons[index] != value[index]:
+					SetWeapon(index, value[index]);
+					break;
 
-					// If an item was added
-					case int index when index >= minLength && index < value.Count:
-						AddWeapon(value[index]);
-						break;
+				// If an item was added
+				case int index when index >= minLength && index < value.Count:
+					AddWeapon(value[index]);
+					break;
 
-					// If an item was removed
-					case int index when index >= minLength && index >= value.Count:
-						RemoveWeapon(index);
-						break;
+				// If an item was removed
+				case int index when index >= minLength && index >= value.Count:
+					RemoveWeapon(index);
+					break;
 				}
 			}
 
@@ -54,59 +54,28 @@ public sealed partial class MultiWeapon : Weapon {
 
 	public override int StyleCount => Mathf.Max(_weapons.Count, 1);
 
-	public override int Style {
+	[ExportGroup("Current Weapon")]
+	[Export] public override int Style {
 		get => _currentIndex;
 		set => SwitchTo(value);
-	}
-
-	[ExportGroup("Current Weapon")]
-	[Export] private int CurrentIndex {
-		get => Style;
-		set => Style = value;
 	}
 	private int _currentIndex;
 
 
 
 	public Weapon? CurrentWeapon {
-		get => IndexInBounds(CurrentIndex) ? _weapons[CurrentIndex] : null;
+		get => IndexInBounds(_currentIndex) ? _weapons[_currentIndex] : null;
 		private set {
 			if (value is not null) {
-				CurrentIndex = _weapons.IndexOf(value);
+				_currentIndex = _weapons.IndexOf(value);
 			}
 		}
 	}
-
-	[ExportGroup("Dependencies")]
-	[Export] public override Skeleton3D? Skeleton {
-		get => _skeleton;
-		protected set {
-			_skeleton = value;
-
-			_weapons.ForEach(w => {
-				if (w is IInjectable<Skeleton3D?> mSkeleton) mSkeleton.Inject(value);
-			});
-		}
-	}
-	private Skeleton3D? _skeleton;
-
-	[Export] public override Handedness Handedness {
-		get => CurrentWeapon?.Handedness ?? 0;
-		protected set {
-			_handedness = value;
-
-			_weapons.ForEach(w => {
-				if (w is IInjectable<Handedness> mHanded) mHanded.Inject(value);
-			});
-		}
-	}
-	private Handedness _handedness;
 
 
 	public override string DisplayName => CurrentWeapon?.DisplayName ?? string.Empty;
 	public override Texture2D? DisplayPortrait => CurrentWeapon?.DisplayPortrait;
 
-	public override ICustomizable[] Customizables => [.. _weapons];
 
 	public override IWeapon.Type WeaponType => CurrentWeapon?.WeaponType ?? 0;
 	public override IWeapon.Usage WeaponUsage => CurrentWeapon?.WeaponUsage ?? 0;
@@ -114,7 +83,7 @@ public sealed partial class MultiWeapon : Weapon {
 
 
 	private MultiWeapon() : base() { }
-	public MultiWeapon(IEnumerable<Weapon> weapons) : this() {
+	public MultiWeapon(ReadOnlySpan<Weapon> weapons) : this() {
 		Weapons = [.. weapons];
 	}
 	public MultiWeapon(ImmutableArray<ISaveData<Weapon>> weaponSaves) : this() {
@@ -123,6 +92,10 @@ public sealed partial class MultiWeapon : Weapon {
 		}
 	}
 
+	public override List<ICustomizable> GetSubCustomizables() {
+		List<ICustomizable> list = base.GetSubCustomizables();
+		return [.. list.Concat(_weapons)];
+	}
 
 
 	private bool IndexInBounds(int index) => index < _weapons.Count && index >= 0;
@@ -209,26 +182,13 @@ public sealed partial class MultiWeapon : Weapon {
 			});
 	}
 
-	public override void Inject(Skeleton3D? skeleton) {
-		base.Inject(skeleton);
-		foreach (Weapon? weapon in Weapons) {
-			weapon?.Inject(skeleton);
-		}
-	}
-	public override void Inject(Handedness handedness) {
-		base.Inject(handedness);
-		foreach (Weapon? weapon in Weapons) {
-			weapon?.Inject(handedness);
-		}
-	}
-
 
 	public override void _Notification(int what) {
 		base._Notification(what);
 		switch ((ulong)what) {
-			case NotificationChildOrderChanged:
-				Callable.From(() => Weapons = [.. GetChildren().OfType<Weapon>()]).CallDeferred(); // Modifying the Hierarchy is locked because of the Notification
-				break;
+		case NotificationChildOrderChanged:
+			Callable.From(() => Weapons = [.. GetChildren().OfType<Weapon>()]).CallDeferred(); // Modifying the Hierarchy is locked because of the Notification
+			break;
 		}
 	}
 

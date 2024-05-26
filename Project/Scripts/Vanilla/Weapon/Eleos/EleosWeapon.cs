@@ -10,7 +10,7 @@ public sealed partial class EleosWeapon : SingleWeapon, IPlayerHandler {
 	private readonly CompositeChargeAttackBuilder chargeAttack = new(
 		SlashAttackBuilder.Instance,
 		SlashAttackBuilder.Instance,
-		"attack_heavy",
+		Inputs.AttackHeavy,
 		750,
 		[new PercentileModifier(Attributes.GenericMoveSpeed, -0.7f), new PercentileModifier(Attributes.GenericjumpHeight, -0.5f)]
 	);
@@ -34,11 +34,16 @@ public sealed partial class EleosWeapon : SingleWeapon, IPlayerHandler {
 	public void HandlePlayer(Player player) {
 		if (player.Entity is null) return;
 
-		if (player.InputDevice.IsActionJustPressed("attack_light")) {
-			player.Entity.ExecuteAction(SlashAttackBuilder.Instance.GetInfo(this));
+		switch (player.Entity.CurrentBehaviour) {
+		case GroundedBehaviour grounded:
+			if (player.InputDevice.IsActionJustPressed(Inputs.AttackLight)) {
+				player.Entity.ExecuteAction(SlashAttackBuilder.Instance.GetInfo(this));
+			}
+
+			chargeAttack.ExecuteOnKeyJustPressed(player, this);
+			break;
 		}
 
-		chargeAttack.ExecuteOnKeyJustPressed(player, this);
 	}
 	public void DisavowPlayer() { }
 }

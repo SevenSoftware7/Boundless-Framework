@@ -48,8 +48,8 @@ public partial class BipedBehaviour : GroundedBehaviour, IPlayerHandler {
 		float speedSquared = _inputDirection.LengthSquared();
 		MovementType speed = speedSquared switch {
 			_ when Mathf.IsZeroApprox(speedSquared) => MovementType.Idle,
-			_ when speedSquared <= 0.25f || player.InputDevice.IsActionPressed("walk") => MovementType.Walk,
-			_ when player.InputDevice.IsActionPressed("evade") => MovementType.Sprint,
+			_ when speedSquared <= 0.25f || player.InputDevice.IsActionPressed(Inputs.Walk) => MovementType.Walk,
+			_ when player.InputDevice.IsActionPressed(Inputs.Evade) => MovementType.Sprint,
 			_ => MovementType.Run
 		};
 		SetMovementType(speed);

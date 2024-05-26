@@ -27,8 +27,12 @@ public sealed partial class EpiphronWeapon : SingleWeapon, IPlayerHandler {
 	public void HandlePlayer(Player player) {
 		if (player.Entity is null) return;
 
-		if (player.InputDevice.IsActionJustPressed("attack_light")) {
-			player.Entity.ExecuteAction(SlashAttackBuilder.Instance.GetInfo(this));
+		switch (player.Entity.CurrentBehaviour) {
+		case GroundedBehaviour grounded:
+			if (player.InputDevice.IsActionJustPressed(Inputs.AttackLight)) {
+				player.Entity.ExecuteAction(SlashAttackBuilder.Instance.GetInfo(this));
+			}
+			break;
 		}
 	}
 	public void DisavowPlayer() { }

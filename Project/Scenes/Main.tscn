@@ -1,4 +1,4 @@
-[gd_scene load_steps=75 format=3 uid="uid://b505xodur2iff"]
+[gd_scene load_steps=76 format=3 uid="uid://b505xodur2iff"]
 
 [ext_resource type="Environment" uid="uid://cly878e1j23yy" path="res://Resources/Shaders/environment.tres" id="1_l7i5q"]
 [ext_resource type="PackedScene" uid="uid://bxcpbr13uyeh1" path="res://Resources/Entities/Bike/Bike.tscn" id="1_pikp0"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://Scripts/Core/EntityVoidoutTrigger.cs" id="5_aiymr"]
 [ext_resource type="Script" path="res://addons/cyclops_level_builder/resources/convex_block_data.gd" id="5_vmujk"]
 [ext_resource type="PackedScene" uid="uid://b7rhbgw2dujty" path="res://Resources/Entities/Eos/Eos.tscn" id="9_0jt21"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/Implementations/AkimboWeapon.cs" id="11_uqmxm"]
 [ext_resource type="PackedScene" uid="uid://fbs6dr24ss3g" path="res://Resources/Weapons/Epiphron/Epiphron.tscn" id="12_1jl3t"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/Implementations/MultiWeapon.cs" id="13_d6cna"]
 [ext_resource type="PackedScene" uid="uid://b7b17ebmgtrfy" path="res://Resources/Weapons/Nemesis/Nemesis.tscn" id="15_x4bcq"]
@@ -1533,7 +1534,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30201, -4.81285)
 curve = SubResource("Curve3D_1g2j1")
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Environment/Path3D"]
-transform = Transform3D(-0.0922568, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97163e-07, 0.995733, 8.27696e-08, -0.0922568, -1.98959, 0, 2.30373)
+transform = Transform3D(-0.0922569, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97164e-07, 0.995733, 8.27696e-08, -0.0922569, -1.98959, 0, 2.30373)
 script = ExtResource("36_x7xeh")
 
 [node name="AnimatableBody3D" type="AnimatableBody3D" parent="Environment/Path3D/PathFollow3D"]
@@ -1590,7 +1591,7 @@ mesh = SubResource("SphereMesh_nkuww")
 skeleton = NodePath("../../CollisionShape3D/MeshInstance3D")
 
 [node name="Bike" parent="." node_paths=PackedStringArray("CurrentBehaviour") instance=ExtResource("1_pikp0")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.59766, 0.813364, 15.1074)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.99529, 2, 34.5791)
 CurrentBehaviour = NodePath("VehicleBehaviour")
 
 [node name="Eos" parent="." node_paths=PackedStringArray("Weapon", "Skeleton", "AnimationPlayer", "Health") instance=ExtResource("9_0jt21")]
@@ -1601,27 +1602,36 @@ Skeleton = NodePath("Skeleton")
 AnimationPlayer = NodePath("AnimationPlayer")
 Health = NodePath("Health")
 
-[node name="Weapon" type="Node3D" parent="Eos" node_paths=PackedStringArray("Weapons", "Skeleton")]
+[node name="Weapon" type="Node3D" parent="Eos" node_paths=PackedStringArray("MainWeapon", "Skeleton")]
 transform = Transform3D(8.74228e-08, -7.64274e-15, -1, 1, -8.74228e-08, 8.74228e-08, -8.74228e-08, -1, 0, 1.11649, 2.61582, 0.185959)
-script = ExtResource("13_d6cna")
-Weapons = [NodePath("Epiphron"), NodePath("Nemesis"), NodePath("Eleos")]
+script = ExtResource("11_uqmxm")
+MainWeapon = NodePath("Main")
 Skeleton = NodePath("../Skeleton")
 
-[node name="Epiphron" parent="Eos/Weapon" node_paths=PackedStringArray("Skeleton") instance=ExtResource("12_1jl3t")]
+[node name="Main" type="Node3D" parent="Eos/Weapon" node_paths=PackedStringArray("Weapons", "Skeleton")]
 transform = Transform3D(1, 0, 0, -7.10543e-15, 1, 0, 7.10543e-15, 0, 1, 0, 0, 0)
+script = ExtResource("13_d6cna")
+Weapons = [NodePath("Epiphron"), NodePath("Nemesis"), NodePath("Eleos")]
 Skeleton = NodePath("../../Skeleton")
 
-[node name="Nemesis" parent="Eos/Weapon" node_paths=PackedStringArray("Skeleton") instance=ExtResource("15_x4bcq")]
+[node name="Epiphron" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton", "Skeleton") instance=ExtResource("12_1jl3t")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -7.405e-29, -2.01948e-28, 1, 0, 0, 0)
+Skeleton = NodePath("../../../Skeleton")
+Skeleton = NodePath("../../../Skeleton")
+
+[node name="Nemesis" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton", "Skeleton") instance=ExtResource("15_x4bcq")]
 process_mode = 4
 transform = Transform3D(1, 0, 0, -7.10543e-15, 1, 0, 7.10543e-15, 0, 1, 0, 0, 0)
 visible = false
-Skeleton = NodePath("../../Skeleton")
+Skeleton = NodePath("../../../Skeleton")
+Skeleton = NodePath("../../../Skeleton")
 
-[node name="Eleos" parent="Eos/Weapon" node_paths=PackedStringArray("Skeleton") instance=ExtResource("17_jhoyp")]
+[node name="Eleos" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton", "Skeleton") instance=ExtResource("17_jhoyp")]
 process_mode = 4
 transform = Transform3D(1, 0, 0, -7.10543e-15, 1, 0, 7.10543e-15, 0, 1, 0, 0, 0)
 visible = false
-Skeleton = NodePath("../../Skeleton")
+Skeleton = NodePath("../../../Skeleton")
+Skeleton = NodePath("../../../Skeleton")
 
 [node name="Erebos" parent="Eos" node_paths=PackedStringArray("Entity", "Skeleton") instance=ExtResource("26_ds8t8")]
 Entity = NodePath("..")
