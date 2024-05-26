@@ -1,6 +1,6 @@
 [gd_scene load_steps=14 format=3 uid="uid://b7rhbgw2dujty"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Entity.cs" id="1_fjps2"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Implementations/ArmedEntity.cs" id="1_44rt4"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/EntityStats.cs" id="2_lubr1"]
 [ext_resource type="PackedScene" uid="uid://dr77fv5m8yjck" path="res://Scenes/UI/Pointer.tscn" id="3_qcq8b"]
 [ext_resource type="PackedScene" uid="uid://cck2wboppochk" path="res://Scenes/UI/Gauge.tscn" id="3_uuynt"]
@@ -38,7 +38,7 @@ height = 3.1
 [node name="Eos" type="CharacterBody3D" node_paths=PackedStringArray("Skeleton", "AnimationPlayer", "Health")]
 collision_layer = 2
 floor_constant_speed = true
-script = ExtResource("1_fjps2")
+script = ExtResource("1_44rt4")
 DisplayName = "Eos"
 Stats = SubResource("Resource_v01j0")
 HudPack = SubResource("Resource_qwv27")

@@ -1,16 +1,14 @@
 namespace LandlessSkies.Core;
 
-using System;
 using Godot;
-using SevenDev.Utility;
 
 [GlobalClass]
 public abstract partial class EntityBehaviour : Node {
-	[Export] public Entity Entity;
+	[Export] public Entity? Entity;
 
 
-	protected EntityBehaviour() : this(null!) { }
-	public EntityBehaviour(Entity entity) {
+	protected EntityBehaviour() : base() { }
+	public EntityBehaviour(Entity entity) : this() {
 		Entity = entity;
 	}
 

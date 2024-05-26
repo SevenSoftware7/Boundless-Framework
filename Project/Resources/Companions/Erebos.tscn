@@ -3,16 +3,19 @@
 [ext_resource type="Script" path="res://Scripts/Vanilla/Companion/FloatingCompanion.cs" id="1_1r20i"]
 [ext_resource type="Resource" uid="uid://caqyvip0olism" path="res://Resources/Companions/Erebos/Costumes/Base/Erebos_base.tres" id="3_gqdmn"]
 
-[sub_resource type="Curve3D" id="Curve3D_m3m6a"]
+[sub_resource type="Curve3D" id="Curve3D_11sy3"]
 _data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, -1, -1.2, 0.3, 0.2, 0, 0, -1, 0, 0, 0, 1.2, 0.3, 0.2),
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 "tilts": PackedFloat32Array(0, 0)
 }
 point_count = 2
 up_vector_enabled = false
 
-[node name="Erebos" type="Node3D"]
+[node name="Erebos" type="Node3D" node_paths=PackedStringArray("Skeleton")]
 script = ExtResource("1_1r20i")
-Curve = SubResource("Curve3D_m3m6a")
+Curve = SubResource("Curve3D_11sy3")
 DisplayName = "Erebos"
+Skeleton = NodePath("ErebosBase")
 Costume = ExtResource("3_gqdmn")
+
+[node name="ErebosBase" type="Skeleton3D" parent="."]

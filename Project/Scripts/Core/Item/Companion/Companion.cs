@@ -6,9 +6,21 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class Companion : Node3D, IUIObject, ICostumable<CompanionCostume>, ICustomizable, ISaveable<Companion> {
+public partial class Companion : Node3D, IUIObject, ICostumable<CompanionCostume>, ICustomizable, ISaveable<Companion>, IInjector<Skeleton3D?> {
 	[Export] public string DisplayName { get; private set; } = string.Empty;
 	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
+
+
+	[Export] public virtual Skeleton3D? Skeleton {
+		get => _skeleton;
+		protected set {
+			_skeleton = value;
+			this.PropagateInject(_skeleton);
+		}
+	}
+	private Skeleton3D? _skeleton;
+	public Skeleton3D? Inject() => Skeleton;
+
 
 	public virtual IUIObject UIObject => this;
 	public virtual ICustomizable[] Customizables => [];
@@ -49,11 +61,15 @@ public partial class Companion : Node3D, IUIObject, ICostumable<CompanionCostume
 
 
 	public void Load(bool forceReload = false) {
-		if (IsLoaded && !forceReload) return;
+		if (IsLoaded && ! forceReload) return;
 
 		Unload();
 
 		Model = Costume?.Instantiate()?.ParentTo(this);
+
+		if (Model is null) return;
+
+		Model?.PropagateInject(Skeleton);
 	}
 	public void Unload() {
 		Model?.QueueFree();

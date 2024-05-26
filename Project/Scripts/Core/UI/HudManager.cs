@@ -3,7 +3,6 @@ namespace LandlessSkies.Core;
 using Godot;
 using SevenDev.Utility;
 
-[Tool]
 [GlobalClass]
 public partial class HudManager : Control {
 	[Export] public Camera3D? ProjectorCamera;

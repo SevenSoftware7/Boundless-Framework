@@ -17,21 +17,20 @@ public partial class BipedBehaviour : GroundedBehaviour, IPlayerHandler {
 	public bool HasSetupPlayer => interactPrompt is not null && interactPointer is not null;
 
 
-	protected BipedBehaviour() : this(null!) { }
+	protected BipedBehaviour() : base() { }
 	public BipedBehaviour(Entity entity) : base(entity) { }
 
 
 	public override void Start(EntityBehaviour? previousBehaviour) {
 		base.Start(previousBehaviour);
 
-		interactPrompt?.Enable();
 		interactPointer?.Enable();
 
 	}
 	public override void Stop() {
 		base.Stop();
 
-		interactPrompt?.Disable();
+		interactPrompt?.Update(false);
 		interactPointer?.Disable();
 	}
 
@@ -39,8 +38,8 @@ public partial class BipedBehaviour : GroundedBehaviour, IPlayerHandler {
 	public override void SetupPlayer(Player player) {
 		base.SetupPlayer(player);
 
-		interactPrompt ??= player.HudManager.AddPrompt(Entity.HudPack.InteractPrompt);
-		interactPointer ??= player.HudManager.AddPointer(Entity.HudPack.InteractPointer);
+		interactPrompt ??= player.HudManager.AddPrompt(Entity?.HudPack.InteractPrompt);
+		interactPointer ??= player.HudManager.AddPointer(Entity?.HudPack.InteractPointer);
 	}
 
 	public override void HandlePlayer(Player player) {
@@ -62,7 +61,7 @@ public partial class BipedBehaviour : GroundedBehaviour, IPlayerHandler {
 	public override void DisavowPlayer() {
 		base.DisavowPlayer();
 
-		interactPrompt?.QueueFree();
+		interactPrompt?.Destroy();
 		interactPrompt = null;
 
 		interactPointer?.QueueFree();
@@ -70,6 +69,8 @@ public partial class BipedBehaviour : GroundedBehaviour, IPlayerHandler {
 	}
 
 	private void HandleInteraction(Player player) {
+		if (Entity is null) return;
+
 		InteractTarget? target = InteractTarget.GetBestTarget(Entity, 3.25f);
 
 		if (target is not null) {
@@ -90,7 +91,7 @@ public partial class BipedBehaviour : GroundedBehaviour, IPlayerHandler {
 	}
 
 	public override bool SetMovementType(MovementType speed) {
-		if (!base.SetMovementType(speed)) return false;
+		if (! base.SetMovementType(speed)) return false;
 		if (speed == _movementType) return false;
 
 		_movementType = speed;
@@ -103,6 +104,7 @@ public partial class BipedBehaviour : GroundedBehaviour, IPlayerHandler {
 		base._Process(delta);
 
 		if (Engine.IsEditorHint()) return;
+		if (Entity is null) return;
 
 
 		float floatDelta = (float)delta;

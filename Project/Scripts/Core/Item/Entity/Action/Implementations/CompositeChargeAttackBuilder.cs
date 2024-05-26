@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using Godot;
 
 public class CompositeChargeAttackBuilder(AttackBuilder UnchargedAttack, AttackBuilder ChargedAttack) : ChargeAttackBuilder {
-	public StringName ActionKey { get; private set; } = "attack_light";
-	public ulong ChargeDuration { get; private set; } = 1000;
-	public IEnumerable<AttributeModifier> AttributeModifiers { get; private set; } = [];
-	public AttackBuilder UnchargedAttack { get; private set; } = UnchargedAttack;
-	public AttackBuilder ChargedAttack { get; private set; } = ChargedAttack;
+	public StringName ActionKey { get; init; } = "attack_light";
+	public ulong ChargeDuration { get; init; } = 1000;
+	public IEnumerable<AttributeModifier> AttributeModifiers { get; init; } = [];
+
+	public AttackBuilder UnchargedAttack { get; init; } = UnchargedAttack;
+	public AttackBuilder ChargedAttack { get; init; } = ChargedAttack;
 
 
 

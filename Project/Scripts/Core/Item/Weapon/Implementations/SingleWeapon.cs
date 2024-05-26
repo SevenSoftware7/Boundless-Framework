@@ -31,7 +31,7 @@ public abstract partial class SingleWeapon : Weapon, ICostumable<WeaponCostume>,
 		protected set {
 			_skeleton = value;
 
-			if (Model is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(value);
+			if (Model is IInjectable<Skeleton3D?> mSkeleton) mSkeleton.Inject(value);
 		}
 	}
 	private Skeleton3D? _skeleton;
@@ -41,7 +41,7 @@ public abstract partial class SingleWeapon : Weapon, ICostumable<WeaponCostume>,
 		protected set {
 			_handedness = value;
 
-			if (Model is IHandAdaptable mHanded) mHanded.SetHandedness(value);
+			if (Model is IInjectable<Handedness> mHanded) mHanded.Inject(value);
 		}
 	}
 	private Handedness _handedness = Handedness.Right;
@@ -79,17 +79,17 @@ public abstract partial class SingleWeapon : Weapon, ICostumable<WeaponCostume>,
 
 
 
-	public override void SetParentSkeleton(Skeleton3D? skeleton) {
-		base.SetParentSkeleton(skeleton);
-		if (Model is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(skeleton);
+	public override void Inject(Skeleton3D? skeleton) {
+		base.Inject(skeleton);
+		if (Model is IInjectable<Skeleton3D?> mSkeleton) mSkeleton.Inject(skeleton);
 	}
-	public override void SetHandedness(Handedness handedness) {
-		base.SetHandedness(handedness);
-		if (Model is IHandAdaptable mHand) mHand.SetHandedness(handedness);
+	public override void Inject(Handedness handedness) {
+		base.Inject(handedness);
+		if (Model is IInjectable<Handedness> mHand) mHand.Inject(handedness);
 	}
 
 	public void Load(bool forceReload = false) {
-		if (IsLoaded && !forceReload) return;
+		if (IsLoaded && ! forceReload) return;
 
 		Unload();
 
@@ -97,8 +97,8 @@ public abstract partial class SingleWeapon : Weapon, ICostumable<WeaponCostume>,
 
 		if (Model is null) return;
 
-		if (Model is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(Skeleton);
-		if (Model is IHandAdaptable mHanded) mHanded.SetHandedness(Handedness);
+		if (Model is IInjectable<Skeleton3D?> mSkeleton) mSkeleton.Inject(Skeleton);
+		if (Model is IInjectable<Handedness> mHanded) mHanded.Inject(Handedness);
 	}
 	public void Unload() {
 		Model?.QueueFree();

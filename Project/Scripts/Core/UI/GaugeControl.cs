@@ -3,7 +3,6 @@ namespace LandlessSkies.Core;
 using Godot;
 using SevenDev.Utility;
 
-[Tool]
 [GlobalClass]
 public abstract partial class GaugeControl : Control {
 	protected readonly TimeDuration DamagedTimer = new();

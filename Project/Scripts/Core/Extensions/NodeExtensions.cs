@@ -1,9 +1,10 @@
 namespace SevenDev.Utility;
 
 using System;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Godot;
-
+using LandlessSkies.Core;
 
 public static class NodeExtensions {
 
@@ -91,7 +92,7 @@ public static class NodeExtensions {
 	public static T SafeReparentEditor<T>(this T child, Node? newParent, bool keepGlobalTransform = true) where T : Node {
 		child.SafeReparent(newParent, keepGlobalTransform);
 
-		if (!Engine.IsEditorHint()) return child;
+		if (! Engine.IsEditorHint()) return child;
 		if (child.Owner == newParent?.Owner) return child;
 
 		Reown(child, newParent?.Owner ?? newParent);
@@ -116,7 +117,7 @@ public static class NodeExtensions {
 	public static T SafeReparent<T>(this T child, Node? newParent, bool keepGlobalTransform = true) where T : Node {
 		if (child.GetParent() == newParent) return child;
 
-		if (!child.IsInsideTree()) {
+		if (! child.IsInsideTree()) {
 			child.Unparent();
 		}
 		if (child.GetParent() is null) {
@@ -190,7 +191,7 @@ public static class NodeExtensions {
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool TryGetNode<T>(this Node obj, NodePath nodePath, out T node) where T : class {
 		node = default!;
-		if (!obj.HasNode(nodePath))
+		if (! obj.HasNode(nodePath))
 			return false;
 
 		if (obj.GetNodeOrNull(nodePath) is T tNode) {
@@ -218,8 +219,22 @@ public static class NodeExtensions {
 
 		emitter = newEmitter;
 
-		if (emitter is not null && !emitter.IsConnected(signalName, method)) { // IsConnected() sometimes does not work, not my fault https://github.com/godotengine/godot/issues/76690
+		if (emitter is not null && ! emitter.IsConnected(signalName, method)) { // IsConnected() sometimes does not work, not my fault https://github.com/godotengine/godot/issues/76690
 			emitter.Connect(signalName, method, (uint)flags);
+		}
+	}
+
+	public static void PropagateActionToChildren<T>(this Node parent, Action<T>? action, bool parentFirst = false) {
+		if (parentFirst && parent is T tParent1) {
+			action?.Invoke(tParent1);
+		}
+
+		foreach (T child in parent.GetChildren().OfType<T>()) {
+			action?.Invoke(child);
+		}
+
+		if (! parentFirst && parent is T tParent2) {
+			action?.Invoke(tParent2);
 		}
 	}
 
@@ -232,8 +247,30 @@ public static class NodeExtensions {
 			child.PropagateAction(action, parentFirst);
 		}
 
-		if (!parentFirst && parent is T tParent2) {
+		if (! parentFirst && parent is T tParent2) {
 			action?.Invoke(tParent2);
+		}
+	}
+
+
+	public static void PropagateInject<T>(this Node parent, T value, bool parentFirst = false, bool stopAtInjector = true) {
+		IInjectable<T>? injectableParent = parent as IInjectable<T>;
+		if (stopAtInjector) {
+			injectableParent?.Inject(value);
+			return;
+		}
+
+
+		if (parentFirst) {
+			injectableParent?.Inject(value);
+		}
+
+		foreach (Node child in parent.GetChildren()) {
+			child.PropagateInject(value, parentFirst, stopAtInjector);
+		}
+
+		if (! parentFirst) {
+			injectableParent?.Inject(value);
 		}
 	}
 

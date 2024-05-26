@@ -11,7 +11,7 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 	protected abstract Transform3D SittingPosition { get; }
 
 
-	protected SittingBehaviour() : this(null!) { }
+	protected SittingBehaviour() : base() { }
 	public SittingBehaviour(Entity entity) : base(entity) { }
 
 
@@ -27,7 +27,7 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 	}
 
 	public void Dismount() {
-		Entity.SetBehaviour(previousBehaviour);
+		Entity?.SetBehaviour(previousBehaviour);
 	}
 
 	public virtual void SetupPlayer(Player player) {
@@ -42,12 +42,14 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 	}
 
 	public virtual void DisavowPlayer() {
-		dismountPrompt?.QueueFree();
+		dismountPrompt?.Destroy();
 		dismountPrompt = null;
 	}
 
 	public override void _Process(double delta) {
 		base._Process(delta);
+		if (Entity is null) return;
+
 		Entity.GlobalTransform = SittingPosition;
 		Entity.GlobalForward = SittingPosition.Basis.Forward();
 	}

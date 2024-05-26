@@ -20,7 +20,7 @@ public abstract partial class ChargeAttack(Entity entity, SingleWeapon weapon, u
 
 	public virtual void SetupPlayer(Player player) { }
 	public virtual void HandlePlayer(Player player) {
-		if (!isDone && chargeTime.IsDone) {
+		if (! isDone && chargeTime.IsDone) {
 			isDone = true;
 			ChargeDone();
 		}

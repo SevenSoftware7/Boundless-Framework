@@ -33,7 +33,6 @@ public partial class CompositeChargeAttack(Entity entity, SingleWeapon weapon, C
 
 		Entity.AttributeModifiers.AddRange(modifiers);
 	}
-
 	public override void _ExitTree() {
 		base._ExitTree();
 

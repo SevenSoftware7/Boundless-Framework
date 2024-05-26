@@ -3,7 +3,7 @@ namespace LandlessSkies.Core;
 using Godot;
 using SevenDev.Utility;
 
-[Tool]
+// [Tool]
 [GlobalClass]
 public sealed partial class Player : Node {
 	public const byte MaxPlayers = 2;

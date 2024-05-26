@@ -4,7 +4,7 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public partial class SkinnedModel : Model, ISkeletonAdaptable {
+public partial class SkinnedModel : Model, IInjectable<Skeleton3D?> {
 	[Export] protected GeometryInstance3D Model { get; private set; } = null!;
 
 	[ExportGroup("Dependencies")]
@@ -17,7 +17,14 @@ public partial class SkinnedModel : Model, ISkeletonAdaptable {
 
 
 
-	private void ParentToSkeleton() {
+	public override Aabb GetAabb() => Model.GetAabb();
+
+	public void SetHandedness(Handedness handedness) {
+		Handedness = handedness;
+	}
+	public void Inject(Skeleton3D? skeleton) {
+		Skeleton = skeleton;
+
 		if (Model is null || Model is not MeshInstance3D meshInstance) return;
 
 		if (Skeleton is null) {
@@ -28,27 +35,12 @@ public partial class SkinnedModel : Model, ISkeletonAdaptable {
 		meshInstance.Skeleton = meshInstance.GetPathTo(Skeleton);
 	}
 
-	protected virtual void HandleSkeleton() {
-		if (Skeleton is not null) {
-			GlobalTransform = Skeleton.GlobalTransform;
-		}
-	}
-
-
-	public override Aabb GetAabb() => Model.GetAabb();
-
-	public void SetHandedness(Handedness handedness) {
-		Handedness = handedness;
-	}
-	public void SetParentSkeleton(Skeleton3D? skeleton) {
-		Skeleton = skeleton;
-		ParentToSkeleton();
-	}
-
 
 
 	public override void _Process(double delta) {
 		base._Process(delta);
-		HandleSkeleton();
+		if (Skeleton is null) return;
+
+		GlobalTransform = Skeleton.GlobalTransform;
 	}
 }

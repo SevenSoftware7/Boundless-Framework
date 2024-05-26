@@ -8,7 +8,6 @@ public abstract partial class EntityAction : Node {
 	public event Action? OnDestroy;
 
 
-	protected EntityAction() : this(null!) { }
 	public EntityAction(Entity entity) {
 		Entity = entity;
 	}

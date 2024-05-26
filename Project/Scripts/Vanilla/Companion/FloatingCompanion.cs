@@ -40,15 +40,12 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 
 
 	private static Curve3D CreateCurve() {
-		Vector3 rightOffset = new(1.2f, 0.3f, 0.2f);
-		Vector3 LeftOffset = new(-1.2f, 0.3f, 0.2f);
-
 		Curve3D curve = new() {
 			UpVectorEnabled = false
 		};
-		curve.AddPoint(LeftOffset, @out: Vector3.Forward);
-		// curve.AddPoint(Vector3.Zero, Vector3.Forward, Vector3.Forward);
-		curve.AddPoint(rightOffset, @in: Vector3.Forward);
+
+		curve.AddPoint(Vector3.Zero);
+		curve.AddPoint(Vector3.Zero);
 
 		return curve;
 	}
@@ -91,11 +88,11 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 
 		OnFace |= PositionBlocked(GetLocalPosition(rightPosition)) && PositionBlocked(GetLocalPosition(leftPosition));
 
-		if (!OnFace && PositionBlocked(GetPosition(GetCurveT())))
-			OnRight = !OnRight;
+		if (! OnFace && PositionBlocked(GetPosition(GetCurveT())))
+			OnRight = ! OnRight;
 
 
-		T = Mathf.MoveToward(T, /* OnFace ? 0.5f :  */GetCurveT(), 6f * floatDelta);
+		T = Mathf.MoveToward(T, GetCurveT(), 6f * floatDelta);
 		TFace = Mathf.Lerp(TFace, OnFace ? 1f : 0f, 12f * floatDelta);
 
 		Vector3 tPosition = GetPosition(T);

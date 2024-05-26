@@ -9,26 +9,27 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<EntityCostume>, ICustomizable, ISaveable<Entity> {
+public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<EntityCostume>, ICustomizable, ISaveable<Entity>, IInjector<Skeleton3D?> {
 	private readonly List<Vector3> standableSurfaceBuffer = [];
 	private const int STANDABLE_SURFACE_BUFFER_SIZE = 20;
 	private GaugeControl? healthBar;
 
 	[Export] public string DisplayName { get; private set; } = string.Empty;
 	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
-	public virtual ICustomizable[] Customizables => [.. new List<ICustomizable?>(){Model, Weapon}.OfType<ICustomizable>()];
+	public virtual ICustomizable[] Customizables => Model is null ? [] : [Model];
 	public virtual ICustomization[] Customizations => [];
 
-	[Export] public Handedness Handedness {
+	[Export] public EntityStats Stats { get; private set; } = new();
+	[Export] public HudPack HudPack { get; private set; } = new();
+
+	[Export] public virtual Handedness Handedness {
 		get => _handedness;
-		private set {
+		protected set {
 			_handedness = value;
-			_weapon?.Inject(this);
+			this.PropagateInject(_handedness);
 		}
 	}
 	private Handedness _handedness = Handedness.Right;
-	[Export] public EntityStats Stats { get; private set; } = new();
-	[Export] public HudPack HudPack { get; private set; } = new();
 
 
 	[ExportGroup("Costume")]
@@ -42,31 +43,16 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 	public bool IsLoaded => Model is not null;
 
 
-	[ExportGroup("Weapon")]
-	[Export] public Weapon? Weapon {
-		get => _weapon;
-		set {
-			_weapon?.Inject(null);
-
-			_weapon = value;
-			if (_weapon is not null) {
-				_weapon.Inject(this);
-				_weapon.Name = PropertyName.Weapon;
-			}
-		}
-	}
-	private Weapon? _weapon;
-
-
 	[ExportGroup("Dependencies")]
-	[Export] public Skeleton3D? Skeleton {
+	[Export] public virtual Skeleton3D? Skeleton {
 		get => _skeleton;
-		private set {
+		protected set {
 			_skeleton = value;
-			_weapon?.Inject(this);
+			this.PropagateInject(_skeleton);
 		}
 	}
 	private Skeleton3D? _skeleton;
+	public Skeleton3D? Inject() => Skeleton;
 
 	[Export] public AnimationPlayer? AnimationPlayer {
 		get => _animationPlayer;
@@ -150,7 +136,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 	}
 
 	public void ExecuteAction(EntityActionInfo action, bool forceExecute = false) {
-		if (!forceExecute && !ActionExtensions.CanCancel(CurrentAction)) return;
+		if (! forceExecute && ! ActionExtensions.CanCancel(CurrentAction)) return;
 
 		CurrentAction?.QueueFree();
 		CurrentAction = null;
@@ -173,10 +159,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 
 
 	private void Move(double delta) {
-		if ((Inertia + Movement).IsEqualApprox(Vector3.Zero)) return;
 
 		if (MotionMode == MotionModeEnum.Grounded) {
-
 			if (
 				IsOnFloor() && GetPlatformVelocity().IsZeroApprox()
 				// && (lastStandableSurfaces.Count == 0 || GlobalPosition.DistanceSquaredTo(lastStandableSurfaces[^1]) > 0.25f)
@@ -202,14 +186,12 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 		}
 
 		Velocity = Inertia + Movement;
-		if (Velocity.IsEqualApprox(Vector3.Zero)) return;
 
 		MoveAndSlide();
 
 
-
 		bool MoveStep(double delta) {
-			if (Mathf.IsZeroApprox(Movement.LengthSquared())) return false;
+			if (Mathf.IsZeroApprox(Movement.LengthSquared()) || ! IsOnFloor()) return false;
 
 			Vector3 movement = Movement * (float)delta;
 			Vector3 destination = GlobalTransform.Origin + movement;
@@ -241,11 +223,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 				stepTestResult
 			);
 
-			if (!findStep)
-				return false;
-
-			if (stepObstacleCollision is not null && stepTestResult.GetColliderRid() != stepObstacleCollision.GetColliderRid())
-				return false;
+			if (! findStep) return false;
+			if (stepObstacleCollision is not null && stepTestResult.GetColliderRid() != stepObstacleCollision.GetColliderRid()) return false;
 
 
 			Vector3 point = stepTestResult.GetCollisionPoint();
@@ -254,8 +233,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 			Vector3 pointHeight = point.Project(UpDirection);
 
 			float stepHeightSquared = destinationHeight.DistanceSquaredTo(pointHeight);
-			if (stepHeightSquared >= sweepMotion.LengthSquared())
-				return false;
+			if (stepHeightSquared >= sweepMotion.LengthSquared()) return false;
 
 
 			GlobalTransform = GlobalTransform with { Origin = destination - destinationHeight + pointHeight };
@@ -266,6 +244,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 			return true;
 		}
 	}
+
 
 
 	private void OnKill(float fromHealth) {
@@ -302,18 +281,6 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 		player.CameraController.MoveCamera(
 			player.InputDevice.GetVector("look_left", "look_right", "look_down", "look_up") * player.InputDevice.Sensitivity
 		);
-
-		if (_weapon is not null) {
-			if (player.InputDevice.IsActionJustPressed("switch_weapon_primary")) {
-				_weapon.Style = 0;
-			}
-			else if (player.InputDevice.IsActionJustPressed("switch_weapon_secondary")) {
-				_weapon.Style = 1;
-			}
-			else if (player.InputDevice.IsActionJustPressed("switch_weapon_ternary")) {
-				_weapon.Style = 2;
-			}
-		}
 	}
 
 	public virtual void DisavowPlayer() {
@@ -323,7 +290,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 
 
 	public void Load(bool forceReload = false) {
-		if (IsLoaded && !forceReload) return;
+		if (IsLoaded && ! forceReload) return;
 
 		Unload();
 
@@ -331,8 +298,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 
 		if (Model is null) return;
 
-		if (Model is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(Skeleton);
-		if (Model is IHandAdaptable mHanded) mHanded.SetHandedness(Handedness);
+		Model?.PropagateInject(Skeleton);
 	}
 	public void Unload() {
 		Model?.QueueFree();
@@ -375,18 +341,11 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 		healthBar?.QueueFree();
 	}
 
-	public override void _Notification(int what) {
-		base._Notification(what);
-		switch ((ulong)what) {
-			case NotificationChildOrderChanged:
-				Weapon ??= GetChildren().OfType<Weapon>().FirstOrDefault();
-				break;
-		}
-	}
-
 
 
 	public ISaveData<Entity> Save() => new EntitySaveData<Entity>(this);
+
+
 
 	[Serializable]
 	public class EntitySaveData<T>(T data) : CostumableSaveData<Entity, T, EntityCostume>(data) where T : Entity {

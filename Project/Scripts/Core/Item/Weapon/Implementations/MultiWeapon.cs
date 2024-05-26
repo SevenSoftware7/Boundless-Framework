@@ -84,7 +84,7 @@ public sealed partial class MultiWeapon : Weapon {
 			_skeleton = value;
 
 			_weapons.ForEach(w => {
-				if (w is ISkeletonAdaptable mSkeleton) mSkeleton.SetParentSkeleton(value);
+				if (w is IInjectable<Skeleton3D?> mSkeleton) mSkeleton.Inject(value);
 			});
 		}
 	}
@@ -96,7 +96,7 @@ public sealed partial class MultiWeapon : Weapon {
 			_handedness = value;
 
 			_weapons.ForEach(w => {
-				if (w is IHandAdaptable mHanded) mHanded.SetHandedness(value);
+				if (w is IInjectable<Handedness> mHanded) mHanded.Inject(value);
 			});
 		}
 	}
@@ -127,7 +127,7 @@ public sealed partial class MultiWeapon : Weapon {
 
 	private bool IndexInBounds(int index) => index < _weapons.Count && index >= 0;
 	private void UpdateCurrent() {
-		if (!IndexInBounds(_currentIndex)) {
+		if (! IndexInBounds(_currentIndex)) {
 			_currentIndex = 0;
 		}
 		_weapons.ForEach((w) => w?.Disable());
@@ -162,13 +162,13 @@ public sealed partial class MultiWeapon : Weapon {
 	}
 
 	public void SetWeapon(int index, Weapon? weapon) {
-		if (!IndexInBounds(index)) return;
+		if (! IndexInBounds(index)) return;
 
 		if (weapon is null) return;
 
 		weapon.SafeReparent(this);
-		weapon.SetHandedness(Handedness);
-		weapon.SetParentSkeleton(Skeleton);
+		weapon.Inject(Handedness);
+		weapon.Inject(Skeleton);
 
 		_weapons[index] = weapon;
 
@@ -178,7 +178,7 @@ public sealed partial class MultiWeapon : Weapon {
 
 
 	public void RemoveWeapon(int index) {
-		if (!IndexInBounds(index)) return;
+		if (! IndexInBounds(index)) return;
 
 		_weapons.RemoveAt(index);
 
@@ -209,16 +209,16 @@ public sealed partial class MultiWeapon : Weapon {
 			});
 	}
 
-	public override void SetParentSkeleton(Skeleton3D? skeleton) {
-		base.SetParentSkeleton(skeleton);
+	public override void Inject(Skeleton3D? skeleton) {
+		base.Inject(skeleton);
 		foreach (Weapon? weapon in Weapons) {
-			weapon?.SetParentSkeleton(skeleton);
+			weapon?.Inject(skeleton);
 		}
 	}
-	public override void SetHandedness(Handedness handedness) {
-		base.SetHandedness(handedness);
+	public override void Inject(Handedness handedness) {
+		base.Inject(handedness);
 		foreach (Weapon? weapon in Weapons) {
-			weapon?.SetHandedness(handedness);
+			weapon?.Inject(handedness);
 		}
 	}
 

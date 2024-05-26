@@ -1,18 +1,16 @@
 [gd_scene load_steps=3 format=3 uid="uid://r6yqclqm3ubp"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Implementation/SkeletonModel.cs" id="1_wegxi"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Implementation/SkinnedModel.cs" id="1_om25c"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_vq4kn"]
 size = Vector3(0.3, 0.3, 0.15)
 
 [node name="Model - Erebos (base)" type="Node3D" node_paths=PackedStringArray("Model")]
-script = ExtResource("1_wegxi")
-Model = NodePath("ErebosBase")
-IsEnabled = true
+script = ExtResource("1_om25c")
+Model = NodePath("Model")
 
-[node name="ErebosBase" type="Skeleton3D" parent="."]
-
-[node name="Model" type="MeshInstance3D" parent="ErebosBase"]
+[node name="Model" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -0.15)
 layers = 2
 mesh = SubResource("BoxMesh_vq4kn")
+skeleton = NodePath("")

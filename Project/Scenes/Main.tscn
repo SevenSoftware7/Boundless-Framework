@@ -1253,9 +1253,9 @@ albedo_color = Color(0.752941, 0, 0, 0.498039)
 [sub_resource type="SphereMesh" id="SphereMesh_nkuww"]
 material = SubResource("StandardMaterial3D_k6yo1")
 
-[sub_resource type="Curve3D" id="Curve3D_1n68a"]
+[sub_resource type="Curve3D" id="Curve3D_1wene"]
 _data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, -1, -1.2, 0.3, 0.2, 0, 0, -1, 0, 0, 0, 1.2, 0.3, 0.2),
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 "tilts": PackedFloat32Array(0, 0)
 }
 point_count = 2
@@ -1546,14 +1546,19 @@ shape = SubResource("BoxShape3D_x4tkf")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/Path3D/PathFollow3D"]
 mesh = SubResource("BoxMesh_juan7")
 
+[node name="Player" parent="." node_paths=PackedStringArray("CameraController", "HudManager", "Entity") instance=ExtResource("26_rkn04")]
+CameraController = NodePath("CameraController3D")
+HudManager = NodePath("HUD")
+Entity = NodePath("../Eos")
+
 [node name="TestInteractable" type="Area3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 2.5, 32)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -53.1233, 0.5, -10.6023)
 collision_layer = 8
 collision_mask = 0
 script = ExtResource("35_lrkn5")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="TestInteractable"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
 shape = SubResource("SphereShape3D_ycdom")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="TestInteractable/CollisionShape3D"]
@@ -1561,7 +1566,7 @@ mesh = SubResource("SphereMesh_nkuww")
 skeleton = NodePath("../..")
 
 [node name="CollisionShape3D_2" type="CollisionShape3D" parent="TestInteractable"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
 shape = SubResource("SphereShape3D_ycdom")
 
 [node name="MeshInstance3D_2" type="MeshInstance3D" parent="TestInteractable/CollisionShape3D_2"]
@@ -1569,7 +1574,7 @@ mesh = SubResource("SphereMesh_nkuww")
 skeleton = NodePath("../../CollisionShape3D/MeshInstance3D")
 
 [node name="CollisionShape3D_3" type="CollisionShape3D" parent="TestInteractable"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
 shape = SubResource("SphereShape3D_ycdom")
 
 [node name="MeshInstance3D_3" type="MeshInstance3D" parent="TestInteractable/CollisionShape3D_3"]
@@ -1577,7 +1582,7 @@ mesh = SubResource("SphereMesh_nkuww")
 skeleton = NodePath("../../CollisionShape3D/MeshInstance3D")
 
 [node name="CollisionShape3D_4" type="CollisionShape3D" parent="TestInteractable"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
 shape = SubResource("SphereShape3D_ycdom")
 
 [node name="MeshInstance3D_4" type="MeshInstance3D" parent="TestInteractable/CollisionShape3D_4"]
@@ -1585,20 +1590,19 @@ mesh = SubResource("SphereMesh_nkuww")
 skeleton = NodePath("../../CollisionShape3D/MeshInstance3D")
 
 [node name="Bike" parent="." node_paths=PackedStringArray("CurrentBehaviour") instance=ExtResource("1_pikp0")]
-process_mode = 4
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.49402, 2, 26.3616)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.59766, 0.813364, 15.1074)
 CurrentBehaviour = NodePath("VehicleBehaviour")
 
 [node name="Eos" parent="." node_paths=PackedStringArray("Weapon", "Skeleton", "AnimationPlayer", "Health") instance=ExtResource("9_0jt21")]
 process_priority = -10
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.98336, 2, 27.7771)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.62958, 2, 33.2576)
 Weapon = NodePath("Weapon")
 Skeleton = NodePath("Skeleton")
 AnimationPlayer = NodePath("AnimationPlayer")
 Health = NodePath("Health")
 
 [node name="Weapon" type="Node3D" parent="Eos" node_paths=PackedStringArray("Weapons", "Skeleton")]
-transform = Transform3D(8.74228e-08, -7.64274e-15, -1, 1, -8.74228e-08, 8.74228e-08, -8.74228e-08, -1, 0, 1.11649, 2.61582, 0.185957)
+transform = Transform3D(8.74228e-08, -7.64274e-15, -1, 1, -8.74228e-08, 8.74228e-08, -8.74228e-08, -1, 0, 1.11649, 2.61582, 0.185959)
 script = ExtResource("13_d6cna")
 Weapons = [NodePath("Epiphron"), NodePath("Nemesis"), NodePath("Eleos")]
 Skeleton = NodePath("../Skeleton")
@@ -1619,12 +1623,7 @@ transform = Transform3D(1, 0, 0, -7.10543e-15, 1, 0, 7.10543e-15, 0, 1, 0, 0, 0)
 visible = false
 Skeleton = NodePath("../../Skeleton")
 
-[node name="Erebos" parent="Eos" node_paths=PackedStringArray("Entity") instance=ExtResource("26_ds8t8")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.141533, 0, 0)
+[node name="Erebos" parent="Eos" node_paths=PackedStringArray("Entity", "Skeleton") instance=ExtResource("26_ds8t8")]
 Entity = NodePath("..")
-Curve = SubResource("Curve3D_1n68a")
-
-[node name="Player" parent="." node_paths=PackedStringArray("CameraController", "HudManager", "Entity") instance=ExtResource("26_rkn04")]
-CameraController = NodePath("CameraController3D")
-HudManager = NodePath("HUD")
-Entity = NodePath("../Eos")
+Curve = SubResource("Curve3D_1wene")
+Skeleton = NodePath("ErebosBase")

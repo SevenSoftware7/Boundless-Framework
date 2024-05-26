@@ -11,12 +11,13 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 	protected readonly TimeDuration jumpCooldown = new(500);
 
 
-	protected GroundedBehaviour() : this(null!) { }
+	protected GroundedBehaviour() : base() { }
 	public GroundedBehaviour(Entity entity) : base(entity) { }
 
 
 	public override void Start(EntityBehaviour? previousBehaviour) {
 		base.Start(previousBehaviour);
+		if (Entity is null) return;
 
 		Entity.GlobalForward = Entity.GlobalForward.SlideOnFace(Entity.UpDirection).Normalized();
 		Entity.GlobalBasis = Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection);
@@ -28,6 +29,8 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 	public virtual void SetupPlayer(Player player) { }
 
 	public virtual void HandlePlayer(Player player) {
+		if (Entity is null) return;
+
 		if (player.InputDevice.IsActionPressed("jump")) {
 			Jump();
 		}
@@ -47,7 +50,7 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 
 	public virtual bool SetMovementType(MovementType speed) => true;
 	public override bool Move(Vector3 direction) {
-		if (!base.Move(direction)) return false;
+		if (! base.Move(direction)) return false;
 
 		_inputDirection = direction;
 		return true;
@@ -70,6 +73,8 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 	}
 
 	private void HandleInertia(double delta) {
+		if (Entity is null) return;
+
 		Entity.Inertia.Split(Entity.UpDirection, out Vector3 verticalInertia, out Vector3 horizontalInertia);
 
 		horizontalInertia = ProcessHorizontalInertia(delta, horizontalInertia);
@@ -79,6 +84,7 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 	}
 
 	protected virtual Vector3 ProcessHorizontalInertia(double delta, Vector3 horizontalInertia) {
+		if (Entity is null) return horizontalInertia;
 		if (horizontalInertia.IsEqualApprox(Vector3.Zero)) return horizontalInertia;
 
 		return horizontalInertia.MoveToward(
@@ -90,6 +96,7 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 	}
 
 	protected virtual Vector3 ProcessVerticalInertia(double delta, Vector3 verticalInertia) {
+		if (Entity is null) return verticalInertia;
 		if (Entity.IsOnFloor()) return verticalInertia.SlideOnFace(Entity.UpDirection);
 
 		const float fallSpeed = 32f;
@@ -117,11 +124,13 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 	}
 
 	protected virtual void HandleJump(double delta) {
+		if (Entity is null) return;
+
 		if (Entity.IsOnFloor()) {
 			coyoteTimer.Start();
 		}
 
-		if (!jumpBuffer.IsDone && jumpCooldown.IsDone && !coyoteTimer.IsDone) {
+		if (! jumpBuffer.IsDone && jumpCooldown.IsDone && !coyoteTimer.IsDone) {
 			float jumpHeight = Entity.AttributeModifiers.Get(Attributes.GenericjumpHeight).ApplyTo(Entity.Stats.JumpHeight);
 
 			Entity.Inertia = Entity.Inertia.SlideOnFace(Entity.UpDirection) + Entity.UpDirection * jumpHeight;

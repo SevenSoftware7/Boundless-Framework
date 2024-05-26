@@ -7,7 +7,6 @@ using KGySoft.Serialization.Binary;
 using LandlessSkies.Core;
 using SevenDev.Utility;
 
-[Tool]
 [GlobalClass]
 public partial class TestInteractable : Interactable {
 	public override string InteractLabel => "Interact";

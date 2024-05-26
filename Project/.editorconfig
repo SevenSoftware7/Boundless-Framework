@@ -21,6 +21,7 @@ csharp_new_line_before_members_in_anonymous_types = true:suggestion
 csharp_new_line_between_query_expression_clauses = true:suggestion
 
 dotnet_style_require_accessibility_modifiers = for_non_interface_members:error
+csharp_style_prefer_primary_constructors = false
 csharp_preferred_modifier_order = public, private, protected, internal, file, static, extern, new, virtual, abstract, sealed, override, readonly, unsafe, volatile, async:warning
 
 csharp_indent_case_contents = true:suggestion

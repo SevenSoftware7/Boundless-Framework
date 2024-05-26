@@ -2,14 +2,18 @@ namespace LandlessSkies.Core;
 
 using Godot;
 
-[Tool]
 [GlobalClass]
 public abstract partial class PromptControl : Control {
 	[Export] public bool Enabled;
+	public bool QueuedForDestruction { get; private set; }
 
 
 	public abstract void SetText(string text);
 	public abstract void SetKey(Texture2D image);
+
+	public void Update(bool enabled) {
+		Enabled = enabled;
+	}
 
 	public void Update(bool enabled, string text) {
 		Enabled = enabled;
@@ -32,5 +36,10 @@ public abstract partial class PromptControl : Control {
 		if (interactTarget is not null) {
 			SetText(interactTarget.Interactable.InteractLabel);
 		}
+	}
+
+	public void Destroy() {
+		QueuedForDestruction = true;
+		Enabled = false;
 	}
 }

@@ -19,9 +19,18 @@ public partial class SliderPromptControl : PromptControl {
 		Key.Texture = image;
 	}
 
+	public override void _Ready() {
+		base._Ready();
+		Enabled = false;
+		Position = Position with { X = - Size.X };
+		Scale = new(1f, 0f);
+		Visible = false;
+	}
 
 	public override void _Process(double delta) {
 		base._Process(delta);
+
+		if (QueuedForDestruction && ! Visible && IsQueuedForDeletion()) return;
 
 		float floatDelta = (float)delta;
 
@@ -39,6 +48,10 @@ public partial class SliderPromptControl : PromptControl {
 		Visible = ! Mathf.IsEqualApprox(Scale.Y, Mathf.Epsilon);
 		if (Visible && wasNotVisible) {
 			GetParent()?.MoveChild(this, 0);
+		}
+
+		if (QueuedForDestruction && ! Visible) {
+			QueueFree();
 		}
 
 		if (! Visible) return;

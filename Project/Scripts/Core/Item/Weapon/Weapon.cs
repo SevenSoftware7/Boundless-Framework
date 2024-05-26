@@ -7,7 +7,7 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public abstract partial class Weapon : Node3D, IWeapon, ISkeletonAdaptable, ISaveable<Weapon> {
+public abstract partial class Weapon : Node3D, IWeapon, IInjectable<Skeleton3D?>, IInjectable<Handedness>, ISaveable<Weapon> {
 	public static readonly Basis rightHandBoneBasis = Basis.FromEuler(new(Mathfs.Deg2Rad(-90f), 0f, Mathfs.Deg2Rad(90f)));
 	public static readonly Basis leftHandBoneBasis = Basis.FromEuler(new(Mathfs.Deg2Rad(-90f), 0f, Mathfs.Deg2Rad(-90f)));
 
@@ -33,15 +33,11 @@ public abstract partial class Weapon : Node3D, IWeapon, ISkeletonAdaptable, ISav
 
 
 	public abstract IEnumerable<AttackActionInfo> GetAttacks(Entity target);
-	public void Inject(Entity? entity) {
-		SetParentSkeleton(entity?.Skeleton);
-		SetHandedness(entity?.Handedness ?? Handedness.Right);
-	}
 
 	public abstract ISaveData<Weapon> Save();
 
-	public virtual void SetParentSkeleton(Skeleton3D? skeleton) => Skeleton = skeleton;
-	public virtual void SetHandedness(Handedness handedness) => Handedness = handedness;
+	public virtual void Inject(Skeleton3D? skeleton) => Skeleton = skeleton;
+	public virtual void Inject(Handedness handedness) => Handedness = handedness;
 
 	private void StickToSkeletonBone() {
 		if (Skeleton is null) return;
