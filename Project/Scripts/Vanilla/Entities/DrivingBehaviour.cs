@@ -27,11 +27,6 @@ public partial class DrivingBehaviour : SittingBehaviour {
 	}
 
 
-	public override void SetupPlayer(Player player) {
-		base.SetupPlayer(player);
-
-		Vehicle?.SetupPlayer(player);
-	}
 	public override void HandlePlayer(Player player) {
 		base.HandlePlayer(player);
 

@@ -2,15 +2,13 @@ namespace LandlessSkies.Core;
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using Godot;
-using GodotPlugins.Game;
 using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public sealed partial class AkimboWeapon : Weapon, IInjector<Handedness> {
+public sealed partial class AkimboWeapon : Weapon, IInjectionInterceptor<Handedness> {
 	[Export] public Weapon? MainWeapon {
 		get => _mainWeapon;
 		set {
@@ -20,7 +18,7 @@ public sealed partial class AkimboWeapon : Weapon, IInjector<Handedness> {
 			_mainWeapon?.PropagateInject(Skeleton);
 			_mainWeapon?.PropagateInject(Handedness);
 
-			MoveChild(_mainWeapon, 0);
+			_mainWeapon?.GetParent().MoveChild(_mainWeapon, 0);
 		}
 	}
 	private Weapon? _mainWeapon;
@@ -34,7 +32,7 @@ public sealed partial class AkimboWeapon : Weapon, IInjector<Handedness> {
 			_sideWeapon?.PropagateInject(Skeleton);
 			_sideWeapon?.PropagateInject(Handedness.Reverse());
 
-			MoveChild(_sideWeapon, 1);
+			_sideWeapon?.GetParent().MoveChild(_sideWeapon, 1);
 		}
 	}
 	private Weapon? _sideWeapon;
@@ -59,8 +57,8 @@ public sealed partial class AkimboWeapon : Weapon, IInjector<Handedness> {
 		protected set {
 			base.Skeleton = value;
 
-			MainWeapon?.PropagateInject(Skeleton);
-			SideWeapon?.PropagateInject(Skeleton);
+			_mainWeapon?.PropagateInject(Skeleton);
+			_sideWeapon?.PropagateInject(Skeleton);
 		}
 	}
 
@@ -69,8 +67,8 @@ public sealed partial class AkimboWeapon : Weapon, IInjector<Handedness> {
 		protected set {
 			base.Handedness = value;
 
-			MainWeapon?.PropagateInject(Handedness);
-			SideWeapon?.PropagateInject(Handedness.Reverse());
+			_mainWeapon?.PropagateInject(Handedness);
+			_sideWeapon?.PropagateInject(Handedness.Reverse());
 		}
 	}
 
@@ -110,21 +108,12 @@ public sealed partial class AkimboWeapon : Weapon, IInjector<Handedness> {
 			.SelectMany(w => w.GetAttacks(target));
 	}
 
-	public override void Inject(Skeleton3D? skeleton) {
-		base.Inject(skeleton);
-
-		_mainWeapon?.PropagateInject(skeleton);
-		_sideWeapon?.PropagateInject(skeleton);
+	public Handedness Intercept(Node child) {
+		if (child == _sideWeapon) {
+			return Handedness.Reverse();
+		}
+		return Handedness;
 	}
-	public override void Inject(Handedness handedness) {
-		base.Inject(handedness);
-
-		_mainWeapon?.PropagateInject(handedness);
-		_sideWeapon?.PropagateInject(handedness.Reverse());
-	}
-
-	public Handedness Inject() => Handedness;
-
 
 	public override void _Notification(int what) {
 		base._Notification(what);

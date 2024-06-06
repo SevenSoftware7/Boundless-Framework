@@ -26,8 +26,6 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 	}
 
 
-	public virtual void SetupPlayer(Player player) { }
-
 	public virtual void HandlePlayer(Player player) {
 		if (Entity is null) return;
 

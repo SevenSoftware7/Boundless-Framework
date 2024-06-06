@@ -9,7 +9,7 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<EntityCostume>, ICustomizable, ISaveable<Entity>, IInjector<Skeleton3D?> {
+public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<EntityCostume>, ICustomizable, ISaveable<Entity>, IInjectionBlocker<Skeleton3D?> {
 	private readonly List<Vector3> standableSurfaceBuffer = [];
 	private const int STANDABLE_SURFACE_BUFFER_SIZE = 20;
 	private GaugeControl? healthBar;
@@ -28,7 +28,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 		get => _handedness;
 		protected set {
 			_handedness = value;
-			this.PropagateInject(_handedness, stopAtInjector: true, passThroughThisInjector: true);
+			this.PropagateInject(_handedness);
 		}
 	}
 	private Handedness _handedness = Handedness.Right;
@@ -50,11 +50,10 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 		get => _skeleton;
 		protected set {
 			_skeleton = value;
-			this.PropagateInject(_skeleton, stopAtInjector: true, passThroughThisInjector: true);
+			this.PropagateInject(_skeleton);
 		}
 	}
 	private Skeleton3D? _skeleton;
-	public Skeleton3D? Inject() => Skeleton;
 
 	[Export] public AnimationPlayer? AnimationPlayer {
 		get => _animationPlayer;
@@ -269,16 +268,14 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 		}
 	}
 
-	public virtual void SetupPlayer(Player player) {
-		if (Health is null) return;
-
-		healthBar ??= player.HudManager.AddInfo(HudPack.HealthBar);
-		if (healthBar is null) return;
-
-		healthBar!.Value = Health;
-	}
-
 	public virtual void HandlePlayer(Player player) {
+		if (healthBar is null && Health is not null) {
+			healthBar = player.HudManager.AddInfo(HudPack.HealthBar);
+
+			if (healthBar is not null) {
+				healthBar.Value = Health;
+			}
+		}
 		player.CameraController.SetEntityAsSubject(this);
 		player.CameraController.MoveCamera(
 			player.InputDevice.GetVector("look_left", "look_right", "look_down", "look_up") * player.InputDevice.Sensitivity
@@ -300,7 +297,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 
 		if (Model is null) return;
 
-		Model?.PropagateInject(Skeleton, stopAtInjector: true, passThroughThisInjector: true);
+		Model?.PropagateInject(Skeleton);
+		Model?.PropagateInject(Handedness);
 	}
 	public void Unload() {
 		Model?.QueueFree();

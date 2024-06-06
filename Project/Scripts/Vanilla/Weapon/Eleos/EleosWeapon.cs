@@ -30,7 +30,6 @@ public sealed partial class EleosWeapon : SingleWeapon, IPlayerHandler {
 		];
 	}
 
-	public void SetupPlayer(Player player) { }
 	public void HandlePlayer(Player player) {
 		if (player.Entity is null) return;
 

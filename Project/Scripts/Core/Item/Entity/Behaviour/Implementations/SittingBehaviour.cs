@@ -7,7 +7,6 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 	private EntityBehaviour? previousBehaviour;
 	private PromptControl? dismountPrompt;
 
-	public virtual bool HasSetupPlayer => dismountPrompt is not null;
 	protected abstract Transform3D SittingPosition { get; }
 
 
@@ -30,11 +29,10 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 		Entity?.SetBehaviour(previousBehaviour);
 	}
 
-	public virtual void SetupPlayer(Player player) {
-		dismountPrompt ??= player.HudManager.AddPrompt(player.Entity?.HudPack.InteractPrompt);
-	}
 
 	public virtual void HandlePlayer(Player player) {
+		dismountPrompt ??= player.HudManager.AddPrompt(player.Entity?.HudPack.InteractPrompt);
+
 		dismountPrompt?.Update(true, "Dismount", player.InputDevice.GetActionSymbol(Inputs.Interact));
 		if (player.InputDevice.IsActionJustPressed(Inputs.Interact)) {
 			Dismount();

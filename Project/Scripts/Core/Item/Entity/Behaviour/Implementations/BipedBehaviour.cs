@@ -14,8 +14,6 @@ public partial class BipedBehaviour : GroundedBehaviour, IPlayerHandler {
 	private PromptControl? interactPrompt;
 	private PointerControl? interactPointer;
 
-	public bool HasSetupPlayer => interactPrompt is not null && interactPointer is not null;
-
 
 	protected BipedBehaviour() : base() { }
 	public BipedBehaviour(Entity entity) : base(entity) { }
@@ -35,15 +33,13 @@ public partial class BipedBehaviour : GroundedBehaviour, IPlayerHandler {
 	}
 
 
-	public override void SetupPlayer(Player player) {
-		base.SetupPlayer(player);
-
-		interactPrompt ??= player.HudManager.AddPrompt(Entity?.HudPack.InteractPrompt);
-		interactPointer ??= player.HudManager.AddPointer(Entity?.HudPack.InteractPointer);
-	}
-
 	public override void HandlePlayer(Player player) {
 		base.HandlePlayer(player);
+
+		if (interactPrompt is null && interactPointer is null) {
+			interactPrompt ??= player.HudManager.AddPrompt(Entity?.HudPack.InteractPrompt);
+			interactPointer ??= player.HudManager.AddPointer(Entity?.HudPack.InteractPointer);
+		}
 
 		float speedSquared = _inputDirection.LengthSquared();
 		MovementType speed = speedSquared switch {

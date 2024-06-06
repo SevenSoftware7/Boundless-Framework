@@ -49,7 +49,7 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 
 		return curve;
 	}
-	public void SetupPlayer(Player player) { }
+
 	public void HandlePlayer(Player player) {
 		OnFace |= player.InputDevice.IsActionPressed(Inputs.Focus);
 	}

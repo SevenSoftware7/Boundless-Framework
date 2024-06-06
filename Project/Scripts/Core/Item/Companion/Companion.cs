@@ -7,7 +7,7 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class Companion : Node3D, IUIObject, ICostumable<CompanionCostume>, ICustomizable, ISaveable<Companion>, IInjector<Skeleton3D?> {
+public partial class Companion : Node3D, IUIObject, ICostumable<CompanionCostume>, ICustomizable, ISaveable<Companion>, IInjectionBlocker<Skeleton3D?> {
 	[Export] public string DisplayName { get; private set; } = string.Empty;
 	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
 
@@ -20,7 +20,6 @@ public partial class Companion : Node3D, IUIObject, ICostumable<CompanionCostume
 		}
 	}
 	private Skeleton3D? _skeleton;
-	public Skeleton3D? Inject() => Skeleton;
 
 
 	[ExportGroup("Costume")]
