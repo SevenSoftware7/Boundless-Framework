@@ -1,8 +1,8 @@
 [gd_scene load_steps=76 format=3 uid="uid://b505xodur2iff"]
 
-[ext_resource type="Environment" uid="uid://cly878e1j23yy" path="res://Resources/Shaders/environment.tres" id="1_l7i5q"]
+[ext_resource type="Environment" uid="uid://cly878e1j23yy" path="res://Resources/Rendering/environment.tres" id="1_l7i5q"]
 [ext_resource type="PackedScene" uid="uid://bxcpbr13uyeh1" path="res://Resources/Entities/Bike/Bike.tscn" id="1_pikp0"]
-[ext_resource type="Compositor" uid="uid://dwtv47w5dgtou" path="res://Resources/Shaders/compositor.tres" id="2_w2ny8"]
+[ext_resource type="Compositor" uid="uid://dwtv47w5dgtou" path="res://Resources/Rendering/compositor.tres" id="2_w2ny8"]
 [ext_resource type="Script" path="res://addons/cyclops_level_builder/nodes/cyclops_block.gd" id="4_xwxtm"]
 [ext_resource type="Script" path="res://Scripts/Core/EntityVoidoutTrigger.cs" id="5_aiymr"]
 [ext_resource type="Script" path="res://addons/cyclops_level_builder/resources/convex_block_data.gd" id="5_vmujk"]
@@ -1303,6 +1303,7 @@ directional_shadow_max_distance = 110.0
 
 [node name="FogVolume" type="FogVolume" parent="Environment/Volumes"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+visible = false
 shape = 4
 material = SubResource("FogMaterial_2f08y")
 
@@ -1534,7 +1535,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30201, -4.81285)
 curve = SubResource("Curve3D_1g2j1")
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Environment/Path3D"]
-transform = Transform3D(-0.0922569, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97164e-07, 0.995733, 8.27696e-08, -0.0922569, -1.98959, 0, 2.30373)
+transform = Transform3D(-0.0922568, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97163e-07, 0.995733, 8.27696e-08, -0.0922568, -1.98959, 0, 2.30373)
 script = ExtResource("36_x7xeh")
 
 [node name="AnimatableBody3D" type="AnimatableBody3D" parent="Environment/Path3D/PathFollow3D"]
@@ -1621,14 +1622,14 @@ Skeleton = NodePath("../../../Skeleton")
 
 [node name="Nemesis" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton", "Skeleton") instance=ExtResource("15_x4bcq")]
 process_mode = 4
-transform = Transform3D(1, 0, 0, -7.10543e-15, 1, 0, 7.10543e-15, 0, 1, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, -7.405e-29, -2.01948e-28, 1, 0, 0, 0)
 visible = false
 Skeleton = NodePath("../../../Skeleton")
 Skeleton = NodePath("../../../Skeleton")
 
 [node name="Eleos" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton", "Skeleton") instance=ExtResource("17_jhoyp")]
 process_mode = 4
-transform = Transform3D(1, 0, 0, -7.10543e-15, 1, 0, 7.10543e-15, 0, 1, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, -7.405e-29, -2.01948e-28, 1, 0, 0, 0)
 visible = false
 Skeleton = NodePath("../../../Skeleton")
 Skeleton = NodePath("../../../Skeleton")

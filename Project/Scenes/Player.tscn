@@ -1,8 +1,8 @@
 [gd_scene load_steps=7 format=3 uid="uid://7ic4jncm8p1a"]
 
 [ext_resource type="Script" path="res://Scripts/Core/Player/Player.cs" id="1_mxve3"]
-[ext_resource type="Environment" uid="uid://cly878e1j23yy" path="res://Resources/Shaders/environment.tres" id="2_0fgdf"]
-[ext_resource type="Compositor" uid="uid://dwtv47w5dgtou" path="res://Resources/Shaders/compositor.tres" id="3_0t2r7"]
+[ext_resource type="Environment" uid="uid://cly878e1j23yy" path="res://Resources/Rendering/environment.tres" id="2_0fgdf"]
+[ext_resource type="Compositor" uid="uid://dwtv47w5dgtou" path="res://Resources/Rendering/compositor.tres" id="3_0t2r7"]
 [ext_resource type="Script" path="res://Scripts/Core/Player/CameraController3D.cs" id="4_8b0k0"]
 [ext_resource type="Script" path="res://Scripts/Core/UI/HudManager.cs" id="5_oov52"]
 [ext_resource type="Script" path="res://Scripts/Core/UI/TestContainer.cs" id="7_v7vwx"]
