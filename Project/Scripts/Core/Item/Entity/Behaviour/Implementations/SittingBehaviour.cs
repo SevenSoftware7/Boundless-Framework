@@ -20,8 +20,7 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 	}
 
 	public override void Stop() {
-		DisavowPlayer();
-
+		base.Stop();
 		QueueFree();
 	}
 
@@ -30,7 +29,8 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 	}
 
 
-	public virtual void HandlePlayer(Player player) {
+	public override void HandlePlayer(Player player) {
+		base.HandlePlayer(player);
 		dismountPrompt ??= player.HudManager.AddPrompt(player.Entity?.HudPack.InteractPrompt);
 
 		dismountPrompt?.Update(true, "Dismount", player.InputDevice.GetActionSymbol(Inputs.Interact));
@@ -39,7 +39,8 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 		}
 	}
 
-	public virtual void DisavowPlayer() {
+	public override void DisavowPlayer() {
+		base.DisavowPlayer();
 		dismountPrompt?.Destroy();
 		dismountPrompt = null;
 	}

@@ -90,7 +90,7 @@ public static class NodeExtensions {
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static T SafeReparentEditor<T>(this T child, Node? newParent, bool keepGlobalTransform = true) where T : Node {
-		child.SafeReparent(newParent, keepGlobalTransform);
+		child.SafeReparentTo(newParent, keepGlobalTransform);
 
 		if (! Engine.IsEditorHint()) return child;
 		if (child.Owner == newParent?.Owner) return child;
@@ -108,13 +108,13 @@ public static class NodeExtensions {
 	}
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static T SafeReparentAndSetOwner<T>(this T child, Node? newParent, bool keepGlobalTransform = true) where T : Node {
-		child.SafeReparent(newParent, keepGlobalTransform);
+		child.SafeReparentTo(newParent, keepGlobalTransform);
 		child.Owner = newParent?.Owner ?? newParent;
 		return child;
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static T SafeReparent<T>(this T child, Node? newParent, bool keepGlobalTransform = true) where T : Node {
+	public static T SafeReparentTo<T>(this T child, Node? newParent, bool keepGlobalTransform = true) where T : Node {
 		if (child.GetParent() == newParent) return child;
 
 		if (! child.IsInsideTree()) {
@@ -249,27 +249,6 @@ public static class NodeExtensions {
 
 		if (! parentFirst && parent is T tParent2) {
 			action?.Invoke(tParent2);
-		}
-	}
-
-
-	public static void PropagateInject<T>(this Node parent, T value, bool parentFirst = false) {
-		IInjectable<T>? injectableParent = parent as IInjectable<T>;
-
-
-		if (parentFirst) {
-			injectableParent?.Inject(value);
-		}
-
-		foreach (Node child in parent.GetChildren()) {
-			if (child is IInjectionBlocker<T>) continue;
-
-			T childValue = parent is IInjectionInterceptor<T> injectorParent ? injectorParent.Intercept(child) : value;
-			child.PropagateInject(childValue, parentFirst);
-		}
-
-		if (! parentFirst) {
-			injectableParent?.Inject(value);
 		}
 	}
 

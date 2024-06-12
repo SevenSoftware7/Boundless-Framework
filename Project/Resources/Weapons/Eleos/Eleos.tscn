@@ -1,9 +1,13 @@
-[gd_scene load_steps=3 format=3 uid="uid://bp1e6thwkkcrr"]
+[gd_scene load_steps=4 format=3 uid="uid://bp1e6thwkkcrr"]
 
 [ext_resource type="Script" path="res://Scripts/Vanilla/Weapon/Eleos/EleosWeapon.cs" id="1_pwvbn"]
 [ext_resource type="Resource" uid="uid://q68mneifjek2" path="res://Resources/Weapons/Eleos/Costumes/Base/Eleos_base.tres" id="2_ft1fa"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="2_n5f5j"]
 
 [node name="Eleos" type="Node3D"]
 script = ExtResource("1_pwvbn")
 _displayName = "Eleos"
+
+[node name="CostumeHolder" type="Node3D" parent="."]
+script = ExtResource("2_n5f5j")
 Costume = ExtResource("2_ft1fa")

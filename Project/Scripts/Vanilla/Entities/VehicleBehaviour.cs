@@ -6,13 +6,17 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class VehicleBehaviour : GroundedBehaviour, IPlayerHandler {
+public partial class VehicleBehaviour : GroundedBehaviour {
 	private float _moveSpeed;
 	private Vector3 _modelUp = Vector3.Up;
 
 
-	protected VehicleBehaviour() : base() { }
-	public VehicleBehaviour(Entity entity) : base(entity) { }
+	protected VehicleBehaviour() : base() {
+		JumpAction = new BipedJumpActionInfo();
+	}
+	public VehicleBehaviour(Entity entity) : base(entity) {
+		JumpAction = new BipedJumpActionInfo();
+	}
 
 
 	public override void _Process(double delta) {
@@ -39,7 +43,7 @@ public partial class VehicleBehaviour : GroundedBehaviour, IPlayerHandler {
 		Vector3 normal = Entity.GetFloorNormal();
 		float groundFlatness = normal.Dot(Entity.UpDirection);
 
-		if (Entity.Model is Model model) {
+		if (Entity.CostumeHolder?.Model is Model model) {
 			Vector3 groundUp = groundFlatness > 0.5f ? normal : Entity.UpDirection;
 			Vector3 rightDir = Entity.GlobalForward.Cross(groundUp).Normalized();
 

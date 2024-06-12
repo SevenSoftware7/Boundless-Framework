@@ -25,45 +25,34 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 	[Export] public float T { get; private set; }
 	[Export] public float TFace { get; private set; }
 
-	[Export(PropertyHint.Layers3DPhysics)] private uint CollisionMask = uint.MaxValue;
+	[Export(PropertyHint.Layers3DPhysics)] private uint CollisionMask = Collisions.TerrainCollisionLayer | Collisions.WaterCollisionLayer;
 
 	[Export] public Curve3D Curve { get; private set; }
 
 
 	private FloatingCompanion() : base() {
-		Curve = CreateCurve();
-	}
-	public FloatingCompanion(CompanionCostume costume) : base(costume) {
-		Curve = CreateCurve();
-	}
-
-
-
-	private static Curve3D CreateCurve() {
-		Curve3D curve = new() {
+		Curve = new() {
 			UpVectorEnabled = false
 		};
 
-		curve.AddPoint(Vector3.Zero);
-		curve.AddPoint(Vector3.Zero);
-
-		return curve;
+		Curve.AddPoint(Vector3.Zero);
+		Curve.AddPoint(Vector3.Zero);
 	}
+
+
+	private bool PositionBlocked(Vector3 position) {
+		SphereShape3D sphere = new() {
+			Radius = (CostumeHolder?.Model?.GetAabb().GetLongestAxisSize() ?? 1f) + 0.5f,
+		};
+
+		return GetWorld3D().CollideShape3D(Transform3D.Identity.Translated(position), out _, sphere, CollisionMask, maxResults: 1, collideWithAreas: false);
+	}
+
 
 	public void HandlePlayer(Player player) {
 		OnFace |= player.InputDevice.IsActionPressed(Inputs.Focus);
 	}
 	public void DisavowPlayer() { }
-
-
-
-	private bool PositionBlocked(Vector3 position) {
-		SphereShape3D sphere = new() {
-			Radius = (Model?.GetAabb().GetLongestAxisSize() ?? 1f) + 0.5f,
-		};
-
-		return GetWorld3D().CollideShape3D(Transform3D.Identity.Translated(position), out _, sphere, CollisionMask, maxResults: 1, collideWithAreas: false);
-	}
 
 
 	public override void _Process(double delta) {
@@ -74,19 +63,17 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 
 		float floatDelta = (float)delta;
 
-		if (Entity is not null) {
-			Subject = Entity.GlobalTransform;
+		Subject = Entity.GlobalTransform;
 
-			if (Entity.Skeleton is not null && Entity.Skeleton.TryGetBoneTransform("Head", out Transform3D boneTransform)) {
-				Head = boneTransform;
-			}
+		if (Entity.Skeleton is not null && Entity.Skeleton.TryGetBoneTransform("Head", out Transform3D boneTransform)) {
+			Head = boneTransform;
 		}
 
 		if (OnFace && Entity?.Health is not null) {
 			Entity.Health.Amount += floatDelta;
 		}
 
-		OnFace |= PositionBlocked(GetLocalPosition(rightPosition)) && PositionBlocked(GetLocalPosition(leftPosition));
+		OnFace |= PositionBlocked(Head * rightPosition) && PositionBlocked(Head * leftPosition);
 
 		if (! OnFace && PositionBlocked(GetPosition(GetCurveT())))
 			OnRight = ! OnRight;
@@ -111,7 +98,6 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 		Curve.SetPointIn(1, Head.Basis * new Vector3(RLT * distance * 0.3f, 0, -0.2f));
 		Curve.SetPointPosition(1, Head.Origin);
 
-
 		GlobalTransform = GlobalTransform with {
 			Origin = Curve.Sample(0, TFace),
 			Basis = HoveringRotation.Slerp(Head.Basis, TFace),
@@ -120,8 +106,7 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 		OnFace = false;
 
 		float GetCurveT() => OnRight ? 1f : 0f;
-		Vector3 GetLocalPosition(Vector3 position) => Head.Origin + Head.Basis * position;
-		Vector3 GetPosition(float t) => GetLocalPosition(leftPosition.Lerp(rightPosition, t));
+		Vector3 GetPosition(float t) => Head * leftPosition.Lerp(rightPosition, t);
 	}
 
 	public override void _Notification(int what) {

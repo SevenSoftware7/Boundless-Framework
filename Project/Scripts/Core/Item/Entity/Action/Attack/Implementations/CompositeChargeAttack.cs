@@ -5,7 +5,7 @@ using SevenDev.Utility;
 
 namespace LandlessSkies.Core;
 
-public partial class CompositeChargeAttack(Entity entity, SingleWeapon weapon, CompositeChargeAttackBuilder info, IEnumerable<AttributeModifier> modifiers) : ChargeAttack(entity, weapon, info.ChargeDuration) {
+public partial class CompositeChargeAttack(Entity entity, SingleWeapon weapon, CompositeChargeAttackInfo info, IEnumerable<AttributeModifier> modifiers) : ChargeAttack(entity, weapon, info.ChargeDuration) {
 
 
 	protected override bool IsChargeStopped(InputDevice inputDevice) {
@@ -19,12 +19,12 @@ public partial class CompositeChargeAttack(Entity entity, SingleWeapon weapon, C
 
 	protected override void ChargedAttack() {
 		QueueFree();
-		Entity.ExecuteAction(new AttackActionInfo(Weapon, info.ChargedAttack), true);
+		Entity.ExecuteAction(new AttackBuilder(info.ChargedAttack, Weapon), true);
 	}
 
 	protected override void UnchargedAttack() {
 		QueueFree();
-		Entity.ExecuteAction(new AttackActionInfo(Weapon, info.UnchargedAttack), true);
+		Entity.ExecuteAction(new AttackBuilder(info.UnchargedAttack, Weapon), true);
 	}
 
 

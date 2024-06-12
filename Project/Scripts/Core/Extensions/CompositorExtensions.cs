@@ -8,12 +8,14 @@ using Godot.Collections;
 public static class CompositorExtensions {
 
 	public static Rid IndexBufferCreate(this RenderingDevice renderingDevice, ushort[] indices) {
-		byte[] byteIndices = indices.ToByteArray();
+		byte[] byteIndices = new byte[indices.Length * sizeof(ushort)];
+		Buffer.BlockCopy(indices, 0, byteIndices, 0, byteIndices.Length);
 
 		return renderingDevice.IndexBufferCreate((uint)indices.Length, RenderingDevice.IndexBufferFormat.Uint16, byteIndices);
 	}
 	public static Rid IndexBufferCreate(this RenderingDevice renderingDevice, uint[] indices) {
-		byte[] byteIndices = indices.ToByteArray();
+		byte[] byteIndices = new byte[indices.Length * sizeof(uint)];
+		Buffer.BlockCopy(indices, 0, byteIndices, 0, byteIndices.Length);
 
 		return renderingDevice.IndexBufferCreate((uint)indices.Length, RenderingDevice.IndexBufferFormat.Uint32, byteIndices);
 	}
@@ -46,7 +48,8 @@ public static class CompositorExtensions {
 
 	public static Rid VertexBufferCreate(this RenderingDevice renderingDevice, float[] vertices) {
 		if (vertices.Length % 3 != 0) throw new ArgumentException("Invalid number of values in the points buffer, there should be three float values per point.", nameof(vertices));
-		byte[] byteVertices = vertices.ToByteArray();
+		byte[] byteVertices = new byte[vertices.Length * sizeof(uint)];
+		Buffer.BlockCopy(vertices, 0, byteVertices, 0, byteVertices.Length);
 
 		return renderingDevice.VertexBufferCreate((uint)byteVertices.Length, byteVertices);
 	}
@@ -102,22 +105,20 @@ public static class CompositorExtensions {
 		return uniform;
 	}
 
-	public static void ComputeListBindImage(this RenderingDevice device, long computeList, Rid shaderRid, Rid image, uint setIndex, int binding = 0) {
+	public static void ComputeListBind(this RenderingDevice device, long computeList, Rid shaderRid, Rid[] ids, RenderingDevice.UniformType uniformType, uint setIndex, int binding = 0) {
 		RDUniform uniform = new RDUniform() {
-			UniformType = RenderingDevice.UniformType.Image,
+			UniformType = uniformType,
 			Binding = binding,
-		}.AddIds([image]);
+		}.AddIds(ids);
 
 		device.ComputeListBindUniform(computeList, uniform, shaderRid, setIndex);
 	}
-	public static void ComputeListBindSampler(this RenderingDevice device, long computeList, Rid shaderRid, Rid image, Rid sampler, uint setIndex, int binding = 0) {
-		RDUniform uniform = new RDUniform() {
-			UniformType = RenderingDevice.UniformType.SamplerWithTexture,
-			Binding = binding,
-		}.AddIds([sampler, image]);
 
-		device.ComputeListBindUniform(computeList, uniform, shaderRid, setIndex);
-	}
+	public static void ComputeListBindImage(this RenderingDevice device, long computeList, Rid shaderRid, Rid image, uint setIndex, int binding = 0) =>
+		device.ComputeListBind(computeList, shaderRid, [image], RenderingDevice.UniformType.Image, setIndex, binding);
+
+	public static void ComputeListBindSampler(this RenderingDevice device, long computeList, Rid shaderRid, Rid image, Rid sampler, uint setIndex, int binding = 0) =>
+		device.ComputeListBind(computeList, shaderRid, [sampler, image], RenderingDevice.UniformType.SamplerWithTexture, setIndex, binding);
 
 	public static void ComputeListBindColor(this RenderingDevice device, long computeList, Rid shaderRid, RenderSceneBuffersRD sceneBuffers, uint view, uint setIndex, int binding = 0) =>
 		device.ComputeListBindImage(computeList, shaderRid, sceneBuffers.GetColorLayer(view), setIndex, binding);

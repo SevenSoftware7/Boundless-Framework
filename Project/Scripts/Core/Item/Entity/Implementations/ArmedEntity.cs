@@ -10,12 +10,8 @@ public partial class ArmedEntity : Entity {
 	[Export] public Weapon? Weapon {
 		get => _weapon;
 		set {
-			_weapon?.Inject(null);
-
 			_weapon = value;
 			if (_weapon is not null) {
-				_weapon.Inject(Skeleton);
-				_weapon.Inject(Handedness);
 				_weapon.Name = PropertyName.Weapon;
 			}
 		}
@@ -65,7 +61,7 @@ public partial class ArmedEntity : Entity {
 		base._Notification(what);
 		switch ((ulong)what) {
 		case NotificationChildOrderChanged:
-			Weapon ??= GetChildren().OfType<Weapon>().FirstOrDefault();
+			Weapon = GetChildren().OfType<Weapon>().FirstOrDefault();
 			break;
 		}
 	}

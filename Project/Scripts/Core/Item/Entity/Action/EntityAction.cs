@@ -3,7 +3,10 @@ namespace LandlessSkies.Core;
 using System;
 using Godot;
 
+
 public abstract partial class EntityAction : Node {
+	public readonly SevenDev.Utility.Timer Lifetime = new();
+
 	[Export] public Entity Entity;
 	public event Action? OnDestroy;
 

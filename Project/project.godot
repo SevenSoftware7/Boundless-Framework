@@ -228,3 +228,10 @@ lights_and_shadows/positional_shadow/atlas_quadrant_0_subdiv=3
 lights_and_shadows/positional_shadow/atlas_quadrant_1_subdiv=3
 lights_and_shadows/positional_shadow/atlas_quadrant_2_subdiv=4
 lights_and_shadows/positional_shadow/atlas_quadrant_3_subdiv=5
+
+[shader_globals]
+
+water_color={
+"type": "color",
+"value": Color(0.045, 0.099, 0.45, 1)
+}

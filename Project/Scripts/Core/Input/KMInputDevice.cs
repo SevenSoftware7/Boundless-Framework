@@ -21,10 +21,12 @@ public sealed partial class KMInputDevice : InputDevice {
 		"look_right" => Mathf.Max(mouseMotion.ScreenRelative.X, base.GetActionStrength(action)),
 		_ => base.GetActionStrength(action),
 	};
+
 	public override float GetActionRawStrength(StringName action) => action.ToString() switch {
 		"look_up" or "look_down" or "look_left" or "look_right" => GetActionStrength(action),
 		_ => base.GetActionRawStrength(action),
 	};
+
 
 	public override void _Process(double delta) {
 		base._Process(delta);

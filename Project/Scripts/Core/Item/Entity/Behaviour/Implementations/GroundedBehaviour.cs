@@ -3,7 +3,8 @@ namespace LandlessSkies.Core;
 using Godot;
 using SevenDev.Utility;
 
-public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandler {
+public abstract partial class GroundedBehaviour : EntityBehaviour {
+	protected JumpActionInfo? JumpAction { get; init; }
 	protected Vector3 _inputDirection;
 
 	protected readonly TimeDuration jumpBuffer = new(125);
@@ -26,7 +27,8 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 	}
 
 
-	public virtual void HandlePlayer(Player player) {
+	public override void HandlePlayer(Player player) {
+		base.HandlePlayer(player);
 		if (Entity is null) return;
 
 		if (player.InputDevice.IsActionPressed(Inputs.Jump)) {
@@ -43,7 +45,8 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 		Move(groundedMovement);
 	}
 
-	public virtual void DisavowPlayer() {
+	public override void DisavowPlayer() {
+		base.DisavowPlayer();
 		_inputDirection = Vector3.Zero;
 	}
 
@@ -107,21 +110,13 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 
 		if (verticalInertia.IsEqualApprox(targetInertia)) return verticalInertia;
 
-
-		const float floatReductionFactor = 0.65f;
 		const float fallIncreaseFactor = 1.75f;
-
-		// Float more if player is holding jump key & rising
-		float isFloating = jumpBuffer.IsDone
-			? 0f
-			: (1f - fallInertia).Clamp01();
-		float floatFactor = Mathf.Lerp(1f, floatReductionFactor, isFloating);
 
 		// Slightly ramp up inertia when falling
 		float inertiaRampFactor = Mathf.Lerp(1f, fallIncreaseFactor, ((1f + fallInertia) * 0.5f).Clamp01());
 
 
-		return verticalInertia.MoveToward(targetInertia, 45f * floatFactor * inertiaRampFactor * (float)delta);
+		return verticalInertia.MoveToward(targetInertia, 45f * inertiaRampFactor * (float)delta);
 	}
 
 	protected virtual void HandleJump(double delta) {
@@ -132,9 +127,9 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 		}
 
 		if (! jumpBuffer.IsDone && jumpCooldown.IsDone && !coyoteTimer.IsDone) {
-			float jumpHeight = Entity.AttributeModifiers.Get(Attributes.GenericjumpHeight).ApplyTo(Entity.Stats.JumpHeight);
-
-			Entity.Inertia = Entity.Inertia.SlideOnFace(Entity.UpDirection) + Entity.UpDirection * jumpHeight;
+			if (JumpAction is not null) {
+				Entity.ExecuteAction(new JumpActionBuilder(JumpAction, Entity.UpDirection));
+			}
 			jumpBuffer.End();
 			jumpCooldown.Start();
 		}

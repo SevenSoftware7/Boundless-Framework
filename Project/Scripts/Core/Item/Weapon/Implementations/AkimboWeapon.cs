@@ -14,10 +14,7 @@ public sealed partial class AkimboWeapon : Weapon, IInjectionInterceptor<Handedn
 		set {
 			if (_mainWeapon == value) return;
 
-			_mainWeapon = value?.SafeReparent(this);
-			_mainWeapon?.PropagateInject(Skeleton);
-			_mainWeapon?.PropagateInject(Handedness);
-
+			_mainWeapon = value?.SafeReparentTo(this);
 			_mainWeapon?.GetParent().MoveChild(_mainWeapon, 0);
 		}
 	}
@@ -28,10 +25,7 @@ public sealed partial class AkimboWeapon : Weapon, IInjectionInterceptor<Handedn
 		set {
 			if (_sideWeapon == value) return;
 
-			_sideWeapon = value?.SafeReparent(this);
-			_sideWeapon?.PropagateInject(Skeleton);
-			_sideWeapon?.PropagateInject(Handedness.Reverse());
-
+			_sideWeapon = value?.SafeReparentTo(this);
 			_sideWeapon?.GetParent().MoveChild(_sideWeapon, 1);
 		}
 	}
@@ -51,35 +45,13 @@ public sealed partial class AkimboWeapon : Weapon, IInjectionInterceptor<Handedn
 		}
 	}
 
-
-	public override Skeleton3D? Skeleton {
-		get => base.Skeleton;
-		protected set {
-			base.Skeleton = value;
-
-			_mainWeapon?.PropagateInject(Skeleton);
-			_sideWeapon?.PropagateInject(Skeleton);
-		}
-	}
-
-	public override Handedness Handedness {
-		get => base.Handedness;
-		protected set {
-			base.Handedness = value;
-
-			_mainWeapon?.PropagateInject(Handedness);
-			_sideWeapon?.PropagateInject(Handedness.Reverse());
-		}
-	}
-
-
 	public override string DisplayName => MainWeapon?.DisplayName ?? string.Empty;
 	public override Texture2D? DisplayPortrait => MainWeapon?.DisplayPortrait;
-
 
 	public override IWeapon.Type WeaponType => MainWeapon?.WeaponType ?? 0;
 	public override IWeapon.Usage WeaponUsage => MainWeapon?.WeaponUsage ?? 0;
 	public override IWeapon.Size WeaponSize => MainWeapon?.WeaponSize ?? 0;
+
 
 
 	private AkimboWeapon() : base() { }
@@ -92,6 +64,8 @@ public sealed partial class AkimboWeapon : Weapon, IInjectionInterceptor<Handedn
 		SideWeapon = sideSave?.Load();
 	}
 
+
+
 	public override List<ICustomizable> GetSubCustomizables() {
 		List<ICustomizable> list = base.GetSubCustomizables();
 		if (_mainWeapon is not null) list.Add(_mainWeapon);
@@ -99,9 +73,7 @@ public sealed partial class AkimboWeapon : Weapon, IInjectionInterceptor<Handedn
 		return list;
 	}
 
-
-
-	public override IEnumerable<AttackActionInfo> GetAttacks(Entity target) {
+	public override IEnumerable<AttackBuilder> GetAttacks(Entity target) {
 		Weapon? currentWeapon = MainWeapon;
 		return new List<Weapon?>() {_mainWeapon, _sideWeapon}
 			.OfType<Weapon>()

@@ -4,7 +4,7 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>LandlessSkies</RootNamespace>
     <Nullable>enable</Nullable>
-    <!-- <PublishAot>true</PublishAot> -->
+    <PublishAot>true</PublishAot>
     <!-- <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild> -->
   </PropertyGroup>
   <ItemGroup>

@@ -9,16 +9,13 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<EntityCostume>, ICustomizable, ISaveable<Entity>, IInjectionBlocker<Skeleton3D?> {
+public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable, ISaveable<Entity>, IInjectionProvider<Skeleton3D?>, IInjectionProvider<Handedness> {
 	private readonly List<Vector3> standableSurfaceBuffer = [];
 	private const int STANDABLE_SURFACE_BUFFER_SIZE = 20;
 	private GaugeControl? healthBar;
 
 	[Export] public string DisplayName { get; private set; } = string.Empty;
-	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
-
-	public virtual List<ICustomization> GetCustomizations() => [];
-	public virtual List<ICustomizable> GetSubCustomizables() => [.. GetChildren().OfType<ICustomizable>()];
+	public Texture2D? DisplayPortrait => CostumeHolder?.Costume?.DisplayPortrait;
 
 
 	[Export] public EntityStats Stats { get; private set; } = new();
@@ -28,21 +25,16 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 		get => _handedness;
 		protected set {
 			_handedness = value;
-			this.PropagateInject(_handedness);
+			if (IsNodeReady()) {
+				this.PropagateInject<Handedness>();
+			}
 		}
 	}
 	private Handedness _handedness = Handedness.Right;
 
 
 	[ExportGroup("Costume")]
-	[Export] public EntityCostume? Costume {
-		get => _costume;
-		set => SetCostume(value);
-	}
-	private EntityCostume? _costume;
-
-	public Model? Model { get; private set; }
-	public bool IsLoaded => Model is not null;
+	[Export] public CostumeHolder? CostumeHolder;
 
 
 	[ExportGroup("Dependencies")]
@@ -50,7 +42,9 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 		get => _skeleton;
 		protected set {
 			_skeleton = value;
-			this.PropagateInject(_skeleton);
+			if (IsNodeReady()) {
+				this.PropagateInject<Skeleton3D?>();
+			}
 		}
 	}
 	private Skeleton3D? _skeleton;
@@ -115,49 +109,34 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 	[Signal] public delegate void DeathEventHandler(float fromHealth);
 
 
-
 	protected Entity() : base() {
 		CollisionLayer = Collisions.EntityCollisionLayer;
 
 		Forward = Vector3.Forward;
 	}
-	public Entity(EntityCostume? costume) : this() {
-		SetCostume(costume);
+	public Entity(EntityCostume? costume = null) {
+		CostumeHolder = new CostumeHolder(costume).ParentTo(this);
 	}
 
 
-
-	public void SetCostume(EntityCostume? newCostume) {
-		EntityCostume? oldCostume = _costume;
-		if (newCostume == oldCostume) return;
-
-		_costume = newCostume;
-
-		Callable.From<bool>(Load).CallDeferred(true);
-	}
-
-	public void ExecuteAction(EntityActionInfo action, bool forceExecute = false) {
+	public void ExecuteAction(EntityActionBuilder action, bool forceExecute = false) {
 		if (! forceExecute && ! ActionExtensions.CanCancel(CurrentAction)) return;
 
 		CurrentAction?.QueueFree();
 		CurrentAction = null;
 
 		action.AfterExecute += () => CurrentAction = null;
-		CurrentAction = action.Execute(this);
-
-		CurrentAction.ParentTo(this);
+		CurrentAction = action.Execute(this).SafeReparentTo(this);
 	}
-
 
 	public void SetBehaviour<TBehaviour>(TBehaviour? behaviour) where TBehaviour : EntityBehaviour {
-		Callable.From(() =>{
-			CurrentBehaviour?.Stop();
+		// Callable.From(() =>{
+		CurrentBehaviour?.Stop();
 
-			behaviour?.Start(CurrentBehaviour?.IsQueuedForDeletion() ?? true ? null : CurrentBehaviour);
-			CurrentBehaviour = behaviour?.SafeReparent(this);
-		}).CallDeferred();
+		behaviour?.Start(CurrentBehaviour?.IsQueuedForDeletion() ?? true ? null : CurrentBehaviour);
+		CurrentBehaviour = behaviour?.SafeReparentTo(this);
+		// }).CallDeferred();
 	}
-
 
 	private void Move(double delta) {
 
@@ -247,6 +226,9 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 	}
 
 
+	public virtual List<ICustomization> GetCustomizations() => [];
+	public virtual List<ICustomizable> GetSubCustomizables() => [.. GetChildren().OfType<ICustomizable>()];
+
 
 	private void OnKill(float fromHealth) {
 		EmitSignal(SignalName.Death, fromHealth);
@@ -288,24 +270,6 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 	}
 
 
-	public void Load(bool forceReload = false) {
-		if (IsLoaded && ! forceReload) return;
-
-		Unload();
-
-		Model = Costume?.Instantiate()?.ParentTo(this);
-
-		if (Model is null) return;
-
-		Model?.PropagateInject(Skeleton);
-		Model?.PropagateInject(Handedness);
-	}
-	public void Unload() {
-		Model?.QueueFree();
-		Model = null;
-	}
-
-
 	private void UpdateHealth(bool keepRatio) {
 		_health?.SetMaximum(AttributeModifiers.Get(Attributes.GenericMaxHealth).ApplyTo(Stats.MaxHealth), keepRatio);
 	}
@@ -322,6 +286,9 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 
 	public override void _Ready() {
 		base._Ready();
+
+		this.PropagateInject<Skeleton3D?>();
+		this.PropagateInject<Handedness>();
 
 		UpdateHealth(true);
 
@@ -345,16 +312,24 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICostumable<Entit
 
 	public ISaveData<Entity> Save() => new EntitySaveData<Entity>(this);
 
+	Skeleton3D? IInjectionProvider<Skeleton3D?>.GetInjection() => Skeleton;
+	Handedness IInjectionProvider<Handedness>.GetInjection() => Handedness;
 
 
 	[Serializable]
-	public class EntitySaveData<T>(T data) : CostumableSaveData<Entity, T, EntityCostume>(data) where T : Entity {
-		public ISaveData[] MiscData = [.. data.GetChildren().OfType<ISaveable>().Select(d => d.Save())];
+	public class EntitySaveData<T>(T entity) : SceneSaveData<Entity>(entity) where T : Entity {
+		public string? CostumePath = entity.CostumeHolder?.Costume?.ResourcePath;
+		public ISaveData[] MiscData = [.. entity.GetChildren().OfType<ISaveable>().Select(d => d.Save())];
 
 		public override T? Load() {
 			if (base.Load() is not T entity) return null;
 
 			MiscData.ForEach(d => d.Load()?.ParentTo(entity));
+
+			if (CostumePath is not null) {
+				EntityCostume? costume = ResourceLoader.Load<EntityCostume>(CostumePath);
+				entity.CostumeHolder = new CostumeHolder(costume).ParentTo(entity);
+			}
 
 			return entity;
 		}

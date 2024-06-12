@@ -2,6 +2,7 @@ namespace LandlessSkies.Core;
 
 using System;
 using Godot;
+using Godot.Collections;
 using SevenDev.Utility;
 
 [Tool]
@@ -76,6 +77,9 @@ public partial class DrawAndComputeCompositorEffect : BaseCompositorEffect {
 		base._RenderCallback(effectCallbackType, renderData);
 
 		// if (effectCallbackType != (long)EffectCallbackTypeEnum.PostTransparent) return;
+		float[] waterMeshVertices = WaterMeshManager.WaterVertices;
+		uint[] waterMeshIndices = WaterMeshManager.WaterIndices;
+		if (waterMeshVertices.Length < 3 || waterMeshIndices.Length < 3) return;
 
 		if (RenderingDevice is null || _renderShaderFile is null || _computeShaderFile is null) return;
 
@@ -125,31 +129,17 @@ public partial class DrawAndComputeCompositorEffect : BaseCompositorEffect {
 				throw new ArgumentException("Water Mask Frame Buffer is Invalid");
 			}
 
-			// TODO: get the mesh data instead of this hard-coded data
-			float[] vertCoords = [
-				5f,	0f,	0f,
-				0f,	0f,	0f,
-				0f,	5f,	0f,
-				5f,	5f,	0f,
-				5f,	5f,	-5f,
-				5f,	0f,	-5f,
-			];
-			uint[] vertIndices = [
-				0, 1, 2,
-				0, 2, 3,
-				0, 3, 4,
-				0, 4, 5,
-			];
-
-			(_, Rid vertexArray) = RenderingDevice.VertexArrayCreate(vertCoords, vertexFormat);
-			(_, Rid indexArray) = RenderingDevice.IndexArrayCreate(vertIndices);
+			(_, Rid vertexArray) = RenderingDevice.VertexArrayCreate(waterMeshVertices, vertexFormat);
+			(_, Rid indexArray) = RenderingDevice.IndexArrayCreate(waterMeshIndices);
 
 
 			Projection projection = sceneData.GetViewProjection(view);
-			Projection viewMatrix = new(sceneData.GetCamTransform().Inverse());
+			float nearClippingPlane = projection.GetZNear();
+			float farClippingPlane = projection.GetZFar();
+			Projection transform = new(sceneData.GetCamTransform().Inverse());
 
 			// World-space -> Clip-space Matrix to be used in the rendering shader
-			Projection WorldToClip = projection * viewMatrix;
+			Projection WorldToClip = projection * transform;
 			// Eye Offset for fancy VR multi-view
 			Vector3 eyeOffset = sceneData.GetViewEyeOffset(view);
 
@@ -161,8 +151,12 @@ public partial class DrawAndComputeCompositorEffect : BaseCompositorEffect {
 				WorldToClip.W.X, WorldToClip.W.Y, WorldToClip.W.Z, WorldToClip.W.W,
 
 				eyeOffset.X, eyeOffset.Y, eyeOffset.Z, 0, // Pad with a zero, because the push constant needs to contain a multiple of 16 bytes (4 floats)
+				nearClippingPlane, farClippingPlane, 0, 0,
+				// WorldToClip.GetZNear(), WorldToClip.GetZFar(), 0, 0,
+
 			];
-			byte[] renderPushConstantBytes = renderPushConstant.ToByteArray();
+			byte[] renderPushConstantBytes = new byte[renderPushConstant.Length * sizeof(float)];
+			Buffer.BlockCopy(renderPushConstant, 0, renderPushConstantBytes, 0, renderPushConstantBytes.Length);
 
 
 			// Render the Geometry (see vertCoords and vertIndices) to an intermediate framebuffer To use later
@@ -176,11 +170,16 @@ public partial class DrawAndComputeCompositorEffect : BaseCompositorEffect {
 			RenderingDevice.DrawListEnd();
 			RenderingDevice.DrawCommandEndLabel();
 
+			Dictionary waterColorSetting = ProjectSettings.GetSetting("shader_globals/water_color").AsGodotDictionary();
+			Color waterColor = waterColorSetting["value"].AsColor();
+
 			// Unfolding into a push constant
 			float[] computePushConstant = [
-				renderSize.X, renderSize.Y, 0, 0, // Pad instead with two zeroes here
+				renderSize.X, renderSize.Y, nearClippingPlane, farClippingPlane,
+				waterColor.R, waterColor.G, waterColor.B, 0,
 			];
-			byte[] computePushConstantBytes = computePushConstant.ToByteArray();
+			byte[] computePushConstantBytes = new byte[computePushConstant.Length * sizeof(float)];
+			Buffer.BlockCopy(computePushConstant, 0, computePushConstantBytes, 0, computePushConstantBytes.Length);
 
 			// Here we draw the Underwater effect, using the waterBuffer to know where there is water geometry
 			RenderingDevice.DrawCommandBeginLabel("Render Underwater Effect", new Color(1f, 1f, 1f));
@@ -240,7 +239,7 @@ public partial class DrawAndComputeCompositorEffect : BaseCompositorEffect {
 			new RDPipelineRasterizationState(),
 			new RDPipelineMultisampleState(),
 			new RDPipelineDepthStencilState() {
-				// Enable Self-occlusion via Depth Test (see ConstructBehaviour(RenderingDevice))
+				// Enable Self-occlusion via Depth Test
 				EnableDepthTest = true,
 				EnableDepthWrite = true,
 				DepthCompareOperator = RenderingDevice.CompareOperator.LessOrEqual

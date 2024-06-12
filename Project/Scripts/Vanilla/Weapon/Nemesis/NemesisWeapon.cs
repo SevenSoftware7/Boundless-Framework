@@ -16,9 +16,9 @@ public sealed partial class NemesisWeapon : SingleWeapon, IPlayerHandler {
 	public NemesisWeapon(WeaponCostume? costume = null) : base(costume) { }
 
 
-	public override IEnumerable<AttackActionInfo> GetAttacks(Entity target) {
+	public override IEnumerable<AttackBuilder> GetAttacks(Entity target) {
 		return [
-			SlashAttackBuilder.Instance.GetInfo(this),
+			new AttackBuilder(SlashAttackInfo.Instance, this),
 		];
 	}
 
@@ -29,7 +29,7 @@ public sealed partial class NemesisWeapon : SingleWeapon, IPlayerHandler {
 		switch (player.Entity.CurrentBehaviour) {
 		case GroundedBehaviour grounded:
 			if (player.InputDevice.IsActionJustPressed(Inputs.AttackLight)) {
-				player.Entity.ExecuteAction(SlashAttackBuilder.Instance.GetInfo(this));
+				player.Entity.ExecuteAction(new AttackBuilder(SlashAttackInfo.Instance, this));
 			}
 			break;
 		}

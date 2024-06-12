@@ -40,18 +40,6 @@ public abstract partial class Weapon : Node3D, IWeapon, IInjectable<Skeleton3D?>
 	public abstract Texture2D? DisplayPortrait { get; }
 
 
-	public virtual List<ICustomization> GetCustomizations() => [];
-	public virtual List<ICustomizable> GetSubCustomizables() => [];
-
-
-	public abstract IEnumerable<AttackActionInfo> GetAttacks(Entity target);
-
-	public abstract ISaveData<Weapon> Save();
-
-	public virtual void Inject(Skeleton3D? skeleton) => Skeleton = skeleton;
-	public virtual void Inject(Handedness handedness) => Handedness = handedness;
-
-
 	private void StickToSkeletonBone() {
 		if (Skeleton is null) return;
 
@@ -77,13 +65,34 @@ public abstract partial class Weapon : Node3D, IWeapon, IInjectable<Skeleton3D?>
 		GlobalTransform = Skeleton.GlobalTransform;
 	}
 
+	public abstract IEnumerable<AttackBuilder> GetAttacks(Entity target);
 
+
+	public virtual List<ICustomization> GetCustomizations() => [];
+	public virtual List<ICustomizable> GetSubCustomizables() => [];
+
+	public abstract ISaveData<Weapon> Save();
+
+	public virtual void Inject(Skeleton3D? skeleton) => Skeleton = skeleton;
+	public virtual void Inject(Handedness handedness) => Handedness = handedness;
 
 	public override void _Process(double delta) {
 		base._Process(delta);
 
 		if (OnHand) {
 			StickToSkeletonBone();
+		}
+	}
+
+	public override void _Notification(int what) {
+		base._Notification(what);
+		switch ((ulong) what) {
+		case NotificationParented:
+			if (IsNodeReady()) {
+				this.RequestInjection<Skeleton3D?>();
+				this.RequestInjection<Handedness>();
+			}
+			break;
 		}
 	}
 }

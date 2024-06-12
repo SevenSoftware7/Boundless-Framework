@@ -1,18 +1,20 @@
-namespace LandlessSkies.Core;
+// namespace LandlessSkies.Core;
 
-using Godot;
+// using Godot;
+// using SevenDev.Utility;
 
-public abstract class CostumableSaveData<T, TCostumable, TCostume>(TCostumable data) : SceneSaveData<T>(data) where T : Node where TCostumable : T, ICostumable<TCostume> where TCostume : Costume {
-	public string? CostumePath = data.Costume?.ResourcePath;
 
-	public override TCostumable? Load() {
-		if (base.Load() is not TCostumable data) return null;
+// public abstract class CostumableSaveData<T>(T data, CostumeHolder? costumeHolder) : SceneSaveData<T>(data) where T : Node {
+// 	public string? CostumePath = costumeHolder?.Costume?.ResourcePath;
 
-		if (CostumePath is not null) {
-			TCostume? costume = ResourceLoader.Load<TCostume>(CostumePath);
-			data.Costume = costume;
-		}
+// 	public override T? Load() {
+// 		if (base.Load() is not T data) return null;
 
-		return data;
-	}
-}
+// 		if (CostumePath is not null) {
+// 			Costume? costume = ResourceLoader.Load<Costume>(CostumePath);
+// 			new CostumeHolder(costume).ParentTo(data);
+// 		}
+
+// 		return data;
+// 	}
+// }

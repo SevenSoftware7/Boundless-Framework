@@ -54,6 +54,7 @@ public partial class InputManager : Node {
 		}
 	}
 
+
 	public override void _Input(InputEvent @event) {
 		base._Input(@event);
 
@@ -71,6 +72,7 @@ public partial class InputManager : Node {
 			return;
 		}
 	}
+
 
 	public override void _EnterTree() {
 		base._EnterTree();

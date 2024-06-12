@@ -11,7 +11,7 @@ public interface IWeapon : ICustomizable {
 
 
 
-	IEnumerable<AttackActionInfo> GetAttacks(Entity target);
+	IEnumerable<AttackBuilder> GetAttacks(Entity target);
 
 
 	[Flags]

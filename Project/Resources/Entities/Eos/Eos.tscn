@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://b7rhbgw2dujty"]
+[gd_scene load_steps=15 format=3 uid="uid://b7rhbgw2dujty"]
 
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Implementations/ArmedEntity.cs" id="1_44rt4"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/EntityStats.cs" id="2_lubr1"]
@@ -8,7 +8,8 @@
 [ext_resource type="PackedScene" uid="uid://bjf6xuch8ncq0" path="res://Scenes/GenericHumanSkeleton.tscn" id="5_j1koo"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/HudPack.cs" id="5_y0ifp"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Gauge.cs" id="8_emu8a"]
-[ext_resource type="Resource" uid="uid://dvcjw3gon7rak" path="res://Resources/Entities/Eos/Costumes/Base/Eos_base.tres" id="22_8jji3"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="9_8kq40"]
+[ext_resource type="Resource" uid="uid://dvcjw3gon7rak" path="res://Resources/Entities/Eos/Costumes/Base/Eos_base.tres" id="10_lfyyx"]
 
 [sub_resource type="Resource" id="Resource_v01j0"]
 script = ExtResource("2_lubr1")
@@ -42,7 +43,6 @@ script = ExtResource("1_44rt4")
 DisplayName = "Eos"
 Stats = SubResource("Resource_v01j0")
 HudPack = SubResource("Resource_qwv27")
-Costume = ExtResource("22_8jji3")
 Skeleton = NodePath("Skeleton")
 AnimationPlayer = NodePath("AnimationPlayer")
 Health = NodePath("Health")
@@ -59,9 +59,15 @@ libraries = {
 }
 
 [node name="Skeleton" parent="." instance=ExtResource("5_j1koo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.152985)
 
 [node name="Collisions" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
 shape = SubResource("CapsuleShape3D_rc57u")
+
+[node name="CostumeHolder" type="Node3D" parent="." node_paths=PackedStringArray("Model")]
+script = ExtResource("9_8kq40")
+Costume = ExtResource("10_lfyyx")
+Model = NodePath("Model - Eos (base)")
 
 [connection signal="Emptied" from="Health" to="." method="OnKill"]

@@ -5,7 +5,7 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class BipedBehaviour : GroundedBehaviour, IPlayerHandler {
+public partial class BipedBehaviour : GroundedBehaviour {
 	private float _moveSpeed;
 	private MovementType _movementType;
 
@@ -15,8 +15,12 @@ public partial class BipedBehaviour : GroundedBehaviour, IPlayerHandler {
 	private PointerControl? interactPointer;
 
 
-	protected BipedBehaviour() : base() { }
-	public BipedBehaviour(Entity entity) : base(entity) { }
+	protected BipedBehaviour() : base() {
+		JumpAction = new BipedJumpActionInfo();
+	}
+	public BipedBehaviour(Entity entity) : base(entity) {
+		JumpAction = new BipedJumpActionInfo();
+	}
 
 
 	public override void Start(EntityBehaviour? previousBehaviour) {

@@ -11,12 +11,12 @@ public partial class Model : Node3D, ICustomizable {
 	public string DisplayName => Costume?.DisplayName ?? string.Empty;
 	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
 
-	public virtual List<ICustomizable> GetSubCustomizables() => [];
-	public virtual List<ICustomization> GetCustomizations() => [];
-
 
 	protected Model() : base() { }
 
+
+	public virtual List<ICustomizable> GetSubCustomizables() => [];
+	public virtual List<ICustomization> GetCustomizations() => [];
 
 	public virtual Aabb GetAabb() => default;
 }

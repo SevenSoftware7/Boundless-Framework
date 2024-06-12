@@ -6,12 +6,14 @@ using Godot;
 /// Timer is used to measure how much time has passed since it was started
 /// </summary>
 public class Timer {
-	public float startTime = 0;
-	public float Duration => Time.GetTicksMsec() - startTime;
+	public ulong startTime = 0;
+	public ulong Duration => Time.GetTicksMsec() - startTime;
 
 
 
-	public Timer() { }
+	public Timer() {
+		Start();
+	}
 
 
 
@@ -20,5 +22,5 @@ public class Timer {
 	}
 
 
-	public static implicit operator float(Timer timer) => timer.Duration;
+	public static implicit operator ulong(Timer timer) => timer.Duration;
 }

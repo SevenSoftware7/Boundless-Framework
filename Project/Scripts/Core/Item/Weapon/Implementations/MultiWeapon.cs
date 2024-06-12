@@ -139,9 +139,7 @@ public sealed partial class MultiWeapon : Weapon {
 
 		if (weapon is null) return;
 
-		weapon.SafeReparent(this);
-		weapon.Inject(Handedness);
-		weapon.Inject(Skeleton);
+		weapon.SafeReparentTo(this);
 
 		_weapons[index] = weapon;
 
@@ -169,7 +167,7 @@ public sealed partial class MultiWeapon : Weapon {
 	}
 
 
-	public override IEnumerable<AttackActionInfo> GetAttacks(Entity target) {
+	public override IEnumerable<AttackBuilder> GetAttacks(Entity target) {
 		Weapon? currentWeapon = CurrentWeapon;
 		return _weapons
 			.SelectMany((w) => w?.GetAttacks(target) ?? [])

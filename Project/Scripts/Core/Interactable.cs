@@ -11,18 +11,20 @@ public abstract partial class Interactable : Area3D {
 	public abstract string InteractLabel { get; }
 	public virtual float? MinLookIncidence => null;
 
+
 	public Interactable() : base() {
 		CollisionLayer = InteractableCollisionLayer;
 		CollisionMask = 0;
 	}
 
-	public abstract bool IsInteractable(Entity entity);
-	public abstract void Interact(Entity entity, Player? player = null, int shapeIndex = 0);
-
 
 	public CollisionShape3D? GetShape3D(int shapeIndex) {
 		return ShapeOwnerGetOwner(ShapeFindOwner(shapeIndex)) as CollisionShape3D;
 	}
+
+
+	public abstract bool IsInteractable(Entity entity);
+	public abstract void Interact(Entity entity, Player? player = null, int shapeIndex = 0);
 }
 
 public sealed class InteractTarget(Interactable interactable, int shapeIndex) : Tuple<Interactable, int>(interactable, shapeIndex) {

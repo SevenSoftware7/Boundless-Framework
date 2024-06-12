@@ -22,7 +22,7 @@ public abstract partial class Attack(Entity entity, SingleWeapon Weapon) : Entit
 
 
 public static class AttackExtensions {
-	public static AttackBuilder SelectAttack(this AttackBuilder[] attacks, IComparer<AttackBuilder> priority, float skillLevel = 0.5f) {
+	public static AttackInfo SelectAttack(this AttackInfo[] attacks, IComparer<AttackInfo> priority, float skillLevel = 0.5f) {
 		skillLevel = Mathf.Clamp(skillLevel, 0, 1);
 
 		Array.Sort(attacks, priority);
@@ -36,7 +36,7 @@ public static class AttackExtensions {
 
 
 	public static class Priorities {
-		public static readonly IComparer<AttackBuilder> PureDamage = new ComparisonComparer<AttackBuilder>(
+		public static readonly IComparer<AttackInfo> PureDamage = new ComparisonComparer<AttackInfo>(
 			(a, b) => a?.PotentialDamage.CompareTo(b?.PotentialDamage ?? 0) ?? 0
 		);
 	}

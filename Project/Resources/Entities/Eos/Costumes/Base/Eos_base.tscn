@@ -351,4 +351,3 @@ Model = NodePath("Costume - Eos (base)")
 layers = 2
 mesh = SubResource("ArrayMesh_xp4o4")
 skin = SubResource("Skin_acg52")
-skeleton = NodePath("../../Skeleton")

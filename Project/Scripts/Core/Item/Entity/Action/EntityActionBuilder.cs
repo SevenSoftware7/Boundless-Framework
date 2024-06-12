@@ -2,11 +2,11 @@ namespace LandlessSkies.Core;
 
 using System;
 
-public abstract class EntityActionInfo {
+public abstract class EntityActionBuilder {
 	public Action? BeforeExecute { get; set; }
 	public Action? AfterExecute { get; set; }
 
-	protected abstract EntityAction Build(Entity entity);
+	protected internal abstract EntityAction Build(Entity entity);
 
 	public EntityAction Execute(Entity entity) {
 		BeforeExecute?.Invoke();

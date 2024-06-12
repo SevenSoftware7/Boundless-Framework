@@ -4,22 +4,20 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public partial class SkinnedModel : Model, IInjectable<Skeleton3D?> {
+public partial class SkinnedModel : Model, IInjectable<Skeleton3D?>, IInjectable<Handedness> {
 	[Export] protected GeometryInstance3D Model { get; private set; } = null!;
 
 	[ExportGroup("Dependencies")]
-	[Export] public Skeleton3D? Skeleton;
+	[Export] public Skeleton3D? Skeleton { get; private set; }
 	[Export] public Handedness Handedness { get; private set; }
-
 
 
 	protected SkinnedModel() : base() { }
 
 
-
 	public override Aabb GetAabb() => Model.GetAabb();
 
-	public void SetHandedness(Handedness handedness) {
+	public void Inject(Handedness handedness) {
 		Handedness = handedness;
 	}
 	public void Inject(Skeleton3D? skeleton) {
@@ -36,11 +34,22 @@ public partial class SkinnedModel : Model, IInjectable<Skeleton3D?> {
 	}
 
 
-
 	public override void _Process(double delta) {
 		base._Process(delta);
 		if (Skeleton is null) return;
 
 		GlobalTransform = Skeleton.GlobalTransform;
+	}
+
+	public override void _Notification(int what) {
+		base._Notification(what);
+		switch ((ulong) what) {
+		case NotificationParented:
+			if (IsNodeReady()) {
+				this.RequestInjection<Skeleton3D?>();
+				this.RequestInjection<Handedness>();
+			}
+			break;
+		}
 	}
 }

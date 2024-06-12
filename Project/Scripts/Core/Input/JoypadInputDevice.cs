@@ -12,10 +12,12 @@ public sealed partial class JoypadInputDevice : InputDevice {
 
 	protected override StringName ActionSuffix => $"joy{Id}";
 
+
 	private JoypadInputDevice() : base() { }
 	public JoypadInputDevice(int DeviceId) : base() {
 		Id = DeviceId;
 	}
+
 
 	protected override InputEvent ConvertEvent(InputEvent @event) {
 		InputEvent newEvent = (@event.Duplicate() as InputEvent)!;
@@ -23,6 +25,7 @@ public sealed partial class JoypadInputDevice : InputDevice {
 		return newEvent;
 	}
 	protected override bool IsEventSupported(InputEvent @event) => @event is InputEventJoypadButton || @event is InputEventJoypadMotion;
+
 
 	public override void Connect() {
 		base.Connect();

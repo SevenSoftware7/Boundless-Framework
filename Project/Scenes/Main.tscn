@@ -1,8 +1,9 @@
-[gd_scene load_steps=76 format=3 uid="uid://b505xodur2iff"]
+[gd_scene load_steps=84 format=3 uid="uid://b505xodur2iff"]
 
-[ext_resource type="Environment" uid="uid://cly878e1j23yy" path="res://Resources/Rendering/environment.tres" id="1_l7i5q"]
+[ext_resource type="RDShaderFile" uid="uid://caumal2txsxfx" path="res://Resources/Rendering/Shaders/TestWater.glsl" id="1_dvbaf"]
 [ext_resource type="PackedScene" uid="uid://bxcpbr13uyeh1" path="res://Resources/Entities/Bike/Bike.tscn" id="1_pikp0"]
-[ext_resource type="Compositor" uid="uid://dwtv47w5dgtou" path="res://Resources/Rendering/compositor.tres" id="2_w2ny8"]
+[ext_resource type="RDShaderFile" uid="uid://b136gtyf7fy3b" path="res://Resources/Rendering/Shaders/TestRender.glsl" id="2_m0fir"]
+[ext_resource type="Script" path="res://Scripts/Core/Rendering/DrawAndComputeCompositorEffect.cs" id="3_dl86w"]
 [ext_resource type="Script" path="res://addons/cyclops_level_builder/nodes/cyclops_block.gd" id="4_xwxtm"]
 [ext_resource type="Script" path="res://Scripts/Core/EntityVoidoutTrigger.cs" id="5_aiymr"]
 [ext_resource type="Script" path="res://addons/cyclops_level_builder/resources/convex_block_data.gd" id="5_vmujk"]
@@ -11,13 +12,50 @@
 [ext_resource type="PackedScene" uid="uid://fbs6dr24ss3g" path="res://Resources/Weapons/Epiphron/Epiphron.tscn" id="12_1jl3t"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/Implementations/MultiWeapon.cs" id="13_d6cna"]
 [ext_resource type="PackedScene" uid="uid://b7b17ebmgtrfy" path="res://Resources/Weapons/Nemesis/Nemesis.tscn" id="15_x4bcq"]
+[ext_resource type="Script" path="res://Scripts/Core/Water/WaterInstance.cs" id="17_awsp8"]
 [ext_resource type="PackedScene" uid="uid://bp1e6thwkkcrr" path="res://Resources/Weapons/Eleos/Eleos.tscn" id="17_jhoyp"]
 [ext_resource type="PackedScene" uid="uid://b7hcoc81x5g0i" path="res://Resources/Companions/Erebos.tscn" id="26_ds8t8"]
 [ext_resource type="PackedScene" uid="uid://7ic4jncm8p1a" path="res://Scenes/Player.tscn" id="26_rkn04"]
 [ext_resource type="Script" path="res://Scripts/Vanilla/TestInteractable.cs" id="35_lrkn5"]
 [ext_resource type="Script" path="res://Scripts/Vanilla/TrainEngine.cs" id="36_x7xeh"]
 
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4yjue"]
+sky_curve = 0.0375001
+ground_bottom_color = Color(0.3237, 0.349115, 0.39, 1)
+ground_curve = 0.20393
+sun_angle_max = 3.0
+sun_curve = 2.0
+
+[sub_resource type="Sky" id="Sky_21y3k"]
+sky_material = SubResource("ProceduralSkyMaterial_4yjue")
+
+[sub_resource type="Environment" id="Environment_0pxe2"]
+background_mode = 2
+sky = SubResource("Sky_21y3k")
+ambient_light_source = 3
+glow_enabled = true
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.0
+volumetric_fog_emission_energy = 389.28
+volumetric_fog_detail_spread = 0.5
+volumetric_fog_ambient_inject = 1.0
+volumetric_fog_temporal_reprojection_amount = 0.99
+
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_8wcfk"]
+
+[sub_resource type="CompositorEffect" id="CompositorEffect_41j7w"]
+resource_local_to_scene = false
+resource_name = ""
+enabled = true
+effect_callback_type = 4
+needs_motion_vectors = false
+needs_normal_roughness = false
+script = ExtResource("3_dl86w")
+RenderShaderFile = ExtResource("2_m0fir")
+ComputeShaderFile = ExtResource("1_dvbaf")
+
+[sub_resource type="Compositor" id="Compositor_gp4nw"]
+compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_41j7w")])
 
 [sub_resource type="Gradient" id="Gradient_r1pcq"]
 offsets = PackedFloat32Array(0.291304, 1)
@@ -1254,22 +1292,23 @@ albedo_color = Color(0.752941, 0, 0, 0.498039)
 [sub_resource type="SphereMesh" id="SphereMesh_nkuww"]
 material = SubResource("StandardMaterial3D_k6yo1")
 
-[sub_resource type="Curve3D" id="Curve3D_1wene"]
-_data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-"tilts": PackedFloat32Array(0, 0)
-}
-point_count = 2
-up_vector_enabled = false
+[sub_resource type="ORMMaterial3D" id="ORMMaterial3D_3s130"]
+transparency = 1
+cull_mode = 2
+albedo_color = Color(0.2886, 0.48516, 0.78, 0.490196)
+
+[sub_resource type="BoxMesh" id="BoxMesh_1aqbm"]
+material = SubResource("ORMMaterial3D_3s130")
+size = Vector3(5, 5, 5)
 
 [node name="Node3D" type="Node3D"]
 
 [node name="Environment" type="Node" parent="."]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="Environment"]
-environment = ExtResource("1_l7i5q")
+environment = SubResource("Environment_0pxe2")
 camera_attributes = SubResource("CameraAttributesPractical_8wcfk")
-compositor = ExtResource("2_w2ny8")
+compositor = SubResource("Compositor_gp4nw")
 
 [node name="Lights" type="Node" parent="Environment"]
 
@@ -1591,8 +1630,9 @@ shape = SubResource("SphereShape3D_ycdom")
 mesh = SubResource("SphereMesh_nkuww")
 skeleton = NodePath("../../CollisionShape3D/MeshInstance3D")
 
-[node name="Bike" parent="." node_paths=PackedStringArray("CurrentBehaviour") instance=ExtResource("1_pikp0")]
+[node name="Bike" parent="." node_paths=PackedStringArray("CostumeHolder", "CurrentBehaviour") instance=ExtResource("1_pikp0")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.99529, 2, 34.5791)
+CostumeHolder = NodePath("CostumeHolder")
 CurrentBehaviour = NodePath("VehicleBehaviour")
 
 [node name="Eos" parent="." node_paths=PackedStringArray("Weapon", "Skeleton", "AnimationPlayer", "Health") instance=ExtResource("9_0jt21")]
@@ -1604,7 +1644,7 @@ AnimationPlayer = NodePath("AnimationPlayer")
 Health = NodePath("Health")
 
 [node name="Weapon" type="Node3D" parent="Eos" node_paths=PackedStringArray("MainWeapon", "Skeleton")]
-transform = Transform3D(8.74228e-08, -7.64274e-15, -1, 1, -8.74228e-08, 8.74228e-08, -8.74228e-08, -1, 0, 1.11649, 2.61582, 0.185959)
+transform = Transform3D(8.74228e-08, -7.64274e-15, -1, 1, -8.74228e-08, 8.74228e-08, -8.74228e-08, -1, 0, 1.11649, 2.61582, 0.0329742)
 script = ExtResource("11_uqmxm")
 MainWeapon = NodePath("Main")
 Skeleton = NodePath("../Skeleton")
@@ -1615,26 +1655,28 @@ script = ExtResource("13_d6cna")
 Weapons = [NodePath("Epiphron"), NodePath("Nemesis"), NodePath("Eleos")]
 Skeleton = NodePath("../../Skeleton")
 
-[node name="Epiphron" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton", "Skeleton") instance=ExtResource("12_1jl3t")]
+[node name="Epiphron" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton") instance=ExtResource("12_1jl3t")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, -7.405e-29, -2.01948e-28, 1, 0, 0, 0)
 Skeleton = NodePath("../../../Skeleton")
-Skeleton = NodePath("../../../Skeleton")
 
-[node name="Nemesis" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton", "Skeleton") instance=ExtResource("15_x4bcq")]
+[node name="Nemesis" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton") instance=ExtResource("15_x4bcq")]
 process_mode = 4
 transform = Transform3D(1, 0, 0, 0, 1, 0, -7.405e-29, -2.01948e-28, 1, 0, 0, 0)
 visible = false
 Skeleton = NodePath("../../../Skeleton")
-Skeleton = NodePath("../../../Skeleton")
 
-[node name="Eleos" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton", "Skeleton") instance=ExtResource("17_jhoyp")]
+[node name="Eleos" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton") instance=ExtResource("17_jhoyp")]
 process_mode = 4
 transform = Transform3D(1, 0, 0, 0, 1, 0, -7.405e-29, -2.01948e-28, 1, 0, 0, 0)
 visible = false
-Skeleton = NodePath("../../../Skeleton")
 Skeleton = NodePath("../../../Skeleton")
 
 [node name="Erebos" parent="Eos" node_paths=PackedStringArray("Entity", "Skeleton") instance=ExtResource("26_ds8t8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.82647, 2.89861, 0)
 Entity = NodePath("..")
-Curve = SubResource("Curve3D_1wene")
-Skeleton = NodePath("ErebosBase")
+Skeleton = NodePath("Erebos Skeleton")
+
+[node name="WaterInstance" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.501, 0)
+mesh = SubResource("BoxMesh_1aqbm")
+script = ExtResource("17_awsp8")
