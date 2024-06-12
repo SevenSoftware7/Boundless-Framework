@@ -4,9 +4,10 @@ using Godot;
 using LandlessSkies.Core;
 
 [GlobalClass]
-public partial class SeatInteractable : Interactable {
-	[Export] private VehicleBehaviour? Vehicle = null;
+public partial class VehicleSeatInteractable : Interactable {
 	public static readonly StringName Mount = "Mount";
+
+	[Export] private VehicleBehaviour? Vehicle = null;
 
 	public override string InteractLabel => Mount;
 

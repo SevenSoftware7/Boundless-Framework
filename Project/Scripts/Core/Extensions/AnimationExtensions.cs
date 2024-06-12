@@ -1,5 +1,6 @@
 namespace SevenDev.Utility;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
@@ -10,26 +11,12 @@ public static class AnimationExtensions {
 			.GetAnimationList()
 			.Select(n => animationPlayer.GetAnimation(n));
 	}
-
-	public static IEnumerable<AnimationTrack> GetTracks(this Animation animation) {
-		int count = animation.GetTrackCount();
-		for (int i = 0; i < count; i++) {
-			yield return new AnimationTrack(animation, i);
-		}
-	}
 }
 
-public struct AnimationTrack(Animation animation, int id) {
+public ref struct AnimationTrack(Animation animation, int id) {
 	public readonly Animation Animation = animation;
 	public int TrackIdx { get; private set; } = id;
 
-
-	public readonly IEnumerable<AnimationKey> GetKeys() {
-		int count = Animation.TrackGetKeyCount(TrackIdx);
-		for (int i = 0; i < count; i++) {
-			yield return new AnimationKey(this, i);
-		}
-	}
 
 	public readonly int GetKeyCount() =>
 		Animation.TrackGetKeyCount(TrackIdx);
@@ -89,7 +76,7 @@ public struct AnimationTrack(Animation animation, int id) {
 		Animation.TrackSetInterpolationType(TrackIdx, interpolation);
 }
 
-public readonly struct AnimationKey(AnimationTrack track, int id) {
+public readonly ref struct AnimationKey(AnimationTrack track, int id) {
 	public readonly AnimationTrack Track = track;
 	public readonly int KeyIdx = id;
 

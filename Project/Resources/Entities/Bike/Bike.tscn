@@ -6,7 +6,7 @@
 [ext_resource type="Resource" uid="uid://bb3xo4pwx7g3y" path="res://Resources/Entities/Bike/Costumes/Bike_base.tres" id="4_yfh4w"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="5_5toi3"]
 [ext_resource type="Script" path="res://Scripts/Vanilla/Entities/VehicleBehaviour.cs" id="5_6pb3w"]
-[ext_resource type="Script" path="res://Scripts/Vanilla/SeatInteractable.cs" id="5_kaq40"]
+[ext_resource type="Script" path="res://Scripts/Vanilla/VehicleSeatInteractable.cs" id="5_kaq40"]
 
 [sub_resource type="Resource" id="Resource_jjk82"]
 script = ExtResource("2_4vcxx")
@@ -53,15 +53,15 @@ script = ExtResource("5_5toi3")
 Costume = ExtResource("4_yfh4w")
 Model = NodePath("Model")
 
-[node name="SeatInteractable" type="Area3D" parent="." node_paths=PackedStringArray("Vehicle")]
+[node name="Seat" type="Area3D" parent="." node_paths=PackedStringArray("Vehicle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1.2)
 script = ExtResource("5_kaq40")
 Vehicle = NodePath("../VehicleBehaviour")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="SeatInteractable"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Seat"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 0, 0)
 shape = SubResource("BoxShape3D_vd6cg")
 
-[node name="CollisionShape3D_2" type="CollisionShape3D" parent="SeatInteractable"]
+[node name="CollisionShape3D_2" type="CollisionShape3D" parent="Seat"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, 0, 0)
 shape = SubResource("BoxShape3D_vd6cg")

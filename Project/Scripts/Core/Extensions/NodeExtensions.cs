@@ -141,12 +141,7 @@ public static class NodeExtensions {
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static T AddSceneInstanceChild<T>(this T obj, Node child, bool forceReadableName = false) where T : Node {
 		obj.AddChild(child, forceReadableName);
-		if (obj.SceneFilePath.Length != 0) {
-			child.Owner = obj;
-		}
-		else {
-			child.Owner = obj.Owner ?? obj;
-		}
+		child.Owner = obj.SceneFilePath.Length != 0 ? obj : obj.Owner ?? obj;
 		return obj;
 	}
 

@@ -1,38 +1,31 @@
 namespace LandlessSkies.Core;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Godot;
 
-public abstract class SceneSaveData<T> : ISaveData<T> where T : Node {
+public abstract class SceneSaveData<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] T> : ISaveData<T> where T : Node {
 	public string ScenePath = string.Empty;
-	public string? TypeName;
+
+	[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+	public Type Type;
 
 
 	public SceneSaveData(T data) {
-		Type baseType = typeof(T);
+		Type = typeof(T);
 		ScenePath = data.SceneFilePath;
 
 		if (ScenePath.Length == 0) {
-			GD.PushWarning($"Attempting to save non-Scene {baseType.Name} ({data.GetPath()}) to SaveData; consider making this {baseType.Name} into a Scene to persist full functionality.");
-
-			TypeName = data.GetType().AssemblyQualifiedName!;
+			GD.PushWarning($"Attempting to save non-Scene {Type.Name} ({data.GetPath()}) to SaveData; consider making this {Type.Name} into a Scene to persist full functionality.");
 		}
 	}
 
 	public virtual T? Load() {
-		Type baseType = typeof(T);
 		T? entity;
 
 		if (ScenePath.Length == 0) {
-			GD.PushWarning($"Attemping to load non-Scene {baseType.Name} ({this}) from SaveData; consider re-saving this {baseType.Name} as a Scene to persist full functionality.");
-
-			if (TypeName is null) return null;
-
-			Type? type = Type.GetType(TypeName);
-			if (type is null) return null;
-
-
-			entity = Activator.CreateInstance(type) as T;
+			GD.PushWarning($"Attemping to load non-Scene {Type.Name} ({this}) from SaveData; consider re-saving this {Type.Name} as a Scene to persist full functionality.");
+			entity = Activator.CreateInstance(Type) as T;
 		}
 		else {
 			entity = ResourceLoader.Load<PackedScene>(ScenePath)?.Instantiate<T>();

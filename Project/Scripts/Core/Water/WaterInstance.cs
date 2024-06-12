@@ -1,6 +1,7 @@
 namespace LandlessSkies.Core;
 
 using Godot;
+using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
@@ -31,22 +32,26 @@ public sealed partial class WaterInstance : MeshInstance3D, ISerializationListen
 	}
 
 	public override bool _Set(StringName property, Variant value) {
-		if (property == PropertyName.Mesh) {
-			if (Mesh is not null) {
-				WaterMeshManager.Remove(Mesh);
-				if (Mesh.IsConnected(Mesh.SignalName.Changed, Callable.From(OnMeshChanged))) {
-					Mesh.Changed -= OnMeshChanged;
-				}
-			}
+		if (property != PropertyName.Mesh) return base._Set(property, value);
 
-			Mesh? newMesh = value.As<Mesh>();
-			if (newMesh is not null) {
-				WaterMeshManager.Add(newMesh);
-				newMesh.Changed += OnMeshChanged;
+		Callable method = Callable.From(OnMeshChanged);
+
+		if (Mesh is not null) {
+			WaterMeshManager.Remove(Mesh);
+			if (Mesh.IsConnected(Mesh.SignalName.Changed, method)) {
+				Mesh.Disconnect(Mesh.SignalName.Changed, method);
 			}
 		}
 
-		return base._Set(property, value);
+		Mesh = value.As<Mesh>();
+		if (Mesh is not null && ! Mesh.IsConnected(Mesh.SignalName.Changed, method)) {
+			WaterMeshManager.Add(Mesh);
+			if (! Mesh.IsConnected(Mesh.SignalName.Changed, method)) {
+				Mesh.Connect(Mesh.SignalName.Changed, method, (uint)ConnectFlags.Persist);
+			}
+		}
+
+		return true;
 	}
 
 	public void OnBeforeSerialize() { }

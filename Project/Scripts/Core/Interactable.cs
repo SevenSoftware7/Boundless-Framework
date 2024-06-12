@@ -27,6 +27,7 @@ public abstract partial class Interactable : Area3D {
 	public abstract void Interact(Entity entity, Player? player = null, int shapeIndex = 0);
 }
 
+
 public sealed class InteractTarget(Interactable interactable, int shapeIndex) : Tuple<Interactable, int>(interactable, shapeIndex) {
 	public Interactable Interactable => Item1;
 	public int ShapeIndex => Item2;
@@ -40,10 +41,11 @@ public sealed class InteractTarget(Interactable interactable, int shapeIndex) : 
 	}
 }
 
-public sealed class InteractCandidate(InteractTarget target, float distanceSquared, float incidence) : Tuple<InteractTarget, float, float>(target, distanceSquared, incidence) {
-	public InteractTarget Target => Item1;
-	public float DistanceSquared => Item2;
-	public float Incidence => Item3;
+
+public sealed class InteractCandidate(InteractTarget target, float distanceSquared, float incidence) {
+	public InteractTarget Target => target;
+	public float DistanceSquared => distanceSquared;
+	public float Incidence => incidence;
 
 
 	public static IEnumerable<InteractCandidate> GetNearCandidates(Entity entity, float maxDistance) {
