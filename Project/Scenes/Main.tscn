@@ -1,6 +1,5 @@
-[gd_scene load_steps=84 format=3 uid="uid://b505xodur2iff"]
+[gd_scene load_steps=83 format=3 uid="uid://b505xodur2iff"]
 
-[ext_resource type="RDShaderFile" uid="uid://caumal2txsxfx" path="res://Resources/Rendering/Shaders/UnderwaterEffect.glsl" id="1_eyihr"]
 [ext_resource type="PackedScene" uid="uid://bxcpbr13uyeh1" path="res://Resources/Entities/Bike/Bike.tscn" id="1_pikp0"]
 [ext_resource type="RDShaderFile" uid="uid://b136gtyf7fy3b" path="res://Resources/Rendering/Shaders/WaterRender.glsl" id="2_vgm2y"]
 [ext_resource type="Script" path="res://Scripts/Core/Rendering/UnderwaterEffect.cs" id="3_vfcd6"]
@@ -52,7 +51,6 @@ needs_motion_vectors = false
 needs_normal_roughness = false
 script = ExtResource("3_vfcd6")
 RenderShaderFile = ExtResource("2_vgm2y")
-ComputeShaderFile = ExtResource("1_eyihr")
 
 [sub_resource type="Compositor" id="Compositor_gp4nw"]
 compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_mnuri")])

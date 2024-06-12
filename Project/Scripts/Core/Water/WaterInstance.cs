@@ -49,9 +49,7 @@ public sealed partial class WaterInstance : MeshInstance3D, ISerializationListen
 		return base._Set(property, value);
 	}
 
-	public void OnBeforeSerialize() {
-		throw new System.NotImplementedException();
-	}
+	public void OnBeforeSerialize() { }
 
 	public void OnAfterDeserialize() {
 		Mesh.Changed += OnMeshChanged;

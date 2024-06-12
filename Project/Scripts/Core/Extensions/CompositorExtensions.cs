@@ -6,7 +6,6 @@ using Godot.Collections;
 
 
 public static class CompositorExtensions {
-
 	public static Rid IndexBufferCreate(this RenderingDevice renderingDevice, ushort[] indices) {
 		byte[] byteIndices = new byte[indices.Length * sizeof(ushort)];
 		Buffer.BlockCopy(indices, 0, byteIndices, 0, byteIndices.Length);
