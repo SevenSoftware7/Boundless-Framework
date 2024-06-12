@@ -7,7 +7,7 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class DrawAndComputeCompositorEffect : BaseCompositorEffect {
+public partial class UnderwaterEffect : BaseCompositorEffect {
 	public static readonly StringName Context = "UnderwaterEffect";
 	public static readonly StringName WaterMapName = "water_map";
 	public static readonly StringName WaterDepthName = "water_depth";
@@ -44,7 +44,7 @@ public partial class DrawAndComputeCompositorEffect : BaseCompositorEffect {
 	private Rid nearestSampler;
 
 	private readonly RDAttachmentFormat waterMapAttachmentFormat = new() {
-		Format = RenderingDevice.DataFormat.R16G16B16A16Unorm,
+		Format = RenderingDevice.DataFormat.R32G32B32A32Sfloat,
 		Samples = RenderingDevice.TextureSamples.Samples1,
 		UsageFlags = (uint)(RenderingDevice.TextureUsageBits.ColorAttachmentBit | RenderingDevice.TextureUsageBits.StorageBit)
 	};
@@ -67,7 +67,7 @@ public partial class DrawAndComputeCompositorEffect : BaseCompositorEffect {
 
 
 
-	public DrawAndComputeCompositorEffect() : base() {
+	public UnderwaterEffect() : base() {
 		EffectCallbackType = EffectCallbackTypeEnum.PostTransparent;
 	}
 
@@ -150,9 +150,8 @@ public partial class DrawAndComputeCompositorEffect : BaseCompositorEffect {
 				WorldToClip.Z.X, WorldToClip.Z.Y, WorldToClip.Z.Z, WorldToClip.Z.W,
 				WorldToClip.W.X, WorldToClip.W.Y, WorldToClip.W.Z, WorldToClip.W.W,
 
-				eyeOffset.X, eyeOffset.Y, eyeOffset.Z, 0, // Pad with a zero, because the push constant needs to contain a multiple of 16 bytes (4 floats)
-				nearClippingPlane, farClippingPlane, 0, 0,
-				// WorldToClip.GetZNear(), WorldToClip.GetZFar(), 0, 0,
+				eyeOffset.X, eyeOffset.Y, // Don't pad for these two because they get packed together
+				nearClippingPlane, farClippingPlane,
 
 			];
 			byte[] renderPushConstantBytes = new byte[renderPushConstant.Length * sizeof(float)];
@@ -175,7 +174,9 @@ public partial class DrawAndComputeCompositorEffect : BaseCompositorEffect {
 
 			// Unfolding into a push constant
 			float[] computePushConstant = [
-				renderSize.X, renderSize.Y, nearClippingPlane, farClippingPlane,
+				renderSize.X, renderSize.Y,
+				nearClippingPlane, farClippingPlane,
+
 				waterColor.R, waterColor.G, waterColor.B, 0,
 			];
 			byte[] computePushConstantBytes = new byte[computePushConstant.Length * sizeof(float)];

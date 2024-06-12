@@ -1,9 +1,9 @@
 [gd_scene load_steps=84 format=3 uid="uid://b505xodur2iff"]
 
-[ext_resource type="RDShaderFile" uid="uid://caumal2txsxfx" path="res://Resources/Rendering/Shaders/TestWater.glsl" id="1_dvbaf"]
+[ext_resource type="RDShaderFile" uid="uid://caumal2txsxfx" path="res://Resources/Rendering/Shaders/UnderwaterEffect.glsl" id="1_eyihr"]
 [ext_resource type="PackedScene" uid="uid://bxcpbr13uyeh1" path="res://Resources/Entities/Bike/Bike.tscn" id="1_pikp0"]
-[ext_resource type="RDShaderFile" uid="uid://b136gtyf7fy3b" path="res://Resources/Rendering/Shaders/TestRender.glsl" id="2_m0fir"]
-[ext_resource type="Script" path="res://Scripts/Core/Rendering/DrawAndComputeCompositorEffect.cs" id="3_dl86w"]
+[ext_resource type="RDShaderFile" uid="uid://b136gtyf7fy3b" path="res://Resources/Rendering/Shaders/WaterRender.glsl" id="2_vgm2y"]
+[ext_resource type="Script" path="res://Scripts/Core/Rendering/UnderwaterEffect.cs" id="3_vfcd6"]
 [ext_resource type="Script" path="res://addons/cyclops_level_builder/nodes/cyclops_block.gd" id="4_xwxtm"]
 [ext_resource type="Script" path="res://Scripts/Core/EntityVoidoutTrigger.cs" id="5_aiymr"]
 [ext_resource type="Script" path="res://addons/cyclops_level_builder/resources/convex_block_data.gd" id="5_vmujk"]
@@ -43,19 +43,19 @@ volumetric_fog_temporal_reprojection_amount = 0.99
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_8wcfk"]
 
-[sub_resource type="CompositorEffect" id="CompositorEffect_41j7w"]
+[sub_resource type="CompositorEffect" id="CompositorEffect_mnuri"]
 resource_local_to_scene = false
 resource_name = ""
 enabled = true
 effect_callback_type = 4
 needs_motion_vectors = false
 needs_normal_roughness = false
-script = ExtResource("3_dl86w")
-RenderShaderFile = ExtResource("2_m0fir")
-ComputeShaderFile = ExtResource("1_dvbaf")
+script = ExtResource("3_vfcd6")
+RenderShaderFile = ExtResource("2_vgm2y")
+ComputeShaderFile = ExtResource("1_eyihr")
 
 [sub_resource type="Compositor" id="Compositor_gp4nw"]
-compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_41j7w")])
+compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_mnuri")])
 
 [sub_resource type="Gradient" id="Gradient_r1pcq"]
 offsets = PackedFloat32Array(0.291304, 1)
@@ -1652,11 +1652,13 @@ Skeleton = NodePath("../Skeleton")
 [node name="Main" type="Node3D" parent="Eos/Weapon" node_paths=PackedStringArray("Weapons", "Skeleton")]
 transform = Transform3D(1, 0, 0, -7.10543e-15, 1, 0, 7.10543e-15, 0, 1, 0, 0, 0)
 script = ExtResource("13_d6cna")
-Weapons = [NodePath("Epiphron"), NodePath("Nemesis"), NodePath("Eleos")]
+Weapons = [NodePath("@Node3D@17522"), NodePath("@Node3D@17523"), NodePath("@Node3D@17524"), NodePath("Epiphron"), NodePath("Nemesis"), NodePath("Eleos")]
 Skeleton = NodePath("../../Skeleton")
 
 [node name="Epiphron" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton") instance=ExtResource("12_1jl3t")]
+process_mode = 4
 transform = Transform3D(1, 0, 0, 0, 1, 0, -7.405e-29, -2.01948e-28, 1, 0, 0, 0)
+visible = false
 Skeleton = NodePath("../../../Skeleton")
 
 [node name="Nemesis" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton") instance=ExtResource("15_x4bcq")]

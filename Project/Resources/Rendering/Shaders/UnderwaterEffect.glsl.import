@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://caumal2txsxfx"
+path="res://.godot/imported/UnderwaterEffect.glsl-e922ef6e229c7c76f5c55fe419675302.res"
+
+[deps]
+
+source_file="res://Resources/Rendering/Shaders/UnderwaterEffect.glsl"
+dest_files=["res://.godot/imported/UnderwaterEffect.glsl-e922ef6e229c7c76f5c55fe419675302.res"]
+
+[params]
+

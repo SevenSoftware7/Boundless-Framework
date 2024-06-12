@@ -5,7 +5,7 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class TestCompositorEffect : BaseCompositorEffect {
+public partial class BlitCompositorEffect : BaseCompositorEffect {
 	private RenderingDevice? renderingDevice;
 	private Rid nearestSampler;
 
@@ -28,7 +28,7 @@ public partial class TestCompositorEffect : BaseCompositorEffect {
 
 
 
-	public TestCompositorEffect() : base() {
+	public BlitCompositorEffect() : base() {
 		EffectCallbackType = EffectCallbackTypeEnum.PostTransparent;
 	}
 

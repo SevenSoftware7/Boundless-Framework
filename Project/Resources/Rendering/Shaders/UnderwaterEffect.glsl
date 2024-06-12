@@ -8,7 +8,8 @@ layout(set = 1, binding = 0) uniform sampler2D depth_image; // Depth buffer of t
 layout(rgba16f, set = 2, binding = 0) uniform image2D water_map_image; // Water Map that was rendered in the Render Shader
 
 layout(push_constant, std430) uniform Params {
-	vec4 screen; // x = width of the screen, y = height of the screen, z = near clipping plane, w = far clipping plane
+	vec2 screen_size; // x: screen width, y: screen height
+	vec2 clipping_planes; // z: near plane, w: far plane
 	vec3 water_color; // Color of the Water
 };
 
@@ -35,12 +36,12 @@ void main()
 	// if (water_map.r == 0) return;
 	float water_depth = water_map.z;
 
-	vec2 depth_uv = vec2(uv) / screen.xy;
+	vec2 depth_uv = vec2(uv) / screen_size;
 	float depth = texture(depth_image, depth_uv).r;
 
 	// The amount of water we are looking through is either the end of the water volume (water_depth) or the closest surface (depth)
 	float max_depth = max(depth, water_depth);
-	max_depth = clamp(linearize_depth(max_depth, screen.z, screen.w), 0, 1);
+	max_depth = clamp(linearize_depth(max_depth, clipping_planes.x, clipping_planes.y), 0, 1);
 
 	// Actual water color calculation
 	vec3 color = imageLoad(color_image, uv).rgb;
