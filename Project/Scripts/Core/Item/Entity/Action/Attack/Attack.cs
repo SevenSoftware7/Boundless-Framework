@@ -6,7 +6,42 @@ using Godot;
 using SevenDev.Utility;
 
 public abstract partial class Attack(Entity entity, SingleWeapon Weapon) : EntityAction(entity) {
-	protected SingleWeapon Weapon { get; private set; } = Weapon;
+	public SingleWeapon Weapon { get; private set; } = Weapon;
+
+	protected static StringName GetAnimationPath(StringName library, StringName attack) => library.IsEmpty ? attack : $"{library}/{attack}";
+
+	public void CreateHitBox(float damage, Vector3 size, Vector3 position, bool parented, ulong lifeTime = 0) {
+		DamageArea3D hitArea = CreateHurtArea(damage, lifeTime);
+		if (parented) {
+			hitArea.ParentTo(Weapon);
+			hitArea.Transform = new() {
+				Origin = position,
+				Basis = Basis.Identity
+			};
+		}
+		else {
+			hitArea.GlobalTransform = new() {
+				Origin = Weapon.GlobalTransform * position,
+				Basis = Weapon.GlobalBasis
+			};
+		}
+
+		AddCollisionShapes(hitArea, size);
+	}
+
+
+	public virtual DamageArea3D CreateHurtArea(float damage, ulong lifeTime) {
+		return new DamageArea3D(Entity as IDamageDealer, damage, lifeTime);
+	}
+
+	public virtual void AddCollisionShapes(DamageArea3D damageArea, Vector3 size) {
+		new CollisionShape3D() {
+			Shape = new BoxShape3D() {
+				Size = size,
+			}
+		}.ParentTo(damageArea);
+	}
+
 
 
 	[Flags]

@@ -14,14 +14,14 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 	public SittingBehaviour(Entity entity) : base(entity) { }
 
 
-	public override void Start(EntityBehaviour? previousBehaviour) {
-		base.Start(previousBehaviour);
-		this.previousBehaviour = previousBehaviour;
+	protected override void _Start(EntityBehaviour? previousBehaviour) {
+		if (previousBehaviour is not null && ! previousBehaviour.IsQueuedForDeletion()) {
+			this.previousBehaviour = previousBehaviour;
+		}
 	}
 
-	public override void Stop() {
-		base.Stop();
-		QueueFree();
+	protected override void _Stop() {
+		this.UnparentAndQueueFree();
 	}
 
 	public void Dismount() {

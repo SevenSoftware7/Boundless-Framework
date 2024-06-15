@@ -18,6 +18,8 @@ public partial class VehicleBehaviour : GroundedBehaviour {
 		JumpAction = new BipedJumpActionInfo();
 	}
 
+	protected override void _Start(EntityBehaviour? oldBehaviour) { }
+	protected override void _Stop() { }
 
 	public override void _Process(double delta) {
 		base._Process(delta);
@@ -31,7 +33,7 @@ public partial class VehicleBehaviour : GroundedBehaviour {
 		if (! _inputDirection.IsEqualApprox(Vector3.Zero)) {
 			Vector3 direction = _inputDirection.Normalized();
 
-			newSpeed = Entity.GlobalForward.Dot(direction) * Entity.AttributeModifiers.Get(Attributes.GenericMoveSpeed).ApplyTo(Entity.Stats.BaseSpeed);
+			newSpeed = Entity.GlobalForward.Dot(direction) * Entity.AttributeModifiers.ApplyTo(Attributes.GenericMoveSpeed, Entity.Stats.BaseSpeed);
 			Entity.GlobalForward = Entity.GlobalForward.Slerp(direction, floatDelta * 3f);
 		}
 

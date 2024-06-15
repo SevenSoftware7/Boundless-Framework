@@ -16,8 +16,7 @@ public abstract partial class GroundedBehaviour : EntityBehaviour {
 	public GroundedBehaviour(Entity entity) : base(entity) { }
 
 
-	public override void Start(EntityBehaviour? previousBehaviour) {
-		base.Start(previousBehaviour);
+	protected override void _Start(EntityBehaviour? previousBehaviour) {
 		if (Entity is null) return;
 
 		Entity.GlobalForward = Entity.GlobalForward.SlideOnFace(Entity.UpDirection).Normalized();
@@ -25,6 +24,7 @@ public abstract partial class GroundedBehaviour : EntityBehaviour {
 
 		Entity.MotionMode = CharacterBody3D.MotionModeEnum.Grounded;
 	}
+	protected override void _Stop() { }
 
 
 	public override void HandlePlayer(Player player) {

@@ -6,7 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "D:/Software/Godot_v4.3-dev6_mono_win64/Godot_v4.3-dev6_mono_win64.exe",
+            "program": "D:/Software/Godot_v4.3-beta1_mono_win64/Godot_v4.3-beta1_mono_win64.exe",
             "cwd": "${workspaceFolder}",
             "console": "internalConsole",
             "stopAtEntry": false,
@@ -16,7 +16,6 @@
 				"--debug-collisions",
 				"--debug-paths",
 				"--debug-navigation",
-				"--verbose",
             ]
         },
         {
@@ -24,7 +23,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "D:/Software/Godot_v4.3-dev6_mono_win64/Godot_v4.3-dev6_mono_win64.exe",
+            "program": "D:/Software/Godot_v4.3-beta1_mono_win64/Godot_v4.3-beta1_mono_win64.exe",
             "cwd": "${workspaceFolder}",
             "console": "internalConsole",
             "stopAtEntry": false,
@@ -33,7 +32,6 @@
                 "${workspaceRoot}",
                 "${command:godot.csharp.getLaunchScene}",
 				"--debug-collisions",
-				"--verbose",
             ]
         },
         {
@@ -47,7 +45,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "D:/Software/Godot_v4.3-dev6_mono_win64/Godot_v4.3-dev6_mono_win64.exe",
+            "program": "D:/Software/Godot_v4.3-beta1_mono_win64/Godot_v4.3-beta1_mono_win64.exe",
             "cwd": "${workspaceFolder}",
             "console": "internalConsole",
             "stopAtEntry": false,

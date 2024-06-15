@@ -80,6 +80,7 @@ public sealed partial class AkimboWeapon : Weapon, IInjectionInterceptor<Handedn
 			.SelectMany(w => w.GetAttacks(target));
 	}
 
+
 	public Handedness Intercept(Node child) {
 		if (child == _sideWeapon) {
 			return Handedness.Reverse();
@@ -104,7 +105,6 @@ public sealed partial class AkimboWeapon : Weapon, IInjectionInterceptor<Handedn
 	public override AkimboWeaponSaveData Save() {
 		return new AkimboWeaponSaveData(this);
 	}
-
 
 	[Serializable]
 	public class AkimboWeaponSaveData(AkimboWeapon akimbo) : ISaveData<Weapon> {

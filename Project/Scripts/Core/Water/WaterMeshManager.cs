@@ -13,6 +13,8 @@ public static class WaterMeshManager {
 
 	private static readonly Dictionary<Mesh, (int vertStartIndex, int indexStartIndex, int vertCount, int indexCount)> waterMeshes = [];
 
+
+
 	public static void Add(Mesh mesh, Transform3D transform = default) {
 		if (mesh is null) return;
 

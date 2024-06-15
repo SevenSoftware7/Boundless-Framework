@@ -7,6 +7,8 @@ using Godot;
 [Tool]
 [GlobalClass]
 public sealed partial class EleosWeapon : SingleWeapon, IPlayerHandler {
+	private static readonly StringName LibName = "Eleos";
+
 	private readonly CompositeChargeAttackInfo chargeAttack = new(
 		SlashAttackInfo.Instance,
 		SlashAttackInfo.Instance,
@@ -19,6 +21,8 @@ public sealed partial class EleosWeapon : SingleWeapon, IPlayerHandler {
 	public override IWeapon.Usage WeaponUsage => IWeapon.Usage.Slash | IWeapon.Usage.Thrust;
 	public override IWeapon.Size WeaponSize => IWeapon.Size.OneHanded | IWeapon.Size.TwoHanded;
 
+	// protected override StringName LibraryName => LibName;
+
 
 	private EleosWeapon() : base() { }
 	public EleosWeapon(WeaponCostume? costume = null) : base(costume) { }
@@ -26,24 +30,26 @@ public sealed partial class EleosWeapon : SingleWeapon, IPlayerHandler {
 
 	public override IEnumerable<AttackBuilder> GetAttacks(Entity target) {
 		return [
-			new AttackBuilder(SlashAttackInfo.Instance, this),
-			new AttackBuilder(chargeAttack, this)
+			new AttackBuilder(SlashAttackInfo.Instance, this, LibraryName),
+			new AttackBuilder(chargeAttack, this, LibraryName)
 		];
 	}
 
-	public void HandlePlayer(Player player) {
+	public override void HandlePlayer(Player player) {
+		base.HandlePlayer(player);
 		if (player.Entity is null) return;
 
 		switch (player.Entity.CurrentBehaviour) {
 		case GroundedBehaviour grounded:
 			if (player.InputDevice.IsActionJustPressed(Inputs.AttackLight)) {
-				player.Entity.ExecuteAction(new AttackBuilder(SlashAttackInfo.Instance, this));
+				player.Entity.ExecuteAction(new AttackBuilder(SlashAttackInfo.Instance, this, LibraryName));
 			}
 
-			chargeAttack.ExecuteOnKeyJustPressed(player, this);
+			chargeAttack.ExecuteOnKeyJustPressed(player, this, LibraryName);
 			break;
 		}
-
 	}
-	public void DisavowPlayer() { }
+	public override void DisavowPlayer() {
+		base.DisavowPlayer();
+	}
 }

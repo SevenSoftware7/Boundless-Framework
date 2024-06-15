@@ -25,7 +25,7 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 	[Export] public float T { get; private set; }
 	[Export] public float TFace { get; private set; }
 
-	[Export(PropertyHint.Layers3DPhysics)] private uint CollisionMask = Collisions.TerrainCollisionLayer | Collisions.WaterCollisionLayer;
+	[Export(PropertyHint.Layers3DPhysics)] private uint CollisionMask = Collisions.Terrain | Collisions.Water;
 
 	[Export] public Curve3D Curve { get; private set; }
 

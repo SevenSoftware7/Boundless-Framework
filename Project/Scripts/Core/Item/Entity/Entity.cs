@@ -9,7 +9,7 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable, ISaveable<Entity>, IInjectionProvider<Skeleton3D?>, IInjectionProvider<Handedness> {
+public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICustomizable, ISaveable<Entity>, IInjectionProvider<Skeleton3D?>, IInjectionProvider<Handedness> {
 	private readonly List<Vector3> standableSurfaceBuffer = [];
 	private const int STANDABLE_SURFACE_BUFFER_SIZE = 20;
 	private GaugeControl? healthBar;
@@ -110,7 +110,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable, IS
 
 
 	protected Entity() : base() {
-		CollisionLayer = Collisions.EntityCollisionLayer;
+		CollisionLayer = Collisions.Entity;
 
 		Forward = Vector3.Forward;
 	}
@@ -122,24 +122,29 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable, IS
 	public void ExecuteAction(EntityActionBuilder action, bool forceExecute = false) {
 		if (! forceExecute && ! ActionExtensions.CanCancel(CurrentAction)) return;
 
-		CurrentAction?.QueueFree();
+		CurrentAction?.Unparent().Stop();
 		CurrentAction = null;
 
 		action.AfterExecute += () => CurrentAction = null;
-		CurrentAction = action.Execute(this).SafeReparentTo(this);
+
+		CurrentAction = action.Build(this).ParentTo(this);
+		CurrentAction.Name = "Action";
+		CurrentAction.Start();
 	}
 
 	public void SetBehaviour<TBehaviour>(TBehaviour? behaviour) where TBehaviour : EntityBehaviour {
-		// Callable.From(() =>{
 		CurrentBehaviour?.Stop();
+		EntityBehaviour? oldBehaviour = CurrentBehaviour;
+		CurrentBehaviour = null;
 
-		behaviour?.Start(CurrentBehaviour?.IsQueuedForDeletion() ?? true ? null : CurrentBehaviour);
-		CurrentBehaviour = behaviour?.SafeReparentTo(this);
-		// }).CallDeferred();
+		if (behaviour is null) return;
+
+		CurrentBehaviour = behaviour.SafeReparentTo(this);
+		CurrentBehaviour.Name = "Behaviour";
+		behaviour.Start(oldBehaviour);
 	}
 
 	private void Move(double delta) {
-
 		if (MotionMode == MotionModeEnum.Grounded) {
 			if (
 				IsOnFloor() && GetPlatformVelocity().IsZeroApprox()
@@ -229,6 +234,18 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable, IS
 	public virtual List<ICustomization> GetCustomizations() => [];
 	public virtual List<ICustomizable> GetSubCustomizables() => [.. GetChildren().OfType<ICustomizable>()];
 
+	public void Damage(float amount) {
+		if (Health is null) return;
+		// TODO: damage reduction, absorption, etc...
+		Health.Amount -= amount;
+		GD.Print($"Entity {Name} took {amount} Damage");
+	}
+
+	public void Kill() {
+		if (Health is null) return;
+		Health.Amount = 0;
+	}
+
 
 	private void OnKill(float fromHealth) {
 		EmitSignal(SignalName.Death, fromHealth);
@@ -271,7 +288,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable, IS
 
 
 	private void UpdateHealth(bool keepRatio) {
-		_health?.SetMaximum(AttributeModifiers.Get(Attributes.GenericMaxHealth).ApplyTo(Stats.MaxHealth), keepRatio);
+		_health?.SetMaximum(AttributeModifiers.ApplyTo(Attributes.GenericMaxHealth, Stats.MaxHealth), keepRatio);
 	}
 
 	public override void _Process(double delta) {
@@ -314,7 +331,6 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, ICustomizable, IS
 
 	Skeleton3D? IInjectionProvider<Skeleton3D?>.GetInjection() => Skeleton;
 	Handedness IInjectionProvider<Handedness>.GetInjection() => Handedness;
-
 
 	[Serializable]
 	public class EntitySaveData<T>(T entity) : SceneSaveData<Entity>(entity) where T : Entity {

@@ -13,7 +13,7 @@ public abstract partial class Interactable : Area3D {
 
 
 	public Interactable() : base() {
-		CollisionLayer = InteractableCollisionLayer;
+		CollisionLayer = Collisions.Interactable;
 		CollisionMask = 0;
 	}
 
@@ -52,7 +52,7 @@ public sealed class InteractCandidate(InteractTarget target, float distanceSquar
 		SphereShape3D sphere = new() {
 			Radius = maxDistance,
 		};
-		Collisions.IntersectShape3D(entity.GetWorld3D(), entity.GlobalTransform, out IntersectShape3DResult[] collisions, sphere, InteractableCollisionLayer);
+		Collisions.IntersectShape3D(entity.GetWorld3D(), entity.GlobalTransform, out IntersectShape3DResult[] collisions, sphere, Collisions.Interactable);
 
 		return GetCandidates(collisions, entity, maxDistance);
 	}

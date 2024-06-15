@@ -1,6 +1,7 @@
 namespace LandlessSkies.Core;
 
 using Godot;
+using Godot.Collections;
 
 public abstract partial class BaseCompositorEffect : CompositorEffect, ISerializationListener {
 	protected RenderingDevice? RenderingDevice { get; private set; }
@@ -41,5 +42,16 @@ public abstract partial class BaseCompositorEffect : CompositorEffect, ISerializ
 	}
 	public void OnAfterDeserialize() {
 		Construct();
+	}
+
+	public override void _ValidateProperty(Dictionary property) {
+		base._ValidateProperty(property);
+
+		StringName name = property["name"].AsStringName();
+
+
+		if (name == PropertyName.RenderingDevice) {
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
+		}
 	}
 }

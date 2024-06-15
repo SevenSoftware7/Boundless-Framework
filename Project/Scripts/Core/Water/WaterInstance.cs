@@ -31,32 +31,32 @@ public sealed partial class WaterInstance : MeshInstance3D, ISerializationListen
 		WaterMeshManager.Remove(Mesh);
 	}
 
-	public override bool _Set(StringName property, Variant value) {
-		if (property != PropertyName.Mesh) return base._Set(property, value);
+	// public override bool _Set(StringName property, Variant value) {
+	// 	if (property != PropertyName.Mesh) return base._Set(property, value);
 
-		Callable method = Callable.From(OnMeshChanged);
+	// 	Callable method = Callable.From(OnMeshChanged);
 
-		if (Mesh is not null) {
-			WaterMeshManager.Remove(Mesh);
-			if (Mesh.IsConnected(Mesh.SignalName.Changed, method)) {
-				Mesh.Disconnect(Mesh.SignalName.Changed, method);
-			}
-		}
+	// 	if (Mesh is not null) {
+	// 		WaterMeshManager.Remove(Mesh);
+	// 		if (Mesh.IsConnected(Mesh.SignalName.Changed, method)) {
+	// 			Mesh.Disconnect(Mesh.SignalName.Changed, method);
+	// 		}
+	// 	}
 
-		Mesh = value.As<Mesh>();
-		if (Mesh is not null && ! Mesh.IsConnected(Mesh.SignalName.Changed, method)) {
-			WaterMeshManager.Add(Mesh);
-			if (! Mesh.IsConnected(Mesh.SignalName.Changed, method)) {
-				Mesh.Connect(Mesh.SignalName.Changed, method, (uint)ConnectFlags.Persist);
-			}
-		}
+	// 	Mesh = value.As<Mesh>();
+	// 	if (Mesh is not null && ! Mesh.IsConnected(Mesh.SignalName.Changed, method)) {
+	// 		WaterMeshManager.Add(Mesh);
+	// 		if (! Mesh.IsConnected(Mesh.SignalName.Changed, method)) {
+	// 			Mesh.Connect(Mesh.SignalName.Changed, method, (uint)ConnectFlags.Persist);
+	// 		}
+	// 	}
 
-		return true;
-	}
+	// 	return true;
+	// }
 
 	public void OnBeforeSerialize() { }
 
 	public void OnAfterDeserialize() {
-		Mesh.Changed += OnMeshChanged;
+		// Mesh.Changed += OnMeshChanged;
 	}
 }

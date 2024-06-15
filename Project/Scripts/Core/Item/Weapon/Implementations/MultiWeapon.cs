@@ -180,6 +180,11 @@ public sealed partial class MultiWeapon : Weapon {
 			});
 	}
 
+	public override MultiWeaponSaveData Save() {
+		return new MultiWeaponSaveData([.. _weapons]);
+	}
+
+
 
 	public override void _Notification(int what) {
 		base._Notification(what);
@@ -189,13 +194,6 @@ public sealed partial class MultiWeapon : Weapon {
 			break;
 		}
 	}
-
-
-	public override MultiWeaponSaveData Save() {
-		return new MultiWeaponSaveData([.. _weapons]);
-	}
-
-
 
 	[Serializable]
 	public class MultiWeaponSaveData(IEnumerable<Weapon> weapons) : ISaveData<Weapon> {

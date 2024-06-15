@@ -23,15 +23,10 @@ public partial class BipedBehaviour : GroundedBehaviour {
 	}
 
 
-	public override void Start(EntityBehaviour? previousBehaviour) {
-		base.Start(previousBehaviour);
-
+	protected override void _Start(EntityBehaviour? previousBehaviour) {
 		interactPointer?.Enable();
-
 	}
-	public override void Stop() {
-		base.Stop();
-
+	protected override void _Stop() {
 		interactPrompt?.Update(false);
 		interactPointer?.Disable();
 	}
@@ -118,7 +113,7 @@ public partial class BipedBehaviour : GroundedBehaviour {
 			MovementType.Sprint => Entity.Stats.SprintSpeed,
 			_ => 0f
 		};
-		newSpeed = Entity.AttributeModifiers.Get(Attributes.GenericMoveSpeed).ApplyTo(newSpeed);
+		newSpeed = Entity.AttributeModifiers.ApplyTo(Attributes.GenericMoveSpeed, newSpeed);
 
 		float speedDelta = _moveSpeed < newSpeed ? Entity.Stats.Acceleration : Entity.Stats.Deceleration;
 		_moveSpeed = Mathf.MoveToward(_moveSpeed, newSpeed, speedDelta * floatDelta);

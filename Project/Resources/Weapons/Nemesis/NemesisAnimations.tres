@@ -1,0 +1,9 @@
+[gd_resource type="AnimationLibrary" load_steps=2 format=3 uid="uid://caafq3ok75ukn"]
+
+[ext_resource type="Animation" uid="uid://luijabmjq650" path="res://Resources/Animations/Slash.res" id="1_72eg2"]
+
+[resource]
+resource_name = "NemesisAnimations"
+_data = {
+"Slash": ExtResource("1_72eg2")
+}

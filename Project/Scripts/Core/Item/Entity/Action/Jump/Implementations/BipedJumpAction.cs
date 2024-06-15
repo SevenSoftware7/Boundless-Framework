@@ -13,10 +13,6 @@ public partial class BipedJumpAction : JumpAction, IPlayerHandler {
 
 	public BipedJumpAction(Entity entity, Vector3 direction) : base(entity) {
 		Direction = direction;
-		float jumpHeight = Entity.AttributeModifiers.Get(Attributes.GenericjumpHeight).ApplyTo(Entity.Stats.JumpHeight);
-
-		Entity.Inertia = Entity.Inertia.SlideOnFace(Direction) + Direction * jumpHeight;
-		maxDistance = jumpHeight * JUMP_HEIGHT_FRACTION;
 	}
 
 
@@ -28,6 +24,16 @@ public partial class BipedJumpAction : JumpAction, IPlayerHandler {
 	}
 
 	public void DisavowPlayer() { }
+
+	protected override void _Start() {
+		float jumpHeight = Entity.AttributeModifiers.ApplyTo(Attributes.GenericjumpHeight, Entity.Stats.JumpHeight);
+
+		Entity.Inertia = Entity.Inertia.SlideOnFace(Direction) + Direction * jumpHeight;
+		maxDistance = jumpHeight * JUMP_HEIGHT_FRACTION;
+	}
+
+	protected override void _Stop() { }
+
 
 	public override void _Process(double delta) {
 		base._Process(delta);

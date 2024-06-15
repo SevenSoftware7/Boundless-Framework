@@ -18,15 +18,15 @@ public class CompositeChargeAttackInfo(
 
 
 
-	public void ExecuteOnKeyJustPressed(Player player, SingleWeapon weapon) {
+	public void ExecuteOnKeyJustPressed(Player player, SingleWeapon weapon, StringName library) {
 		if (player.InputDevice.IsActionJustPressed(ActionKey)) {
-			player?.Entity?.ExecuteAction(new AttackBuilder(this, weapon));
+			player?.Entity?.ExecuteAction(new AttackBuilder(this, weapon, library));
 		}
 	}
 
 
 
-	protected internal override CompositeChargeAttack Create(Entity entity, SingleWeapon weapon) {
-		return new CompositeChargeAttack(entity, weapon, this, Modifiers);
+	protected internal override CompositeChargeAttack Create(Entity entity, SingleWeapon weapon, StringName library) {
+		return new CompositeChargeAttack(entity, weapon, library, this, Modifiers);
 	}
 }

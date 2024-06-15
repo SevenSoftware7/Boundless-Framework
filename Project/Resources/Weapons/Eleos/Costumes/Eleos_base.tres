@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="WeaponCostume" load_steps=3 format=3 uid="uid://q68mneifjek2"]
 
-[ext_resource type="PackedScene" uid="uid://chsj82irsedw6" path="res://Resources/Weapons/Eleos/Costumes/Base/Eleos_base.tscn" id="1_6ctsv"]
+[ext_resource type="PackedScene" uid="uid://chsj82irsedw6" path="res://Resources/Weapons/Eleos/Costumes/Eleos_base.tscn" id="1_6ctsv"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/WeaponCostume.cs" id="2_efaeu"]
 
 [resource]

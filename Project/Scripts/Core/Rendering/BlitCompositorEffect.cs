@@ -6,7 +6,6 @@ using SevenDev.Utility;
 [Tool]
 [GlobalClass]
 public partial class BlitCompositorEffect : BaseCompositorEffect {
-	private RenderingDevice? renderingDevice;
 	private Rid nearestSampler;
 
 
@@ -15,7 +14,7 @@ public partial class BlitCompositorEffect : BaseCompositorEffect {
 		set {
 			_shaderFile = value;
 
-			if (renderingDevice is not null) {
+			if (RenderingDevice is not null) {
 				Destruct();
 				Construct();
 			}
@@ -59,7 +58,7 @@ public partial class BlitCompositorEffect : BaseCompositorEffect {
 
 	public override void _RenderCallback(int effectCallbackType, RenderData renderData) {
 		base._RenderCallback(effectCallbackType, renderData);
-		if (renderingDevice is null || ShaderFile is null) return;
+		if (RenderingDevice is null || ShaderFile is null) return;
 
 		if (effectCallbackType != (long)EffectCallbackTypeEnum.PostTransparent) return;
 
@@ -73,17 +72,17 @@ public partial class BlitCompositorEffect : BaseCompositorEffect {
 		uint yGroups = (uint)((renderSize.Y - 1) / 8) + 1;
 
 
-		renderingDevice.DrawCommandBeginLabel("Test Label", new Color(1f, 1f, 1f));
+		RenderingDevice.DrawCommandBeginLabel("Test Label", new Color(1f, 1f, 1f));
 
 		for (uint view = 0; view < sceneBuffers.GetViewCount(); view++) {
-			long computeList = renderingDevice.ComputeListBegin();
-			renderingDevice.ComputeListBindComputePipeline(computeList, computePipeline);
-			renderingDevice.ComputeListBindColor(computeList, shader, sceneBuffers, view, 0);
-			renderingDevice.ComputeListBindDepth(computeList, shader, sceneBuffers, view, nearestSampler, 1);
-			renderingDevice.ComputeListDispatch(computeList, xGroups, yGroups, 1);
-			renderingDevice.ComputeListEnd();
+			long computeList = RenderingDevice.ComputeListBegin();
+			RenderingDevice.ComputeListBindComputePipeline(computeList, computePipeline);
+			RenderingDevice.ComputeListBindColor(computeList, shader, sceneBuffers, view, 0);
+			RenderingDevice.ComputeListBindDepth(computeList, shader, sceneBuffers, view, nearestSampler, 1);
+			RenderingDevice.ComputeListDispatch(computeList, xGroups, yGroups, 1);
+			RenderingDevice.ComputeListEnd();
 		}
 
-		renderingDevice.DrawCommandEndLabel();
+		RenderingDevice.DrawCommandEndLabel();
 	}
 }

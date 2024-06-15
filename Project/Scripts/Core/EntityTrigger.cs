@@ -1,23 +1,17 @@
 namespace LandlessSkies.Core;
 
 using Godot;
+using SevenDev.Utility;
 
-public abstract partial class EntityTrigger : Area3D {
+
+public abstract partial class EntityTrigger : DetectorArea3D<Entity> {
 	[Signal] public delegate void EntityEnteredEventHandler(Entity entity);
 
 
-	private void OnBodyEntered(Node3D body) {
-		if (body is Entity entity) {
-			OnEntityEntered(entity);
-			EmitSignal(SignalName.EntityEntered, entity);
-		}
+	protected sealed override void OnTargetEntered(Entity target) {
+		EmitSignal(SignalName.EntityEntered, target);
+		OnEntityEntered(target);
 	}
 
 	protected abstract void OnEntityEntered(Entity entity);
-
-
-	public override void _Ready() {
-		base._Ready();
-		BodyEntered += OnBodyEntered;
-	}
 }

@@ -15,15 +15,20 @@ public abstract partial class EntityBehaviour : Node, IPlayerHandler {
 
 	public virtual bool Move(Vector3 direction) => true;
 
-	public virtual void Start(EntityBehaviour? previousBehaviour) {
+	public void Start(EntityBehaviour? previousBehaviour) {
 		ProcessMode = ProcessModeEnum.Inherit;
+		_Start(previousBehaviour);
 	}
-	public virtual void Stop() {
+	public void Stop() {
+		_Stop();
 		ProcessMode = ProcessModeEnum.Disabled;
 		Callable.From(DisavowPlayer).CallDeferred();
 	}
 
-	public virtual void HandlePlayer(Player player) { }
+	protected abstract void _Start(EntityBehaviour? previousBehaviour);
+	protected abstract void _Stop();
 
+
+	public virtual void HandlePlayer(Player player) { }
 	public virtual void DisavowPlayer() { }
 }

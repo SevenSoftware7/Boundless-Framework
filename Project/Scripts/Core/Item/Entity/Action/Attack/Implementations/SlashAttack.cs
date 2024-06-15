@@ -2,15 +2,14 @@ namespace LandlessSkies.Core;
 
 using Godot;
 
-public sealed partial class SlashAttack(Entity entity, SingleWeapon weapon) : Attack(entity, weapon) {
-	public override bool IsCancellable => false;
-	public override bool IsKnockable => true;
+public sealed partial class SlashAttack(Entity entity, SingleWeapon weapon, StringName library) : AnimationAttack(entity, weapon, library) {
+	private static readonly StringName Attack = "Slash";
+
+	protected override StringName AnimationName => Attack;
 
 
-
-	public override void _Ready() {
-		base._Ready();
+	protected override void _Start() {
+		base._Start();
 		GD.Print($"{Weapon.DisplayName} Slash Attack");
-		QueueFree();
 	}
 }

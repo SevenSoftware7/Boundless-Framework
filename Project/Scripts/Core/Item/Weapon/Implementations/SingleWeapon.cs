@@ -2,27 +2,25 @@ namespace LandlessSkies.Core;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Godot;
 using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public abstract partial class SingleWeapon : Weapon, /* ICostumable<WeaponCostume>,  */IUIObject {
+public abstract partial class SingleWeapon : Weapon, IUIObject, IPlayerHandler {
+	[Export] private AnimationLibrary? animationLibrary;
+	private AnimationPlayer? animPlayer;
+
 	[Export] private string _displayName = string.Empty;
 	public override string DisplayName => _displayName;
 	public override Texture2D? DisplayPortrait => CostumeHolder?.Costume?.DisplayPortrait;
 
 
 	[ExportGroup("Costume")]
-	// [Export] public WeaponCostume? Costume {
-	// 	get => _costume;
-	// 	set => SetCostume(value);
-	// }
-	// private WeaponCostume? _costume;
 	[Export] public CostumeHolder? CostumeHolder;
 
 
+	protected StringName LibraryName => animationLibrary?.GetFileName() ?? "";
 
 	public override int Style {
 		get => _style;
@@ -47,6 +45,27 @@ public abstract partial class SingleWeapon : Weapon, /* ICostumable<WeaponCostum
 	}
 
 	public override ISaveData<Weapon> Save() => new SingleWeaponSaveData<SingleWeapon>(this);
+
+	public virtual void HandlePlayer(Player player) {
+		if (animPlayer is null && player.Entity?.AnimationPlayer is not null && animationLibrary is not null) {
+			animPlayer = player.Entity.AnimationPlayer;
+
+			GD.Print($"Adding Library {LibraryName}");
+			if (! animPlayer.HasAnimationLibrary(LibraryName)) {
+				animPlayer.AddAnimationLibrary(LibraryName, animationLibrary);
+			}
+		}
+	}
+	public virtual void DisavowPlayer() {
+		if (animPlayer is not null && animationLibrary is not null) {
+			if (animPlayer.HasAnimationLibrary(LibraryName)) {
+				animPlayer.RemoveAnimationLibrary(LibraryName);
+			}
+
+			animPlayer = null;
+		}
+	}
+
 
 	[Serializable]
 	public class SingleWeaponSaveData<T>(T weapon) : SceneSaveData<Weapon>(weapon) where T : SingleWeapon {
