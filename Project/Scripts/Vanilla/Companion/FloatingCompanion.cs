@@ -66,7 +66,7 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 		Subject = Entity.GlobalTransform;
 
 		if (Entity.Skeleton is not null && Entity.Skeleton.TryGetBoneTransform("Head", out Transform3D boneTransform)) {
-			Head = boneTransform;
+			Head = boneTransform.RotatedLocal(Vector3.Up, Mathfs.Deg2Rad(180f));
 		}
 
 		if (OnFace && Entity?.Health is not null) {
@@ -96,7 +96,7 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 		Curve.SetPointOut(0, Head.Basis * new Vector3(0, 0, -0.1f));
 
 		Curve.SetPointIn(1, Head.Basis * new Vector3(RLT * distance * 0.3f, 0, -0.2f));
-		Curve.SetPointPosition(1, Head.Origin);
+		Curve.SetPointPosition(1, Head * new Vector3(0, 0.25f, -0.15f));
 
 		GlobalTransform = GlobalTransform with {
 			Origin = Curve.Sample(0, TFace),

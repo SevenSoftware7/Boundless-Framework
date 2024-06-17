@@ -1427,13 +1427,6 @@ material = SubResource("StandardMaterial3D_k6yo1")
 
 [sub_resource type="Animation" id="Animation_2ppbj"]
 length = 0.001
-tracks/0/type = "rotation_3d"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Skeleton:RightShoulder")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = PackedFloat32Array(0, 1, 0.5, -0.5, -0.5, -0.5)
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_y2wqj"]
 _data = {
@@ -1738,7 +1731,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30201, -4.81285)
 curve = SubResource("Curve3D_1g2j1")
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Environment/Path3D"]
-transform = Transform3D(-0.0922569, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97164e-07, 0.995733, 8.27696e-08, -0.0922569, -1.98959, 0, 2.30373)
+transform = Transform3D(-0.0922568, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97163e-07, 0.995733, 8.27696e-08, -0.0922568, -1.98959, 0, 2.30373)
 script = ExtResource("36_x7xeh")
 
 [node name="AnimatableBody3D" type="AnimatableBody3D" parent="Environment/Path3D/PathFollow3D"]
@@ -1817,7 +1810,7 @@ process_priority = -10
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.62958, 2, 33.2576)
 Weapon = NodePath("Weapon")
 CostumeHolder = NodePath("CostumeHolder")
-Skeleton = NodePath("Skeleton")
+Skeleton = NodePath("Skeleton3D")
 AnimationPlayer = NodePath("AnimationPlayer")
 Health = NodePath("Health")
 
@@ -1827,40 +1820,43 @@ libraries = {
 "NemesisAnimations": ExtResource("14_7p876")
 }
 
+[node name="Skeleton3D" parent="Eos" index="2"]
+bones/3/position = Vector3(1.90482e-10, 0.203409, -0.0297329)
+
 [node name="CostumeHolder" parent="Eos" index="4" node_paths=PackedStringArray("Model")]
 Model = NodePath("Model - Eos (base)")
 
 [node name="Weapon" type="Node3D" parent="Eos" node_paths=PackedStringArray("MainWeapon", "Skeleton")]
-transform = Transform3D(8.74228e-08, -7.64274e-15, -1, 1, -8.74228e-08, 8.74228e-08, -8.74228e-08, -1, 0, 1.11649, 2.61582, 0.0329742)
+transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.09278, 2.61968, -0.0690575)
 script = ExtResource("11_uqmxm")
 MainWeapon = NodePath("Main")
-Skeleton = NodePath("../Skeleton")
+Skeleton = NodePath("../Skeleton3D")
 
 [node name="Main" type="Node3D" parent="Eos/Weapon" node_paths=PackedStringArray("Weapons", "Skeleton")]
-transform = Transform3D(1, 0, 0, -7.10543e-15, 1, 0, 7.10543e-15, 0, 1, 0, 0, 0)
+transform = Transform3D(1, 0, 1.01037e-15, 7.10543e-15, 1, -1.42109e-14, -6.09506e-15, 1.42109e-14, 1, 0, 0, 0)
 script = ExtResource("13_d6cna")
 Weapons = [NodePath("Epiphron"), NodePath("Nemesis"), NodePath("Eleos")]
-Skeleton = NodePath("../../Skeleton")
+Skeleton = NodePath("../../Skeleton3D")
 
 [node name="Epiphron" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton") instance=ExtResource("12_1jl3t")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, -7.405e-29, -2.01948e-28, 1, 0, 0, 0)
-Skeleton = NodePath("../../../Skeleton")
+transform = Transform3D(1, 0, 1.01037e-15, 0, 1, 1.42109e-14, 1.01037e-15, -1.42109e-14, 1, 0, 0, 0)
+Skeleton = NodePath("../../../Skeleton3D")
 
 [node name="Nemesis" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton") instance=ExtResource("15_x4bcq")]
 process_mode = 4
 transform = Transform3D(1, 0, 0, 0, 1, 0, -7.405e-29, -2.01948e-28, 1, 0, 0, 0)
 visible = false
-Skeleton = NodePath("../../../Skeleton")
+Skeleton = NodePath("../../../Skeleton3D")
 
 [node name="Eleos" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton") instance=ExtResource("17_jhoyp")]
 process_mode = 4
 transform = Transform3D(1, 0, 0, 0, 1, 0, -7.405e-29, -2.01948e-28, 1, 0, 0, 0)
 visible = false
-Skeleton = NodePath("../../../Skeleton")
+Skeleton = NodePath("../../../Skeleton3D")
 
 [node name="Erebos" parent="Eos" node_paths=PackedStringArray("Entity", "Skeleton") instance=ExtResource("26_ds8t8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.82647, 2.89861, 0)
 Entity = NodePath("..")
-Skeleton = NodePath("Erebos Skeleton")
+Skeleton = NodePath("Skeleton")
 
 [editable path="Eos"]

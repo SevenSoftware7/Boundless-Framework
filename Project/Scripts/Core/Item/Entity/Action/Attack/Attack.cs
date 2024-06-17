@@ -40,6 +40,12 @@ public abstract partial class Attack(Entity entity, SingleWeapon Weapon) : Entit
 				Size = size,
 			}
 		}.ParentTo(damageArea);
+
+		new MeshInstance3D() {
+			Mesh = new BoxMesh() {
+				Size = size
+			}
+		}.ParentTo(damageArea);
 	}
 
 

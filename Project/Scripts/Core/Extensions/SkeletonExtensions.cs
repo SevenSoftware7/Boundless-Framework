@@ -38,7 +38,7 @@ public static class SkeletonExtensions {
 
 
 		Transform3D pose = skeleton.GetBoneGlobalPose(boneIndex);
-		return new Transform3D(skeleton.GlobalTransform.Basis * pose.Basis, skeleton.ToGlobal(pose.Origin));
+		return skeleton.GlobalTransform * pose;
 	}
 	public static bool TryGetBoneTransform(this Skeleton3D skeleton, StringName boneName, out Transform3D transform) {
 		transform = Transform3D.Identity;
@@ -51,7 +51,7 @@ public static class SkeletonExtensions {
 
 
 		Transform3D pose = skeleton.GetBoneGlobalPose(boneIndex);
-		transform = new Transform3D(skeleton.GlobalTransform.Basis * pose.Basis, skeleton.ToGlobal(pose.Origin));
+		transform = skeleton.GlobalTransform * pose;
 		return true;
 	}
 }

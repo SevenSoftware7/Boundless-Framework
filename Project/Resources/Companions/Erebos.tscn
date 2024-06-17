@@ -14,12 +14,12 @@ up_vector_enabled = false
 
 [node name="Erebos" type="Node3D" node_paths=PackedStringArray("Skeleton")]
 script = ExtResource("1_1r20i")
-CollisionMask = 5
 Curve = SubResource("Curve3D_11sy3")
 DisplayName = "Erebos"
-Skeleton = NodePath("Erebos Skeleton")
+Skeleton = NodePath("Skeleton")
 
-[node name="Erebos Skeleton" type="Skeleton3D" parent="."]
+[node name="Skeleton" type="Skeleton3D" parent="."]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
 
 [node name="CostumeHolder" type="Node3D" parent="." node_paths=PackedStringArray("Model")]
 script = ExtResource("2_iwojg")

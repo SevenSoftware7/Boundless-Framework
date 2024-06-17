@@ -8,8 +8,8 @@ using SevenDev.Utility;
 [Tool]
 [GlobalClass]
 public abstract partial class Weapon : Node3D, IWeapon, IInjectable<Skeleton3D?>, IInjectable<Handedness>, ISaveable<Weapon>, ICustomizable {
-	public static readonly Basis rightHandBoneBasis = Basis.FromEuler(new(Mathfs.Deg2Rad(-90f), 0f, Mathfs.Deg2Rad(90f)));
-	public static readonly Basis leftHandBoneBasis = Basis.FromEuler(new(Mathfs.Deg2Rad(-90f), 0f, Mathfs.Deg2Rad(-90f)));
+	public static readonly Basis rightHandBoneBasis = Basis.FromEuler(new(Mathfs.Deg2Rad(-90f), 0f, Mathfs.Deg2Rad(-90f)));
+	public static readonly Basis leftHandBoneBasis = Basis.FromEuler(new(Mathfs.Deg2Rad(-90f), 0f, Mathfs.Deg2Rad(90f)));
 
 
 	[ExportGroup("Dependencies")]
