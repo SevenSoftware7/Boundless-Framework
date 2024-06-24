@@ -6,6 +6,7 @@ using Godot;
 using SevenDev.Utility;
 
 public abstract partial class Attack(Entity entity, Weapon Weapon) : EntityAction(entity) {
+	protected readonly List<DamageArea3D> activeHitBoxes = [];
 	public Weapon Weapon { get; private set; } = Weapon;
 
 	protected static StringName GetAnimationPath(StringName library, StringName attack) => library.IsEmpty ? attack : $"{library}/{attack}";
@@ -31,7 +32,10 @@ public abstract partial class Attack(Entity entity, Weapon Weapon) : EntityActio
 
 
 	public virtual DamageArea3D CreateHurtArea(float damage, ulong lifeTime) {
-		return new DamageArea3D(Entity as IDamageDealer, damage, lifeTime);
+		DamageArea3D area = new(Entity as IDamageDealer, damage, lifeTime);
+		area.OnDestroy += () => activeHitBoxes.Remove(area);
+		activeHitBoxes.Add(area);
+		return area;
 	}
 
 	public virtual void AddCollisionShapes(DamageArea3D damageArea, Vector3 size) {
@@ -58,8 +62,14 @@ public abstract partial class Attack(Entity entity, Weapon Weapon) : EntityActio
 		Parry = 1 << 3,
 		Explosive = 1 << 4,
 	}
-}
 
+
+	public static class Comparers {
+		public static readonly IComparer<AttackInfo> PureDamage = new ComparisonComparer<AttackInfo>(
+			(a, b) => a?.PotentialDamage.CompareTo(b?.PotentialDamage ?? 0) ?? 0
+		);
+	}
+}
 
 
 public static class AttackExtensions {
@@ -72,13 +82,5 @@ public static class AttackExtensions {
 		int weightedIndex = Mathf.RoundToInt(GD.Randf() * skillMargin);
 
 		return attacks[weightedIndex];
-	}
-
-
-
-	public static class Priorities {
-		public static readonly IComparer<AttackInfo> PureDamage = new ComparisonComparer<AttackInfo>(
-			(a, b) => a?.PotentialDamage.CompareTo(b?.PotentialDamage ?? 0) ?? 0
-		);
 	}
 }

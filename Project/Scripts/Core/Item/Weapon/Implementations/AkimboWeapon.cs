@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using SevenDev.Utility;
+
 
 [Tool]
 [GlobalClass]
@@ -35,14 +37,14 @@ public sealed partial class AkimboWeapon : Node, IWeapon, IInjectionInterceptor<
 
 
 	private AkimboWeapon() : base() { }
-	public AkimboWeapon(IWeapon mainWeapon, IWeapon sideWeapon) : this() {
+	public AkimboWeapon(IWeapon? mainWeapon, IWeapon? sideWeapon) : this() {
 		MainWeapon = mainWeapon;
+		if (MainWeapon is Node mainWeaponNode) mainWeaponNode.ParentTo(this);
+
 		SideWeapon = sideWeapon;
+		if (SideWeapon is Node sideWeaponNode) sideWeaponNode.ParentTo(this);
 	}
-	public AkimboWeapon(ISaveData<IWeapon>? mainSave, ISaveData<IWeapon>? sideSave) : this() {
-		MainWeapon = mainSave?.Load();
-		SideWeapon = sideSave?.Load();
-	}
+	public AkimboWeapon(ISaveData<IWeapon>? mainWeaponSave, ISaveData<IWeapon>? sideWeaponSave) : this(mainWeaponSave?.Load(), sideWeaponSave?.Load()) { }
 
 
 
@@ -95,7 +97,9 @@ public sealed partial class AkimboWeapon : Node, IWeapon, IInjectionInterceptor<
 		base._Notification(what);
 		switch ((ulong)what) {
 		case NotificationChildOrderChanged:
-			UpdateWeapons();
+			if (IsNodeReady()) {
+				UpdateWeapons();
+			}
 			break;
 		}
 	}
@@ -108,11 +112,10 @@ public sealed partial class AkimboWeapon : Node, IWeapon, IInjectionInterceptor<
 
 
 	[Serializable]
-	public class AkimboWeaponSaveData(AkimboWeapon akimbo) : ISaveData<IWeapon> {
+	public class AkimboWeaponSaveData(AkimboWeapon akimbo) : ISaveData<AkimboWeapon> {
 		private readonly ISaveData<IWeapon>? MainWeaponSave = akimbo.MainWeapon?.Save();
 		private readonly ISaveData<IWeapon>? SideWeaponSave = akimbo.SideWeapon?.Save();
 
-		IWeapon? ISaveData<IWeapon>.Load() => Load();
 		public AkimboWeapon Load() {
 			return new AkimboWeapon(MainWeaponSave, SideWeaponSave);
 		}

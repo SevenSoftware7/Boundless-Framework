@@ -12,6 +12,8 @@ public partial class DamageArea3D : Area3D {
 	public TimeDuration? LifeTime;
 	[Export] public bool SelfDamage = false;
 
+	[Signal] public delegate void OnDestroyEventHandler();
+
 
 	public DamageArea3D() : base() {
 		CollisionLayer = Collisions.Damage;
@@ -66,6 +68,7 @@ public partial class DamageArea3D : Area3D {
 
 
 		if (LifeTime.IsDone) {
+			EmitSignal(SignalName.OnDestroy);
 			QueueFree();
 		}
 	}

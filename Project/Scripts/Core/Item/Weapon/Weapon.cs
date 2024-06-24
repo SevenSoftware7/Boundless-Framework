@@ -8,7 +8,7 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public abstract partial class Weapon : Node3D, IWeapon, IUIObject, IPlayerHandler, IInjectable<Skeleton3D?>, IInjectable<Handedness> {
+public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, IPlayerHandler, IInjectable<Skeleton3D?>, IInjectable<Handedness> {
 	public static readonly Basis rightHandBoneBasis = Basis.FromEuler(new(Mathfs.Deg2Rad(-90f), 0f, Mathfs.Deg2Rad(-90f)));
 	public static readonly Basis leftHandBoneBasis = Basis.FromEuler(new(Mathfs.Deg2Rad(-90f), 0f, Mathfs.Deg2Rad(90f)));
 
@@ -57,7 +57,7 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, IPlayerHandle
 
 
 	[ExportGroup("Costume")]
-	[Export] public CostumeHolder? CostumeHolder;
+	[Export] public CostumeHolder? CostumeHolder { get; set; }
 
 
 	[ExportGroup("Dependencies")]
@@ -89,7 +89,7 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, IPlayerHandle
 
 	public abstract IEnumerable<AttackBuilder> GetAttacks(Entity target);
 
-	public ISaveData<IWeapon> Save() => (ISaveData<IWeapon>) new SingleWeaponSaveData<Weapon>(this);
+	public ISaveData<IWeapon> Save() => new WeaponSaveData<Weapon>(this);
 
 	public virtual void Inject(Skeleton3D? skeleton) => Skeleton = skeleton;
 	public virtual void Inject(Handedness handedness) => Handedness = handedness;
@@ -164,27 +164,7 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, IPlayerHandle
 
 
 	[Serializable]
-	public class SingleWeaponSaveData<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] T>(T weapon) : SceneSaveData<T>(weapon) where T : Weapon {
-		public string? CostumePath = weapon.CostumeHolder?.Costume?.ResourcePath;
+	public class WeaponSaveData<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] T>(T weapon) : CostumableSaveData<T, WeaponCostume>(weapon) where T : Weapon {
 
-		public override T? Load() {
-			if (base.Load() is not T weapon) return null;
-
-			if (CostumePath is not null) {
-				WeaponCostume? costume = ResourceLoader.Load<WeaponCostume>(CostumePath);
-				weapon.CostumeHolder = new CostumeHolder(costume).ParentTo(weapon);
-			}
-
-			return weapon;
-		}
-		// protected override WeaponCostume? GetCostume(T data) => data.Costume;
-		// protected override void SetCostume(T data, WeaponCostume? costume) => data.Costume = costume;
-
-
-		// public override SingleWeapon? Load() {
-		// 	if (base.Load() is not SingleWeapon weapon) return null;
-
-		// 	return base.Load();
-		// }
 	}
 }

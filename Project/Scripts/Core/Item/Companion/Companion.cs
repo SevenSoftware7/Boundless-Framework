@@ -7,7 +7,7 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class Companion : Node3D, IUIObject, ICustomizable, ISaveable<Companion>, IInjectionProvider<Skeleton3D?> {
+public partial class Companion : Node3D, IUIObject, ICustomizable, ICostumable, ISaveable<Companion>, IInjectionProvider<Skeleton3D?> {
 	[Export] public string DisplayName { get; private set; } = string.Empty;
 	public Texture2D? DisplayPortrait => CostumeHolder?.Costume?.DisplayPortrait;
 
@@ -23,7 +23,7 @@ public partial class Companion : Node3D, IUIObject, ICustomizable, ISaveable<Com
 	private Skeleton3D? _skeleton;
 
 	[ExportGroup("Costume")]
-	[Export] public CostumeHolder? CostumeHolder;
+	[Export] public CostumeHolder? CostumeHolder { get; set; }
 
 
 	[Signal] public delegate void CostumeChangedEventHandler(CompanionCostume? newCostume, CompanionCostume? oldCostume);
@@ -52,18 +52,7 @@ public partial class Companion : Node3D, IUIObject, ICustomizable, ISaveable<Com
 
 
 	[Serializable]
-	public class CompanionSaveData<T>(T companion) : SceneSaveData<Companion>(companion) where T : Companion {
-		public string? CostumePath = companion.CostumeHolder?.Costume?.ResourcePath;
+	public class CompanionSaveData<T>(T companion) : CostumableSaveData<Companion, CompanionCostume>(companion) where T : Companion {
 
-		public override Companion? Load() {
-			if (base.Load() is not Companion companion) return null;
-
-			if (CostumePath is not null) {
-				CompanionCostume? costume = ResourceLoader.Load<CompanionCostume>(CostumePath);
-				companion.CostumeHolder = new CostumeHolder(costume).ParentTo(companion);
-			}
-
-			return companion;
-		}
 	}
 }

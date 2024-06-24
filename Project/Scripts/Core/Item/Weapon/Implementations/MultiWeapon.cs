@@ -45,11 +45,9 @@ public sealed partial class MultiWeapon : Node, IWeapon, ISerializationListener,
 
 	private MultiWeapon() : base() { }
 	public MultiWeapon(IEnumerable<IWeapon?> weapons) : this() {
-		Callable.From(() => {
-			foreach (Node weaponNode in weapons.OfType<Node>()) {
-				weaponNode.ParentTo(weaponNode);
-			}
-		});
+		foreach (Node weaponNode in weapons.OfType<Node>()) {
+			weaponNode.SetOwnerAndParent(this);
+		}
 	}
 	public MultiWeapon(ImmutableArray<ISaveData<IWeapon>> weaponSaves) : this(weaponSaves.Select(save => save.Load())) { }
 
@@ -130,7 +128,9 @@ public sealed partial class MultiWeapon : Node, IWeapon, ISerializationListener,
 		base._Notification(what);
 		switch ((ulong)what) {
 		case NotificationChildOrderChanged:
-			UpdateWeapons();
+			if (IsNodeReady()) {
+				UpdateWeapons();
+			}
 			break;
 		}
 	}
@@ -142,12 +142,12 @@ public sealed partial class MultiWeapon : Node, IWeapon, ISerializationListener,
 	}
 
 	[Serializable]
-	public class MultiWeaponSaveData(IEnumerable<IWeapon> weapons) : ISaveData<IWeapon> {
+	public class MultiWeaponSaveData(IEnumerable<IWeapon> weapons) : ISaveData<MultiWeapon> {
 		private readonly ISaveData<IWeapon>[] WeaponSaves = weapons
 			.Select(w => w.Save())
 			.ToArray();
 
-		IWeapon? ISaveData<IWeapon>.Load() => Load();
+
 		public MultiWeapon Load() {
 			return new MultiWeapon([.. WeaponSaves]);
 		}

@@ -3,7 +3,6 @@ namespace LandlessSkies.Core;
 using System.Collections.Generic;
 using Godot;
 
-
 public interface IWeapon : ICustomizable, ISaveable<IWeapon>, IInjectable<WeaponHolsterState> {
 	WeaponHolsterState HolsterState { get; set; }
 

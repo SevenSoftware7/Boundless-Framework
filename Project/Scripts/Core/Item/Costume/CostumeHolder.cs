@@ -27,7 +27,7 @@ public partial class CostumeHolder : Node3D {
 
 		_costume = newCostume;
 
-		/* Callable.From<bool>( */Load/* ).CallDeferred */(true);
+		Load(true);
 	}
 
 	public void Load(bool forceReload = false) {

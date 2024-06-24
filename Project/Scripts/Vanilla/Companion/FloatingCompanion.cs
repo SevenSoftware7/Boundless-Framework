@@ -20,7 +20,7 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 	public Basis HoveringRotation { get; private set; } = Basis.Identity;
 
 
-	[Export] public Entity? Entity { get; private set; }
+	public Entity? Entity { get; private set; }
 
 	[Export] public float T { get; private set; }
 	[Export] public float TFace { get; private set; }

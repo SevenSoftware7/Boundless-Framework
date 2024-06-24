@@ -9,7 +9,7 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICustomizable, ISaveable<Entity>, IInjectionProvider<Skeleton3D?>, IInjectionProvider<Handedness> {
+public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICostumable, ICustomizable, ISaveable<Entity>, IInjectionProvider<Skeleton3D?>, IInjectionProvider<Handedness> {
 	private readonly List<Vector3> standableSurfaceBuffer = [];
 	private const int STANDABLE_SURFACE_BUFFER_SIZE = 20;
 	private GaugeControl? healthBar;
@@ -34,7 +34,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICus
 
 
 	[ExportGroup("Costume")]
-	[Export] public CostumeHolder? CostumeHolder;
+	[Export] public CostumeHolder? CostumeHolder { get; set; }
 
 
 	[ExportGroup("Dependencies")]
@@ -105,6 +105,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICus
 		get => Transform.Basis.Inverse() * _globalForward;
 		set => _globalForward = Transform.Basis * value;
 	}
+
 
 	[Signal] public delegate void DeathEventHandler(float fromHealth);
 
@@ -333,19 +334,13 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICus
 	Handedness IInjectionProvider<Handedness>.GetInjection() => Handedness;
 
 	[Serializable]
-	public class EntitySaveData<T>(T entity) : SceneSaveData<Entity>(entity) where T : Entity {
-		public string? CostumePath = entity.CostumeHolder?.Costume?.ResourcePath;
+	public class EntitySaveData<T>(T entity) : CostumableSaveData<Entity, EntityCostume>(entity) where T : Entity {
 		public ISaveData[] MiscData = [.. entity.GetChildren().OfType<ISaveable>().Select(d => d.Save())];
 
 		public override T? Load() {
 			if (base.Load() is not T entity) return null;
 
 			MiscData.ForEach(d => (d.Load() as Node)?.ParentTo(entity));
-
-			if (CostumePath is not null) {
-				EntityCostume? costume = ResourceLoader.Load<EntityCostume>(CostumePath);
-				entity.CostumeHolder = new CostumeHolder(costume).ParentTo(entity);
-			}
 
 			return entity;
 		}
