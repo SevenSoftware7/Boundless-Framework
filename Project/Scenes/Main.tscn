@@ -1,4 +1,4 @@
-[gd_scene load_steps=95 format=3 uid="uid://b505xodur2iff"]
+[gd_scene load_steps=92 format=3 uid="uid://b505xodur2iff"]
 
 [ext_resource type="RDShaderFile" uid="uid://caumal2txsxfx" path="res://Resources/Rendering/Shaders/UnderwaterEffect.glsl" id="1_eyihr"]
 [ext_resource type="PackedScene" uid="uid://bxcpbr13uyeh1" path="res://Resources/Entities/Bike/Bike.tscn" id="1_pikp0"]
@@ -11,7 +11,6 @@
 [ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/Implementations/AkimboWeapon.cs" id="11_uqmxm"]
 [ext_resource type="PackedScene" uid="uid://fbs6dr24ss3g" path="res://Resources/Weapons/Epiphron/Epiphron.tscn" id="12_1jl3t"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/Implementations/MultiWeapon.cs" id="13_d6cna"]
-[ext_resource type="AnimationLibrary" uid="uid://caafq3ok75ukn" path="res://Resources/Weapons/Nemesis/NemesisAnimations.tres" id="14_7p876"]
 [ext_resource type="PackedScene" uid="uid://b7b17ebmgtrfy" path="res://Resources/Weapons/Nemesis/Nemesis.tscn" id="15_x4bcq"]
 [ext_resource type="Script" path="res://Scripts/Core/Water/WaterInstance.cs" id="17_awsp8"]
 [ext_resource type="PackedScene" uid="uid://bp1e6thwkkcrr" path="res://Resources/Weapons/Eleos/Eleos.tscn" id="17_jhoyp"]
@@ -1425,14 +1424,6 @@ albedo_color = Color(0.025, 0, 0.75, 0.498039)
 [sub_resource type="SphereMesh" id="SphereMesh_nkuww"]
 material = SubResource("StandardMaterial3D_k6yo1")
 
-[sub_resource type="Animation" id="Animation_2ppbj"]
-length = 0.001
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_y2wqj"]
-_data = {
-"RESET": SubResource("Animation_2ppbj")
-}
-
 [node name="Node3D" type="Node3D"]
 
 [node name="Environment" type="Node" parent="."]
@@ -1805,15 +1796,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.99529, 2, 34.5791)
 process_priority = -10
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.62958, 2, 33.2576)
 
-[node name="AnimationPlayer" parent="Eos" index="1"]
-libraries = {
-"": SubResource("AnimationLibrary_y2wqj"),
-"NemesisAnimations": ExtResource("14_7p876")
-}
-
-[node name="Skeleton3D" parent="Eos" index="2"]
-bones/3/position = Vector3(1.90482e-10, 0.203409, -0.0297329)
-
 [node name="Weapon" type="Node" parent="Eos"]
 script = ExtResource("11_uqmxm")
 
@@ -1837,5 +1819,3 @@ Skeleton = NodePath("../../../Skeleton3D")
 [node name="Erebos" parent="Eos" node_paths=PackedStringArray("Entity") instance=ExtResource("26_ds8t8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.82647, 2.89861, 0)
 Entity = NodePath("..")
-
-[editable path="Eos"]
