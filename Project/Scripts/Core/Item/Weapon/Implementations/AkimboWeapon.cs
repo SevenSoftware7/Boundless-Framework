@@ -4,114 +4,115 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public sealed partial class AkimboWeapon : Weapon, IInjectionInterceptor<Handedness> {
-	[Export] public Weapon? MainWeapon {
-		get => _mainWeapon;
-		set {
-			if (_mainWeapon == value) return;
+public sealed partial class AkimboWeapon : Node, IWeapon, IInjectionInterceptor<Handedness>, ISerializationListener {
+	public IWeapon? MainWeapon { get; private set; }
+	public IWeapon? SideWeapon { get; private set; }
 
-			_mainWeapon = value?.SafeReparentTo(this);
-			_mainWeapon?.GetParent().MoveChild(_mainWeapon, 0);
-		}
-	}
-	private Weapon? _mainWeapon;
+	public WeaponHolsterState HolsterState { get; set; } = WeaponHolsterState.Unholstered;
+	public WeaponType Type => MainWeapon?.Type ?? 0;
+	public WeaponUsage Usage => MainWeapon?.Usage ?? 0;
+	public WeaponSize Size => MainWeapon?.Size ?? 0;
 
-	[Export] public Weapon? SideWeapon {
-		get => _sideWeapon;
-		set {
-			if (_sideWeapon == value) return;
-
-			_sideWeapon = value?.SafeReparentTo(this);
-			_sideWeapon?.GetParent().MoveChild(_sideWeapon, 1);
-		}
-	}
-	private Weapon? _sideWeapon;
-
-	public override int StyleCount => (_mainWeapon?.StyleCount ?? base.StyleCount) + (_sideWeapon is null ? 0 : 1);
-
-	public override int Style {
+	public int Style {
 		get => MainWeapon?.Style ?? 0;
 		set {
-			if (_mainWeapon is not null && value < _mainWeapon.StyleCount) {
-				_mainWeapon.Style = value;
+			if (MainWeapon is not null && value < MainWeapon.StyleCount) {
+				MainWeapon.Style = value;
 			}
-			else if (_sideWeapon is not null && value == StyleCount - 1) {
-				_sideWeapon.Style++;
+			else if (SideWeapon is not null && value == StyleCount - 1) {
+				SideWeapon.Style++;
 			}
 		}
 	}
+	public int StyleCount => (MainWeapon?.StyleCount ?? 1) + (SideWeapon is null ? 0 : 1);
 
-	public override string DisplayName => MainWeapon?.DisplayName ?? string.Empty;
-	public override Texture2D? DisplayPortrait => MainWeapon?.DisplayPortrait;
-
-	public override IWeapon.Type WeaponType => MainWeapon?.WeaponType ?? 0;
-	public override IWeapon.Usage WeaponUsage => MainWeapon?.WeaponUsage ?? 0;
-	public override IWeapon.Size WeaponSize => MainWeapon?.WeaponSize ?? 0;
+	public string DisplayName => MainWeapon?.DisplayName ?? string.Empty;
+	public Texture2D? DisplayPortrait => MainWeapon?.DisplayPortrait;
 
 
 
 	private AkimboWeapon() : base() { }
-	public AkimboWeapon(Weapon mainWeapon, Weapon sideWeapon) : this() {
+	public AkimboWeapon(IWeapon mainWeapon, IWeapon sideWeapon) : this() {
 		MainWeapon = mainWeapon;
 		SideWeapon = sideWeapon;
 	}
-	public AkimboWeapon(ISaveData<Weapon>? mainSave, ISaveData<Weapon>? sideSave) : this() {
+	public AkimboWeapon(ISaveData<IWeapon>? mainSave, ISaveData<IWeapon>? sideSave) : this() {
 		MainWeapon = mainSave?.Load();
 		SideWeapon = sideSave?.Load();
 	}
 
 
 
-	public override List<ICustomizable> GetSubCustomizables() {
-		List<ICustomizable> list = base.GetSubCustomizables();
-		if (_mainWeapon is not null) list.Add(_mainWeapon);
-		if (_sideWeapon is not null) list.Add(_sideWeapon);
+	public List<ICustomization> GetCustomizations() => [];
+	public List<ICustomizable> GetSubCustomizables() {
+		List<ICustomizable> list = [];
+		if (MainWeapon is not null) list.Add(MainWeapon);
+		if (SideWeapon is not null) list.Add(SideWeapon);
 		return list;
 	}
 
-	public override IEnumerable<AttackBuilder> GetAttacks(Entity target) {
-		Weapon? currentWeapon = MainWeapon;
-		return new List<Weapon?>() {_mainWeapon, _sideWeapon}
-			.OfType<Weapon>()
+	public IEnumerable<AttackBuilder> GetAttacks(Entity target) {
+		IWeapon? currentWeapon = MainWeapon;
+		return new List<IWeapon?>() {MainWeapon, SideWeapon}
+			.OfType<IWeapon>()
 			.SelectMany(w => w.GetAttacks(target));
 	}
 
-
-	public Handedness Intercept(Node child) {
-		if (child == _sideWeapon) {
-			return Handedness.Reverse();
+	public Handedness Intercept(Node child, Handedness value) {
+		if (child == SideWeapon) {
+			return value.Reverse();
 		}
-		return Handedness;
+		return value;
 	}
 
+	public ISaveData<IWeapon> Save() {
+		return new AkimboWeaponSaveData(this);
+	}
+
+
+	private void UpdateWeapons() {
+		IWeapon[] weapons = GetChildren().OfType<IWeapon>().ToArray();
+		MainWeapon = weapons.Length > 0 ? weapons[0] : null;
+		if (MainWeapon is Node nodeMainWeapon) {
+			nodeMainWeapon.Name = "Main";
+		}
+
+		SideWeapon = weapons.Length > 1 ? weapons[1] : null;
+		if (SideWeapon is Node nodeSideWeapon) {
+			nodeSideWeapon.Name = "Side";
+		}
+	}
+
+
+	public override void _Ready() {
+		base._Ready();
+		UpdateWeapons();
+	}
 	public override void _Notification(int what) {
 		base._Notification(what);
 		switch ((ulong)what) {
 		case NotificationChildOrderChanged:
-			Weapon[] weapons = GetChildren().OfType<Weapon>().ToArray();
-			Callable.From(() => {
-				MainWeapon = weapons.Length > 0 ? weapons[0] : null;
-				SideWeapon = weapons.Length > 1 ? weapons[1] : null;
-			}).CallDeferred();
+			UpdateWeapons();
 			break;
 		}
 	}
 
+	public void OnBeforeSerialize() { }
 
-	public override AkimboWeaponSaveData Save() {
-		return new AkimboWeaponSaveData(this);
+	public void OnAfterDeserialize() {
+		UpdateWeapons();
 	}
 
-	[Serializable]
-	public class AkimboWeaponSaveData(AkimboWeapon akimbo) : ISaveData<Weapon> {
-		private readonly ISaveData<Weapon>? MainWeaponSave = akimbo.MainWeapon?.Save();
-		private readonly ISaveData<Weapon>? SideWeaponSave = akimbo.SideWeapon?.Save();
 
-		Weapon? ISaveData<Weapon>.Load() => Load();
+	[Serializable]
+	public class AkimboWeaponSaveData(AkimboWeapon akimbo) : ISaveData<IWeapon> {
+		private readonly ISaveData<IWeapon>? MainWeaponSave = akimbo.MainWeapon?.Save();
+		private readonly ISaveData<IWeapon>? SideWeaponSave = akimbo.SideWeapon?.Save();
+
+		IWeapon? ISaveData<IWeapon>.Load() => Load();
 		public AkimboWeapon Load() {
 			return new AkimboWeapon(MainWeaponSave, SideWeaponSave);
 		}

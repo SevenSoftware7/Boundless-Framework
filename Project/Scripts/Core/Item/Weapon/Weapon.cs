@@ -1,43 +1,119 @@
 namespace LandlessSkies.Core;
 
+using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
+using System.Diagnostics.CodeAnalysis;
 using Godot;
 using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public abstract partial class Weapon : Node3D, IWeapon, IInjectable<Skeleton3D?>, IInjectable<Handedness>, ISaveable<Weapon>, ICustomizable {
+public abstract partial class Weapon : Node3D, IWeapon, IUIObject, IPlayerHandler, IInjectable<Skeleton3D?>, IInjectable<Handedness> {
 	public static readonly Basis rightHandBoneBasis = Basis.FromEuler(new(Mathfs.Deg2Rad(-90f), 0f, Mathfs.Deg2Rad(-90f)));
 	public static readonly Basis leftHandBoneBasis = Basis.FromEuler(new(Mathfs.Deg2Rad(-90f), 0f, Mathfs.Deg2Rad(90f)));
 
 
+	public WeaponHolsterState HolsterState {
+		get => _holsterState;
+		set {
+			_holsterState = value;
+			if (_holsterState.IsHolstered) {
+				CostumeHolder?.Disable();
+			}
+			else {
+				CostumeHolder?.Enable();
+			}
+		}
+	}
+	private WeaponHolsterState _holsterState = WeaponHolsterState.Unholstered;
+
+	[Export] protected bool IsHolstered {
+		get => HolsterState.IsHolstered;
+		private set => HolsterState = value;
+	}
+
+	public abstract WeaponType Type { get; }
+	public abstract WeaponUsage Usage { get; }
+	public abstract WeaponSize Size { get; }
+
+
+	[Export] public AnimationLibrary? AnimationLibrary {
+		get => _animationLibrary;
+		set {
+			_animationLibrary = value;
+			LibraryName = _animationLibrary?.GetFileName() ?? "";
+		}
+	}
+	private AnimationLibrary? _animationLibrary;
+	protected StringName LibraryName { get; private set; } = "";
+
+	private AnimationPlayer? animPlayer;
+
+
+	[Export] private string _displayName = string.Empty;
+	public string DisplayName => _displayName;
+
+	public Texture2D? DisplayPortrait => CostumeHolder?.Costume?.DisplayPortrait;
+
+
+	[ExportGroup("Costume")]
+	[Export] public CostumeHolder? CostumeHolder;
+
+
 	[ExportGroup("Dependencies")]
-	[Export] public virtual Handedness Handedness {
-		get => _handedness;
-		protected set => _handedness = value;
+	[Export] public virtual Handedness Handedness { get; protected set; }
+	[Export] public virtual Skeleton3D? Skeleton { get; protected set; }
+
+	public int Style {
+		get => _style;
+		set => _style = value % (StyleCount + 1);
 	}
-	private Handedness _handedness = Handedness.Right;
+	private int _style;
+	public virtual int StyleCount => 1;
 
-	[Export] public virtual Skeleton3D? Skeleton {
-		get => _skeleton;
-		protected set => _skeleton = value;
+	[Signal] public delegate void CostumeChangedEventHandler(WeaponCostume? newCostume, WeaponCostume? oldCostume);
+
+
+	protected Weapon() : base() { }
+	public Weapon(WeaponCostume? costume = null) {
+		CostumeHolder = new CostumeHolder(costume).ParentTo(this);
 	}
-	private Skeleton3D? _skeleton;
-
-	public virtual bool OnHand => true;
 
 
-	public virtual int StyleCount { get; } = 1;
-	public abstract int Style { get; set; }
+	public virtual List<ICustomization> GetCustomizations() => [];
+	public List<ICustomizable> GetSubCustomizables() {
+		List<ICustomizable> list = [];
+		if (CostumeHolder?.Model is not null) list.Add(CostumeHolder.Model);
+		return list;
+	}
 
-	public abstract IWeapon.Type WeaponType { get; }
-	public abstract IWeapon.Usage WeaponUsage { get; }
-	public abstract IWeapon.Size WeaponSize { get; }
+	public abstract IEnumerable<AttackBuilder> GetAttacks(Entity target);
+
+	public ISaveData<IWeapon> Save() => (ISaveData<IWeapon>) new SingleWeaponSaveData<Weapon>(this);
+
+	public virtual void Inject(Skeleton3D? skeleton) => Skeleton = skeleton;
+	public virtual void Inject(Handedness handedness) => Handedness = handedness;
 
 
-	public abstract string DisplayName { get; }
-	public abstract Texture2D? DisplayPortrait { get; }
+	public virtual void HandlePlayer(Player player) {
+		if (animPlayer is null && player.Entity?.AnimationPlayer is not null && AnimationLibrary is not null) {
+			animPlayer = player.Entity.AnimationPlayer;
+
+			GD.Print($"Adding Library {LibraryName}");
+			if (! animPlayer.HasAnimationLibrary(LibraryName)) {
+				animPlayer.AddAnimationLibrary(LibraryName, AnimationLibrary);
+			}
+		}
+	}
+	public virtual void DisavowPlayer() {
+		if (animPlayer is not null && AnimationLibrary is not null) {
+			if (animPlayer.HasAnimationLibrary(LibraryName)) {
+				animPlayer.RemoveAnimationLibrary(LibraryName);
+			}
+
+			animPlayer = null;
+		}
+	}
 
 
 	private void StickToSkeletonBone() {
@@ -65,34 +141,50 @@ public abstract partial class Weapon : Node3D, IWeapon, IInjectable<Skeleton3D?>
 		GlobalTransform = Skeleton.GlobalTransform;
 	}
 
-	public abstract IEnumerable<AttackBuilder> GetAttacks(Entity target);
-
-
-	public virtual List<ICustomization> GetCustomizations() => [];
-	public virtual List<ICustomizable> GetSubCustomizables() => [];
-
-	public abstract ISaveData<Weapon> Save();
-
-	public virtual void Inject(Skeleton3D? skeleton) => Skeleton = skeleton;
-	public virtual void Inject(Handedness handedness) => Handedness = handedness;
-
-	public override void _Process(double delta) {
-		base._Process(delta);
-
-		if (OnHand) {
-			StickToSkeletonBone();
-		}
-	}
 
 	public override void _Notification(int what) {
 		base._Notification(what);
 		switch ((ulong) what) {
-		case NotificationParented:
+		case NotificationPathRenamed:
 			if (IsNodeReady()) {
 				this.RequestInjection<Skeleton3D?>();
 				this.RequestInjection<Handedness>();
 			}
 			break;
 		}
+	}
+
+	public override void _Process(double delta) {
+		base._Process(delta);
+
+		if (/* OnHand */true) {
+			StickToSkeletonBone();
+		}
+	}
+
+
+	[Serializable]
+	public class SingleWeaponSaveData<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] T>(T weapon) : SceneSaveData<T>(weapon) where T : Weapon {
+		public string? CostumePath = weapon.CostumeHolder?.Costume?.ResourcePath;
+
+		public override T? Load() {
+			if (base.Load() is not T weapon) return null;
+
+			if (CostumePath is not null) {
+				WeaponCostume? costume = ResourceLoader.Load<WeaponCostume>(CostumePath);
+				weapon.CostumeHolder = new CostumeHolder(costume).ParentTo(weapon);
+			}
+
+			return weapon;
+		}
+		// protected override WeaponCostume? GetCostume(T data) => data.Costume;
+		// protected override void SetCostume(T data, WeaponCostume? costume) => data.Costume = costume;
+
+
+		// public override SingleWeapon? Load() {
+		// 	if (base.Load() is not SingleWeapon weapon) return null;
+
+		// 	return base.Load();
+		// }
 	}
 }

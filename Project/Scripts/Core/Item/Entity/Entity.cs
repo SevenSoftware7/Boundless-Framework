@@ -340,7 +340,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICus
 		public override T? Load() {
 			if (base.Load() is not T entity) return null;
 
-			MiscData.ForEach(d => d.Load()?.ParentTo(entity));
+			MiscData.ForEach(d => (d.Load() as Node)?.ParentTo(entity));
 
 			if (CostumePath is not null) {
 				EntityCostume? costume = ResourceLoader.Load<EntityCostume>(CostumePath);

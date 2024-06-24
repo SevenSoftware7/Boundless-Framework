@@ -6,8 +6,7 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public sealed partial class EleosWeapon : SingleWeapon, IPlayerHandler {
-	private static readonly StringName LibName = "Eleos";
+public sealed partial class EleosWeapon : Weapon, IPlayerHandler {
 
 	private readonly CompositeChargeAttackInfo chargeAttack = new(
 		SlashAttackInfo.Instance,
@@ -17,11 +16,9 @@ public sealed partial class EleosWeapon : SingleWeapon, IPlayerHandler {
 		[new PercentileModifier(Attributes.GenericMoveSpeed, -0.7f), new PercentileModifier(Attributes.GenericjumpHeight, -0.5f)]
 	);
 
-	public override IWeapon.Type WeaponType => IWeapon.Type.Sword;
-	public override IWeapon.Usage WeaponUsage => IWeapon.Usage.Slash | IWeapon.Usage.Thrust;
-	public override IWeapon.Size WeaponSize => IWeapon.Size.OneHanded | IWeapon.Size.TwoHanded;
-
-	// protected override StringName LibraryName => LibName;
+	public override WeaponType Type => WeaponType.Sword;
+	public override WeaponUsage Usage => WeaponUsage.Slash | WeaponUsage.Thrust;
+	public override WeaponSize Size => WeaponSize.OneHanded | WeaponSize.TwoHanded;
 
 
 	private EleosWeapon() : base() { }
@@ -37,6 +34,7 @@ public sealed partial class EleosWeapon : SingleWeapon, IPlayerHandler {
 
 	public override void HandlePlayer(Player player) {
 		base.HandlePlayer(player);
+		if (IsHolstered) return;
 		if (player.Entity is null) return;
 
 		switch (player.Entity.CurrentBehaviour) {

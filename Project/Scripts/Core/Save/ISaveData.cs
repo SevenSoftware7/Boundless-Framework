@@ -3,10 +3,10 @@ using Godot;
 namespace LandlessSkies.Core;
 
 public interface ISaveData {
-	Node? Load();
+	object? Load();
 }
 
-public interface ISaveData<T> : ISaveData where T : Node {
-	Node? ISaveData.Load() => Load();
+public interface ISaveData<T> : ISaveData {
+	object? ISaveData.Load() => Load();
 	new T? Load();
 }

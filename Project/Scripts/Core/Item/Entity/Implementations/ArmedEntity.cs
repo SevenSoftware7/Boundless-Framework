@@ -10,16 +10,16 @@ public partial class ArmedEntity : Entity, IDamageDealer {
 	private readonly List<int> styleSwitchBuffer = [];
 
 	[ExportGroup("Weapon")]
-	[Export] public Weapon? Weapon {
+	public IWeapon? Weapon {
 		get => _weapon;
 		set {
 			_weapon = value;
-			if (_weapon is not null) {
-				_weapon.Name = PropertyName.Weapon;
+			if (_weapon is Node nodeWeapon) {
+				nodeWeapon.Name = "Weapon";
 			}
 		}
 	}
-	private Weapon? _weapon;
+	private IWeapon? _weapon;
 
 
 	public override void HandlePlayer(Player player) {
@@ -85,7 +85,7 @@ public partial class ArmedEntity : Entity, IDamageDealer {
 		base._Notification(what);
 		switch ((ulong)what) {
 		case NotificationChildOrderChanged:
-			Weapon = GetChildren().OfType<Weapon>().FirstOrDefault();
+			Weapon = GetChildren().OfType<IWeapon>().FirstOrDefault();
 			break;
 		}
 	}

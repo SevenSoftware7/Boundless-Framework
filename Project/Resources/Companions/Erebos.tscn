@@ -12,11 +12,12 @@ _data = {
 point_count = 2
 up_vector_enabled = false
 
-[node name="Erebos" type="Node3D" node_paths=PackedStringArray("Skeleton")]
+[node name="Erebos" type="Node3D" node_paths=PackedStringArray("Skeleton", "CostumeHolder")]
 script = ExtResource("1_1r20i")
 Curve = SubResource("Curve3D_11sy3")
 DisplayName = "Erebos"
 Skeleton = NodePath("Skeleton")
+CostumeHolder = NodePath("CostumeHolder")
 
 [node name="Skeleton" type="Skeleton3D" parent="."]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)

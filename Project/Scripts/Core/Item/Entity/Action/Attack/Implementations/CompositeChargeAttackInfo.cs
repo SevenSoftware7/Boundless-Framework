@@ -18,7 +18,7 @@ public class CompositeChargeAttackInfo(
 
 
 
-	public void ExecuteOnKeyJustPressed(Player player, SingleWeapon weapon, StringName library) {
+	public void ExecuteOnKeyJustPressed(Player player, Weapon weapon, StringName library) {
 		if (player.InputDevice.IsActionJustPressed(ActionKey)) {
 			player?.Entity?.ExecuteAction(new AttackBuilder(this, weapon, library));
 		}
@@ -26,7 +26,7 @@ public class CompositeChargeAttackInfo(
 
 
 
-	protected internal override CompositeChargeAttack Create(Entity entity, SingleWeapon weapon, StringName library) {
+	protected internal override CompositeChargeAttack Create(Entity entity, Weapon weapon, StringName library) {
 		return new CompositeChargeAttack(entity, weapon, library, this, Modifiers);
 	}
 }

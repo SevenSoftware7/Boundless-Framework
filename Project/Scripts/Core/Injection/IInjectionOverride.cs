@@ -3,5 +3,5 @@ namespace LandlessSkies.Core;
 using Godot;
 
 public interface IInjectionInterceptor<T> {
-	public T Intercept(Node child);
+	public T Intercept(Node child, T value);
 }

@@ -89,13 +89,13 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 
 
 		// Curve to Face
-		float RLT = T * 2f - 1f;
-		float distance = HoveringPosition.DistanceTo(Head.Origin);
+		float LeftRightT = T * 2f - 1f;
+		float distance = HoveringPosition.DistanceSquaredTo(Head.Origin);
 
 		Curve.SetPointPosition(0, HoveringPosition);
 		Curve.SetPointOut(0, Head.Basis * new Vector3(0, 0, -0.1f));
 
-		Curve.SetPointIn(1, Head.Basis * new Vector3(RLT * distance * 0.3f, 0, -0.2f));
+		Curve.SetPointIn(1, Head.Basis * new Vector3(LeftRightT * distance * 0.3f, 0, -0.2f));
 		Curve.SetPointPosition(1, Head * new Vector3(0, 0.25f, -0.15f));
 
 		GlobalTransform = GlobalTransform with {

@@ -6,14 +6,10 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public sealed partial class EpiphronWeapon : SingleWeapon, IPlayerHandler {
-	private static readonly StringName LibName = "Epiphron";
-
-	public override IWeapon.Type WeaponType => IWeapon.Type.Sword;
-	public override IWeapon.Usage WeaponUsage => IWeapon.Usage.Slash | IWeapon.Usage.Thrust;
-	public override IWeapon.Size WeaponSize => IWeapon.Size.OneHanded;
-
-	// protected override StringName LibraryName => LibName;
+public sealed partial class EpiphronWeapon : Weapon, IPlayerHandler {
+	public override WeaponType Type => WeaponType.Sword;
+	public override WeaponUsage Usage => WeaponUsage.Slash | WeaponUsage.Thrust;
+	public override WeaponSize Size => WeaponSize.OneHanded;
 
 
 	private EpiphronWeapon() : base() { }
@@ -29,6 +25,7 @@ public sealed partial class EpiphronWeapon : SingleWeapon, IPlayerHandler {
 
 	public override void HandlePlayer(Player player) {
 		base.HandlePlayer(player);
+		if (IsHolstered) return;
 		if (player.Entity is null) return;
 
 		switch (player.Entity.CurrentBehaviour) {

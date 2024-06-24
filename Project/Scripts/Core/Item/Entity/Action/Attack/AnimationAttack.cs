@@ -3,7 +3,7 @@ namespace LandlessSkies.Core;
 using System;
 using Godot;
 
-public abstract partial class AnimationAttack(Entity entity, SingleWeapon weapon, StringName library) : Attack(entity, weapon) {
+public abstract partial class AnimationAttack(Entity entity, Weapon weapon, StringName library) : Attack(entity, weapon) {
 	public override bool IsCancellable => false;
 	public override bool IsKnockable => true;
 

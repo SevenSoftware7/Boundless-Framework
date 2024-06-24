@@ -2,7 +2,7 @@ namespace LandlessSkies.Core;
 
 using SevenDev.Utility;
 
-public abstract partial class ChargeAttack(Entity entity, SingleWeapon weapon, ulong chargeDuration = 1000) : Attack(entity, weapon), IPlayerHandler {
+public abstract partial class ChargeAttack(Entity entity, Weapon weapon, ulong chargeDuration = 1000) : Attack(entity, weapon), IPlayerHandler {
 	public override bool IsCancellable => true;
 	public override bool IsKnockable => true;
 
