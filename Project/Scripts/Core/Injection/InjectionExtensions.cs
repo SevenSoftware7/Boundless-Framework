@@ -6,24 +6,19 @@ public static class InjectionExtensions {
 	public static void PropagateInject<T>(this IInjectionProvider<T> parent) {
 		if (parent is not Node nodeParent) return;
 
-		T value = parent.GetInjection();
-		if (parent is IInjectable<T> injectableParent) injectableParent.Inject(value);
-
-		foreach (Node child in nodeParent.GetChildren()) {
-			T childValue = parent is IInjectionInterceptor<T> injectorParent ? injectorParent.Intercept(child, value) : value;
-			child.PropagateInject(childValue);
-		}
+		nodeParent.PropagateInject(parent.GetInjection(), true);
 	}
 
-	public static void PropagateInject<T>(this Node parent, T value) {
+	public static void PropagateInject<T>(this Node parent, T value, bool ignoreParentBlocker = false) {
 		if (parent is IInjectable<T> injectableParent) injectableParent.Inject(value);
-		IInjectionInterceptor<T>? injectorParent = parent as IInjectionInterceptor<T>;
+
+		IInjectionInterceptor<T>? interceptorParent = parent as IInjectionInterceptor<T>;
 		IInjectionBlocker<T>? blockerParent = parent as IInjectionBlocker<T>;
 
 		foreach (Node child in parent.GetChildren()) {
-			if (blockerParent is not null && blockerParent.ShouldBlock(parent, value)) continue;
+			if (! ignoreParentBlocker && blockerParent is not null && blockerParent.ShouldBlock(parent, value)) continue;
 
-			T childValue = injectorParent is not null ? injectorParent.Intercept(child, value) : value;
+			T childValue = interceptorParent is not null ? interceptorParent.Intercept(child, value) : value;
 			child.PropagateInject(childValue);
 		}
 	}
@@ -35,11 +30,10 @@ public static class InjectionExtensions {
 		requester.Inject(default!);
 		nodeRequester.PropagateInject<T>(default!);
 
-		nodeRequester.GetParent().RequestInjection<T>();
+		nodeRequester.GetParent()?.RequestInjection<T>();
 	}
 
 	private static void RequestInjection<T>(this Node requester) {
-		if (requester is null) return;
 		if (requester is not IInjectionProvider<T> provider) {
 			requester.GetParent().RequestInjection<T>();
 			return;
