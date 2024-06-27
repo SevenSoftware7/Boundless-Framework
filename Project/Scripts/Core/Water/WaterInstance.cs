@@ -57,7 +57,7 @@ public sealed partial class WaterInstance : MeshInstance3D, ISerializationListen
 	public void OnBeforeSerialize() { }
 
 	public void OnAfterDeserialize() {
-		// Callable.From(() => Mesh.Changed += OnMeshChanged).CallDeferred();
+		Callable.From(() => Mesh.Changed += OnMeshChanged).CallDeferred();
 		// Mesh.Changed += OnMeshChanged;
 	}
 }

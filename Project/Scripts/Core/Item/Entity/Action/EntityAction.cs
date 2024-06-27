@@ -2,9 +2,10 @@ namespace LandlessSkies.Core;
 
 using System;
 using Godot;
+using SevenDev.Utility;
+
 
 public abstract partial class EntityAction : Node {
-	private bool isStarted = false;
 	public readonly SevenDev.Utility.Timer Lifetime = new();
 
 	[Export] public Entity Entity;
@@ -20,20 +21,14 @@ public abstract partial class EntityAction : Node {
 	}
 
 	public void Start() {
-		if (isStarted) return;
-
 		OnStart?.Invoke();
 		_Start();
-
-		isStarted = true;
 	}
 	public void Stop() {
 		OnStop?.Invoke();
 		_Stop();
 
-		if (! IsQueuedForDeletion()) {
-			QueueFree();
-		}
+		this.UnparentAndQueueFree();
 	}
 
 	protected abstract void _Start();
@@ -43,7 +38,6 @@ public abstract partial class EntityAction : Node {
 	public override void _Notification(int what) {
 		base._Notification(what);
 		if (what == NotificationPredelete) {
-			Stop();
 		}
 	}
 }

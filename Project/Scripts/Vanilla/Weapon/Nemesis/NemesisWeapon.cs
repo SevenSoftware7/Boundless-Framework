@@ -36,7 +36,4 @@ public sealed partial class NemesisWeapon : Weapon, IPlayerHandler {
 			break;
 		}
 	}
-	public override void DisavowPlayer() {
-		base.DisavowPlayer();
-	}
 }

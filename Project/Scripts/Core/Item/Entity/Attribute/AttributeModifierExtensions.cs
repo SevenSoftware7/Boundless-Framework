@@ -8,7 +8,7 @@ public static class AttributeModifierExtensions {
 
 	public static float ApplyTo(this IEnumerable<AttributeModifier> modifiers, StringName attributeName, float baseValue) {
 		float result = baseValue;
-		modifiers = modifiers.Where(a => a.Name == attributeName);
+		modifiers = modifiers.Distinct().Where(a => a.Name == attributeName);
 
 		IEnumerable<IAttributeModifier> nonStackingAttributes = modifiers.Where(a => ! a.IsStacking);
 		foreach (IAttributeModifier attribute in nonStackingAttributes) {

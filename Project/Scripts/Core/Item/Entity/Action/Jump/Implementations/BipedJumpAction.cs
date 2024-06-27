@@ -4,8 +4,9 @@ using SevenDev.Utility;
 namespace LandlessSkies.Core;
 
 public partial class BipedJumpAction : JumpAction, IPlayerHandler {
-	public const float JUMP_HEIGHT_FRACTION = 0.35f;
-	private float maxDistance = EntityStats.DEFAULT_JUMP_HEIGHT * JUMP_HEIGHT_FRACTION;
+	public const float INITIAL_JUMP_HEIGHT_FRACTION = 2f / 3f;
+
+	private float maxDistance = EntityStats.DEFAULT_JUMP_HEIGHT * (1f - INITIAL_JUMP_HEIGHT_FRACTION);
 	private float remainingDistance = 1f;
 
 	public override bool IsCancellable => true;
@@ -18,7 +19,7 @@ public partial class BipedJumpAction : JumpAction, IPlayerHandler {
 
 	public void HandlePlayer(Player player) {
 		if (! player.InputDevice.IsActionPressed(Inputs.Jump)) {
-			QueueFree();
+			Stop();
 			return;
 		}
 	}
@@ -28,8 +29,9 @@ public partial class BipedJumpAction : JumpAction, IPlayerHandler {
 	protected override void _Start() {
 		float jumpHeight = Entity.AttributeModifiers.ApplyTo(Attributes.GenericjumpHeight, Entity.Stats.JumpHeight);
 
-		Entity.Inertia = Entity.Inertia.SlideOnFace(Direction) + Direction * jumpHeight;
-		maxDistance = jumpHeight * JUMP_HEIGHT_FRACTION;
+		float initialJumpHeight = jumpHeight * INITIAL_JUMP_HEIGHT_FRACTION;
+		Entity.Inertia = Entity.Inertia.SlideOnFace(Direction) + Direction * initialJumpHeight;
+		maxDistance = jumpHeight - initialJumpHeight;
 	}
 
 	protected override void _Stop() { }
@@ -39,10 +41,10 @@ public partial class BipedJumpAction : JumpAction, IPlayerHandler {
 		base._Process(delta);
 
 		if (remainingDistance <= 0 || Entity.IsOnFloor()) {
-			QueueFree();
+			Stop();
 		}
 
-		if (Lifetime > 150) {
+		if (maxDistance != 0) {
 			float travelDistance = Mathf.Min(maxDistance * (float)delta * 5f, remainingDistance * maxDistance);
 			Entity.Inertia += Direction * travelDistance;
 			remainingDistance -= travelDistance / maxDistance;

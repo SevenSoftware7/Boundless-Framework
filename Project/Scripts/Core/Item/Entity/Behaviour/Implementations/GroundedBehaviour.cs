@@ -3,7 +3,7 @@ namespace LandlessSkies.Core;
 using Godot;
 using SevenDev.Utility;
 
-public abstract partial class GroundedBehaviour : EntityBehaviour {
+public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandler {
 	protected JumpActionInfo? JumpAction { get; init; }
 	protected Vector3 _inputDirection;
 
@@ -24,14 +24,15 @@ public abstract partial class GroundedBehaviour : EntityBehaviour {
 
 		Entity.MotionMode = CharacterBody3D.MotionModeEnum.Grounded;
 	}
-	protected override void _Stop() { }
+	protected override void _Stop() {
+		DisavowPlayer();
+	}
 
 
-	public override void HandlePlayer(Player player) {
-		base.HandlePlayer(player);
+	public virtual void HandlePlayer(Player player) {
 		if (Entity is null) return;
 
-		if (player.InputDevice.IsActionPressed(Inputs.Jump)) {
+		if (player.InputDevice.IsActionJustPressed(Inputs.Jump)) {
 			Jump();
 		}
 
@@ -45,8 +46,7 @@ public abstract partial class GroundedBehaviour : EntityBehaviour {
 		Move(groundedMovement);
 	}
 
-	public override void DisavowPlayer() {
-		base.DisavowPlayer();
+	public virtual void DisavowPlayer() {
 		_inputDirection = Vector3.Zero;
 	}
 
@@ -103,10 +103,10 @@ public abstract partial class GroundedBehaviour : EntityBehaviour {
 		if (Entity is null) return verticalInertia;
 		if (Entity.IsOnFloor()) return verticalInertia.SlideOnFace(Entity.UpDirection);
 
-		const float fallSpeed = 32f;
+		float fallSpeed = Entity.AttributeModifiers.ApplyTo(Attributes.GenericGravity, 32f);
 
 		float fallInertia = verticalInertia.Dot(-Entity.UpDirection);
-		Vector3 targetInertia = -Entity.UpDirection * Mathf.Max(fallSpeed, fallInertia);
+		Vector3 targetInertia = -Entity.UpDirection * fallSpeed;
 
 		if (verticalInertia.IsEqualApprox(targetInertia)) return verticalInertia;
 
@@ -126,12 +126,11 @@ public abstract partial class GroundedBehaviour : EntityBehaviour {
 			coyoteTimer.Start();
 		}
 
-		if (! jumpBuffer.IsDone && jumpCooldown.IsDone && !coyoteTimer.IsDone) {
-			if (JumpAction is not null) {
-				Entity.ExecuteAction(new JumpActionBuilder(JumpAction, Entity.UpDirection));
+		if (JumpAction is not null && ! jumpBuffer.IsDone && jumpCooldown.IsDone && !coyoteTimer.IsDone) {
+			if (Entity.ExecuteAction(new JumpActionBuilder(JumpAction, Entity.UpDirection))) {
+				jumpBuffer.End();
+				jumpCooldown.Start();
 			}
-			jumpBuffer.End();
-			jumpCooldown.Start();
 		}
 	}
 

@@ -6,7 +6,6 @@ using Godot;
 using SevenDev.Utility;
 
 public abstract partial class Attack(Entity entity, Weapon Weapon) : EntityAction(entity) {
-	protected readonly List<DamageArea3D> activeHitBoxes = [];
 	public Weapon Weapon { get; private set; } = Weapon;
 
 	protected static StringName GetAnimationPath(StringName library, StringName attack) => library.IsEmpty ? attack : $"{library}/{attack}";
@@ -32,10 +31,7 @@ public abstract partial class Attack(Entity entity, Weapon Weapon) : EntityActio
 
 
 	public virtual DamageArea3D CreateHurtArea(float damage, ulong lifeTime) {
-		DamageArea3D area = new(Entity as IDamageDealer, damage, lifeTime);
-		area.OnDestroy += () => activeHitBoxes.Remove(area);
-		activeHitBoxes.Add(area);
-		return area;
+		return new(Entity as IDamageDealer, damage, lifeTime);
 	}
 
 	public virtual void AddCollisionShapes(DamageArea3D damageArea, Vector3 size) {

@@ -10,7 +10,7 @@ public abstract partial class BaseCompositorEffect : CompositorEffect, ISerializ
 
 	public BaseCompositorEffect() : base() {
 		RenderingDevice ??= RenderingServer.GetRenderingDevice();
-		Callable.From(Construct).CallDeferred();
+		/* Callable.From( */Construct/* ).CallDeferred */();
 	}
 
 	public override void _Notification(int what) {

@@ -115,15 +115,15 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 
 		Forward = Vector3.Forward;
 	}
-	public Entity(EntityCostume? costume = null) {
+	public Entity(EntityCostume? costume = null) : base() {
 		CostumeHolder = new CostumeHolder(costume).ParentTo(this);
 	}
 
 
-	public void ExecuteAction(EntityActionBuilder action, bool forceExecute = false) {
-		if (! forceExecute && ! ActionExtensions.CanCancel(CurrentAction)) return;
+	public bool ExecuteAction(EntityActionBuilder action, bool forceExecute = false) {
+		if (! forceExecute && ! Actions.CanCancel(CurrentAction)) return false;
 
-		CurrentAction?.Unparent().Stop();
+		CurrentAction?.Stop();
 		CurrentAction = null;
 
 		action.AfterExecute += () => CurrentAction = null;
@@ -131,6 +131,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 		CurrentAction = action.Build(this).ParentTo(this);
 		CurrentAction.Name = "Action";
 		CurrentAction.Start();
+
+		return true;
 	}
 
 	public void SetBehaviour<TBehaviour>(TBehaviour? behaviour) where TBehaviour : EntityBehaviour {

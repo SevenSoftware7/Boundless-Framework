@@ -14,14 +14,11 @@ public partial class DrivingBehaviour : SittingBehaviour {
 
 
 	protected DrivingBehaviour() : this(null!, null!) { }
-	public DrivingBehaviour(Entity entity, VehicleBehaviour vehicle) : base(entity) { // Can't make Primary Constructor
+	public DrivingBehaviour(Entity entity, VehicleBehaviour vehicle) : base(entity) {
 		Vehicle = vehicle;
 	}
 
 
-	protected override void _Start(EntityBehaviour? oldBehaviour) {
-		base._Start(oldBehaviour);
-	}
 	protected override void _Stop() {
 		base._Stop();
 		if (Entity is null || Vehicle?.Entity is null) return;
@@ -31,13 +28,13 @@ public partial class DrivingBehaviour : SittingBehaviour {
 
 
 	public override void HandlePlayer(Player player) {
-		base.HandlePlayer(player);
+		Vehicle?.HandlePlayer(player); // Do it in this order because player handling is done child-first
 
-		Vehicle?.HandlePlayer(player);
+		base.HandlePlayer(player);
 	}
 	public override void DisavowPlayer() {
-		base.DisavowPlayer();
+		Vehicle?.DisavowPlayer(); // Same here
 
-		Vehicle?.DisavowPlayer();
+		base.DisavowPlayer();
 	}
 }

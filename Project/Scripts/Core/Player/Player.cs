@@ -62,15 +62,11 @@ public sealed partial class Player : Node {
 
 
 		if (_lastEntity != _entity) {
-			_lastEntity?.PropagateAction<IPlayerHandler>(x => x.DisavowPlayer());
+			_lastEntity?.PropagatePlayerDisavowing();
 			_lastEntity = _entity;
 		}
 
-		_entity?.PropagateAction<IPlayerHandler>(x => {
-			if (x is not Node node || node.CanProcess()) {
-				x.HandlePlayer(this);
-			}
-		});
+		_entity?.PropagatePlayerHandling(this);
 	}
 
 	public override void _Ready() {

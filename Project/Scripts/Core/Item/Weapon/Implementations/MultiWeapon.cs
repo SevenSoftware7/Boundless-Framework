@@ -10,7 +10,7 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public sealed partial class MultiWeapon : Node, IWeapon, ISerializationListener, IInjectionInterceptor<WeaponHolsterState> {
+public sealed partial class MultiWeapon : WeaponCollection, IInjectionInterceptor<WeaponHolsterState>, IInjectable<WeaponHolsterState> {
 	private List<IWeapon> _weapons = [];
 	public IWeapon? CurrentWeapon {
 		get => IndexInBounds(_currentIndex) ? _weapons[_currentIndex] : null;
@@ -22,25 +22,18 @@ public sealed partial class MultiWeapon : Node, IWeapon, ISerializationListener,
 		}
 	}
 
+	private WeaponHolsterState HolsterState;
 
-	public WeaponHolsterState HolsterState { get; set; } = WeaponHolsterState.Unholstered;
-	public WeaponType Type => CurrentWeapon?.Type ?? 0;
-	public WeaponUsage Usage => CurrentWeapon?.Usage ?? 0;
-	public WeaponSize Size => CurrentWeapon?.Size ?? 0;
-
-
-	public int StyleCount => Mathf.Max(_weapons.Count, 1);
+	public override int StyleCount => Mathf.Max(_weapons.Count, 1);
 
 	[ExportGroup("Current Weapon")]
-	[Export] public int Style {
+	[Export] public override int Style {
 		get => _currentIndex;
 		set => SwitchTo(value);
 	}
 	private int _currentIndex;
 
-
-	public string DisplayName => CurrentWeapon?.DisplayName ?? string.Empty;
-	public Texture2D? DisplayPortrait => CurrentWeapon?.DisplayPortrait;
+	protected override IWeapon? Weapon => CurrentWeapon;
 
 
 	private MultiWeapon() : base() { }
@@ -88,7 +81,7 @@ public sealed partial class MultiWeapon : Node, IWeapon, ISerializationListener,
 	}
 
 
-	public IEnumerable<AttackBuilder> GetAttacks(Entity target) {
+	public override IEnumerable<AttackBuilder> GetAttacks(Entity target) {
 		IWeapon? currentWeapon = CurrentWeapon;
 		return _weapons
 			.SelectMany((w) => w?.GetAttacks(target) ?? [])
@@ -98,24 +91,27 @@ public sealed partial class MultiWeapon : Node, IWeapon, ISerializationListener,
 					a.AfterExecute += () => SwitchTo(currentWeapon);
 				}
 				return a;
-			});
+			})
+			.Concat(base.GetAttacks(target));
 	}
 
 
+	public void Inject(WeaponHolsterState value) => HolsterState = value;
 	public WeaponHolsterState Intercept(Node child, WeaponHolsterState value) =>
 		child == CurrentWeapon ? value : WeaponHolsterState.Holstered;
 
-	public List<ICustomization> GetCustomizations() => [];
-	public List<ICustomizable> GetSubCustomizables() {
-		List<ICustomizable> list = [];
+
+	public override List<ICustomization> GetCustomizations() => base.GetCustomizations();
+	public override List<ICustomizable> GetSubCustomizables() {
+		List<ICustomizable> list = base.GetSubCustomizables();
 		return [.. list.Concat(_weapons)];
 	}
-	public ISaveData<IWeapon> Save() {
+	public override ISaveData<IWeapon> Save() {
 		return new MultiWeaponSaveData([.. _weapons]);
 	}
 
 
-	private void UpdateWeapons() {
+	protected override void UpdateWeapons() {
 		_weapons = [.. GetChildren().OfType<IWeapon>()];
 		UpdateCurrent();
 	}
@@ -135,11 +131,6 @@ public sealed partial class MultiWeapon : Node, IWeapon, ISerializationListener,
 		}
 	}
 
-	public void OnBeforeSerialize() { }
-
-	public void OnAfterDeserialize() {
-		UpdateWeapons();
-	}
 
 	[Serializable]
 	public class MultiWeaponSaveData(IEnumerable<IWeapon> weapons) : ISaveData<MultiWeapon> {

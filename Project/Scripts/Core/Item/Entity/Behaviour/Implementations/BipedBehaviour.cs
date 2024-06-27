@@ -24,9 +24,11 @@ public partial class BipedBehaviour : GroundedBehaviour {
 
 
 	protected override void _Start(EntityBehaviour? previousBehaviour) {
+		base._Start(previousBehaviour);
 		interactPointer?.Enable();
 	}
 	protected override void _Stop() {
+		base._Stop();
 		interactPrompt?.Update(false);
 		interactPointer?.Disable();
 	}
@@ -61,6 +63,8 @@ public partial class BipedBehaviour : GroundedBehaviour {
 
 		interactPointer?.QueueFree();
 		interactPointer = null;
+
+		_lastDirection = Vector3.Zero;
 	}
 
 	private void HandleInteraction(Player player) {
@@ -120,12 +124,13 @@ public partial class BipedBehaviour : GroundedBehaviour {
 
 
 		// ----- Rotation & Movement -----
+		float rotationSpeed = Entity.AttributeModifiers.ApplyTo(Attributes.GenericTurnSpeed, Entity.Stats.RotationSpeed);
 
 		if (_movementType != MovementType.Idle) {
 			Vector3 normalizedInput = _inputDirection.Normalized();
 
-			_lastDirection = _lastDirection.Lerp(normalizedInput, Entity.Stats.RotationSpeed * floatDelta);
-			Entity.GlobalForward = Entity.GlobalForward.SafeSlerp(normalizedInput, Entity.Stats.RotationSpeed * floatDelta);
+			_lastDirection = _lastDirection.Lerp(normalizedInput, rotationSpeed * floatDelta);
+			Entity.GlobalForward = Entity.GlobalForward.SafeSlerp(normalizedInput, rotationSpeed * floatDelta);
 
 			Entity.Movement = _lastDirection * _moveSpeed * Mathf.Clamp(_lastDirection.Dot(Entity.GlobalForward), 0f, 1f);
 		} else {
@@ -134,7 +139,7 @@ public partial class BipedBehaviour : GroundedBehaviour {
 
 
 		Basis newRotation = Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection);
-		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * Entity.Stats.RotationSpeed);
+		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * rotationSpeed);
 
 		_movementType = MovementType.Idle;
 	}

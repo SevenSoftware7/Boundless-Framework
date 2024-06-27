@@ -1,20 +1,14 @@
 namespace LandlessSkies.Core;
 
 using System.Collections.Generic;
-using Godot;
 
-public interface IWeapon : ICustomizable, ISaveable<IWeapon>, IInjectable<WeaponHolsterState> {
-	WeaponHolsterState HolsterState { get; set; }
-
+public interface IWeapon : ICustomizable, ISaveable<IWeapon> {
 	WeaponType Type { get; }
 	WeaponUsage Usage { get; }
 	WeaponSize Size { get; }
 
-	public abstract int Style { get; set; }
-	public virtual int StyleCount => 1;
-
-
-	void IInjectable<WeaponHolsterState>.Inject(WeaponHolsterState value) => HolsterState = value;
+	abstract int Style { get; set; }
+	virtual int StyleCount => 1;
 
 	IEnumerable<AttackBuilder> GetAttacks(Entity target);
 }

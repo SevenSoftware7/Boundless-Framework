@@ -10,7 +10,7 @@ public partial class EntityStats : Resource {
 	public const float DEFAULT_MAX_HEALTH = 1f;
 	public const float DEFAULT_STEP_HEIGHT = 0.5f;
 	public const float DEFAULT_WEIGHT = 12f;
-	public const float DEFAULT_JUMP_HEIGHT = 15f;
+	public const float DEFAULT_JUMP_HEIGHT = 20f;
 	public const float DEFAULT_ACCELERATION = 50f;
 	public const float DEFAULT_DECELERATION = 35f;
 	public const float DEFAULT_ROTATION_SPEED = 20f;

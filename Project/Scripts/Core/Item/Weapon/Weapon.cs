@@ -8,7 +8,7 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, IPlayerHandler, IInjectable<Skeleton3D?>, IInjectable<Handedness> {
+public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, IPlayerHandler, IInjectable<Skeleton3D?>, IInjectable<Handedness>, IInjectable<WeaponHolsterState> {
 	public static readonly Basis rightHandBoneBasis = Basis.FromEuler(new(Mathfs.Deg2Rad(-90f), 0f, Mathfs.Deg2Rad(-90f)));
 	public static readonly Basis leftHandBoneBasis = Basis.FromEuler(new(Mathfs.Deg2Rad(-90f), 0f, Mathfs.Deg2Rad(90f)));
 
@@ -93,6 +93,7 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 
 	public virtual void Inject(Skeleton3D? skeleton) => Skeleton = skeleton;
 	public virtual void Inject(Handedness handedness) => Handedness = handedness;
+	public virtual void Inject(WeaponHolsterState value) => HolsterState = value;
 
 
 	public virtual void HandlePlayer(Player player) {

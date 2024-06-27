@@ -3,7 +3,7 @@ using Godot;
 namespace LandlessSkies.Core;
 
 public partial class BipedJumpActionInfo : JumpActionInfo {
-	private static readonly float PotentialJumpHeight = 1f + BipedJumpAction.JUMP_HEIGHT_FRACTION;
+	private static readonly float PotentialJumpHeight = 1f;
 	public override float PotentialHeight => PotentialJumpHeight;
 
 

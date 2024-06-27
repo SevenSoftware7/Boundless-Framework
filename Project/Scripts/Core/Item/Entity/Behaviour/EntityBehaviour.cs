@@ -1,15 +1,19 @@
 namespace LandlessSkies.Core;
 
 using Godot;
+using SevenDev.Utility;
 
 [GlobalClass]
-public abstract partial class EntityBehaviour : Node, IPlayerHandler {
+public abstract partial class EntityBehaviour : Node {
 	[Export] public Entity? Entity;
+
+	public bool IsOneTime { get; }
 
 
 	protected EntityBehaviour() : base() { }
-	public EntityBehaviour(Entity entity) : this() {
+	public EntityBehaviour(Entity entity, bool isOneTime = false) : this() {
 		Entity = entity;
+		IsOneTime = isOneTime;
 	}
 
 
@@ -20,15 +24,13 @@ public abstract partial class EntityBehaviour : Node, IPlayerHandler {
 		_Start(previousBehaviour);
 	}
 	public void Stop() {
-		_Stop();
 		ProcessMode = ProcessModeEnum.Disabled;
-		Callable.From(DisavowPlayer).CallDeferred();
+		_Stop();
+		if (IsOneTime) {
+			this.UnparentAndQueueFree();
+		}
 	}
 
 	protected abstract void _Start(EntityBehaviour? previousBehaviour);
 	protected abstract void _Stop();
-
-
-	public virtual void HandlePlayer(Player player) { }
-	public virtual void DisavowPlayer() { }
 }

@@ -233,17 +233,18 @@ public static class NodeExtensions {
 		}
 	}
 
-	public static void PropagateAction<T>(this Node parent, Action<T>? action, bool parentFirst = false) {
-		if (parentFirst && parent is T tParent1) {
-			action?.Invoke(tParent1);
+	public static void PropagateAction<T>(this Node parent, Action<T>? action, bool parentFirst = false) where T : class {
+		T? tParent = parent as T;
+		if (parentFirst && tParent is not null) {
+			action?.Invoke(tParent);
 		}
 
 		foreach (Node child in parent.GetChildren()) {
 			child.PropagateAction(action, parentFirst);
 		}
 
-		if (! parentFirst && parent is T tParent2) {
-			action?.Invoke(tParent2);
+		if (! parentFirst && tParent is not null) {
+			action?.Invoke(tParent);
 		}
 	}
 

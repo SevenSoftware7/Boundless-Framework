@@ -9,16 +9,11 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public sealed partial class AkimboWeapon : Node, IWeapon, IInjectionInterceptor<Handedness>, ISerializationListener {
+public sealed partial class AkimboWeapon : WeaponCollection, IInjectionInterceptor<Handedness> {
 	public IWeapon? MainWeapon { get; private set; }
 	public IWeapon? SideWeapon { get; private set; }
 
-	public WeaponHolsterState HolsterState { get; set; } = WeaponHolsterState.Unholstered;
-	public WeaponType Type => MainWeapon?.Type ?? 0;
-	public WeaponUsage Usage => MainWeapon?.Usage ?? 0;
-	public WeaponSize Size => MainWeapon?.Size ?? 0;
-
-	public int Style {
+	public override int Style {
 		get => MainWeapon?.Style ?? 0;
 		set {
 			if (MainWeapon is not null && value < MainWeapon.StyleCount) {
@@ -29,11 +24,9 @@ public sealed partial class AkimboWeapon : Node, IWeapon, IInjectionInterceptor<
 			}
 		}
 	}
-	public int StyleCount => (MainWeapon?.StyleCount ?? 1) + (SideWeapon is null ? 0 : 1);
+	public override int StyleCount => (MainWeapon?.StyleCount ?? 1) + (SideWeapon is null ? 0 : 1);
 
-	public string DisplayName => MainWeapon?.DisplayName ?? string.Empty;
-	public Texture2D? DisplayPortrait => MainWeapon?.DisplayPortrait;
-
+	protected override IWeapon? Weapon => MainWeapon;
 
 
 	private AkimboWeapon() : base() { }
@@ -48,20 +41,22 @@ public sealed partial class AkimboWeapon : Node, IWeapon, IInjectionInterceptor<
 
 
 
-	public List<ICustomization> GetCustomizations() => [];
-	public List<ICustomizable> GetSubCustomizables() {
-		List<ICustomizable> list = [];
+	public override List<ICustomization> GetCustomizations() => base.GetCustomizations();
+	public override List<ICustomizable> GetSubCustomizables() {
+		List<ICustomizable> list = base.GetSubCustomizables();
 		if (MainWeapon is not null) list.Add(MainWeapon);
 		if (SideWeapon is not null) list.Add(SideWeapon);
 		return list;
 	}
 
-	public IEnumerable<AttackBuilder> GetAttacks(Entity target) {
+	public override IEnumerable<AttackBuilder> GetAttacks(Entity target) {
 		IWeapon? currentWeapon = MainWeapon;
 		return new List<IWeapon?>() {MainWeapon, SideWeapon}
 			.OfType<IWeapon>()
-			.SelectMany(w => w.GetAttacks(target));
+			.SelectMany(w => w.GetAttacks(target))
+			.Concat(base.GetAttacks(target));
 	}
+
 
 	public Handedness Intercept(Node child, Handedness value) {
 		if (child == SideWeapon) {
@@ -70,12 +65,12 @@ public sealed partial class AkimboWeapon : Node, IWeapon, IInjectionInterceptor<
 		return value;
 	}
 
-	public ISaveData<IWeapon> Save() {
+	public override ISaveData<IWeapon> Save() {
 		return new AkimboWeaponSaveData(this);
 	}
 
 
-	private void UpdateWeapons() {
+	protected override void UpdateWeapons() {
 		IWeapon[] weapons = GetChildren().OfType<IWeapon>().ToArray();
 		MainWeapon = weapons.Length > 0 ? weapons[0] : null;
 		if (MainWeapon is Node nodeMainWeapon) {
@@ -86,28 +81,6 @@ public sealed partial class AkimboWeapon : Node, IWeapon, IInjectionInterceptor<
 		if (SideWeapon is Node nodeSideWeapon) {
 			nodeSideWeapon.Name = "Side";
 		}
-	}
-
-
-	public override void _Ready() {
-		base._Ready();
-		UpdateWeapons();
-	}
-	public override void _Notification(int what) {
-		base._Notification(what);
-		switch ((ulong)what) {
-		case NotificationChildOrderChanged:
-			if (IsNodeReady()) {
-				UpdateWeapons();
-			}
-			break;
-		}
-	}
-
-	public void OnBeforeSerialize() { }
-
-	public void OnAfterDeserialize() {
-		UpdateWeapons();
 	}
 
 

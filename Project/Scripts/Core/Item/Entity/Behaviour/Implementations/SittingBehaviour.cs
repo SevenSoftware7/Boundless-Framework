@@ -11,26 +11,25 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 
 
 	protected SittingBehaviour() : base() { }
-	public SittingBehaviour(Entity entity) : base(entity) { }
+	public SittingBehaviour(Entity entity) : base(entity, true) { }
 
 
 	protected override void _Start(EntityBehaviour? previousBehaviour) {
-		if (previousBehaviour is not null && ! previousBehaviour.IsQueuedForDeletion()) {
+		if (previousBehaviour is not null && ! previousBehaviour.IsOneTime) {
 			this.previousBehaviour = previousBehaviour;
 		}
 	}
-
 	protected override void _Stop() {
-		this.UnparentAndQueueFree();
+		DisavowPlayer();
 	}
+
 
 	public void Dismount() {
 		Entity?.SetBehaviour(previousBehaviour);
 	}
 
 
-	public override void HandlePlayer(Player player) {
-		base.HandlePlayer(player);
+	public virtual void HandlePlayer(Player player) {
 		dismountPrompt ??= player.HudManager.AddPrompt(player.Entity?.HudPack.InteractPrompt);
 
 		dismountPrompt?.Update(true, "Dismount", player.InputDevice.GetActionSymbol(Inputs.Interact));
@@ -39,8 +38,7 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 		}
 	}
 
-	public override void DisavowPlayer() {
-		base.DisavowPlayer();
+	public virtual void DisavowPlayer() {
 		dismountPrompt?.Destroy();
 		dismountPrompt = null;
 	}
