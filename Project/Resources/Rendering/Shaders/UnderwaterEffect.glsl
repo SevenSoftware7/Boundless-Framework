@@ -9,7 +9,7 @@ layout(rgba16f, set = 2, binding = 0) uniform restrict readonly image2D water_ma
 
 layout(push_constant, std430) uniform Params {
 	restrict readonly vec2 screen_size; // x: screen width, y: screen height
-	restrict readonly vec2 clipping_planes; // z: near plane, w: far plane
+	restrict readonly vec2 clipping_planes; // x: near plane, y: far plane
 	restrict readonly vec3 water_color; // Color of the Water
 };
 
