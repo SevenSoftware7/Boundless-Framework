@@ -41,7 +41,11 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 	private RDShaderFile? _computeShaderFile;
 	private Rid computeShader;
 
-	private Rid nearestSampler;
+	private Rid displacementSampler;
+	private Rid depthSampler;
+
+	[Export] private Texture2Drd? WaterDisplacementTexture;
+
 
 	private readonly RDAttachmentFormat waterMapAttachmentFormat = new() {
 		Format = RenderingDevice.DataFormat.R32G32B32A32Sfloat,
@@ -76,10 +80,12 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 	public override void _RenderCallback(int effectCallbackType, RenderData renderData) {
 		base._RenderCallback(effectCallbackType, renderData);
 
+		if (WaterDisplacementTexture is null || ! WaterDisplacementTexture.TextureRdRid.IsValid) return;
+
 		// if (effectCallbackType != (long)EffectCallbackTypeEnum.PostTransparent) return;
 		float[] waterMeshVertices = WaterMeshManager.WaterVertices;
 		uint[] waterMeshIndices = WaterMeshManager.WaterIndices;
-		if (waterMeshVertices.Length < 3 || waterMeshIndices.Length < 3) return;
+		if (waterMeshVertices.Length == 0 || waterMeshVertices.Length % 3 != 0 || waterMeshIndices.Length == 0 || waterMeshIndices.Length % 3 != 0) return;
 
 		if (RenderingDevice is null || _renderShaderFile is null || _computeShaderFile is null) return;
 
@@ -104,7 +110,9 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 		if (sceneBuffers.HasTexture(Context, WaterMapName)) {
 			// Reset the Color and Depth textures if their sizes are wrong
 			RDTextureFormat textureFormat = sceneBuffers.GetTextureFormat(Context, WaterMapName);
-			if (textureFormat.Width != renderSize.X || textureFormat.Height != renderSize.Y) {
+			if (textureFormat.Width != renderSize.X || textureFormat.Height != renderSize.Y
+				|| textureFormat.Format != waterMapAttachmentFormat.Format // Should only happen when actively changing the Format in the Editor
+			) {
 				sceneBuffers.ClearContext(Context);
 			}
 		}
@@ -116,9 +124,10 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 		}
 
 
+		(Rid vertexBuffer, Rid vertexArray) = RenderingDevice.VertexArrayCreate(waterMeshVertices, vertexFormat);
+		(Rid indexBuffer, Rid indexArray) = RenderingDevice.IndexArrayCreate(waterMeshIndices);
+
 		Color[] clearColors = [new Color(0, 0, 0, 0)];
-
-
 		for (uint view = 0; view < viewCount; view++) {
 			Rid waterMap = sceneBuffers.GetTextureSlice(Context, WaterMapName, view, 0, 1, 1);
 			Rid waterDepth = sceneBuffers.GetTextureSlice(Context, WaterDepthName, view, 0, 1, 1);
@@ -128,9 +137,6 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			if (! waterBuffer.IsValid) {
 				throw new ArgumentException("Water Mask Frame Buffer is Invalid");
 			}
-
-			(_, Rid vertexArray) = RenderingDevice.VertexArrayCreate(waterMeshVertices, vertexFormat);
-			(_, Rid indexArray) = RenderingDevice.IndexArrayCreate(waterMeshIndices);
 
 
 			Projection projection = sceneData.GetViewProjection(view);
@@ -143,6 +149,12 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			// Eye Offset for fancy VR multi-view
 			Vector3 eyeOffset = sceneData.GetViewEyeOffset(view);
 
+			Dictionary waterScaleSetting = ProjectSettings.GetSetting("shader_globals/water_scale").AsGodotDictionary();
+			float waterScale = waterScaleSetting["value"].As<float>();
+
+			Dictionary waterIntensitySetting = ProjectSettings.GetSetting("shader_globals/water_intensity").AsGodotDictionary();
+			float waterIntensity = waterIntensitySetting["value"].As<float>();
+
 			// Unfolding into a push constant
 			float[] renderPushConstant = [
 				WorldToClip.X.X, WorldToClip.X.Y, WorldToClip.X.Z, WorldToClip.X.W,
@@ -152,6 +164,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 
 				eyeOffset.X, eyeOffset.Y, // Don't pad for these two because they get packed together
 				nearClippingPlane, farClippingPlane,
+				waterScale, waterIntensity, 0, 0,
 
 			];
 			byte[] renderPushConstantBytes = new byte[renderPushConstant.Length * sizeof(float)];
@@ -164,6 +177,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			RenderingDevice.DrawListBindRenderPipeline(drawList, renderPipeline);
 			RenderingDevice.DrawListBindVertexArray(drawList, vertexArray);
 			RenderingDevice.DrawListBindIndexArray(drawList, indexArray);
+			RenderingDevice.DrawListBindSampler(drawList, renderShader, WaterDisplacementTexture.TextureRdRid, displacementSampler, 0);
 			RenderingDevice.DrawListSetPushConstant(drawList, renderPushConstantBytes, (uint)renderPushConstantBytes.Length);
 			RenderingDevice.DrawListDraw(drawList, true, 2);
 			RenderingDevice.DrawListEnd();
@@ -187,19 +201,20 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			long computeList = RenderingDevice.ComputeListBegin();
 			RenderingDevice.ComputeListBindComputePipeline(computeList, computePipeline);
 			RenderingDevice.ComputeListBindColor(computeList, computeShader, sceneBuffers, view, 0);
-			RenderingDevice.ComputeListBindDepth(computeList, computeShader, sceneBuffers, view, nearestSampler, 1);
+			RenderingDevice.ComputeListBindDepth(computeList, computeShader, sceneBuffers, view, depthSampler, 1);
 			RenderingDevice.ComputeListBindImage(computeList, computeShader, waterMap, 2);
 			RenderingDevice.ComputeListSetPushConstant(computeList, computePushConstantBytes, (uint)computePushConstantBytes.Length);
 			RenderingDevice.ComputeListDispatch(computeList, xGroups, yGroups, 1);
 			RenderingDevice.ComputeListEnd();
 			RenderingDevice.DrawCommandEndLabel();
 
-
-			RenderingDevice.FreeRid(vertexArray);
-			RenderingDevice.FreeRid(indexArray);
-
 			RenderingDevice.FreeRid(waterBuffer);
 		}
+
+		RenderingDevice.FreeRid(vertexArray);
+		RenderingDevice.FreeRid(vertexBuffer);
+		RenderingDevice.FreeRid(indexArray);
+		RenderingDevice.FreeRid(indexBuffer);
 	}
 
 
@@ -210,7 +225,15 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 		framebufferFormat = renderingDevice.FramebufferFormatCreate([waterMapAttachmentFormat, waterDepthAttachmentFormat]);
 		vertexFormat = renderingDevice.VertexFormatCreate([vertexAttribute]);
 
-		nearestSampler = renderingDevice.SamplerCreate(new() {
+		displacementSampler = renderingDevice.SamplerCreate(new() {
+			MinFilter = RenderingDevice.SamplerFilter.Linear,
+			MagFilter = RenderingDevice.SamplerFilter.Linear,
+			RepeatU = RenderingDevice.SamplerRepeatMode.Repeat,
+			RepeatV = RenderingDevice.SamplerRepeatMode.Repeat,
+			RepeatW = RenderingDevice.SamplerRepeatMode.Repeat,
+		});
+
+		depthSampler = renderingDevice.SamplerCreate(new() {
 			MinFilter = RenderingDevice.SamplerFilter.Nearest,
 			MagFilter = RenderingDevice.SamplerFilter.Nearest
 		});
@@ -269,8 +292,14 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 
 
 	protected override void DestructBehaviour(RenderingDevice renderingDevice) {
-		if (nearestSampler.IsValid) {
-			renderingDevice.FreeRid(nearestSampler);
+		if (displacementSampler.IsValid) {
+			renderingDevice.FreeRid(displacementSampler);
+			displacementSampler = default;
+		}
+
+		if (depthSampler.IsValid) {
+			renderingDevice.FreeRid(depthSampler);
+			depthSampler = default;
 		}
 
 		if (renderShader.IsValid) {

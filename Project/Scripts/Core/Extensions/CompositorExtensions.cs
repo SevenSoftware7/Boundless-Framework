@@ -131,4 +131,33 @@ public static class CompositorExtensions {
 
 		device.ComputeListBindUniformSet(computeList, set, setIndex);
 	}
+
+
+	public static void DrawListBind(this RenderingDevice device, long drawList, Rid shaderRid, Rid[] ids, RenderingDevice.UniformType uniformType, uint setIndex, int binding = 0) {
+		RDUniform uniform = new RDUniform() {
+			UniformType = uniformType,
+			Binding = binding,
+		}.AddIds(ids);
+
+		device.DrawListBindUniform(drawList, uniform, shaderRid, setIndex);
+	}
+
+	public static void DrawListBindImage(this RenderingDevice device, long drawList, Rid shaderRid, Rid image, uint setIndex, int binding = 0) =>
+		device.DrawListBind(drawList, shaderRid, [image], RenderingDevice.UniformType.Image, setIndex, binding);
+
+	public static void DrawListBindSampler(this RenderingDevice device, long drawList, Rid shaderRid, Rid image, Rid sampler, uint setIndex, int binding = 0) =>
+		device.DrawListBind(drawList, shaderRid, [sampler, image], RenderingDevice.UniformType.SamplerWithTexture, setIndex, binding);
+
+	public static void DrawListBindColor(this RenderingDevice device, long drawList, Rid shaderRid, RenderSceneBuffersRD sceneBuffers, uint view, uint setIndex, int binding = 0) =>
+		device.DrawListBindImage(drawList, shaderRid, sceneBuffers.GetColorLayer(view), setIndex, binding);
+
+	public static void DrawListBindDepth(this RenderingDevice device, long drawList, Rid shaderRid, RenderSceneBuffersRD sceneBuffers, uint view, Rid sampler, uint setIndex, int binding = 0) =>
+		device.DrawListBindSampler(drawList, shaderRid, sceneBuffers.GetDepthLayer(view), sampler, setIndex, binding);
+
+
+	public static void DrawListBindUniform(this RenderingDevice device, long drawList, RDUniform uniform, Rid shaderRid, uint setIndex) {
+		Rid set = UniformSetCacheRD.GetCache(shaderRid, setIndex, [uniform]);
+
+		device.DrawListBindUniformSet(drawList, set, setIndex);
+	}
 }

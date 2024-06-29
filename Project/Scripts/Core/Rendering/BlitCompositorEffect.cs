@@ -6,7 +6,7 @@ using SevenDev.Utility;
 [Tool]
 [GlobalClass]
 public partial class BlitCompositorEffect : BaseCompositorEffect {
-	private Rid nearestSampler;
+	private Rid depthSampler;
 
 
 	[Export] private RDShaderFile? ShaderFile {
@@ -32,20 +32,27 @@ public partial class BlitCompositorEffect : BaseCompositorEffect {
 	}
 
 
-	protected override void ConstructBehaviour(RenderingDevice renderingDevice) {
+	protected virtual void BlitConstructBehaviour(in RenderingDevice renderingDevice) { }
+	protected virtual void BlitDestructBehaviour(in RenderingDevice renderingDevice) { }
+	protected virtual void ComputeListBind(in RenderingDevice renderingDevice, in long computeList, in Rid shader, in RenderSceneBuffersRD sceneBuffers, in uint view) { }
+
+
+	protected sealed override void ConstructBehaviour(RenderingDevice renderingDevice) {
 		if (ShaderFile is null) return;
 		shader = renderingDevice.ShaderCreateFromSpirV(ShaderFile.GetSpirV());
 
-		nearestSampler = renderingDevice.SamplerCreate(new() {
+		depthSampler = renderingDevice.SamplerCreate(new() {
 			MinFilter = RenderingDevice.SamplerFilter.Nearest,
 			MagFilter = RenderingDevice.SamplerFilter.Nearest
 		});
 
 		computePipeline = renderingDevice.ComputePipelineCreate(shader);
+
+		BlitConstructBehaviour(renderingDevice);
 	}
-	protected override void DestructBehaviour(RenderingDevice renderingDevice) {
-		if (nearestSampler.IsValid) {
-			renderingDevice.FreeRid(nearestSampler);
+	protected sealed override void DestructBehaviour(RenderingDevice renderingDevice) {
+		if (depthSampler.IsValid) {
+			renderingDevice.FreeRid(depthSampler);
 		}
 
 		if (computePipeline.IsValid) {
@@ -54,6 +61,8 @@ public partial class BlitCompositorEffect : BaseCompositorEffect {
 		if (shader.IsValid) {
 			renderingDevice.FreeRid(shader);
 		}
+
+		BlitDestructBehaviour(renderingDevice);
 	}
 
 	public override void _RenderCallback(int effectCallbackType, RenderData renderData) {
@@ -77,8 +86,9 @@ public partial class BlitCompositorEffect : BaseCompositorEffect {
 		for (uint view = 0; view < sceneBuffers.GetViewCount(); view++) {
 			long computeList = RenderingDevice.ComputeListBegin();
 			RenderingDevice.ComputeListBindComputePipeline(computeList, computePipeline);
-			RenderingDevice.ComputeListBindColor(computeList, shader, sceneBuffers, view, 0);
-			RenderingDevice.ComputeListBindDepth(computeList, shader, sceneBuffers, view, nearestSampler, 1);
+			RenderingDevice.ComputeListBindColor(computeList, shader, sceneBuffers, view, 0, 0);
+			RenderingDevice.ComputeListBindDepth(computeList, shader, sceneBuffers, view, depthSampler, 0, 1);
+			ComputeListBind(RenderingDevice, computeList, shader, sceneBuffers, view);
 			RenderingDevice.ComputeListDispatch(computeList, xGroups, yGroups, 1);
 			RenderingDevice.ComputeListEnd();
 		}

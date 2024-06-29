@@ -1,18 +1,22 @@
-[gd_scene load_steps=93 format=3 uid="uid://b505xodur2iff"]
+[gd_scene load_steps=98 format=3 uid="uid://b505xodur2iff"]
 
-[ext_resource type="RDShaderFile" uid="uid://caumal2txsxfx" path="res://Resources/Rendering/Shaders/UnderwaterEffect.glsl" id="1_eyihr"]
 [ext_resource type="PackedScene" uid="uid://bxcpbr13uyeh1" path="res://Resources/Entities/Bike/Bike.tscn" id="1_pikp0"]
-[ext_resource type="RDShaderFile" uid="uid://b136gtyf7fy3b" path="res://Resources/Rendering/Shaders/WaterRender.glsl" id="2_vgm2y"]
-[ext_resource type="Script" path="res://Scripts/Core/Rendering/UnderwaterEffect.cs" id="3_vfcd6"]
+[ext_resource type="RDShaderFile" uid="uid://caumal2txsxfx" path="res://Resources/Rendering/Shaders/UnderwaterEffect.glsl" id="4_2f2ji"]
+[ext_resource type="RDShaderFile" uid="uid://dabjxhg50sdto" path="res://Resources/Rendering/Shaders/WaterDisplacementCompute.glsl" id="4_tdgd3"]
 [ext_resource type="Script" path="res://addons/cyclops_level_builder/nodes/cyclops_block.gd" id="4_xwxtm"]
+[ext_resource type="Texture2D" uid="uid://dspqirrnynnb" path="res://Resources/Rendering/WaterDisplacement.tres" id="5_5pwvj"]
 [ext_resource type="Script" path="res://Scripts/Core/EntityVoidoutTrigger.cs" id="5_aiymr"]
+[ext_resource type="RDShaderFile" uid="uid://b136gtyf7fy3b" path="res://Resources/Rendering/Shaders/WaterRender.glsl" id="5_gw1ln"]
 [ext_resource type="Script" path="res://addons/cyclops_level_builder/resources/convex_block_data.gd" id="5_vmujk"]
+[ext_resource type="Script" path="res://Scripts/Core/Rendering/UnderwaterEffect.cs" id="6_7qu10"]
+[ext_resource type="Script" path="res://Scripts/Core/Rendering/WaterDisplacementEffect.cs" id="6_cd6pn"]
 [ext_resource type="PackedScene" uid="uid://b7rhbgw2dujty" path="res://Resources/Entities/Eos/Eos.tscn" id="9_0jt21"]
+[ext_resource type="Shader" path="res://Resources/Rendering/Shaders/Water.gdshader" id="11_cp2h1"]
+[ext_resource type="Script" path="res://Scripts/Core/Water/WaterInstance.cs" id="11_eq8k7"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/Implementations/AkimboWeapon.cs" id="11_uqmxm"]
 [ext_resource type="PackedScene" uid="uid://fbs6dr24ss3g" path="res://Resources/Weapons/Epiphron/Epiphron.tscn" id="12_1jl3t"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/Implementations/MultiWeapon.cs" id="13_d6cna"]
 [ext_resource type="PackedScene" uid="uid://b7b17ebmgtrfy" path="res://Resources/Weapons/Nemesis/Nemesis.tscn" id="15_x4bcq"]
-[ext_resource type="Script" path="res://Scripts/Core/Water/WaterInstance.cs" id="17_awsp8"]
 [ext_resource type="PackedScene" uid="uid://bp1e6thwkkcrr" path="res://Resources/Weapons/Eleos/Eleos.tscn" id="17_jhoyp"]
 [ext_resource type="Script" path="res://Scripts/Core/Damage/DamageArea3D.cs" id="19_77ura"]
 [ext_resource type="PackedScene" uid="uid://b7hcoc81x5g0i" path="res://Resources/Companions/Erebos.tscn" id="26_ds8t8"]
@@ -44,19 +48,33 @@ volumetric_fog_temporal_reprojection_amount = 0.99
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_8wcfk"]
 
-[sub_resource type="CompositorEffect" id="CompositorEffect_5cjs8"]
+[sub_resource type="CompositorEffect" id="CompositorEffect_5fpkd"]
+resource_local_to_scene = false
+resource_name = ""
+enabled = true
+effect_callback_type = 1
+access_resolved_color = false
+access_resolved_depth = false
+needs_motion_vectors = false
+needs_normal_roughness = false
+script = ExtResource("6_cd6pn")
+Texture = ExtResource("5_5pwvj")
+ComputeShaderFile = ExtResource("4_tdgd3")
+
+[sub_resource type="CompositorEffect" id="CompositorEffect_8kyyx"]
 resource_local_to_scene = false
 resource_name = ""
 enabled = true
 effect_callback_type = 4
 needs_motion_vectors = false
 needs_normal_roughness = false
-script = ExtResource("3_vfcd6")
-RenderShaderFile = ExtResource("2_vgm2y")
-ComputeShaderFile = ExtResource("1_eyihr")
+script = ExtResource("6_7qu10")
+RenderShaderFile = ExtResource("5_gw1ln")
+ComputeShaderFile = ExtResource("4_2f2ji")
+WaterDisplacementTexture = ExtResource("5_5pwvj")
 
 [sub_resource type="Compositor" id="Compositor_gp4nw"]
-compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_5cjs8")])
+compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_5fpkd"), SubResource("CompositorEffect_8kyyx")])
 
 [sub_resource type="Gradient" id="Gradient_rpn3q"]
 offsets = PackedFloat32Array(0.666667, 1)
@@ -1380,14 +1398,6 @@ active_edge = 2
 active_face = -1
 active_face_vertex = 0
 
-[sub_resource type="ORMMaterial3D" id="ORMMaterial3D_3s130"]
-transparency = 1
-cull_mode = 2
-albedo_color = Color(0.2886, 0.48516, 0.78, 0.490196)
-
-[sub_resource type="BoxMesh" id="BoxMesh_1aqbm"]
-material = SubResource("ORMMaterial3D_3s130")
-
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_n387p"]
 
 [sub_resource type="Curve3D" id="Curve3D_1g2j1"]
@@ -1402,6 +1412,16 @@ size = Vector3(3, 1, 6)
 
 [sub_resource type="BoxMesh" id="BoxMesh_juan7"]
 size = Vector3(3, 1, 6)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nn348"]
+render_priority = 0
+shader = ExtResource("11_cp2h1")
+
+[sub_resource type="BoxMesh" id="BoxMesh_oe5ee"]
+material = SubResource("ShaderMaterial_nn348")
+subdivide_width = 32
+subdivide_height = 32
+subdivide_depth = 32
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_d0jor"]
 radius = 1.0
@@ -1708,12 +1728,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, -3, 40)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_8ro5m")
 
-[node name="WaterInstance" type="MeshInstance3D" parent="Environment"]
-transform = Transform3D(60, 0, 0, 0, 11, 0, 0, 0, 58, -28.25, -6.125, 70)
-mesh = SubResource("BoxMesh_1aqbm")
-skeleton = NodePath("../..")
-script = ExtResource("17_awsp8")
-
 [node name="EntityVoidoutTrigger" type="Area3D" parent="Environment"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -30, 0)
 collision_layer = 0
@@ -1729,7 +1743,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30201, -4.81285)
 curve = SubResource("Curve3D_1g2j1")
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Environment/Path3D"]
-transform = Transform3D(-0.0922569, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97164e-07, 0.995733, 8.27696e-08, -0.0922569, -1.98959, 0, 2.30373)
+transform = Transform3D(-0.0922568, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97163e-07, 0.995733, 8.27696e-08, -0.0922568, -1.98959, 0, 2.30373)
 script = ExtResource("36_x7xeh")
 
 [node name="AnimatableBody3D" type="AnimatableBody3D" parent="Environment/Path3D/PathFollow3D"]
@@ -1741,6 +1755,11 @@ shape = SubResource("BoxShape3D_x4tkf")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/Path3D/PathFollow3D"]
 mesh = SubResource("BoxMesh_juan7")
+
+[node name="WaterInstance" type="MeshInstance3D" parent="Environment"]
+transform = Transform3D(60, 0, 0, 0, 10, 0, 0, 0, 58, -28.25, -6.5, 70)
+mesh = SubResource("BoxMesh_oe5ee")
+script = ExtResource("11_eq8k7")
 
 [node name="Player" parent="." node_paths=PackedStringArray("Entity") instance=ExtResource("26_rkn04")]
 Entity = NodePath("../Eos")

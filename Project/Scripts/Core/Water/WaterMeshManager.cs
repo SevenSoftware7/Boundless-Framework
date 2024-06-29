@@ -59,7 +59,7 @@ public static class WaterMeshManager {
 		waterMeshes.Remove(mesh);
 	}
 
-	public static void Replace(Mesh oldMesh, Mesh newMesh, Transform3D transform = default) {
+	public static void Replace(Mesh? oldMesh, Mesh? newMesh, Transform3D transform = default) {
 		if (oldMesh is null && newMesh is null) return;
 
 		if (oldMesh is not null) {

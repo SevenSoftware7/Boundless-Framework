@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://dabjxhg50sdto"
+path="res://.godot/imported/WaterDisplacementCompute.glsl-113061c2116432bab5b53536a507f4cb.res"
+
+[deps]
+
+source_file="res://Resources/Rendering/Shaders/WaterDisplacementCompute.glsl"
+dest_files=["res://.godot/imported/WaterDisplacementCompute.glsl-113061c2116432bab5b53536a507f4cb.res"]
+
+[params]
+
