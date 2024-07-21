@@ -6,6 +6,9 @@ using System.Diagnostics.CodeAnalysis;
 using Godot;
 using SevenDev.Utility;
 
+/// <summary>
+/// A Weapon is needed to initiate an Attack as an Entity.
+/// </summary>
 [Tool]
 [GlobalClass]
 public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, IPlayerHandler, IInjectable<Skeleton3D?>, IInjectable<Handedness>, IInjectable<WeaponHolsterState> {

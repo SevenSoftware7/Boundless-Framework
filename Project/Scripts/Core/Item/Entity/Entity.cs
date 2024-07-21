@@ -7,6 +7,10 @@ using Godot;
 using KGySoft.CoreLibraries;
 using SevenDev.Utility;
 
+/// <summary>
+/// The Entity is the Main part of the Framework and corresponds to any thing a Player is able to Control partially or entirely.
+/// All Characters and Enemies are Entities.
+/// </summary>
 [Tool]
 [GlobalClass]
 public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICostumable, ICustomizable, ISaveable<Entity>, IInjectionProvider<Skeleton3D?>, IInjectionProvider<Handedness> {

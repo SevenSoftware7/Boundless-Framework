@@ -3,6 +3,9 @@ namespace LandlessSkies.Core;
 using Godot;
 using SevenDev.Utility;
 
+/// <summary>
+/// A Hierarchical state machine node for an Entity's
+/// </summary>
 [GlobalClass]
 public abstract partial class EntityBehaviour : Node {
 	[Export] public Entity? Entity;
