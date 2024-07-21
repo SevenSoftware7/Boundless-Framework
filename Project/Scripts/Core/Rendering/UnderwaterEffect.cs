@@ -55,7 +55,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 	private readonly RDAttachmentFormat waterDepthAttachmentFormat = new() {
 		Format = RenderingDevice.DataFormat.D32Sfloat,
 		Samples = RenderingDevice.TextureSamples.Samples1,
-		UsageFlags = (uint)RenderingDevice.TextureUsageBits.DepthStencilAttachmentBit
+		UsageFlags = (uint)RenderingDevice.TextureUsageBits.DepthStencilAttachmentBit,
 	};
 	private long framebufferFormat;
 
@@ -128,6 +128,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 		(Rid indexBuffer, Rid indexArray) = RenderingDevice.IndexArrayCreate(waterMeshIndices);
 
 		Color[] clearColors = [new Color(0, 0, 0, 0)];
+		float clearDepth = 0f;
 		for (uint view = 0; view < viewCount; view++) {
 			Rid waterMap = sceneBuffers.GetTextureSlice(Context, WaterMapName, view, 0, 1, 1);
 			Rid waterDepth = sceneBuffers.GetTextureSlice(Context, WaterDepthName, view, 0, 1, 1);
@@ -162,10 +163,8 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 				WorldToClip.Z.X, WorldToClip.Z.Y, WorldToClip.Z.Z, WorldToClip.Z.W,
 				WorldToClip.W.X, WorldToClip.W.Y, WorldToClip.W.Z, WorldToClip.W.W,
 
-				eyeOffset.X, eyeOffset.Y, // Don't pad for these two because they get packed together
-				nearClippingPlane, farClippingPlane,
-				waterScale, waterIntensity, 0, 0,
-
+				eyeOffset.X, eyeOffset.Y, // Don't pad for these two because they get packed together with the next values
+				waterScale, waterIntensity
 			];
 			byte[] renderPushConstantBytes = new byte[renderPushConstant.Length * sizeof(float)];
 			Buffer.BlockCopy(renderPushConstant, 0, renderPushConstantBytes, 0, renderPushConstantBytes.Length);
@@ -173,7 +172,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 
 			// Render the Geometry (see vertCoords and vertIndices) to an intermediate framebuffer To use later
 			RenderingDevice.DrawCommandBeginLabel("Render Water Mask", new Color(1f, 1f, 1f));
-			long drawList = RenderingDevice.DrawListBegin(waterBuffer, RenderingDevice.InitialAction.Clear, RenderingDevice.FinalAction.Store, RenderingDevice.InitialAction.Clear, RenderingDevice.FinalAction.Discard, clearColors);
+			long drawList = RenderingDevice.DrawListBegin(waterBuffer, RenderingDevice.InitialAction.Clear, RenderingDevice.FinalAction.Store, RenderingDevice.InitialAction.Clear, RenderingDevice.FinalAction.Discard, clearColors, clearDepth);
 			RenderingDevice.DrawListBindRenderPipeline(drawList, renderPipeline);
 			RenderingDevice.DrawListBindVertexArray(drawList, vertexArray);
 			RenderingDevice.DrawListBindIndexArray(drawList, indexArray);
@@ -266,7 +265,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 				// Enable Self-occlusion via Depth Test
 				EnableDepthTest = true,
 				EnableDepthWrite = true,
-				DepthCompareOperator = RenderingDevice.CompareOperator.LessOrEqual
+				DepthCompareOperator = RenderingDevice.CompareOperator.GreaterOrEqual
 			},
 			blend
 		);
