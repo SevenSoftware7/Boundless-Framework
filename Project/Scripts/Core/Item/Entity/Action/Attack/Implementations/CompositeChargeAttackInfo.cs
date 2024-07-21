@@ -14,7 +14,6 @@ public class CompositeChargeAttackInfo(
 
 	public StringName ActionKey { get; init; } = actionKey ?? Inputs.AttackLight;
 	public ulong ChargeDuration { get; init; } = chargeDuration ?? 1000;
-	public IEnumerable<AttributeModifier> Modifiers { get; init; } = modifiers ?? [];
 
 
 
@@ -27,6 +26,6 @@ public class CompositeChargeAttackInfo(
 
 
 	protected internal override CompositeChargeAttack Create(Entity entity, Weapon weapon, StringName library) {
-		return new CompositeChargeAttack(entity, weapon, library, this, Modifiers);
+		return new CompositeChargeAttack(entity, weapon, library, this, modifiers);
 	}
 }

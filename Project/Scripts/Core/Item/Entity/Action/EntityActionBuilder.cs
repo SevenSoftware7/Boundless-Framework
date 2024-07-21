@@ -8,7 +8,7 @@ public abstract class EntityActionBuilder {
 
 	protected internal abstract EntityAction Create(Entity entity);
 
-	public EntityAction Build(Entity entity) {
+	internal EntityAction Build(Entity entity) {
 		EntityAction action = Create(entity);
 		action.OnStart += BeforeExecute;
 		action.OnStop += AfterExecute;

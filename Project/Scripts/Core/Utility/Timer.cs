@@ -11,8 +11,8 @@ public class Timer {
 
 
 
-	public Timer() {
-		Start();
+	public Timer(bool start = true) {
+		if (start) Start();
 	}
 
 

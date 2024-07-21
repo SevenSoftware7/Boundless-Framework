@@ -1,43 +1,48 @@
 namespace LandlessSkies.Core;
 
 using System;
+using System.Collections.Generic;
 using Godot;
 using SevenDev.Utility;
 
 
 public abstract partial class EntityAction : Node {
-	public readonly SevenDev.Utility.Timer Lifetime = new();
+	public readonly SevenDev.Utility.Timer Lifetime = new(false);
 
 	[Export] public Entity Entity;
+	public IEnumerable<AttributeModifier> Modifiers;
+
 	public event Action? OnStart;
 	public event Action? OnStop;
 
-	public abstract bool IsCancellable { get; }
-	public abstract bool IsKnockable { get; }
-
-
-	public EntityAction(Entity entity) {
+	public EntityAction(Entity entity, IEnumerable<AttributeModifier>? modifiers = null) {
 		Entity = entity;
+		Modifiers = modifiers ?? [];
 	}
 
+	public abstract bool IsCancellable { get; }
+	public abstract bool IsInterruptable { get; }
 	public void Start() {
+		if (Entity is null) {
+			GD.PushError($"Entity was null when trying to execute {GetType().Name} Action");
+			return;
+		}
+		Lifetime.Start();
 		OnStart?.Invoke();
+
+		Entity.AttributeModifiers.AddRange(Modifiers);
 		_Start();
 	}
 	public void Stop() {
 		OnStop?.Invoke();
+
+		Entity.AttributeModifiers.RemoveRange(Modifiers);
 		_Stop();
 
 		this.UnparentAndQueueFree();
 	}
 
-	protected abstract void _Start();
-	protected abstract void _Stop();
+	protected virtual void _Start() { }
 
-
-	public override void _Notification(int what) {
-		base._Notification(what);
-		if (what == NotificationPredelete) {
-		}
-	}
+	protected virtual void _Stop() { }
 }

@@ -1,59 +1,59 @@
 {
-    "version": "2.0.0",
-    "configurations": [
-        {
-            "name": "Launch",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build",
-            "program": "D:/Software/Godot/Godot_v4.3-beta2_mono_win64/Godot_v4.3-beta2_mono_win64.exe",
-            "cwd": "${workspaceFolder}",
-            "console": "internalConsole",
-            "stopAtEntry": false,
-            "args": [
+	"version": "2.0.0",
+	"configurations": [
+		{
+			"name": "Launch",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build",
+			"program": "E:/Software/Godot/Godot_v4.3-beta3_mono_win64/Godot_v4.3-beta3_mono_win64.exe",
+			"cwd": "${workspaceFolder}",
+			"console": "internalConsole",
+			"stopAtEntry": false,
+			"args": [
 				"--path",
-                "${workspaceRoot}",
+				"${workspaceRoot}",
 				"--debug-collisions",
 				"--debug-paths",
 				"--debug-navigation",
-            ]
-        },
-        {
-            "name": "Launch (Select Scene)",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build",
-            "program": "D:/Software/Godot/Godot_v4.3-beta2_mono_win64/Godot_v4.3-beta2_mono_win64.exe",
-            "cwd": "${workspaceFolder}",
-            "console": "internalConsole",
-            "stopAtEntry": false,
-            "args": [
-                "--path",
-                "${workspaceRoot}",
-                "${command:godot.csharp.getLaunchScene}",
+			]
+		},
+		{
+			"name": "Launch (Select Scene)",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build",
+			"program": "E:/Software/Godot/Godot_v4.3-beta3_mono_win64/Godot_v4.3-beta3_mono_win64.exe",
+			"cwd": "${workspaceFolder}",
+			"console": "internalConsole",
+			"stopAtEntry": false,
+			"args": [
+				"--path",
+				"${workspaceRoot}",
+				"${command:godot.csharp.getLaunchScene}",
 				"--debug-collisions",
-            ]
-        },
-        {
-            "name": "Attach",
-            "type": "coreclr",
-            "request": "attach",
+			]
+		},
+		{
+			"name": "Attach",
+			"type": "coreclr",
+			"request": "attach",
 			"processId":"${command:pickProcess}"
-        },
-        {
-            "name": "Launch Editor",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build",
-            "program": "D:/Software/Godot/Godot_v4.3-beta2_mono_win64/Godot_v4.3-beta2_mono_win64.exe",
-            "cwd": "${workspaceFolder}",
-            "console": "internalConsole",
-            "stopAtEntry": false,
-            "args": [
-                "--path",
-                "${workspaceRoot}",
-                "--editor"
-            ]
-        }
-    ]
+		},
+		{
+			"name": "Launch Editor",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build",
+			"program": "E:/Software/Godot/Godot_v4.3-beta3_mono_win64/Godot_v4.3-beta3_mono_win64.exe",
+			"cwd": "${workspaceFolder}",
+			"console": "internalConsole",
+			"stopAtEntry": false,
+			"args": [
+				"--path",
+				"${workspaceRoot}",
+				"--editor"
+			]
+		}
+	]
 }

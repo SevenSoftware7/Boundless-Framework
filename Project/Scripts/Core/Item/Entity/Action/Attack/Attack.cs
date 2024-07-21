@@ -5,8 +5,8 @@ using System.Collections.Generic;
 using Godot;
 using SevenDev.Utility;
 
-public abstract partial class Attack(Entity entity, Weapon Weapon) : EntityAction(entity) {
-	public Weapon Weapon { get; private set; } = Weapon;
+public abstract partial class Attack(Entity entity, Weapon weapon, IEnumerable<AttributeModifier>? modifiers = null) : EntityAction(entity, modifiers) {
+	public Weapon Weapon { get; private set; } = weapon;
 
 	protected static StringName GetAnimationPath(StringName library, StringName attack) => library.IsEmpty ? attack : $"{library}/{attack}";
 

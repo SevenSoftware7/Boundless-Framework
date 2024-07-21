@@ -1,13 +1,16 @@
 namespace LandlessSkies.Core;
 
 using System;
+using System.Collections.Generic;
 using Godot;
 
-public abstract partial class AnimationAttack(Entity entity, Weapon weapon, StringName library) : Attack(entity, weapon) {
-	private bool _isCancellable = false;
+public abstract partial class AnimationAttack(Entity entity, Weapon weapon, StringName library, IEnumerable<AttributeModifier>? modifiers = null) : Attack(entity, weapon, modifiers) {
 
 	public override bool IsCancellable => _isCancellable;
-	public override bool IsKnockable => true;
+	private bool _isCancellable = false;
+
+	public override bool IsInterruptable => true;
+	private bool _isInterruptable = false;
 
 	protected abstract StringName AnimationName { get; }
 
@@ -17,24 +20,27 @@ public abstract partial class AnimationAttack(Entity entity, Weapon weapon, Stri
 		_SetCancellable(cancellable);
 	}
 	protected virtual void _SetCancellable(bool cancellable) { }
+	public void SetInterruptable(bool interruptable) {
+		_isInterruptable = interruptable;
+		_SetInterruptable(interruptable);
+	}
+	protected virtual void _SetInterruptable(bool interruptable) { }
+
 
 	private void OnStarted(StringName name) {
-		GD.PrintS("Started", name);
 		Stop();
 	}
 	private void OnChanged(StringName oldName, StringName newName) {
-		GD.PrintS("Changed", oldName, newName);
 		Stop();
 	}
 	private void OnFinished(StringName name) {
-		GD.PrintS("Finished", name);
 		Stop();
 	}
 
 
 	protected override void _Start() {
-		GD.Print("Start");
-		if (Entity?.AnimationPlayer is null) {
+		if (Entity.AnimationPlayer is null) {
+			GD.PushError($"Could not start {GetType().Name} AnimationAttack, because the no AnimationPlayer could be found");
 			Stop();
 			return;
 		}
@@ -51,7 +57,6 @@ public abstract partial class AnimationAttack(Entity entity, Weapon weapon, Stri
 		}
 	}
 	protected override void _Stop() {
-		GD.Print("Stop");
 		if (Entity?.AnimationPlayer is null) return;
 
 		if (Entity.AnimationPlayer.CurrentAnimation == GetAnimationPath(library, AnimationName)) {

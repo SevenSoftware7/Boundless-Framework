@@ -10,7 +10,7 @@ public partial class BipedJumpAction : JumpAction, IPlayerHandler {
 	private float remainingDistance = 1f;
 
 	public override bool IsCancellable => true;
-	public override bool IsKnockable => true;
+	public override bool IsInterruptable => true;
 
 	public BipedJumpAction(Entity entity, Vector3 direction) : base(entity) {
 		Direction = direction;
