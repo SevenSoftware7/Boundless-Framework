@@ -16,7 +16,7 @@ public abstract partial class AnimationAttack(Entity entity, Weapon weapon, Stri
 	public override bool IsCancellable => _isCancellable;
 	private bool _isCancellable = false;
 
-	public override bool IsInterruptable => true;
+	public override bool IsInterruptable => _isInterruptable;
 	private bool _isInterruptable = false;
 
 	protected abstract StringName AnimationName { get; }
@@ -52,7 +52,7 @@ public abstract partial class AnimationAttack(Entity entity, Weapon weapon, Stri
 
 
 	private void OnStarted(StringName name) {
-		Stop();
+		if (name != GetAnimationPath(library, AnimationName)) Stop();
 	}
 	private void OnChanged(StringName oldName, StringName newName) {
 		Stop();
@@ -64,7 +64,7 @@ public abstract partial class AnimationAttack(Entity entity, Weapon weapon, Stri
 
 	protected override void _Start() {
 		if (Entity.AnimationPlayer is null) {
-			GD.PushError($"Could not start {GetType().Name} AnimationAttack, because the no AnimationPlayer could be found");
+			GD.PushError($"Could not start {GetType().Name} AnimationAttack, because no AnimationPlayer could be found");
 			Stop();
 			return;
 		}
@@ -72,7 +72,7 @@ public abstract partial class AnimationAttack(Entity entity, Weapon weapon, Stri
 		Entity.AnimationPlayer.Stop();
 		try {
 			Entity.AnimationPlayer.Play(GetAnimationPath(library, AnimationName));
-			// Entity.AnimationPlayer.AnimationStarted += OnStarted;
+			Entity.AnimationPlayer.AnimationStarted += OnStarted;
 			Entity.AnimationPlayer.AnimationChanged += OnChanged;
 			Entity.AnimationPlayer.AnimationFinished += OnFinished;
 		} catch (Exception e) {

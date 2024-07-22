@@ -14,10 +14,10 @@ public abstract partial class ChargeAttack(Entity entity, Weapon weapon, IEnumer
 
 
 	/// <summary>
-	/// Check whether the Charge should stop.
+	/// Check whether the Charge should stop this frame.
 	/// </summary>
 	/// <param name="inputDevice">The Input device responsible for the Charge input</param>
-	/// <returns>Whether the Charge should be stopped</returns>
+	/// <returns>Whether the Charge should be stopped this frame.</returns>
 	protected abstract bool IsChargeStopped(InputDevice inputDevice);
 
 	/// <summary>
