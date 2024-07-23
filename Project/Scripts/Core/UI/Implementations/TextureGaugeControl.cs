@@ -49,7 +49,7 @@ public partial class TextureGaugeControl : GaugeControl {
 		if (DamagedBar.Value < _progress) {
 			DamagedBar.Value = _progress;
 		}
-		else if (! DamagedTimer) {
+		else if (!DamagedTimer) {
 			_damagedVelocity = 0f;
 		}
 		else {

@@ -14,7 +14,7 @@ public sealed partial class KMInputDevice : InputDevice {
 	protected override bool IsEventSupported(InputEvent @event) => @event is InputEventMouse || @event is InputEventKey;
 
 	public override float GetActionStrength(StringName action) => action.ToString() switch {
-		_ when ! DeviceConnected => base.GetActionStrength(action),
+		_ when !DeviceConnected => base.GetActionStrength(action),
 		"look_up" => Mathf.Max(-mouseMotion.ScreenRelative.Y, base.GetActionStrength(action)),
 		"look_down" => Mathf.Max(mouseMotion.ScreenRelative.Y, base.GetActionStrength(action)),
 		"look_left" => Mathf.Max(-mouseMotion.ScreenRelative.X, base.GetActionStrength(action)),
@@ -36,6 +36,8 @@ public sealed partial class KMInputDevice : InputDevice {
 		Callable.From(() => {
 			mouseMotion = new();
 		}).CallDeferred(); // Do at the end of the Frame
+
+
 	}
 
 	public override void _UnhandledInput(InputEvent @event) {

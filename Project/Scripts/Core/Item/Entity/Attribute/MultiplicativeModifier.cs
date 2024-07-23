@@ -5,7 +5,8 @@ using Godot;
 [Tool]
 [GlobalClass]
 public sealed partial class MultiplicativeModifier : AttributeModifier {
-	[Export] public float Multiplier {
+	[Export]
+	public float Multiplier {
 		get => _multiplier;
 		private set {
 			_multiplier = value;
@@ -19,11 +20,11 @@ public sealed partial class MultiplicativeModifier : AttributeModifier {
 
 
 
-	public MultiplicativeModifier(StringName name, float multiplier, bool isStacking = false) : base(name) {
+	public MultiplicativeModifier(EntityAttribute target, float multiplier, bool isStacking = false) : base(target) {
 		_multiplier = multiplier;
 		_isStacking = isStacking;
 	}
-	private MultiplicativeModifier() : base() {}
+	private MultiplicativeModifier() : base() { }
 
 
 

@@ -13,7 +13,8 @@ public sealed partial class Player : Node {
 	[Export] public CameraController3D CameraController { get; private set; } = null!;
 	[Export] public HudManager HudManager { get; private set; } = null!;
 
-	[Export] public Entity? Entity {
+	[Export]
+	public Entity? Entity {
 		get => _entity;
 		set {
 			if (_entity == value) return;
@@ -72,7 +73,7 @@ public sealed partial class Player : Node {
 	public override void _Ready() {
 		base._Ready();
 
-		if (! Engine.IsEditorHint()) {
+		if (!Engine.IsEditorHint()) {
 			int index = System.Array.FindIndex(Players, p => p is null);
 			if (index == -1) {
 				QueueFree();
@@ -90,9 +91,9 @@ public sealed partial class Player : Node {
 	public override void _Notification(int what) {
 		base._Notification(what);
 		switch ((ulong)what) {
-		case NotificationPredelete:
-			UnsetPlayerId();
-			break;
+			case NotificationPredelete:
+				UnsetPlayerId();
+				break;
 		}
 	}
 }

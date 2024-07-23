@@ -28,7 +28,7 @@ public abstract partial class InputDevice : Node {
 	protected static void BindInput(StringName actionName, float deadzone = 0.5f, params InputEvent[] events) {
 		if (actionName.IsEmpty) return;
 
-		if (! InputMap.HasAction(actionName)) {
+		if (!InputMap.HasAction(actionName)) {
 			InputMap.AddAction(actionName, deadzone);
 		}
 
@@ -59,6 +59,7 @@ public abstract partial class InputDevice : Node {
 
 	public Texture2D GetActionSymbol(StringName action) =>
 		InputManager.ActionSymbol; // TODO
+
 
 
 	protected abstract bool IsEventSupported(InputEvent @event);
@@ -94,7 +95,7 @@ public abstract partial class InputDevice : Node {
 	}
 
 	public virtual void Disconnect() {
-		if (! DeviceConnected) return;
+		if (!DeviceConnected) return;
 
 		foreach (StringName action in InputManager.BaseActions) {
 			StringName newAction = GetActionName(action);

@@ -11,7 +11,8 @@ public partial class Companion : Node3D, IUIObject, ICustomizable, ICostumable, 
 	[Export] public string DisplayName { get; private set; } = string.Empty;
 	public Texture2D? DisplayPortrait => CostumeHolder?.Costume?.DisplayPortrait;
 
-	[Export] public virtual Skeleton3D? Skeleton {
+	[Export]
+	public virtual Skeleton3D? Skeleton {
 		get => _skeleton;
 		protected set {
 			_skeleton = value;

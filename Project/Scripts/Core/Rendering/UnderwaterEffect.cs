@@ -13,7 +13,8 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 	public static readonly StringName WaterDepthName = "water_depth";
 
 
-	[Export] private RDShaderFile? RenderShaderFile {
+	[Export]
+	private RDShaderFile? RenderShaderFile {
 		get => _renderShaderFile;
 		set {
 			_renderShaderFile = value;
@@ -27,7 +28,8 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 	private RDShaderFile? _renderShaderFile;
 	private Rid renderShader;
 
-	[Export] private RDShaderFile? ComputeShaderFile {
+	[Export]
+	private RDShaderFile? ComputeShaderFile {
 		get => _computeShaderFile;
 		set {
 			_computeShaderFile = value;
@@ -80,7 +82,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 	public override void _RenderCallback(int effectCallbackType, RenderData renderData) {
 		base._RenderCallback(effectCallbackType, renderData);
 
-		if (WaterDisplacementTexture is null || ! WaterDisplacementTexture.TextureRdRid.IsValid) return;
+		if (WaterDisplacementTexture is null || !WaterDisplacementTexture.TextureRdRid.IsValid) return;
 
 		// if (effectCallbackType != (long)EffectCallbackTypeEnum.PostTransparent) return;
 		float[] waterMeshVertices = WaterMeshManager.WaterVertices;
@@ -117,7 +119,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			}
 		}
 
-		if (! sceneBuffers.HasTexture(Context, WaterMapName)) {
+		if (!sceneBuffers.HasTexture(Context, WaterMapName)) {
 			// Create and cache the Map and Depth to create the Water Buffer
 			sceneBuffers.CreateTexture(Context, WaterMapName, waterMapAttachmentFormat.Format, waterMapAttachmentFormat.UsageFlags, waterMapAttachmentFormat.Samples, renderSize, viewCount, 1, true);
 			sceneBuffers.CreateTexture(Context, WaterDepthName, waterDepthAttachmentFormat.Format, waterDepthAttachmentFormat.UsageFlags, waterDepthAttachmentFormat.Samples, renderSize, viewCount, 1, true);
@@ -135,7 +137,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 
 			// Include the Map and Depth from earlier
 			Rid waterBuffer = RenderingDevice.FramebufferCreate([waterMap, waterDepth], framebufferFormat);
-			if (! waterBuffer.IsValid) {
+			if (!waterBuffer.IsValid) {
 				throw new ArgumentException("Water Mask Frame Buffer is Invalid");
 			}
 
@@ -245,7 +247,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 		if (RenderShaderFile is null) return;
 
 		renderShader = renderingDevice.ShaderCreateFromSpirV(RenderShaderFile.GetSpirV());
-		if (! renderShader.IsValid) {
+		if (!renderShader.IsValid) {
 			throw new ArgumentException("Render Shader is Invalid");
 		}
 
@@ -269,7 +271,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			},
 			blend
 		);
-		if (! renderPipeline.IsValid) {
+		if (!renderPipeline.IsValid) {
 			throw new ArgumentException("Render Pipeline is Invalid");
 		}
 	}
@@ -279,12 +281,12 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 		if (ComputeShaderFile is null) return;
 
 		computeShader = renderingDevice.ShaderCreateFromSpirV(ComputeShaderFile.GetSpirV());
-		if (! computeShader.IsValid) {
+		if (!computeShader.IsValid) {
 			throw new ArgumentException("Compute Shader is Invalid");
 		}
 
 		computePipeline = renderingDevice.ComputePipelineCreate(computeShader);
-		if (! computePipeline.IsValid) {
+		if (!computePipeline.IsValid) {
 			throw new ArgumentException("Compute Pipeline is Invalid");
 		}
 	}

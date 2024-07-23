@@ -17,7 +17,7 @@ public partial class CompositeChargeAttack(Entity entity, Weapon weapon, StringN
 	private bool isDone;
 
 
-	protected sealed override bool IsChargeStopped(InputDevice inputDevice) => ! inputDevice.IsActionPressed(info.ActionKey);
+	protected sealed override bool IsChargeStopped(InputDevice inputDevice) => !inputDevice.IsActionPressed(info.ActionKey);
 
 	/// <summary>
 	/// Called when the Attack finishes Charging.
@@ -50,7 +50,7 @@ public partial class CompositeChargeAttack(Entity entity, Weapon weapon, StringN
 	protected virtual void _UnchargedAttack() { }
 
 	public override void HandlePlayer(Player player) {
-		if (! isDone && chargeTime.IsDone) {
+		if (!isDone && chargeTime.IsDone) {
 			isDone = true;
 			_ChargeDone();
 		}

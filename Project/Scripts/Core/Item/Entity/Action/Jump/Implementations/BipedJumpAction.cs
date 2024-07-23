@@ -18,7 +18,7 @@ public partial class BipedJumpAction : JumpAction, IPlayerHandler {
 
 
 	public void HandlePlayer(Player player) {
-		if (! player.InputDevice.IsActionPressed(Inputs.Jump)) {
+		if (!player.InputDevice.IsActionPressed(Inputs.Jump)) {
 			Stop();
 			return;
 		}

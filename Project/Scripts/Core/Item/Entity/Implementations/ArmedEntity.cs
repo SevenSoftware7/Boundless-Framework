@@ -63,7 +63,8 @@ public partial class ArmedEntity : Entity, IDamageDealer {
 		if (bufferStyle != -1) {
 			if (CurrentAction is Attack) {
 				styleSwitchBuffer.Add(bufferStyle);
-			} else {
+			}
+			else {
 				_weapon.Style = bufferStyle;
 			}
 		}
@@ -84,9 +85,9 @@ public partial class ArmedEntity : Entity, IDamageDealer {
 	public override void _Notification(int what) {
 		base._Notification(what);
 		switch ((ulong)what) {
-		case NotificationChildOrderChanged:
-			Weapon = GetChildren().OfType<IWeapon>().FirstOrDefault();
-			break;
+			case NotificationChildOrderChanged:
+				Weapon = GetChildren().OfType<IWeapon>().FirstOrDefault();
+				break;
 		}
 	}
 }

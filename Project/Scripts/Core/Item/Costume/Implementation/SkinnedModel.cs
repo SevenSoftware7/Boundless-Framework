@@ -43,13 +43,13 @@ public partial class SkinnedModel : Model, IInjectable<Skeleton3D?>, IInjectable
 
 	public override void _Notification(int what) {
 		base._Notification(what);
-		switch ((ulong) what) {
-		case NotificationParented:
-			if (IsNodeReady()) {
-				this.RequestInjection<Skeleton3D?>();
-				this.RequestInjection<Handedness>();
-			}
-			break;
+		switch ((ulong)what) {
+			case NotificationParented:
+				if (IsNodeReady()) {
+					this.RequestInjection<Skeleton3D?>();
+					this.RequestInjection<Handedness>();
+				}
+				break;
 		}
 	}
 }

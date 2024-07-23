@@ -27,7 +27,8 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 	public override int StyleCount => Mathf.Max(_weapons.Count, 1);
 
 	[ExportGroup("Current Weapon")]
-	[Export] public override int Style {
+	[Export]
+	public override int Style {
 		get => _currentIndex;
 		set => SwitchTo(value);
 	}
@@ -49,7 +50,7 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 
 	private bool IndexInBounds(int index) => index < _weapons.Count && index >= 0;
 	private void UpdateCurrent() {
-		if (! IndexInBounds(_currentIndex)) {
+		if (!IndexInBounds(_currentIndex)) {
 			_currentIndex = 0;
 		}
 
@@ -123,11 +124,11 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 	public override void _Notification(int what) {
 		base._Notification(what);
 		switch ((ulong)what) {
-		case NotificationChildOrderChanged:
-			if (IsNodeReady()) {
-				UpdateWeapons();
-			}
-			break;
+			case NotificationChildOrderChanged:
+				if (IsNodeReady()) {
+					UpdateWeapons();
+				}
+				break;
 		}
 	}
 

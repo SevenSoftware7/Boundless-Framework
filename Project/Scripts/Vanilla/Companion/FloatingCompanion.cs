@@ -75,8 +75,8 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 
 		OnFace |= PositionBlocked(Head * rightPosition) && PositionBlocked(Head * leftPosition);
 
-		if (! OnFace && PositionBlocked(GetPosition(GetCurveT())))
-			OnRight = ! OnRight;
+		if (!OnFace && PositionBlocked(GetPosition(GetCurveT())))
+			OnRight = !OnRight;
 
 
 		T = Mathf.MoveToward(T, GetCurveT(), 6f * floatDelta);
@@ -89,6 +89,8 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 
 
 		// Curve to Face
+
+
 		float LeftRightT = T * 2f - 1f;
 		float distance = HoveringPosition.DistanceSquaredTo(Head.Origin);
 
@@ -112,9 +114,9 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 	public override void _Notification(int what) {
 		base._Notification(what);
 		switch ((ulong)what) {
-		case NotificationParented:
-			Entity ??= GetParent() as Entity;
-			break;
+			case NotificationParented:
+				Entity ??= GetParent() as Entity;
+				break;
 		}
 	}
 }

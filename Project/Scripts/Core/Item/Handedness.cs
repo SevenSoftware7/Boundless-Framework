@@ -7,7 +7,7 @@ public enum Handedness : byte {
 
 public static class HandednessExtensions {
 	public static Handedness Reverse(this Handedness handedness) => handedness switch {
-		Handedness.Left       => Handedness.Right,
+		Handedness.Left => Handedness.Right,
 		Handedness.Right or _ => Handedness.Left,
 	};
 }

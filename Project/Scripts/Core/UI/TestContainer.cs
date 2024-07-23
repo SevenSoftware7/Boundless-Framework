@@ -14,7 +14,7 @@ public partial class TestContainer : Container {
 			if (GetChild(i) is not Control control)
 				continue;
 
-			if (! control.Visible)
+			if (!control.Visible)
 				continue;
 
 			control.Position = new Vector2(control.Position.X, size.Y);

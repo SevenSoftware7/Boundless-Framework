@@ -8,14 +8,18 @@ using Godot.Collections;
 public abstract partial class AttributeModifier : Resource, IAttributeModifier {
 	public static readonly StringName AttributeValue = "AttributeValue";
 
-
-	[Export] public StringName Name { get; private set; } = string.Empty;
+	[Export]
+	public StringName Name {
+		get => Target.Name;
+		set => Target = value;
+	}
+	public EntityAttribute Target { get; private set; } = string.Empty;
 	public virtual bool IsStacking => false;
 
 
 
-	public AttributeModifier(StringName name) : base() {
-		Name = name;
+	public AttributeModifier(EntityAttribute target) : base() {
+		Target = target;
 	}
 	protected AttributeModifier() : base() { }
 
@@ -23,7 +27,7 @@ public abstract partial class AttributeModifier : Resource, IAttributeModifier {
 
 	public abstract float ApplyTo(float baseValue);
 	public void UpdateName() {
-		if (! Engine.IsEditorHint()) return;
+		if (!Engine.IsEditorHint()) return;
 
 		ResourceName = GetResourceName();
 	}

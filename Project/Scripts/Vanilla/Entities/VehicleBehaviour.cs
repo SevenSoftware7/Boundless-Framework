@@ -27,10 +27,10 @@ public partial class VehicleBehaviour : GroundedBehaviour {
 		if (Engine.IsEditorHint()) return;
 		if (Entity is null) return;
 
-		float floatDelta = (float) delta;
+		float floatDelta = (float)delta;
 
 		float newSpeed = 0f;
-		if (! _inputDirection.IsEqualApprox(Vector3.Zero)) {
+		if (!_inputDirection.IsEqualApprox(Vector3.Zero)) {
 			Vector3 direction = _inputDirection.Normalized();
 
 			newSpeed = Entity.GlobalForward.Dot(direction) * Entity.AttributeModifiers.ApplyTo(Attributes.GenericMoveSpeed, Entity.Stats.BaseSpeed);

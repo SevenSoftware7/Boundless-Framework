@@ -113,7 +113,7 @@ public partial class CameraController3D : Camera3D {
 	private Vector3 GetSmoothTargetPosition(float floatDelta) {
 		Vector3 verticalPos = Subject.Origin.Project(Subject.Basis.Y);
 
-		if (! smoothVerticalPosition.IsEqualApprox(verticalPos)) {
+		if (!smoothVerticalPosition.IsEqualApprox(verticalPos)) {
 			if (Style == CameraStyle.ThirdPersonGrounded) {
 				// The camera's new vertical speed is based on the camera's current vertical velocity
 				// The camera's vertical movement gets faster as the player keeps moving vertically
@@ -131,7 +131,7 @@ public partial class CameraController3D : Camera3D {
 
 		// Make The Camera Movement slower on the Y axis than on the X axis
 		Vector3 horizontalPos = Subject.Origin - verticalPos;
-		if (! smoothHorizontalPosition.IsEqualApprox(horizontalPos)) {
+		if (!smoothHorizontalPosition.IsEqualApprox(horizontalPos)) {
 			smoothHorizontalPosition = smoothHorizontalPosition.SmoothDamp(horizontalPos, ref horizontalVelocity, horizontalSmoothTime, Mathf.Inf, floatDelta);
 		}
 
@@ -156,11 +156,11 @@ public partial class CameraController3D : Camera3D {
 			CollisionMask = CollisionMask,
 		};
 
-		bool rayCastHit = GetWorld3D().CastMotion(castParameters, out CastMotionResult result );
+		bool rayCastHit = GetWorld3D().CastMotion(castParameters, out CastMotionResult result);
 
 
-		if (! rayCastHit) {
-			if (! Mathf.IsEqualApprox(cameraDistance, distance)) {
+		if (!rayCastHit) {
+			if (!Mathf.IsEqualApprox(cameraDistance, distance)) {
 				cameraDistance = cameraDistance.SmoothDamp(distance, ref distanceVelocity, 0.2f, Mathf.Inf, floatDelta);
 			}
 

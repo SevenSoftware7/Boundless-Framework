@@ -7,7 +7,8 @@ using SevenDev.Utility;
 [Tool]
 [GlobalClass]
 public partial class DrawCompositorEffect : BaseCompositorEffect {
-	[Export] private RDShaderFile? DrawShaderFile {
+	[Export]
+	private RDShaderFile? DrawShaderFile {
 		get => _drawShaderFile;
 		set {
 			_drawShaderFile = value;
@@ -43,7 +44,7 @@ public partial class DrawCompositorEffect : BaseCompositorEffect {
 		if (DrawShaderFile is null) return;
 		drawShader = renderingDevice.ShaderCreateFromSpirV(DrawShaderFile.GetSpirV());
 
-		if (! drawShader.IsValid) {
+		if (!drawShader.IsValid) {
 			GD.Print("Shader is Invalid");
 			return;
 		}
@@ -59,7 +60,7 @@ public partial class DrawCompositorEffect : BaseCompositorEffect {
 		RDTextureView tex_view = new();
 
 		frameBufferTexture = renderingDevice.TextureCreate(tex_format, tex_view);
-		if (! frameBufferTexture.IsValid) {
+		if (!frameBufferTexture.IsValid) {
 			GD.Print("Frame Buffer Texture is Invalid");
 			return;
 		}
@@ -74,7 +75,7 @@ public partial class DrawCompositorEffect : BaseCompositorEffect {
 		];
 		long frameBufferFormat = renderingDevice.FramebufferFormatCreate(attachments);
 		frameBuffer = renderingDevice.FramebufferCreate([frameBufferTexture], frameBufferFormat);
-		if (! frameBuffer.IsValid) {
+		if (!frameBuffer.IsValid) {
 			GD.Print("Frame Buffer is Invalid");
 			return;
 		}
@@ -93,20 +94,20 @@ public partial class DrawCompositorEffect : BaseCompositorEffect {
 		long vertexFormat = renderingDevice.VertexFormatCreate(vertexAttributes);
 
 		float[] points = [
-			0,		0,		0,
-			-0.25f,	0f,		0,
-			-0.25f,	0.25f,	0,
-			0,		0.25f,	0,
-			0.25f,	0.25f,	0,
-			0.25f,	0,		0,
+			0,      0,      0,
+			-0.25f, 0f,     0,
+			-0.25f, 0.25f,  0,
+			0,      0.25f,  0,
+			0.25f,  0.25f,  0,
+			0.25f,  0,      0,
 		];
 		vertexBuffer = renderingDevice.VertexBufferCreate(points);
-		if (! vertexBuffer.IsValid) {
+		if (!vertexBuffer.IsValid) {
 			GD.Print("Vertex Buffer is Invalid");
 			return;
 		}
 		vertexArray = renderingDevice.VertexArrayCreate((uint)(points.Length / 3), vertexFormat, [vertexBuffer]);
-		if (! vertexArray.IsValid) {
+		if (!vertexArray.IsValid) {
 			GD.Print("Vertex Array is Invalid");
 			return;
 		}
@@ -120,12 +121,12 @@ public partial class DrawCompositorEffect : BaseCompositorEffect {
 			0, 4, 5,
 		];
 		indexBuffer = renderingDevice.IndexBufferCreate(indices);
-		if (! indexBuffer.IsValid) {
+		if (!indexBuffer.IsValid) {
 			GD.Print("Index Buffer is Invalid");
 			return;
 		}
 		indexArray = renderingDevice.IndexArrayCreate(indexBuffer, 0, (uint)indices.Length);
-		if (! indexArray.IsValid) {
+		if (!indexArray.IsValid) {
 			GD.Print("Index Array is Invalid");
 			return;
 		}
@@ -146,7 +147,7 @@ public partial class DrawCompositorEffect : BaseCompositorEffect {
 			new RDPipelineDepthStencilState(),
 			blend
 		);
-		if (! renderPipeline.IsValid) {
+		if (!renderPipeline.IsValid) {
 			GD.Print("Render Pipeline is Invalid");
 			return;
 		}
@@ -185,11 +186,11 @@ public partial class DrawCompositorEffect : BaseCompositorEffect {
 	public override void _RenderCallback(int effectCallbackType, RenderData renderData) {
 		base._RenderCallback(effectCallbackType, renderData);
 		if (RenderingDevice is null || DrawShaderFile is null) return;
-		if (! drawShader.IsValid) {
+		if (!drawShader.IsValid) {
 			GD.Print("Shader not valid");
 			return;
 		}
-		if (! renderPipeline.IsValid) {
+		if (!renderPipeline.IsValid) {
 			GD.Print("Render Pipeline not valid");
 			return;
 		}

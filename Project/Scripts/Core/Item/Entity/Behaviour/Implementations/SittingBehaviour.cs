@@ -15,7 +15,7 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 
 
 	protected override void _Start(EntityBehaviour? previousBehaviour) {
-		if (previousBehaviour is not null && ! previousBehaviour.IsOneTime) {
+		if (previousBehaviour is not null && !previousBehaviour.IsOneTime) {
 			this.previousBehaviour = previousBehaviour;
 		}
 	}

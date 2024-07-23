@@ -7,8 +7,8 @@ public struct BoolInfo {
 	public Timer trueTimer = new();
 	public Timer falseTimer = new();
 
-	public readonly bool Started => currentValue && ! lastValue;
-	public readonly bool Stopped => ! currentValue && lastValue;
+	public readonly bool Started => currentValue && !lastValue;
+	public readonly bool Stopped => !currentValue && lastValue;
 
 
 

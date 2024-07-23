@@ -38,13 +38,13 @@ public sealed partial class EleosWeapon : Weapon, IPlayerHandler {
 		if (player.Entity is null) return;
 
 		switch (player.Entity.CurrentBehaviour) {
-		case GroundedBehaviour grounded:
-			if (player.InputDevice.IsActionJustPressed(Inputs.AttackLight)) {
-				player.Entity.ExecuteAction(new AttackBuilder(SlashAttackInfo.Instance, this, LibraryName));
-			}
+			case GroundedBehaviour grounded:
+				if (player.InputDevice.IsActionJustPressed(Inputs.AttackLight)) {
+					player.Entity.ExecuteAction(new AttackBuilder(SlashAttackInfo.Instance, this, LibraryName));
+				}
 
-			chargeAttack.ExecuteOnKeyJustPressed(player, this, LibraryName);
-			break;
+				chargeAttack.ExecuteOnKeyJustPressed(player, this, LibraryName);
+				break;
 		}
 	}
 	public override void DisavowPlayer() {

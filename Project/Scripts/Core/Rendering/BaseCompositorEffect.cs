@@ -10,15 +10,15 @@ public abstract partial class BaseCompositorEffect : CompositorEffect, ISerializ
 
 	public BaseCompositorEffect() : base() {
 		RenderingDevice ??= RenderingServer.GetRenderingDevice();
-		/* Callable.From( */Construct/* ).CallDeferred */();
+		Construct();
 	}
 
 	public override void _Notification(int what) {
 		base._Notification(what);
 		switch ((ulong)what) {
-		case NotificationPredelete:
-			Destruct();
-			break;
+			case NotificationPredelete:
+				Destruct();
+				break;
 		}
 	}
 

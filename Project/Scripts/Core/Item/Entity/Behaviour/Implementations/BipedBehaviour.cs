@@ -90,7 +90,7 @@ public partial class BipedBehaviour : GroundedBehaviour {
 	}
 
 	public override bool SetMovementType(MovementType speed) {
-		if (! base.SetMovementType(speed)) return false;
+		if (!base.SetMovementType(speed)) return false;
 		if (speed == _movementType) return false;
 
 		_movementType = speed;
@@ -133,7 +133,8 @@ public partial class BipedBehaviour : GroundedBehaviour {
 			Entity.GlobalForward = Entity.GlobalForward.SafeSlerp(normalizedInput, rotationSpeed * floatDelta);
 
 			Entity.Movement = _lastDirection * _moveSpeed * Mathf.Clamp(_lastDirection.Dot(Entity.GlobalForward), 0f, 1f);
-		} else {
+		}
+		else {
 			Entity.Movement = _lastDirection * _moveSpeed;
 		}
 

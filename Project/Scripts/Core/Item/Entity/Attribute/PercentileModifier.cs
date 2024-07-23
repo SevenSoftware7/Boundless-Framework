@@ -5,7 +5,8 @@ using Godot;
 [Tool]
 [GlobalClass]
 public sealed partial class PercentileModifier : AttributeModifier {
-	[Export] public float Percentile {
+	[Export]
+	public float Percentile {
 		get => _percentile;
 		private set {
 			_percentile = value;
@@ -19,11 +20,11 @@ public sealed partial class PercentileModifier : AttributeModifier {
 
 
 
-	public PercentileModifier(StringName name, float percentile, bool isStacking = false) : base(name) {
+	public PercentileModifier(EntityAttribute target, float percentile, bool isStacking = false) : base(target) {
 		_percentile = percentile;
 		_isStacking = isStacking;
 	}
-	private PercentileModifier() : base() {}
+	private PercentileModifier() : base() { }
 
 
 

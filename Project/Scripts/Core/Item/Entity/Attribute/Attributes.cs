@@ -1,17 +1,16 @@
 namespace LandlessSkies.Core;
 
 using System.Collections.Generic;
-using Godot;
 
 public static class Attributes {
-	public static readonly StringName GenericGravity = "generic_gravity";
-	public static readonly StringName GenericMaxHealth = "generic_max_health";
-	public static readonly StringName GenericMeleeDamage = "generic_melee_damage";
-	public static readonly StringName GenericjumpHeight = "generic_jump_height";
-	public static readonly StringName GenericMoveSpeed = "generic_move_speed";
-	public static readonly StringName GenericTurnSpeed = "generic_turn_speed";
+	public static readonly EntityAttribute GenericGravity = "generic_gravity";
+	public static readonly EntityAttribute GenericMaxHealth = "generic_max_health";
+	public static readonly EntityAttribute GenericMeleeDamage = "generic_melee_damage";
+	public static readonly EntityAttribute GenericjumpHeight = "generic_jump_height";
+	public static readonly EntityAttribute GenericMoveSpeed = "generic_move_speed";
+	public static readonly EntityAttribute GenericTurnSpeed = "generic_turn_speed";
 
-	public static readonly List<StringName> GenericAttributes = [
+	public static readonly List<EntityAttribute> GenericAttributes = [
 		GenericGravity,
 		GenericMaxHealth,
 		GenericMeleeDamage,

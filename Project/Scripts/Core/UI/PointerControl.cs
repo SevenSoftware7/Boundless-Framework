@@ -11,7 +11,7 @@ public partial class PointerControl : CenterContainer {
 		base._Process(delta);
 
 		Visible = Target is not null;
-		if (! Target.HasValue || ProjectorCamera is null) return;
+		if (!Target.HasValue || ProjectorCamera is null) return;
 
 		Position = ProjectorCamera.UnprojectPosition(Target.Value.Origin);
 	}

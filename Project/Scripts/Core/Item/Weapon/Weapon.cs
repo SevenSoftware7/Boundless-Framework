@@ -30,7 +30,8 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 	}
 	private WeaponHolsterState _holsterState = WeaponHolsterState.Unholstered;
 
-	[Export] protected bool IsHolstered {
+	[Export]
+	protected bool IsHolstered {
 		get => HolsterState.IsHolstered;
 		private set => HolsterState = value;
 	}
@@ -40,7 +41,8 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 	public abstract WeaponSize Size { get; }
 
 
-	[Export] public AnimationLibrary? AnimationLibrary {
+	[Export]
+	public AnimationLibrary? AnimationLibrary {
 		get => _animationLibrary;
 		set {
 			_animationLibrary = value;
@@ -104,7 +106,7 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 			animPlayer = player.Entity.AnimationPlayer;
 
 			GD.Print($"Adding Library {LibraryName}");
-			if (! animPlayer.HasAnimationLibrary(LibraryName)) {
+			if (!animPlayer.HasAnimationLibrary(LibraryName)) {
 				animPlayer.AddAnimationLibrary(LibraryName, AnimationLibrary);
 			}
 		}
@@ -148,13 +150,13 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 
 	public override void _Notification(int what) {
 		base._Notification(what);
-		switch ((ulong) what) {
-		case NotificationPathRenamed:
-			if (IsNodeReady()) {
-				this.RequestInjection<Skeleton3D?>();
-				this.RequestInjection<Handedness>();
-			}
-			break;
+		switch ((ulong)what) {
+			case NotificationPathRenamed:
+				if (IsNodeReady()) {
+					this.RequestInjection<Skeleton3D?>();
+					this.RequestInjection<Handedness>();
+				}
+				break;
 		}
 	}
 

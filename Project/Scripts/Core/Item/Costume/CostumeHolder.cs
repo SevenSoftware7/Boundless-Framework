@@ -5,8 +5,9 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class CostumeHolder : Node3D {
-	[Export] public Costume? Costume {
+public partial class CostumeHolder : Node3D, ISerializationListener {
+	[Export]
+	public Costume? Costume {
 		get => _costume;
 		set => SetCostume(value);
 	}
@@ -31,7 +32,7 @@ public partial class CostumeHolder : Node3D {
 	}
 
 	public void Load(bool forceReload = false) {
-		if (Model is not null && ! forceReload) return;
+		if (Model is not null && !forceReload) return;
 
 		Unload();
 
@@ -41,4 +42,11 @@ public partial class CostumeHolder : Node3D {
 		Model?.QueueFree();
 		Model = null;
 	}
+
+	public void OnBeforeSerialize() { }
+
+	public void OnAfterDeserialize() {
+		Load();
+	}
+
 }

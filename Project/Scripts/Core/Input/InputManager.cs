@@ -21,7 +21,8 @@ public partial class InputManager : Node {
 
 	public static Texture2D ActionSymbol { get; private set; } = null!;
 
-	[Export] private Texture2D _actionSymbol {
+	[Export]
+	private Texture2D _actionSymbol {
 		get => ActionSymbol;
 		set => ActionSymbol = value;
 	}

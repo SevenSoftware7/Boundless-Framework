@@ -88,14 +88,6 @@ public static class CompositorExtensions {
 		return (frameBufferTexture, frameBuffer);
 	}
 
-	// public static RDUniform GetUniform(Rid[] ids, RenderingDevice.UniformType uniformType = RenderingDevice.UniformType.Image, int binding = 0) {
-	// 	RDUniform uniform = new() {
-	// 		UniformType = uniformType,
-	// 		Binding = binding,
-	// 	};
-
-	// 	return uniform.AddIds(ids);
-	// }
 	public static RDUniform AddIds(this RDUniform uniform, Span<Rid> ids) {
 		for (int i = 0; i < ids.Length; i++) {
 			uniform.AddId(ids[i]);

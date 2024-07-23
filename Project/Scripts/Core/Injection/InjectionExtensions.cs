@@ -16,7 +16,7 @@ public static class InjectionExtensions {
 		IInjectionBlocker<T>? blockerParent = parent as IInjectionBlocker<T>;
 
 		foreach (Node child in parent.GetChildren()) {
-			if (! ignoreParentBlocker && blockerParent is not null && blockerParent.ShouldBlock(parent, value)) continue;
+			if (!ignoreParentBlocker && blockerParent is not null && blockerParent.ShouldBlock(parent, value)) continue;
 
 			T childValue = interceptorParent is not null ? interceptorParent.Intercept(child, value) : value;
 			child.PropagateInject(childValue);

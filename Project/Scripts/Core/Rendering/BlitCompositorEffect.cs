@@ -9,7 +9,8 @@ public partial class BlitCompositorEffect : BaseCompositorEffect {
 	private Rid depthSampler;
 
 
-	[Export] private RDShaderFile? ShaderFile {
+	[Export]
+	private RDShaderFile? ShaderFile {
 		get => _shaderFile;
 		set {
 			_shaderFile = value;

@@ -51,7 +51,7 @@ public sealed partial class AkimboWeapon : WeaponCollection, IInjectionIntercept
 
 	public override IEnumerable<AttackBuilder> GetAttacks(Entity target) {
 		IWeapon? currentWeapon = MainWeapon;
-		return new List<IWeapon?>() {MainWeapon, SideWeapon}
+		return new List<IWeapon?>() { MainWeapon, SideWeapon }
 			.OfType<IWeapon>()
 			.SelectMany(w => w.GetAttacks(target))
 			.Concat(base.GetAttacks(target));

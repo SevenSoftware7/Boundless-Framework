@@ -7,13 +7,15 @@ using SevenDev.Utility;
 [Tool]
 [GlobalClass]
 public partial class Gauge : Node {
-	[Export] public float MaxAmount {
+	[Export]
+	public float MaxAmount {
 		get => _maxAmount;
 		private set => SetMaximum(value, StaticRatio);
 	}
 	private float _maxAmount = 100f;
 
-	[Export] public float Amount {
+	[Export]
+	public float Amount {
 		get => _amount;
 		set {
 			float oldAmount = _amount;
@@ -28,7 +30,8 @@ public partial class Gauge : Node {
 	}
 	private float _amount;
 
-	[Export(PropertyHint.Range, "0,1,")] public float Ratio {
+	[Export(PropertyHint.Range, "0,1,")]
+	public float Ratio {
 		get => Amount / MaxAmount;
 		set => Amount = MaxAmount * value;
 	}

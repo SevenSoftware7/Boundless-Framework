@@ -52,11 +52,20 @@ public static class WaterMeshManager {
 		UpdateBuffer();
 	}
 	private static void RemoveInternal(Mesh mesh) {
-		if (! waterMeshes.TryGetValue(mesh, out var res)) return;
+		if (!waterMeshes.TryGetValue(mesh, out var res)) return;
 
 		waterVertices.RemoveRange(res.vertStartIndex, res.vertCount);
 		waterIndices.RemoveRange(res.indexStartIndex, res.indexCount);
 		waterMeshes.Remove(mesh);
+	}
+
+	public static void UpdateTransform(Mesh mesh, Transform3D transform = default) {
+		if (mesh is null) return;
+
+		RemoveInternal(mesh);
+		AddInternal(mesh, transform);
+
+		UpdateBuffer();
 	}
 
 	public static void Replace(Mesh? oldMesh, Mesh? newMesh, Transform3D transform = default) {

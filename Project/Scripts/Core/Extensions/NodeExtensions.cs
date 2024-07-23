@@ -92,7 +92,7 @@ public static class NodeExtensions {
 	public static T SafeReparentEditor<T>(this T child, Node? newParent, bool keepGlobalTransform = true) where T : Node {
 		child.SafeReparentTo(newParent, keepGlobalTransform);
 
-		if (! Engine.IsEditorHint()) return child;
+		if (!Engine.IsEditorHint()) return child;
 		if (child.Owner == newParent?.Owner) return child;
 
 		Reown(child, newParent?.Owner ?? newParent);
@@ -117,7 +117,7 @@ public static class NodeExtensions {
 	public static T SafeReparentTo<T>(this T child, Node? newParent, bool keepGlobalTransform = true) where T : Node {
 		if (child.GetParent() == newParent) return child;
 
-		if (! child.IsInsideTree()) {
+		if (!child.IsInsideTree()) {
 			child.Unparent();
 		}
 		if (child.GetParent() is null) {
@@ -186,7 +186,7 @@ public static class NodeExtensions {
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool TryGetNode<T>(this Node obj, NodePath nodePath, out T node) where T : class {
 		node = default!;
-		if (! obj.HasNode(nodePath))
+		if (!obj.HasNode(nodePath))
 			return false;
 
 		if (obj.GetNodeOrNull(nodePath) is T tNode) {
@@ -214,7 +214,9 @@ public static class NodeExtensions {
 
 		emitter = newEmitter;
 
-		if (emitter is not null && ! emitter.IsConnected(signalName, method)) { // IsConnected() sometimes does not work, not my fault https://github.com/godotengine/godot/issues/76690
+		if (emitter is not null && !emitter.IsConnected(signalName, method)) { // IsConnected() sometimes does not work, not my fault https://github.com/godotengine/godot/issues/76690
+
+
 			emitter.Connect(signalName, method, (uint)flags);
 		}
 	}
@@ -228,7 +230,7 @@ public static class NodeExtensions {
 			action?.Invoke(child);
 		}
 
-		if (! parentFirst && parent is T tParent2) {
+		if (!parentFirst && parent is T tParent2) {
 			action?.Invoke(tParent2);
 		}
 	}
@@ -243,7 +245,7 @@ public static class NodeExtensions {
 			child.PropagateAction(action, parentFirst);
 		}
 
-		if (! parentFirst && tParent is not null) {
+		if (!parentFirst && tParent is not null) {
 			action?.Invoke(tParent);
 		}
 	}

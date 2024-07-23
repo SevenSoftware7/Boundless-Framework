@@ -54,7 +54,7 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 
 	public virtual bool SetMovementType(MovementType speed) => true;
 	public override bool Move(Vector3 direction) {
-		if (! base.Move(direction)) return false;
+		if (!base.Move(direction)) return false;
 
 		_inputDirection = direction;
 		return true;
@@ -126,7 +126,7 @@ public abstract partial class GroundedBehaviour : EntityBehaviour, IPlayerHandle
 			coyoteTimer.Start();
 		}
 
-		if (JumpAction is not null && ! jumpBuffer.IsDone && jumpCooldown.IsDone && !coyoteTimer.IsDone) {
+		if (JumpAction is not null && !jumpBuffer.IsDone && jumpCooldown.IsDone && !coyoteTimer.IsDone) {
 			if (Entity.ExecuteAction(new JumpActionBuilder(JumpAction, Entity.UpDirection))) {
 				jumpBuffer.End();
 				jumpCooldown.Start();

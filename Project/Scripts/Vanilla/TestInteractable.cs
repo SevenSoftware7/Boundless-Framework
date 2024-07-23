@@ -45,6 +45,8 @@ public partial class TestInteractable : Interactable {
 				clonedEntity.GlobalTransform = GlobalTransform;
 
 				// player.Entity = clonedEntity;
+
+
 			}
 
 			SaveLoadTask = null;

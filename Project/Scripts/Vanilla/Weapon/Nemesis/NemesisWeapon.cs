@@ -29,11 +29,11 @@ public sealed partial class NemesisWeapon : Weapon, IPlayerHandler {
 		if (player.Entity is null) return;
 
 		switch (player.Entity.CurrentBehaviour) {
-		case GroundedBehaviour grounded:
-			if (player.InputDevice.IsActionJustPressed(Inputs.AttackLight)) {
-				player.Entity.ExecuteAction(new AttackBuilder(SlashAttackInfo.Instance, this, LibraryName));
-			}
-			break;
+			case GroundedBehaviour grounded:
+				if (player.InputDevice.IsActionJustPressed(Inputs.AttackLight)) {
+					player.Entity.ExecuteAction(new AttackBuilder(SlashAttackInfo.Instance, this, LibraryName));
+				}
+				break;
 		}
 	}
 }

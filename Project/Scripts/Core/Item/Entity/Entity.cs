@@ -25,7 +25,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 	[Export] public EntityStats Stats { get; private set; } = new();
 	[Export] public HudPack HudPack { get; private set; } = new();
 
-	[Export] public virtual Handedness Handedness {
+	[Export]
+	public virtual Handedness Handedness {
 		get => _handedness;
 		protected set {
 			_handedness = value;
@@ -42,7 +43,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 
 
 	[ExportGroup("Dependencies")]
-	[Export] public virtual Skeleton3D? Skeleton {
+	[Export]
+	public virtual Skeleton3D? Skeleton {
 		get => _skeleton;
 		protected set {
 			_skeleton = value;
@@ -53,7 +55,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 	}
 	private Skeleton3D? _skeleton;
 
-	[Export] public AnimationPlayer? AnimationPlayer {
+	[Export]
+	public AnimationPlayer? AnimationPlayer {
 		get => _animationPlayer;
 		private set {
 			_animationPlayer = value;
@@ -65,7 +68,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 	}
 	private AnimationPlayer? _animationPlayer;
 
-	[Export] public Gauge? Health {
+	[Export]
+	public Gauge? Health {
 		get => _health;
 		set {
 			if (_health == value) return;
@@ -93,7 +97,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 	/// <remarks>
 	/// Editing this value also changes <see cref="Forward"/> to match.
 	/// </remarks>
-	[Export] public Vector3 GlobalForward {
+	[Export]
+	public Vector3 GlobalForward {
 		get => _globalForward;
 		set => _globalForward = value.Normalized();
 	}
@@ -105,7 +110,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 	/// <remarks>
 	/// Editing this value also changes <see cref="GlobalForward"/> to match.
 	/// </remarks>
-	[Export] public Vector3 Forward {
+	[Export]
+	public Vector3 Forward {
 		get => Transform.Basis.Inverse() * _globalForward;
 		set => _globalForward = Transform.Basis * value;
 	}
@@ -125,7 +131,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 
 
 	public bool ExecuteAction(EntityActionBuilder action, bool forceExecute = false) {
-		if (! forceExecute && ! CurrentAction.CanCancel()) return false;
+		if (!forceExecute && !CurrentAction.CanCancel()) return false;
 
 		CurrentAction?.Stop();
 		CurrentAction = null;
@@ -183,7 +189,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 
 
 		bool MoveStep(double delta) {
-			if (Mathf.IsZeroApprox(Movement.LengthSquared()) || ! IsOnFloor()) return false;
+			if (Mathf.IsZeroApprox(Movement.LengthSquared()) || !IsOnFloor()) return false;
 
 			Vector3 movement = Movement * (float)delta;
 			Vector3 destination = GlobalTransform.Origin + movement;
@@ -215,7 +221,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 				stepTestResult
 			);
 
-			if (! findStep) return false;
+			if (!findStep) return false;
 			if (stepObstacleCollision is not null && stepTestResult.GetColliderRid() != stepObstacleCollision.GetColliderRid()) return false;
 
 

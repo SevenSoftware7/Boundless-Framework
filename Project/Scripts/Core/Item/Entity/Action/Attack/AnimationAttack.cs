@@ -75,7 +75,8 @@ public abstract partial class AnimationAttack(Entity entity, Weapon weapon, Stri
 			Entity.AnimationPlayer.AnimationStarted += OnStarted;
 			Entity.AnimationPlayer.AnimationChanged += OnChanged;
 			Entity.AnimationPlayer.AnimationFinished += OnFinished;
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			GD.PushError($"{GetType().Name} AnimationAttack error: {e}");
 			Stop();
 		}

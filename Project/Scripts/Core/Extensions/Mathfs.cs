@@ -5,12 +5,12 @@ using System.Runtime.CompilerServices;
 using Godot;
 
 public static class Mathfs {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static float Clamp01(this float value) {
 		return Mathf.Clamp(value, 0f, 1f);
 	}
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static double Clamp01(this double value) {
 		return Mathf.Clamp(value, 0f, 1f);
 	}

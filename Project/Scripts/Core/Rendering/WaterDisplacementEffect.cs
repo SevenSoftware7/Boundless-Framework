@@ -9,7 +9,8 @@ using SevenDev.Utility;
 public partial class WaterDisplacementEffect : BaseCompositorEffect {
 	public static readonly StringName Context = "WaterDisplacementEffect";
 	public static readonly StringName DisplacementMapName = "water_displacement";
-	[Export] private Texture2Drd? Texture {
+	[Export]
+	private Texture2Drd? Texture {
 		get => _texture;
 		set {
 			if (RenderingDevice is not null) Destruct();
@@ -22,7 +23,8 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 	private Texture2Drd? _texture;
 
 
-	[Export] private RDShaderFile? ComputeShaderFile {
+	[Export]
+	private RDShaderFile? ComputeShaderFile {
 		get => _computeShaderFile;
 		set {
 			if (RenderingDevice is not null) Destruct();
@@ -106,12 +108,12 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 		if (Texture is null || ComputeShaderFile is null) return;
 
 		computeShader = renderingDevice.ShaderCreateFromSpirV(ComputeShaderFile.GetSpirV());
-		if (! computeShader.IsValid) {
+		if (!computeShader.IsValid) {
 			throw new ArgumentException("Compute Shader is Invalid");
 		}
 
 		computePipeline = renderingDevice.ComputePipelineCreate(computeShader);
-		if (! computePipeline.IsValid) {
+		if (!computePipeline.IsValid) {
 			throw new ArgumentException("Compute Pipeline is Invalid");
 		}
 

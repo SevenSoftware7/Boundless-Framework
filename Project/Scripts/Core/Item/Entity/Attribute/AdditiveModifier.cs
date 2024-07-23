@@ -5,7 +5,8 @@ using Godot;
 [Tool]
 [GlobalClass]
 public sealed partial class AdditiveModifier : AttributeModifier {
-	[Export] public float Adder {
+	[Export]
+	public float Adder {
 		get => _adder;
 		private set {
 			_adder = value;
@@ -16,10 +17,10 @@ public sealed partial class AdditiveModifier : AttributeModifier {
 
 
 
-	public AdditiveModifier(StringName name, float adder) : base(name) {
+	public AdditiveModifier(EntityAttribute target, float adder) : base(target) {
 		_adder = adder;
 	}
-	private AdditiveModifier() : base() {}
+	private AdditiveModifier() : base() { }
 
 
 

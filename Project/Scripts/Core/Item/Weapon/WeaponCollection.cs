@@ -36,12 +36,12 @@ public abstract partial class WeaponCollection : Node, IWeapon, ISerializationLi
 	}
 	public override void _Notification(int what) {
 		base._Notification(what);
-		if (! IsNodeReady()) return;
+		if (!IsNodeReady()) return;
 
 		switch ((ulong)what) {
-		case NotificationChildOrderChanged:
-			UpdateWeapons();
-			break;
+			case NotificationChildOrderChanged:
+				UpdateWeapons();
+				break;
 		}
 	}
 
