@@ -48,11 +48,11 @@ volumetric_fog_temporal_reprojection_amount = 0.99
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_8wcfk"]
 
-[sub_resource type="CompositorEffect" id="CompositorEffect_5fpkd"]
+[sub_resource type="CompositorEffect" id="CompositorEffect_iivda"]
 resource_local_to_scene = false
 resource_name = ""
 enabled = true
-effect_callback_type = 1
+effect_callback_type = 0
 access_resolved_color = false
 access_resolved_depth = false
 needs_motion_vectors = false
@@ -74,7 +74,7 @@ ComputeShaderFile = ExtResource("4_2f2ji")
 WaterDisplacementTexture = ExtResource("5_5pwvj")
 
 [sub_resource type="Compositor" id="Compositor_gp4nw"]
-compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_5fpkd"), SubResource("CompositorEffect_8kyyx")])
+compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_iivda"), SubResource("CompositorEffect_8kyyx")])
 
 [sub_resource type="Gradient" id="Gradient_rpn3q"]
 offsets = PackedFloat32Array(0.666667, 1)
@@ -1757,7 +1757,7 @@ shape = SubResource("BoxShape3D_x4tkf")
 mesh = SubResource("BoxMesh_juan7")
 
 [node name="WaterInstance" type="MeshInstance3D" parent="Environment"]
-transform = Transform3D(60, 0, 0, 0, 13, 0, 0, 0, 58, -28.25, -8.71976, 70)
+transform = Transform3D(60, 0, 0, 0, 13, 0, 0, 0, 58, -28.25, -7.6674, 70)
 mesh = SubResource("BoxMesh_oe5ee")
 script = ExtResource("11_eq8k7")
 

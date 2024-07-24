@@ -113,7 +113,10 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			// Reset the Color and Depth textures if their sizes are wrong
 			RDTextureFormat textureFormat = sceneBuffers.GetTextureFormat(Context, WaterMapName);
 			if (textureFormat.Width != renderSize.X || textureFormat.Height != renderSize.Y
-				|| textureFormat.Format != waterMapAttachmentFormat.Format // Should only happen when actively changing the Format in the Editor
+#if TOOLS
+				// Should only happen when actively changing the Format in the Editor
+				|| textureFormat.Format != waterMapAttachmentFormat.Format
+#endif
 			) {
 				sceneBuffers.ClearContext(Context);
 			}

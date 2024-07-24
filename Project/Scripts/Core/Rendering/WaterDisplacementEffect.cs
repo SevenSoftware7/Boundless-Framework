@@ -74,21 +74,21 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 
 		// Unfolding into a push constant
 		int[] computePushConstantInts = [
-			renderSize.X, renderSize.Y, 0, 0,
+			renderSize.X, renderSize.Y,
 			// nearClippingPlane, farClippingPlane,
 
 			// waterColor.R, waterColor.G, waterColor.B, 0,
 		];
 		int intsByteCount = computePushConstantInts.Length * sizeof(int);
 
-		// float[] computePushConstantFloats = [
+		float[] computePushConstantFloats = [
+			Time.GetTicksMsec() / 1000f, 0
+		];
+		int floatsByteCount = computePushConstantFloats.Length * sizeof(float);
 
-		// ];
-		// int floatsByteCount = computePushConstantFloats.Length * sizeof(float);
-
-		byte[] computePushConstantBytes = new byte[intsByteCount/*  + floatsByteCount */];
+		byte[] computePushConstantBytes = new byte[intsByteCount + floatsByteCount];
 		Buffer.BlockCopy(computePushConstantInts, 0, computePushConstantBytes, 0, intsByteCount);
-		// Buffer.BlockCopy(computePushConstantFloats, 0, computePushConstantBytes, intsByteCount, floatsByteCount);
+		Buffer.BlockCopy(computePushConstantFloats, 0, computePushConstantBytes, intsByteCount, floatsByteCount);
 
 		// Here we draw the Underwater effect, using the waterBuffer to know where there is water geometry
 		RenderingDevice.DrawCommandBeginLabel("Render Water Displacement", new Color(1f, 1f, 1f));
