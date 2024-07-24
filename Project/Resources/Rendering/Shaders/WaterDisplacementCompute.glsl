@@ -3,7 +3,7 @@
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
-layout(rgba32f, set = 0, binding = 0) uniform image2D color_image; // Color to output the computed displacement to
+layout(rgba32f, set = 0, binding = 0) uniform image2D displacement_image; // Image to output the computed displacement to
 
 layout(push_constant, std430) uniform Params {
 	restrict readonly ivec2 size; // x: texture width, y: texture height
@@ -110,5 +110,5 @@ void main()
 	vec3 displacement = generate_displacement(scaled_uv);
 	displacement = clamp(displacement * 0.5 + 0.5, 0, 1); // keep values in range [-1, 1] and store as [0, 1]
 
-	imageStore(color_image, uv, vec4(displacement, 0));
+	imageStore(displacement_image, uv, vec4(displacement, 0));
 }
