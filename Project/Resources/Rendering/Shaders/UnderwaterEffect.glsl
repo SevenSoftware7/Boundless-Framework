@@ -14,25 +14,31 @@ layout(push_constant, std430) uniform Params {
 };
 
 
-float delinearize_depth(float depth, float zNear, float zFar)
-{
-	depth = 2.0 * depth - 1.0;
-	float zLinear = 2.0 * zNear * zFar / (zFar + zNear - depth * (zFar - zNear));
-	return zLinear;
-}
 float linearize_depth(float depth, float zNear, float zFar)
 {
-	float nonLinearDepth = (zFar + zNear - 2.0 * zNear * zFar / depth) / (zFar - zNear);
-	nonLinearDepth = (nonLinearDepth + 1.0) / 2.0;
-	return nonLinearDepth;
+	float z_ndc = depth * 2.0 - 1.0; // Convert [0, 1] depth to [-1, 1] NDC space
+	float linear = (2.0 * zNear * zFar) / (zFar + zNear - z_ndc * (zFar - zNear));
+	return (linear - zNear) / (zFar - zNear); // Normalize to [0, 1] range
+}
+
+
+vec3 apply_underwater_fog(vec3 color, vec3 fog_color, float depth, float fog_density, float fog_distance)
+{
+	float fog_factor = clamp(depth * fog_distance / fog_density, 0, 1);
+	return mix(fog_color, color, fog_factor);
 }
 
 void main()
 {
 	ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
 
+	// r: underwater mask, underwater if > 0, out of water if 0
+	// g: unused (feel free to use it for something)
+	// b: depth of the water (z)
+	// a: W value of the water fragment (w)
 	vec4 water_map = imageLoad(water_map_image, uv);
-	if (water_map.r == 0) return;
+
+	if (water_map.r == 0) return; // Stop if there is no water to render
 	float water_depth = water_map.z;
 
 	vec2 depth_uv = vec2(uv) / screen_size;
@@ -40,11 +46,11 @@ void main()
 
 	// The amount of water we are looking through is either the end of the water volume (water_depth) or the closest surface (depth)
 	float max_depth = max(depth, water_depth);
-	max_depth = clamp(linearize_depth(max_depth, clipping_planes.x, clipping_planes.y), 0, 1);
+	// max_depth = clamp(linearize_depth(max_depth, clipping_planes.x, clipping_planes.y), 0, 1);
 
 	// Actual water color calculation
 	vec3 color = imageLoad(color_image, uv).rgb;
-	vec3 water_color = mix(color, water_color, (1 - max_depth) * 0.7);
+	vec3 water_color = apply_underwater_fog(color, water_color, max_depth, 0.3, 7.0);
 
 	imageStore(color_image, uv, vec4(mix(color, water_color, water_map.r), 1));
 }
