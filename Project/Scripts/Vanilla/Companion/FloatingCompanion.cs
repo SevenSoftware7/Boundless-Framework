@@ -70,7 +70,7 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 		}
 
 		if (OnFace && Entity?.Health is not null) {
-			Entity.Health.Amount += floatDelta;
+			Entity.Health.Value += floatDelta;
 		}
 
 		OnFace |= PositionBlocked(Head * rightPosition) && PositionBlocked(Head * leftPosition);

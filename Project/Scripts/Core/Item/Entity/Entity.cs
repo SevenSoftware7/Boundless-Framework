@@ -254,13 +254,13 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 	public void Damage(float amount) {
 		if (Health is null) return;
 		// TODO: damage reduction, absorption, etc...
-		Health.Amount -= amount;
+		Health.Value -= amount;
 		GD.Print($"Entity {Name} took {amount} Damage");
 	}
 
 	public void Kill() {
 		if (Health is null) return;
-		Health.Amount = 0;
+		Health.Value = 0;
 	}
 
 
@@ -280,7 +280,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 		GD.Print($"Entity {Name} Voided out.");
 
 		if (Health is not null) {
-			Health.Amount -= Health.MaxAmount / 8f;
+			Health.Value -= Health.Maximum / 8f;
 		}
 	}
 

@@ -42,13 +42,18 @@ public sealed class AttributeModifierCollection : ICollection<AttributeModifier>
 			entry.Add(item);
 		}
 
-		item.Changed += OnModifiersUpdated;
+		Callable changeCallable = Callable.From(OnModifiersUpdated!);
+
+		if (!item.IsConnected(Resource.SignalName.Changed, changeCallable)) {
+			item.Connect(Resource.SignalName.Changed, changeCallable);
+		}
 	}
 
 	public void AddRange(IEnumerable<AttributeModifier> items) {
 		foreach (AttributeModifier item in items) {
-			Add(item);
+			AddInternal(item);
 		}
+		OnModifiersUpdated?.Invoke();
 	}
 
 	public bool Remove(AttributeModifier item) {
@@ -62,14 +67,19 @@ public sealed class AttributeModifierCollection : ICollection<AttributeModifier>
 		if (Unsafe.IsNullRef(ref entry) || !entry.Remove(item))
 			return false;
 
-		item.Changed -= OnModifiersUpdated;
+		Callable changeCallable = Callable.From(OnModifiersUpdated!);
+
+		if (item.IsConnected(Resource.SignalName.Changed, changeCallable)) {
+			item.Disconnect(Resource.SignalName.Changed, changeCallable);
+		}
 		return true;
 	}
 
 	public void RemoveRange(IEnumerable<AttributeModifier> items) {
 		foreach (AttributeModifier item in items) {
-			Remove(item);
+			RemoveInternal(item);
 		}
+		OnModifiersUpdated?.Invoke();
 	}
 
 	public void Set(IEnumerable<AttributeModifier> modifiers) {
@@ -104,15 +114,6 @@ public sealed class AttributeModifierCollection : ICollection<AttributeModifier>
 	public bool Contains(AttributeModifier item) =>
 		_dictionary.TryGetValue(item.Target, out AttributeModifierEntry entry) &&
 		entry.Contains(item);
-	public bool ContainsAll(IEnumerable<AttributeModifier> items) {
-		foreach (AttributeModifier item in items) {
-			if (!Contains(item)) {
-				GD.Print(item);
-				return false;
-			}
-		}
-		return true;
-	}
 
 	public void CopyTo(AttributeModifier[] array, int arrayIndex) =>
 		_dictionary.Values

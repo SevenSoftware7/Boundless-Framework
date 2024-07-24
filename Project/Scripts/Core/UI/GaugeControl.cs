@@ -25,8 +25,8 @@ public abstract partial class GaugeControl : Control {
 			NodeExtensions.SwapSignalEmitter(ref _value, value, Gauge.SignalName.ValueChanged, onValueChanged);
 
 			if (_value is not null) {
-				OnMaximumChanged(_value.Amount);
-				OnValueChanged(_value.Amount);
+				OnMaximumChanged(_value.Value);
+				OnValueChanged(_value.Value);
 			}
 		}
 	}

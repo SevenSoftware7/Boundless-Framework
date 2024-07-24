@@ -2,38 +2,39 @@ namespace LandlessSkies.Core;
 
 using Godot;
 using Godot.Collections;
-using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
 public partial class Gauge : Node {
 	[Export]
-	public float MaxAmount {
-		get => _maxAmount;
+	public float Maximum {
+		get => _maximum;
 		private set => SetMaximum(value, StaticRatio);
 	}
-	private float _maxAmount = 100f;
+	private float _maximum = 100f;
 
 	[Export]
-	public float Amount {
-		get => _amount;
+	public float Value {
+		get => _value;
 		set {
-			float oldAmount = _amount;
-			_amount = Mathf.Clamp(value, 0f, _maxAmount);
+			float oldValue = _value;
+			_value = Mathf.Clamp(value, 0f, _maximum);
 
-			if (_amount == 0f) {
-				EmitSignal(SignalName.Emptied, oldAmount);
+			if (_value == oldValue) return;
+
+			if (_value == 0f) {
+				EmitSignal(SignalName.Emptied, oldValue);
 			}
 
-			EmitSignal(SignalName.ValueChanged, _amount);
+			EmitSignal(SignalName.ValueChanged, _value);
 		}
 	}
-	private float _amount;
+	private float _value;
 
 	[Export(PropertyHint.Range, "0,1,")]
 	public float Ratio {
-		get => Amount / MaxAmount;
-		set => Amount = MaxAmount * value;
+		get => Value / Maximum;
+		set => Value = Maximum * value;
 	}
 	[Export] public bool StaticRatio = false;
 
@@ -45,29 +46,27 @@ public partial class Gauge : Node {
 
 
 	protected Gauge() : base() {
-		_amount = _maxAmount;
+		_value = _maximum;
 	}
-	public Gauge(float max) : this() {
-		_maxAmount = max;
+	public Gauge(float maximum) : this() {
+		_maximum = maximum;
 	}
 
-	public void SetMaximum(float max, bool keepAmountRatio = false) {
-		if (max == _maxAmount) return;
+	public void SetMaximum(float maximum, bool keepRatio = false) {
+		float oldMaximum = _maximum;
+		_maximum = Mathf.Max(maximum, 0f);
 
-		float oldMaxAmount = _maxAmount;
-		_maxAmount = Mathf.Max(max, 0f);
+		if (_maximum == oldMaximum) return;
 
-		Amount = keepAmountRatio
-			? Mathf.Clamp(_amount / oldMaxAmount, 0f, 1f) * _maxAmount
-			: Mathf.Min(Amount, _maxAmount);
+		Value = keepRatio
+			? Mathf.Clamp(_value / oldMaximum, 0f, 1f) * _maximum
+			: Mathf.Min(Value, _maximum);
 
-		EmitSignal(SignalName.MaximumChanged, _maxAmount);
-
-		NotifyPropertyListChanged();
+		EmitSignal(SignalName.MaximumChanged, _maximum);
 	}
 
 	public void Kill() {
-		Amount = 0f;
+		Value = 0f;
 	}
 
 	public override void _Ready() {
@@ -79,9 +78,9 @@ public partial class Gauge : Node {
 
 		StringName name = property["name"].AsStringName();
 
-		if (name == PropertyName.Amount) {
+		if (name == PropertyName.Value) {
 			property["hint"] = (int)PropertyHint.Range;
-			property["hint_string"] = $"0,{MaxAmount},";
+			property["hint_string"] = $"0,{Maximum},";
 		}
 	}
 }
