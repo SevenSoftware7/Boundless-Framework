@@ -30,14 +30,10 @@ public partial class DrivingBehaviour : SittingBehaviour {
 	public override void HandlePlayer(Player player) {
 		Vehicle?.HandlePlayer(player); // Do it in this order because player handling is done child-first
 
-
-
 		base.HandlePlayer(player);
 	}
 	public override void DisavowPlayer() {
 		Vehicle?.DisavowPlayer(); // Same here
-
-
 
 		base.DisavowPlayer();
 	}

@@ -14,8 +14,9 @@ using SevenDev.Utility;
 [Tool]
 [GlobalClass]
 public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICostumable, ICustomizable, ISaveable<Entity>, IInjectionProvider<Skeleton3D?>, IInjectionProvider<Handedness> {
-	private readonly List<Vector3> standableSurfaceBuffer = [];
-	private const int STANDABLE_SURFACE_BUFFER_SIZE = 20;
+	public readonly List<Vector3> RecoverLocationBuffer = [];
+	public const int RECOVER_LOCATION_BUFFER_SIZE = 20;
+
 	private GaugeControl? healthBar;
 
 	[Export] public string DisplayName { get; private set; } = string.Empty;
@@ -161,92 +162,6 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 		behaviour.Start(oldBehaviour);
 	}
 
-	private void Move(double delta) {
-		if (MotionMode == MotionModeEnum.Grounded) {
-			if (
-				IsOnFloor() && GetPlatformVelocity().IsZeroApprox()
-				// && (lastStandableSurfaces.Count == 0 || GlobalPosition.DistanceSquaredTo(lastStandableSurfaces[^1]) > 0.25f)
-			) {
-				if (standableSurfaceBuffer.Count >= STANDABLE_SURFACE_BUFFER_SIZE) standableSurfaceBuffer.RemoveRange(0, standableSurfaceBuffer.Count - STANDABLE_SURFACE_BUFFER_SIZE);
-				standableSurfaceBuffer.Add(GlobalPosition);
-			}
-
-			Inertia.Split(UpDirection, out Vector3 verticalInertia, out Vector3 horizontalInertia);
-
-			if (IsOnFloor()) {
-				verticalInertia = verticalInertia.SlideOnFace(UpDirection);
-			}
-			if (IsOnCeiling()) {
-				verticalInertia = verticalInertia.SlideOnFace(-UpDirection);
-			}
-
-			Inertia = horizontalInertia + verticalInertia;
-
-			if (MoveStep(delta)) {
-				Movement = Vector3.Zero;
-			}
-		}
-
-		Velocity = Inertia + Movement;
-
-		MoveAndSlide();
-
-
-		bool MoveStep(double delta) {
-			if (Mathf.IsZeroApprox(Movement.LengthSquared()) || !IsOnFloor()) return false;
-
-			Vector3 movement = Movement * (float)delta;
-			Vector3 destination = GlobalTransform.Origin + movement;
-
-			KinematicCollision3D? stepObstacleCollision = MoveAndCollide(movement, true);
-
-			float margin = Mathf.Epsilon;
-
-			// // Down Step
-			// if (stepObstacleCollision is null) {
-			// 	margin += 4.5f;
-			// }
-
-			Vector3 sweepStart = destination;
-			Vector3 sweepMotion = (Stats.StepHeight + margin) * -UpDirection;
-
-			// Up Step
-			if (stepObstacleCollision is not null) {
-				sweepStart -= sweepMotion;
-			}
-
-			PhysicsTestMotionResult3D stepTestResult = new();
-			bool findStep = PhysicsServer3D.BodyTestMotion(
-				GetRid(),
-				new() {
-					From = GlobalTransform with { Origin = sweepStart },
-					Motion = sweepMotion,
-				},
-				stepTestResult
-			);
-
-			if (!findStep) return false;
-			if (stepObstacleCollision is not null && stepTestResult.GetColliderRid() != stepObstacleCollision.GetColliderRid()) return false;
-
-
-			Vector3 point = stepTestResult.GetCollisionPoint();
-
-			Vector3 destinationHeight = destination.Project(UpDirection);
-			Vector3 pointHeight = point.Project(UpDirection);
-
-			float stepHeightSquared = destinationHeight.DistanceSquaredTo(pointHeight);
-			if (stepHeightSquared >= sweepMotion.LengthSquared()) return false;
-
-
-			GlobalTransform = GlobalTransform with { Origin = destination - destinationHeight + pointHeight };
-			// if (stepHeightSquared >= Mathf.Pow(stepHeight, 2f) / 4f) {
-			// 	GD.Print("Step Found");
-			// }
-
-			return true;
-		}
-	}
-
 
 	public virtual List<ICustomization> GetCustomizations() => [];
 	public virtual List<ICustomizable> GetSubCustomizables() => [.. GetChildren().OfType<ICustomizable>()];
@@ -269,13 +184,14 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 	}
 
 	public void VoidOut() {
-		if (standableSurfaceBuffer.Count == 0) {
-			GD.PushError("Could not Void out Properly");
+		if (RecoverLocationBuffer.Count == 0) {
+			GD.PushError("Could not Void out Properly, falling back to World Origin");
+			GlobalPosition = Vector3.Zero;
 			return;
 		}
 
-		standableSurfaceBuffer.RemoveRange(1, standableSurfaceBuffer.Count - 1);
-		GlobalPosition = standableSurfaceBuffer[0];
+		RecoverLocationBuffer.RemoveRange(1, RecoverLocationBuffer.Count - 1);
+		GlobalPosition = RecoverLocationBuffer[0];
 
 		GD.Print($"Entity {Name} Voided out.");
 
@@ -308,14 +224,6 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 		_health?.SetMaximum(AttributeModifiers.ApplyTo(Attributes.GenericMaxHealth, Stats.MaxHealth), keepRatio);
 	}
 	private void OnHealthModifiersUpdate() => UpdateHealth(false);
-
-	public override void _Process(double delta) {
-		base._Process(delta);
-
-		if (Engine.IsEditorHint()) return;
-
-		Move(delta);
-	}
 
 	public override void _Ready() {
 		base._Ready();

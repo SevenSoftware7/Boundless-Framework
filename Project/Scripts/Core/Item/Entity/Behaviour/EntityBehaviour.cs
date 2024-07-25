@@ -20,8 +20,6 @@ public abstract partial class EntityBehaviour : Node {
 	}
 
 
-	public virtual bool Move(Vector3 direction) => true;
-
 	public void Start(EntityBehaviour? previousBehaviour) {
 		ProcessMode = ProcessModeEnum.Inherit;
 		_Start(previousBehaviour);
