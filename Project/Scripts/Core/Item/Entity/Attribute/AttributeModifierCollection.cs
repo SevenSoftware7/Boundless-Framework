@@ -14,8 +14,10 @@ public sealed class AttributeModifierCollection : ICollection<AttributeModifier>
 	public int Count => _dictionary.Values.Sum(e => e.Count);
 	public bool IsReadOnly => false;
 
-	public event Action<AttributeModifier>? OnModifierAdded;
-	public event Action<AttributeModifier>? OnModifierRemoved;
+	// Ideally, this would be of type Action<EntityAttribute>? so we can optimize when we refresh data,
+	// But Godot Signals don't play nice with Lambdas so we can't inject parameters in the event invocations.
+	// -----> https://github.com/godotengine/godot/issues/76690
+	public event Action? OnModifiersUpdated;
 
 
 	public float ApplyTo(EntityAttribute target, float baseValue) {
@@ -26,6 +28,11 @@ public sealed class AttributeModifierCollection : ICollection<AttributeModifier>
 	}
 
 	public void Add(AttributeModifier item) {
+		AddInternal(item);
+		OnModifiersUpdated?.Invoke();
+	}
+
+	private void AddInternal(AttributeModifier item) {
 		ref AttributeModifierEntry entry = ref CollectionsMarshal.GetValueRefOrAddDefault(_dictionary, item.Target, out bool existed);
 
 		if (!existed) {
@@ -35,7 +42,7 @@ public sealed class AttributeModifierCollection : ICollection<AttributeModifier>
 			entry.Add(item);
 		}
 
-		OnModifierAdded?.Invoke(item);
+		item.Changed += OnModifiersUpdated;
 	}
 
 	public void AddRange(IEnumerable<AttributeModifier> items) {
@@ -45,13 +52,17 @@ public sealed class AttributeModifierCollection : ICollection<AttributeModifier>
 	}
 
 	public bool Remove(AttributeModifier item) {
-		GD.Print($"remove {item}");
+		bool wasRemoved = RemoveInternal(item);
+		if (wasRemoved) OnModifiersUpdated?.Invoke();
+		return wasRemoved;
+	}
 
+	private bool RemoveInternal(AttributeModifier item) {
 		ref var entry = ref CollectionsMarshal.GetValueRefOrNullRef(_dictionary, item.Target);
 		if (Unsafe.IsNullRef(ref entry) || !entry.Remove(item))
 			return false;
 
-		OnModifierRemoved?.Invoke(item);
+		item.Changed -= OnModifiersUpdated;
 		return true;
 	}
 

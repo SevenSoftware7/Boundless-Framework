@@ -307,7 +307,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 	private void UpdateHealth(bool keepRatio) {
 		_health?.SetMaximum(AttributeModifiers.ApplyTo(Attributes.GenericMaxHealth, Stats.MaxHealth), keepRatio);
 	}
-	private void UpdateHealth() => UpdateHealth(false);
+	private void OnHealthModifiersUpdate() => UpdateHealth(false);
 
 	public override void _Process(double delta) {
 		base._Process(delta);
@@ -325,20 +325,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 
 		UpdateHealth(true);
 
-		// We should make an "OnModifierUpdate(EntityAttribute)" event in AttributeModifierCollection
-		// but we can't because Godot Signals are janky when it comes to lambda functions and disconnecting them
-		AttributeModifiers.OnModifierAdded += modifier => {
-			if (modifier.Target == Attributes.GenericMaxHealth) {
-				modifier.Changed += UpdateHealth;
-				UpdateHealth();
-			}
-		};
-		AttributeModifiers.OnModifierRemoved += modifier => {
-			if (modifier.Target == Attributes.GenericMaxHealth) {
-				modifier.Changed -= UpdateHealth;
-				UpdateHealth();
-			}
-		};
+		AttributeModifiers.OnModifiersUpdated += OnHealthModifiersUpdate;
 
 		if (_globalForward == Vector3.Zero) {
 			_globalForward = GlobalBasis.Forward();
