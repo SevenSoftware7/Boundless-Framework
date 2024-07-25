@@ -8,9 +8,10 @@ public sealed partial class PercentileModifier : AttributeModifier {
 	[Export]
 	public float Percentile {
 		get => _percentile;
-		private set {
+		set {
 			_percentile = value;
 			UpdateName();
+			EmitChanged();
 		}
 	}
 	private float _percentile;

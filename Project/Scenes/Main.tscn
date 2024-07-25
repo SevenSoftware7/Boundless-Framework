@@ -1,4 +1,4 @@
-[gd_scene load_steps=98 format=3 uid="uid://b505xodur2iff"]
+[gd_scene load_steps=103 format=3 uid="uid://b505xodur2iff"]
 
 [ext_resource type="PackedScene" uid="uid://bxcpbr13uyeh1" path="res://Resources/Entities/Bike/Bike.tscn" id="1_pikp0"]
 [ext_resource type="RDShaderFile" uid="uid://caumal2txsxfx" path="res://Resources/Rendering/Shaders/UnderwaterEffect.glsl" id="4_2f2ji"]
@@ -16,7 +16,9 @@
 [ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/Implementations/AkimboWeapon.cs" id="11_uqmxm"]
 [ext_resource type="PackedScene" uid="uid://fbs6dr24ss3g" path="res://Resources/Weapons/Epiphron/Epiphron.tscn" id="12_1jl3t"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/Implementations/MultiWeapon.cs" id="13_d6cna"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Attribute/AttributeModifierTrigger.cs" id="14_w4log"]
 [ext_resource type="PackedScene" uid="uid://b7b17ebmgtrfy" path="res://Resources/Weapons/Nemesis/Nemesis.tscn" id="15_x4bcq"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Attribute/AdditiveModifier.cs" id="15_y8l2d"]
 [ext_resource type="PackedScene" uid="uid://bp1e6thwkkcrr" path="res://Resources/Weapons/Eleos/Eleos.tscn" id="17_jhoyp"]
 [ext_resource type="Script" path="res://Scripts/Core/Damage/DamageArea3D.cs" id="19_77ura"]
 [ext_resource type="PackedScene" uid="uid://b7hcoc81x5g0i" path="res://Resources/Companions/Erebos.tscn" id="26_ds8t8"]
@@ -52,7 +54,7 @@ volumetric_fog_temporal_reprojection_amount = 0.99
 resource_local_to_scene = false
 resource_name = ""
 enabled = true
-effect_callback_type = 0
+effect_callback_type = 1
 access_resolved_color = false
 access_resolved_depth = false
 needs_motion_vectors = false
@@ -1423,14 +1425,28 @@ subdivide_width = 32
 subdivide_height = 32
 subdivide_depth = 32
 
+[sub_resource type="Resource" id="Resource_tocgr"]
+resource_name = "+-15 generic_max_health"
+script = ExtResource("15_y8l2d")
+Adder = -15.0
+Name = &"generic_max_health"
+
 [sub_resource type="SphereShape3D" id="SphereShape3D_d0jor"]
 radius = 1.0
 
-[sub_resource type="ORMMaterial3D" id="ORMMaterial3D_g7pdi"]
+[sub_resource type="ORMMaterial3D" id="ORMMaterial3D_xlwmm"]
+albedo_color = Color(0, 0, 0, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_xl38q"]
+material = SubResource("ORMMaterial3D_xlwmm")
+radius = 1.0
+height = 2.0
+
+[sub_resource type="ORMMaterial3D" id="ORMMaterial3D_jna2o"]
 albedo_color = Color(1, 0, 0, 1)
 
-[sub_resource type="SphereMesh" id="SphereMesh_62qap"]
-material = SubResource("ORMMaterial3D_g7pdi")
+[sub_resource type="SphereMesh" id="SphereMesh_c40qo"]
+material = SubResource("ORMMaterial3D_jna2o")
 radius = 1.0
 height = 2.0
 
@@ -1743,7 +1759,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30201, -4.81285)
 curve = SubResource("Curve3D_1g2j1")
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Environment/Path3D"]
-transform = Transform3D(-0.0922568, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97163e-07, 0.995733, 8.27696e-08, -0.0922568, -1.98959, 0, 2.30373)
+transform = Transform3D(-0.0922569, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97164e-07, 0.995733, 8.27696e-08, -0.0922569, -1.98959, 0, 2.30373)
 script = ExtResource("36_x7xeh")
 
 [node name="AnimatableBody3D" type="AnimatableBody3D" parent="Environment/Path3D/PathFollow3D"]
@@ -1764,6 +1780,20 @@ script = ExtResource("11_eq8k7")
 [node name="Player" parent="." node_paths=PackedStringArray("Entity") instance=ExtResource("26_rkn04")]
 Entity = NodePath("../Eos")
 
+[node name="WitherArea3D" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.4761, 1.30216, -12.7711)
+collision_layer = 16
+collision_mask = 18
+script = ExtResource("14_w4log")
+_attributeModifiers = [SubResource("Resource_tocgr")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WitherArea3D"]
+shape = SubResource("SphereShape3D_d0jor")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="WitherArea3D/CollisionShape3D"]
+mesh = SubResource("SphereMesh_xl38q")
+skeleton = NodePath("../..")
+
 [node name="DamageArea3D" type="Area3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.4761, 1.30216, -12.7711)
 collision_layer = 16
@@ -1774,7 +1804,7 @@ script = ExtResource("19_77ura")
 shape = SubResource("SphereShape3D_d0jor")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="DamageArea3D/CollisionShape3D"]
-mesh = SubResource("SphereMesh_62qap")
+mesh = SubResource("SphereMesh_c40qo")
 skeleton = NodePath("../..")
 
 [node name="TestInteractable" type="Area3D" parent="."]
@@ -1817,10 +1847,12 @@ skeleton = NodePath("../../CollisionShape3D/MeshInstance3D")
 
 [node name="Bike" parent="." instance=ExtResource("1_pikp0")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.99529, 2, 34.5791)
+_attributeModifiers = [null]
 
 [node name="Eos" parent="." instance=ExtResource("9_0jt21")]
 process_priority = -10
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.62958, 2, 33.2576)
+_attributeModifiers = [null]
 
 [node name="Weapon" type="Node" parent="Eos"]
 script = ExtResource("11_uqmxm")

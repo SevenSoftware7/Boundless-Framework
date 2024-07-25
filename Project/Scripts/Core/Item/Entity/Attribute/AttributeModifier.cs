@@ -11,9 +11,12 @@ public abstract partial class AttributeModifier : Resource, IAttributeModifier {
 	[Export]
 	public StringName Name {
 		get => Target.Name;
-		set => Target = value;
+		set {
+			Target = value;
+			EmitChanged();
+		}
 	}
-	public EntityAttribute Target { get; private set; } = string.Empty;
+	public EntityAttribute Target { get; private set; } = Attributes.GenericAttributes[0];
 	public virtual bool IsStacking => false;
 
 

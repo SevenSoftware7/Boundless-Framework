@@ -8,9 +8,10 @@ public sealed partial class MultiplicativeModifier : AttributeModifier {
 	[Export]
 	public float Multiplier {
 		get => _multiplier;
-		private set {
+		set {
 			_multiplier = value;
 			UpdateName();
+			EmitChanged();
 		}
 	}
 	private float _multiplier;

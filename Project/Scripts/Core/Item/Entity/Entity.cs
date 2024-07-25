@@ -84,7 +84,11 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 	[ExportGroup("State")]
 	[Export] public EntityAction? CurrentAction { get; private set; }
 	[Export] public EntityBehaviour? CurrentBehaviour { get; private set; }
-	[Export] public Godot.Collections.Array<AttributeModifier> AttributeModifiers { get; private set; } = [];
+	[Export] private Godot.Collections.Array<AttributeModifier> _attributeModifiers {
+		get => [.. AttributeModifiers, null];
+		set => AttributeModifiers.Set([.. value.Where(a => a is not null)]);
+	}
+	public readonly AttributeModifierCollection AttributeModifiers = [];
 
 
 	[ExportGroup("Movement")]
@@ -303,11 +307,10 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 	private void UpdateHealth(bool keepRatio) {
 		_health?.SetMaximum(AttributeModifiers.ApplyTo(Attributes.GenericMaxHealth, Stats.MaxHealth), keepRatio);
 	}
+	private void UpdateHealth() => UpdateHealth(false);
 
 	public override void _Process(double delta) {
 		base._Process(delta);
-
-		UpdateHealth(false);
 
 		if (Engine.IsEditorHint()) return;
 
@@ -321,6 +324,21 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 		this.PropagateInject<Handedness>();
 
 		UpdateHealth(true);
+
+		// We should make an "OnModifierUpdate(EntityAttribute)" event in AttributeModifierCollection
+		// but we can't because Godot Signals are janky when it comes to lambda functions and disconnecting them
+		AttributeModifiers.OnModifierAdded += modifier => {
+			if (modifier.Target == Attributes.GenericMaxHealth) {
+				modifier.Changed += UpdateHealth;
+				UpdateHealth();
+			}
+		};
+		AttributeModifiers.OnModifierRemoved += modifier => {
+			if (modifier.Target == Attributes.GenericMaxHealth) {
+				modifier.Changed -= UpdateHealth;
+				UpdateHealth();
+			}
+		};
 
 		if (_globalForward == Vector3.Zero) {
 			_globalForward = GlobalBasis.Forward();

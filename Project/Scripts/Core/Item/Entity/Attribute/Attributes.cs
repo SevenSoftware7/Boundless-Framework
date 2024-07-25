@@ -11,12 +11,12 @@ public static class Attributes {
 	public static readonly EntityAttribute GenericTurnSpeed = "generic_turn_speed";
 
 	public static readonly List<EntityAttribute> GenericAttributes = [
-		GenericGravity,
 		GenericMaxHealth,
 		GenericMeleeDamage,
-		GenericjumpHeight,
 		GenericMoveSpeed,
 		GenericTurnSpeed,
+		GenericjumpHeight,
+		GenericGravity,
 	];
 
 }

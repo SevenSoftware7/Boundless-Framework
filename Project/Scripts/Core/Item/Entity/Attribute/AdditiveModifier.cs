@@ -8,9 +8,10 @@ public sealed partial class AdditiveModifier : AttributeModifier {
 	[Export]
 	public float Adder {
 		get => _adder;
-		private set {
+		set {
 			_adder = value;
 			UpdateName();
+			EmitChanged();
 		}
 	}
 	private float _adder;
