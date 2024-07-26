@@ -6,7 +6,7 @@ using LandlessSkies.Core;
 [Tool]
 [GlobalClass]
 public partial class DrivingBehaviour : SittingBehaviour {
-	[Export] public VehicleBehaviour? Vehicle;
+	[Export] public VehicleBehaviour Vehicle;
 
 	private EntityBehaviour? previousBehaviour;
 
@@ -23,17 +23,21 @@ public partial class DrivingBehaviour : SittingBehaviour {
 		base._Stop();
 		if (Entity is null || Vehicle?.Entity is null) return;
 
-		Entity.Inertia += Vehicle.Entity.Velocity;
+		Entity.Inertia += Vehicle.Entity.Movement + Vehicle.Entity.Inertia;
 	}
 
+	public override void Dismount() {
+		base.Dismount();
+		Vehicle.Driver = null;
+	}
 
 	public override void HandlePlayer(Player player) {
-		Vehicle?.HandlePlayer(player); // Do it in this order because player handling is done child-first
+		Vehicle.HandlePlayer(player); // Do this child-first because player handling is done in that order
 
 		base.HandlePlayer(player);
 	}
 	public override void DisavowPlayer() {
-		Vehicle?.DisavowPlayer(); // Same here
+		Vehicle.DisavowPlayer(); // Same here
 
 		base.DisavowPlayer();
 	}

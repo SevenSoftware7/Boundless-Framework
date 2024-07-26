@@ -14,7 +14,7 @@ layout(push_constant, std430) uniform Params {
 
 void main()
 {
-	highp vec3 water_displacement = (texture(water_displacement_image, world_vertex.xz / water_scale).rgb * 2.0 - 1.0) * water_intensity;
+	highp vec3 water_displacement = (texture(water_displacement_image, world_vertex.xz / water_scale).xyz * 2.0 - 1.0) * water_intensity;
 	highp vec4 clip_pos = world_to_clip * vec4(world_vertex + water_displacement, 1.0);
 	clip_pos.xy += eye_offset;
 

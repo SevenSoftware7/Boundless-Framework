@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://br3hg0ejs6wif"
+path="res://.godot/imported/FetchWaterData.glsl-24a18dfcc6afe1b20157214c3ec34698.res"
+
+[deps]
+
+source_file="res://Resources/Rendering/Shaders/FetchWaterData.glsl"
+dest_files=["res://.godot/imported/FetchWaterData.glsl-24a18dfcc6afe1b20157214c3ec34698.res"]
+
+[params]
+

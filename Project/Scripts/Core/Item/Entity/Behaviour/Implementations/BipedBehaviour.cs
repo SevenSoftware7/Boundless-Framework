@@ -42,7 +42,7 @@ public partial class BipedBehaviour : GroundedBehaviour {
 			interactPointer ??= player.HudManager.AddPointer(Entity?.HudPack.InteractPointer);
 		}
 
-		float speedSquared = _inputDirection.LengthSquared();
+		float speedSquared = _moveDirection.LengthSquared();
 		MovementType speed = speedSquared switch {
 			_ when Mathf.IsZeroApprox(speedSquared) => MovementType.Idle,
 			_ when speedSquared <= 0.25f || player.InputDevice.IsActionPressed(Inputs.Walk) => MovementType.Walk,
@@ -65,6 +65,7 @@ public partial class BipedBehaviour : GroundedBehaviour {
 		interactPointer = null;
 
 		_lastDirection = Vector3.Zero;
+		_movementType = MovementType.Idle;
 	}
 
 	private void HandleInteraction(Player player) {
@@ -97,20 +98,10 @@ public partial class BipedBehaviour : GroundedBehaviour {
 		return true;
 	}
 
-
-
-	public override void _Process(double delta) {
-		base._Process(delta);
-
-		if (Engine.IsEditorHint()) return;
-		if (Entity is null) return;
-
-
+	protected override void HandleGroundedMovement(double delta) {
 		float floatDelta = (float)delta;
 
-
 		// ---- Speed Calculation ----
-
 		float newSpeed = _movementType switch {
 			MovementType.Walk => Entity.Stats.SlowSpeed,
 			MovementType.Run => Entity.Stats.BaseSpeed,
@@ -127,7 +118,7 @@ public partial class BipedBehaviour : GroundedBehaviour {
 		float rotationSpeed = Entity.AttributeModifiers.ApplyTo(Attributes.GenericTurnSpeed, Entity.Stats.RotationSpeed);
 
 		if (_movementType != MovementType.Idle) {
-			Vector3 normalizedInput = _inputDirection.Normalized();
+			Vector3 normalizedInput = _moveDirection.Normalized();
 
 			_lastDirection = _lastDirection.Lerp(normalizedInput, rotationSpeed * floatDelta);
 			Entity.GlobalForward = Entity.GlobalForward.SafeSlerp(normalizedInput, rotationSpeed * floatDelta);
@@ -141,14 +132,5 @@ public partial class BipedBehaviour : GroundedBehaviour {
 
 		Basis newRotation = Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection);
 		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * rotationSpeed);
-
-		_movementType = MovementType.Idle;
-	}
-
-
-	public override void _ExitTree() {
-		base._ExitTree();
-		interactPrompt?.QueueFree();
-		interactPointer?.QueueFree();
 	}
 }

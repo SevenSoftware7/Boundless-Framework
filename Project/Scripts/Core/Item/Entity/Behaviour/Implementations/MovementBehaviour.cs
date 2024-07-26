@@ -2,25 +2,28 @@ using Godot;
 
 namespace LandlessSkies.Core;
 
+[Tool]
 public abstract partial class MovementBehaviour : EntityBehaviour {
 
+	protected override bool IsOneTime => false;
+
 	protected MovementBehaviour() : base() { }
-	public MovementBehaviour(Entity entity, bool isOneTime = false) : base(entity, isOneTime) { }
+	public MovementBehaviour(Entity entity) : base(entity) { }
 
 
-	public virtual bool Move(Vector3 direction) => true;
+	public abstract bool Move(Vector3 direction);
 
-	public override void _Process(double delta) {
-		if (Entity is not Entity entity) return;
+	public sealed override void _Process(double delta) {
+		if (Engine.IsEditorHint()) return;
 
 		base._Process(delta);
 
-		HandleMovement(entity, delta);
+		HandleMovement(delta);
 
-		entity.Velocity = entity.Inertia + entity.Movement;
+		Entity.Velocity = Entity.Inertia + Entity.Movement;
 
-		entity.MoveAndSlide();
+		Entity.MoveAndSlide();
 	}
 
-	protected abstract void HandleMovement(Entity entity, double delta);
+	protected abstract void HandleMovement(double delta);
 }

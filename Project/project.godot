@@ -248,7 +248,7 @@ water_displacement={
 }
 water_scale={
 "type": "float",
-"value": 20.0
+"value": 70.0
 }
 water_intensity={
 "type": "float",

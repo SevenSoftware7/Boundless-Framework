@@ -1,6 +1,6 @@
-[gd_scene load_steps=103 format=3 uid="uid://b505xodur2iff"]
+[gd_scene load_steps=107 format=3 uid="uid://b505xodur2iff"]
 
-[ext_resource type="PackedScene" uid="uid://bxcpbr13uyeh1" path="res://Resources/Entities/Bike/Bike.tscn" id="1_pikp0"]
+[ext_resource type="RDShaderFile" uid="uid://br3hg0ejs6wif" path="res://Resources/Rendering/Shaders/FetchWaterData.glsl" id="2_5l7vn"]
 [ext_resource type="RDShaderFile" uid="uid://caumal2txsxfx" path="res://Resources/Rendering/Shaders/UnderwaterEffect.glsl" id="4_2f2ji"]
 [ext_resource type="RDShaderFile" uid="uid://dabjxhg50sdto" path="res://Resources/Rendering/Shaders/WaterDisplacementCompute.glsl" id="4_tdgd3"]
 [ext_resource type="Script" path="res://addons/cyclops_level_builder/nodes/cyclops_block.gd" id="4_xwxtm"]
@@ -12,9 +12,10 @@
 [ext_resource type="Script" path="res://Scripts/Core/Rendering/WaterDisplacementEffect.cs" id="6_cd6pn"]
 [ext_resource type="PackedScene" uid="uid://b7rhbgw2dujty" path="res://Resources/Entities/Eos/Eos.tscn" id="9_0jt21"]
 [ext_resource type="Shader" path="res://Resources/Rendering/Shaders/Water.gdshader" id="11_cp2h1"]
-[ext_resource type="Script" path="res://Scripts/Core/Water/WaterInstance.cs" id="11_eq8k7"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/Implementations/AkimboWeapon.cs" id="11_uqmxm"]
 [ext_resource type="PackedScene" uid="uid://fbs6dr24ss3g" path="res://Resources/Weapons/Epiphron/Epiphron.tscn" id="12_1jl3t"]
+[ext_resource type="Script" path="res://Scripts/Core/Water/WaterArea.cs" id="12_rd84o"]
+[ext_resource type="Script" path="res://Scripts/Core/Water/WaterMesh.cs" id="13_c8te0"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/Implementations/MultiWeapon.cs" id="13_d6cna"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Attribute/AttributeModifierTrigger.cs" id="14_w4log"]
 [ext_resource type="PackedScene" uid="uid://b7b17ebmgtrfy" path="res://Resources/Weapons/Nemesis/Nemesis.tscn" id="15_x4bcq"]
@@ -23,6 +24,7 @@
 [ext_resource type="Script" path="res://Scripts/Core/Damage/DamageArea3D.cs" id="19_77ura"]
 [ext_resource type="PackedScene" uid="uid://b7hcoc81x5g0i" path="res://Resources/Companions/Erebos.tscn" id="26_ds8t8"]
 [ext_resource type="PackedScene" uid="uid://7ic4jncm8p1a" path="res://Scenes/Player.tscn" id="26_rkn04"]
+[ext_resource type="Script" path="res://Scripts/Core/Water/WaterFloater.cs" id="29_nhfxh"]
 [ext_resource type="Script" path="res://Scripts/Vanilla/TestInteractable.cs" id="35_lrkn5"]
 [ext_resource type="Script" path="res://Scripts/Vanilla/TrainEngine.cs" id="36_x7xeh"]
 
@@ -54,7 +56,7 @@ volumetric_fog_temporal_reprojection_amount = 0.99
 resource_local_to_scene = false
 resource_name = ""
 enabled = true
-effect_callback_type = 1
+effect_callback_type = 3
 access_resolved_color = false
 access_resolved_depth = false
 needs_motion_vectors = false
@@ -62,6 +64,8 @@ needs_normal_roughness = false
 script = ExtResource("6_cd6pn")
 Texture = ExtResource("5_5pwvj")
 ComputeShaderFile = ExtResource("4_tdgd3")
+FetchShaderFile = ExtResource("2_5l7vn")
+FetchWaterDisplacement = true
 
 [sub_resource type="CompositorEffect" id="CompositorEffect_8kyyx"]
 resource_local_to_scene = false
@@ -1415,12 +1419,16 @@ size = Vector3(3, 1, 6)
 [sub_resource type="BoxMesh" id="BoxMesh_juan7"]
 size = Vector3(3, 1, 6)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_asmth"]
+size = Vector3(60, 12, 58)
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_nn348"]
 render_priority = 0
 shader = ExtResource("11_cp2h1")
 
 [sub_resource type="BoxMesh" id="BoxMesh_oe5ee"]
 material = SubResource("ShaderMaterial_nn348")
+size = Vector3(60, 12, 58)
 subdivide_width = 32
 subdivide_height = 32
 subdivide_depth = 32
@@ -1460,13 +1468,15 @@ albedo_color = Color(0.025, 0, 0.75, 0.498039)
 [sub_resource type="SphereMesh" id="SphereMesh_nkuww"]
 material = SubResource("StandardMaterial3D_k6yo1")
 
-[sub_resource type="Curve3D" id="Curve3D_y62gl"]
+[sub_resource type="Curve3D" id="Curve3D_tbdd0"]
 _data = {
 "points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 "tilts": PackedFloat32Array(0, 0)
 }
 point_count = 2
 up_vector_enabled = false
+
+[sub_resource type="SphereMesh" id="SphereMesh_0tosi"]
 
 [node name="Node3D" type="Node3D"]
 
@@ -1772,10 +1782,20 @@ shape = SubResource("BoxShape3D_x4tkf")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/Path3D/PathFollow3D"]
 mesh = SubResource("BoxMesh_juan7")
 
-[node name="WaterInstance" type="MeshInstance3D" parent="Environment"]
-transform = Transform3D(60, 0, 0, 0, 13, 0, 0, 0, 58, -28.25, -7.6674, 70)
+[node name="WaterArea" type="Area3D" parent="Environment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.25, -7, 70)
+collision_layer = 4
+collision_mask = 10
+gravity_space_override = 3
+gravity = 0.0
+script = ExtResource("12_rd84o")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/WaterArea"]
+shape = SubResource("BoxShape3D_asmth")
+
+[node name="WaterMesh" type="MeshInstance3D" parent="Environment/WaterArea"]
 mesh = SubResource("BoxMesh_oe5ee")
-script = ExtResource("11_eq8k7")
+script = ExtResource("13_c8te0")
 
 [node name="Player" parent="." node_paths=PackedStringArray("Entity") instance=ExtResource("26_rkn04")]
 Entity = NodePath("../Eos")
@@ -1845,10 +1865,6 @@ shape = SubResource("SphereShape3D_ycdom")
 mesh = SubResource("SphereMesh_nkuww")
 skeleton = NodePath("../../CollisionShape3D/MeshInstance3D")
 
-[node name="Bike" parent="." instance=ExtResource("1_pikp0")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.99529, 2, 34.5791)
-_attributeModifiers = [null]
-
 [node name="Eos" parent="." instance=ExtResource("9_0jt21")]
 process_priority = -10
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.62958, 2, 33.2576)
@@ -1875,4 +1891,11 @@ Skeleton = NodePath("../../../Skeleton3D")
 
 [node name="Erebos" parent="Eos" instance=ExtResource("26_ds8t8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.82647, 2.89861, 0)
-Curve = SubResource("Curve3D_y62gl")
+Curve = SubResource("Curve3D_tbdd0")
+
+[node name="WaterFloater" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.62854, -0.771069, 59.0621)
+script = ExtResource("29_nhfxh")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="WaterFloater"]
+mesh = SubResource("SphereMesh_0tosi")

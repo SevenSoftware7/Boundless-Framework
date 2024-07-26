@@ -117,6 +117,9 @@ public static class CompositorExtensions {
 	public static void ComputeListBindDepth(this RenderingDevice device, long computeList, Rid shaderRid, RenderSceneBuffersRD sceneBuffers, uint view, Rid sampler, uint setIndex, int binding = 0) =>
 		device.ComputeListBindSampler(computeList, shaderRid, sceneBuffers.GetDepthLayer(view), sampler, setIndex, binding);
 
+	public static void ComputeListBindStorageBuffer(this RenderingDevice device, long computeList, Rid shaderRid, Rid buffer, uint setIndex, int binding = 0) =>
+		device.ComputeListBind(computeList, shaderRid, [buffer], RenderingDevice.UniformType.StorageBuffer, setIndex, binding);
+
 
 	public static void ComputeListBindUniform(this RenderingDevice device, long computeList, RDUniform uniform, Rid shaderRid, uint setIndex) {
 		Rid set = UniformSetCacheRD.GetCache(shaderRid, setIndex, [uniform]);

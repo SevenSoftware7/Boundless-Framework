@@ -28,14 +28,14 @@ public abstract partial class Interactable : Area3D {
 }
 
 
-public sealed class InteractTarget(Interactable interactable, int shapeIndex) : Tuple<Interactable, int>(interactable, shapeIndex) {
-	public Interactable Interactable => Item1;
-	public int ShapeIndex => Item2;
+public sealed class InteractTarget(Interactable interactable, int shapeIndex) {
+	public Interactable Interactable => interactable;
+	public int ShapeIndex => shapeIndex;
 
 	public static InteractTarget? GetBestTarget(Entity entity, float maxDistance) {
 		return InteractCandidate.GetNearCandidates(entity, maxDistance)?
-			.OrderBy(x => x.DistanceSquared)
-			.ThenByDescending(x => x.Incidence)
+			.OrderByDescending(x => x.Incidence)
+			.ThenBy(x => x.DistanceSquared)
 			.Select(x => x.Target)
 			.FirstOrDefault();
 	}

@@ -1,7 +1,10 @@
 namespace LandlessSkies.Core;
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Godot;
+using Godot.Collections;
 using SevenDev.Utility;
 
 [Tool]
@@ -22,7 +25,6 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 	}
 	private Texture2Drd? _texture;
 
-
 	[Export]
 	private RDShaderFile? ComputeShaderFile {
 		get => _computeShaderFile;
@@ -37,6 +39,29 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 	private RDShaderFile? _computeShaderFile;
 	private Rid computeShader;
 
+	private Rid computePipeline;
+
+
+	[Export]
+	private RDShaderFile? FetchShaderFile {
+		get => _fetchShaderFile;
+		set {
+			if (RenderingDevice is not null) Destruct();
+
+			_fetchShaderFile = value;
+
+			if (RenderingDevice is not null) Construct();
+		}
+	}
+	private RDShaderFile? _fetchShaderFile;
+	private Rid fetchShader;
+
+	private Rid fetchPipeline;
+
+	private Rid displacementSampler;
+
+
+
 	private readonly RDTextureFormat waterDisplacementMapAttachmentFormat = new() {
 		Width = 128,
 		Height = 128,
@@ -47,14 +72,13 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 	};
 	private Rid waterDisplacementMap;
 
-	private Rid computePipeline;
-
+	[Export] public bool FetchWaterDisplacement;
+	public static readonly HashSet<IWaterDisplacementSubscriber> Subscribers = [];
 
 
 	public WaterDisplacementEffect() : base() {
-		EffectCallbackType = EffectCallbackTypeEnum.PostOpaque;
+		EffectCallbackType = EffectCallbackTypeEnum.PreTransparent;
 	}
-
 
 
 	public override void _RenderCallback(int effectCallbackType, RenderData renderData) {
@@ -75,39 +99,107 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 		// Unfolding into a push constant
 		int[] computePushConstantInts = [
 			renderSize.X, renderSize.Y,
-			// nearClippingPlane, farClippingPlane,
-
-			// waterColor.R, waterColor.G, waterColor.B, 0,
 		];
-		int intsByteCount = computePushConstantInts.Length * sizeof(int);
+		int computeIntsByteCount = computePushConstantInts.Length * sizeof(int);
 
 		float[] computePushConstantFloats = [
 			Time.GetTicksMsec() / 1000f, 0
 		];
-		int floatsByteCount = computePushConstantFloats.Length * sizeof(float);
+		int computeFloatsByteCount = computePushConstantFloats.Length * sizeof(float);
 
-		byte[] computePushConstantBytes = new byte[intsByteCount + floatsByteCount];
-		Buffer.BlockCopy(computePushConstantInts, 0, computePushConstantBytes, 0, intsByteCount);
-		Buffer.BlockCopy(computePushConstantFloats, 0, computePushConstantBytes, intsByteCount, floatsByteCount);
+		byte[] computePushConstantBytes = new byte[computeIntsByteCount + computeFloatsByteCount];
+		Buffer.BlockCopy(computePushConstantInts, 0, computePushConstantBytes, 0, computeIntsByteCount);
+		Buffer.BlockCopy(computePushConstantFloats, 0, computePushConstantBytes, computeIntsByteCount, computeFloatsByteCount);
 
 		// Here we draw the Underwater effect, using the waterBuffer to know where there is water geometry
 		RenderingDevice.DrawCommandBeginLabel("Render Water Displacement", new Color(1f, 1f, 1f));
 		long computeList = RenderingDevice.ComputeListBegin();
 		RenderingDevice.ComputeListBindComputePipeline(computeList, computePipeline);
+
 		RenderingDevice.ComputeListBindImage(computeList, computeShader, waterDisplacementMap, 0);
+
 		RenderingDevice.ComputeListSetPushConstant(computeList, computePushConstantBytes, (uint)computePushConstantBytes.Length);
+
 		RenderingDevice.ComputeListDispatch(computeList, xGroups, yGroups, 1);
 		RenderingDevice.ComputeListEnd();
 		RenderingDevice.DrawCommandEndLabel();
+
+
+
+		if (!FetchWaterDisplacement || _fetchShaderFile is null ) return;
+		if (Subscribers.Count == 0) return;
+
+
+		float waterScale = ProjectSettings.GetSetting("shader_globals/water_scale").AsGodotDictionary()["value"].As<float>();
+
+		float waterIntensity = ProjectSettings.GetSetting("shader_globals/water_intensity").AsGodotDictionary()["value"].As<float>();
+
+
+		float[] fetchPushConstantFloats = [
+			waterScale, waterIntensity, 0, 0
+		];
+		int FetchFloatsByteCount = fetchPushConstantFloats.Length * sizeof(int);
+
+		byte[] fetchPushConstantBytes = new byte[FetchFloatsByteCount];
+		Buffer.BlockCopy(fetchPushConstantFloats, 0, fetchPushConstantBytes, 0, FetchFloatsByteCount);
+
+		IWaterDisplacementSubscriber[] subs = [.. Subscribers];
+
+		float[] locations = new float[subs.Length * 4];
+		for (int i = 0; i < subs.Length; i+=4) {
+			IWaterDisplacementSubscriber reader = subs[i];
+			Vector3 readerLocation = reader.GetLocation();
+			locations[i] = readerLocation.X;
+			locations[i + 1] = readerLocation.X;
+			locations[i + 2] = readerLocation.Z;
+		}
+
+		byte[]? locationBytes = new byte[locations.Length * sizeof(float)];
+		Buffer.BlockCopy(locations, 0, locationBytes, 0, locationBytes.Length);
+
+		Rid buffer = RenderingDevice.StorageBufferCreate((uint)locationBytes.Length, locationBytes);
+
+
+		RenderingDevice.DrawCommandBeginLabel("Fetch Water Displacement", new Color(1f, 1f, 1f));
+		long fetchList = RenderingDevice.ComputeListBegin();
+		RenderingDevice.ComputeListBindComputePipeline(fetchList, fetchPipeline);
+
+		RenderingDevice.ComputeListBindStorageBuffer(fetchList, fetchShader, buffer, 0);
+		RenderingDevice.ComputeListBindSampler(fetchList, fetchShader, waterDisplacementMap, displacementSampler, 1);
+
+		RenderingDevice.ComputeListSetPushConstant(fetchList, fetchPushConstantBytes, (uint)fetchPushConstantBytes.Length);
+
+		RenderingDevice.ComputeListDispatch(fetchList, xGroups, yGroups, 1);
+		RenderingDevice.ComputeListEnd();
+		RenderingDevice.DrawCommandEndLabel();
+
+		byte[] data = RenderingDevice.BufferGetData(buffer);
+		Buffer.BlockCopy(data, 0, locations, 0, data.Length);
+
+
+		for (int i = 0; i < subs.Length; i+=4) {
+			IWaterDisplacementSubscriber reader = subs[i];
+			reader.UpdateWaterDisplacement(new(locations[i], locations[i+1], locations[i+2]));
+		}
+
+		RenderingDevice.FreeRid(buffer);
 	}
 
 
 
 
 	protected override void ConstructBehaviour(RenderingDevice renderingDevice) {
-		if (Texture is null || ComputeShaderFile is null) return;
+		if (_computeShaderFile is null || _texture is null) return;
 
-		computeShader = renderingDevice.ShaderCreateFromSpirV(ComputeShaderFile.GetSpirV());
+		displacementSampler = renderingDevice.SamplerCreate(new() {
+			MinFilter = RenderingDevice.SamplerFilter.Linear,
+			MagFilter = RenderingDevice.SamplerFilter.Linear,
+			RepeatU = RenderingDevice.SamplerRepeatMode.Repeat,
+			RepeatV = RenderingDevice.SamplerRepeatMode.Repeat,
+			RepeatW = RenderingDevice.SamplerRepeatMode.Repeat,
+		});
+
+		computeShader = renderingDevice.ShaderCreateFromSpirV(_computeShaderFile.GetSpirV());
 		if (!computeShader.IsValid) {
 			throw new ArgumentException("Compute Shader is Invalid");
 		}
@@ -117,19 +209,46 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 			throw new ArgumentException("Compute Pipeline is Invalid");
 		}
 
+		if (_fetchShaderFile is not null) {
+			fetchShader = renderingDevice.ShaderCreateFromSpirV(_fetchShaderFile.GetSpirV());
+			if (!fetchShader.IsValid) {
+				throw new ArgumentException("Fetch Shader is Invalid");
+			}
+
+			fetchPipeline = renderingDevice.ComputePipelineCreate(fetchShader);
+			if (!fetchPipeline.IsValid) {
+				throw new ArgumentException("Fetch Pipeline is Invalid");
+			}
+		}
+
 
 		waterDisplacementMap = renderingDevice.TextureCreate(waterDisplacementMapAttachmentFormat, new RDTextureView(), null);
-		Texture.TextureRdRid = waterDisplacementMap;
+		_texture.TextureRdRid = waterDisplacementMap;
 	}
 
 
 	protected override void DestructBehaviour(RenderingDevice renderingDevice) {
+		if (displacementSampler.IsValid) {
+			renderingDevice.FreeRid(displacementSampler);
+			displacementSampler = default;
+		}
+
+
 		if (computeShader.IsValid) {
 			renderingDevice.FreeRid(computeShader);
 			computeShader = default;
 		}
 		// Don't need to free the pipeline as freeing the shader does that for us.
 		computePipeline = default;
+
+
+		if (fetchShader.IsValid) {
+			renderingDevice.FreeRid(fetchShader);
+			fetchShader = default;
+		}
+		// Don't need to free the pipeline as freeing the shader does that for us.
+		fetchPipeline = default;
+
 
 		if (Texture is not null) {
 			Texture.TextureRdRid = default;

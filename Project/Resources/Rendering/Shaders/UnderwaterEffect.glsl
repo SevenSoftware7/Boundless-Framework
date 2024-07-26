@@ -5,7 +5,7 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
 layout(rgba8, set = 0, binding = 0) uniform image2D color_image; // Color of the screen pre post-processing
 layout(set = 1, binding = 0) uniform sampler2D depth_image; // Depth buffer of the screen
-layout(rgba16f, set = 2, binding = 0) uniform restrict readonly image2D water_map_image; // Water Map that was rendered in the Render Shader
+layout(rgba32f, set = 2, binding = 0) uniform restrict readonly image2D water_map_image; // Water Map that was rendered in the Render Shader
 
 layout(push_constant, std430) uniform Params {
 	restrict readonly vec2 screen_size; // x: screen width, y: screen height

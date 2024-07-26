@@ -155,11 +155,9 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			// Eye Offset for fancy VR multi-view
 			Vector3 eyeOffset = sceneData.GetViewEyeOffset(view);
 
-			Dictionary waterScaleSetting = ProjectSettings.GetSetting("shader_globals/water_scale").AsGodotDictionary();
-			float waterScale = waterScaleSetting["value"].As<float>();
+			float waterScale = ProjectSettings.GetSetting("shader_globals/water_scale").AsGodotDictionary()["value"].As<float>();
 
-			Dictionary waterIntensitySetting = ProjectSettings.GetSetting("shader_globals/water_intensity").AsGodotDictionary();
-			float waterIntensity = waterIntensitySetting["value"].As<float>();
+			float waterIntensity = ProjectSettings.GetSetting("shader_globals/water_intensity").AsGodotDictionary()["value"].As<float>();
 
 			// Unfolding into a push constant
 			float[] renderPushConstant = [
@@ -179,16 +177,20 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			RenderingDevice.DrawCommandBeginLabel("Render Water Mask", new Color(1f, 1f, 1f));
 			long drawList = RenderingDevice.DrawListBegin(waterBuffer, RenderingDevice.InitialAction.Clear, RenderingDevice.FinalAction.Store, RenderingDevice.InitialAction.Clear, RenderingDevice.FinalAction.Discard, clearColors, clearDepth);
 			RenderingDevice.DrawListBindRenderPipeline(drawList, renderPipeline);
+
 			RenderingDevice.DrawListBindVertexArray(drawList, vertexArray);
 			RenderingDevice.DrawListBindIndexArray(drawList, indexArray);
 			RenderingDevice.DrawListBindSampler(drawList, renderShader, WaterDisplacementTexture.TextureRdRid, displacementSampler, 0);
+
 			RenderingDevice.DrawListSetPushConstant(drawList, renderPushConstantBytes, (uint)renderPushConstantBytes.Length);
+
 			RenderingDevice.DrawListDraw(drawList, true, 2);
 			RenderingDevice.DrawListEnd();
 			RenderingDevice.DrawCommandEndLabel();
 
-			Dictionary waterColorSetting = ProjectSettings.GetSetting("shader_globals/water_color").AsGodotDictionary();
-			Color waterColor = waterColorSetting["value"].AsColor();
+
+
+			Color waterColor = ProjectSettings.GetSetting("shader_globals/water_color").AsGodotDictionary()["value"].AsColor();
 
 			// Unfolding into a push constant
 			float[] computePushConstant = [

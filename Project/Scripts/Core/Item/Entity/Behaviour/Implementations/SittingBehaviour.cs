@@ -3,28 +3,28 @@ namespace LandlessSkies.Core;
 using Godot;
 using SevenDev.Utility;
 
+[Tool]
 public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler {
 	private EntityBehaviour? previousBehaviour;
 	private PromptControl? dismountPrompt;
 
 	protected abstract Transform3D SittingPosition { get; }
+	protected override bool IsOneTime => true;
 
 
 	protected SittingBehaviour() : base() { }
-	public SittingBehaviour(Entity entity) : base(entity, true) { }
+	public SittingBehaviour(Entity entity) : base(entity) { }
 
 
 	protected override void _Start(EntityBehaviour? previousBehaviour) {
-		if (previousBehaviour is not null && !previousBehaviour.IsOneTime) {
-			this.previousBehaviour = previousBehaviour;
-		}
+		this.previousBehaviour = previousBehaviour;
 	}
 	protected override void _Stop() {
 		DisavowPlayer();
 	}
 
 
-	public void Dismount() {
+	public virtual void Dismount() {
 		Entity?.SetBehaviour(previousBehaviour);
 	}
 
@@ -45,9 +45,11 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 
 	public override void _Process(double delta) {
 		base._Process(delta);
-		if (Entity is null) return;
 
-		Entity.GlobalTransform = SittingPosition;
-		Entity.GlobalForward = SittingPosition.Basis.Forward();
+		if (Engine.IsEditorHint()) return;
+		if (Entity is not Entity entity) return;
+
+		entity.GlobalTransform = SittingPosition;
+		entity.GlobalForward = SittingPosition.Basis.Forward();
 	}
 }

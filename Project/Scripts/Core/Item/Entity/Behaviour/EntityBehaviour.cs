@@ -6,23 +6,30 @@ using SevenDev.Utility;
 /// <summary>
 /// A Hierarchical state machine node for an Entity's
 /// </summary>
+[Tool]
 [GlobalClass]
 public abstract partial class EntityBehaviour : Node {
-	[Export] public Entity? Entity;
+	[Export] public Entity Entity;
 
-	public bool IsOneTime { get; }
+	protected abstract bool IsOneTime { get; }
 
 
-	protected EntityBehaviour() : base() { }
-	public EntityBehaviour(Entity entity, bool isOneTime = false) : this() {
+	protected EntityBehaviour() : this(null!) { }
+	public EntityBehaviour(Entity entity) : base() {
+		ProcessMode = ProcessModeEnum.Disabled;
 		Entity = entity;
-		IsOneTime = isOneTime;
 	}
 
 
-	public void Start(EntityBehaviour? previousBehaviour) {
+	public void Start(EntityBehaviour? previousBehaviour = null) {
+		if (Entity is null) {
+			Stop();
+			GD.PushError($"Could not start Behaviour {GetType().Name}, no reference to an Entity");
+			return;
+		}
+
 		ProcessMode = ProcessModeEnum.Inherit;
-		_Start(previousBehaviour);
+		_Start(previousBehaviour is null || previousBehaviour.IsOneTime ? null : previousBehaviour);
 	}
 	public void Stop() {
 		ProcessMode = ProcessModeEnum.Disabled;

@@ -15,7 +15,7 @@ using SevenDev.Utility;
 [GlobalClass]
 public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICostumable, ICustomizable, ISaveable<Entity>, IInjectionProvider<Skeleton3D?>, IInjectionProvider<Handedness> {
 	public readonly List<Vector3> RecoverLocationBuffer = [];
-	public const int RECOVER_LOCATION_BUFFER_SIZE = 20;
+	public const int RECOVER_LOCATION_BUFFER_SIZE = 5;
 
 	private GaugeControl? healthBar;
 
@@ -189,15 +189,18 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 			GlobalPosition = Vector3.Zero;
 			return;
 		}
+		else {
+			RecoverLocationBuffer.RemoveRange(1, RecoverLocationBuffer.Count - 1);
+			GlobalPosition = RecoverLocationBuffer[0];
 
-		RecoverLocationBuffer.RemoveRange(1, RecoverLocationBuffer.Count - 1);
-		GlobalPosition = RecoverLocationBuffer[0];
-
-		GD.Print($"Entity {Name} Voided out.");
+			GD.Print($"Entity {Name} Voided out.");
+		}
 
 		if (Health is not null) {
 			Health.Value -= Health.Maximum / 8f;
 		}
+
+		Inertia = Vector3.Zero;
 	}
 
 	public virtual void HandlePlayer(Player player) {
@@ -244,6 +247,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 		if (CurrentBehaviour is null) {
 			SetBehaviour(new BipedBehaviour(this));
 		}
+
+		CurrentBehaviour?.Start();
 	}
 
 	public override void _ExitTree() {

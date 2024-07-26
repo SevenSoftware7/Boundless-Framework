@@ -4,7 +4,7 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public sealed partial class WaterInstance : MeshInstance3D, ISerializationListener {
+public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
 	private Transform3D? lastTransform = null;
 
 	private void OnMeshChanged() {
