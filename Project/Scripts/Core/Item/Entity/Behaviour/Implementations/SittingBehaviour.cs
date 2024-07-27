@@ -9,17 +9,19 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 	private PromptControl? dismountPrompt;
 
 	protected abstract Transform3D SittingPosition { get; }
-	protected override bool IsOneTime => true;
+	protected sealed override bool IsOneTime => true;
 
 
-	protected SittingBehaviour() : base() { }
-	public SittingBehaviour(Entity entity) : base(entity) { }
+	protected SittingBehaviour() : this(null!) { }
+	public SittingBehaviour(Entity entity, EntityBehaviour? previousBehaviour = null) : base(entity) {
+		this.previousBehaviour = previousBehaviour;
+	}
 
 
 	protected override void _Start(EntityBehaviour? previousBehaviour) {
-		this.previousBehaviour = previousBehaviour;
+		this.previousBehaviour ??= previousBehaviour;
 	}
-	protected override void _Stop() {
+	protected override void _Stop(EntityBehaviour? nextBehaviour) {
 		DisavowPlayer();
 	}
 
@@ -30,6 +32,7 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 
 
 	public virtual void HandlePlayer(Player player) {
+		if (!IsActive) return;
 		dismountPrompt ??= player.HudManager.AddPrompt(player.Entity?.HudPack.InteractPrompt);
 
 		dismountPrompt?.Update(true, "Dismount", player.InputDevice.GetActionSymbol(Inputs.Interact));

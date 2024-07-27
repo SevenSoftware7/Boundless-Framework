@@ -150,8 +150,13 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 		return true;
 	}
 
+	public void SetBehaviour<TBehaviour>(Func<TBehaviour?> creator) where TBehaviour : EntityBehaviour =>
+		SetBehaviour<TBehaviour, TBehaviour>(creator);
+	public void SetBehaviour<TDefault, TFallback>(Func<TFallback?> creator) where TDefault : EntityBehaviour where TFallback : EntityBehaviour =>
+		SetBehaviour(GetChildren().OfType<TDefault>().FirstOrDefault() as EntityBehaviour ?? creator.Invoke());
+
 	public void SetBehaviour<TBehaviour>(TBehaviour? behaviour) where TBehaviour : EntityBehaviour {
-		CurrentBehaviour?.Stop();
+		CurrentBehaviour?.Stop(behaviour);
 		EntityBehaviour? oldBehaviour = CurrentBehaviour;
 		CurrentBehaviour = null;
 

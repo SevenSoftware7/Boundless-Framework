@@ -1,4 +1,6 @@
+using System.Linq;
 using Godot;
+using KGySoft.CoreLibraries;
 using SevenDev.Utility;
 
 namespace LandlessSkies.Core;
@@ -9,10 +11,6 @@ public sealed partial class WaterArea : Area3D {
 		CollisionMask = Collisions.Entity | Collisions.Interactable;
 	}
 
-
-	public void GetWaterSurfaceAt(Vector3 location) {
-
-	}
 
 
 	private void OnBodyEntered(Node3D body) {
@@ -35,4 +33,13 @@ public sealed partial class WaterArea : Area3D {
 		BodyEntered += OnBodyEntered;
 		BodyExited += OnBodyExited;
 	}
+
+	// public override void _Process(double delta) {
+	// 	base._Process(delta);
+	// 	GetOverlappingBodies().OfType<Entity>().ForEach(e =>
+	// 		/* Callable.From(() =>  */e.PropagateAction<IWaterCollisionNotifier>(c => {
+	// 			c.Enter(this);
+	// 		})/* ).CallDeferred() */
+	// 	);
+	// }
 }

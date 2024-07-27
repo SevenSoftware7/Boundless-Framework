@@ -146,12 +146,12 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 		IWaterDisplacementSubscriber[] subs = [.. Subscribers];
 
 		float[] locations = new float[subs.Length * 4];
-		for (int i = 0; i < subs.Length; i+=4) {
+		for (int i = 0; i < subs.Length; i++) {
 			IWaterDisplacementSubscriber reader = subs[i];
 			Vector3 readerLocation = reader.GetLocation();
-			locations[i] = readerLocation.X;
-			locations[i + 1] = readerLocation.X;
-			locations[i + 2] = readerLocation.Z;
+			locations[i * 4] = readerLocation.X;
+			locations[i * 4 + 1] = readerLocation.X;
+			locations[i * 4 + 2] = readerLocation.Z;
 		}
 
 		byte[]? locationBytes = new byte[locations.Length * sizeof(float)];
@@ -176,10 +176,10 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 		byte[] data = RenderingDevice.BufferGetData(buffer);
 		Buffer.BlockCopy(data, 0, locations, 0, data.Length);
 
-
-		for (int i = 0; i < subs.Length; i+=4) {
+		for (int i = 0; i < subs.Length; i++) {
 			IWaterDisplacementSubscriber reader = subs[i];
-			reader.UpdateWaterDisplacement(new(locations[i], locations[i+1], locations[i+2]));
+			Vector3 displacement = new(locations[i * 4], locations[i * 4 + 1], locations[i * 4 + 2]);
+			reader.UpdateWaterDisplacement(displacement);
 		}
 
 		RenderingDevice.FreeRid(buffer);

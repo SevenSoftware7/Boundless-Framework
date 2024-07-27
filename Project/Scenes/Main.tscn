@@ -1380,7 +1380,7 @@ active_face_vertex = 0
 script = ExtResource("5_vmujk")
 selected = false
 active = false
-collsion = true
+collsion = false
 physics_layer = 0
 physics_mask = 0
 vertex_points = PackedVector3Array(5, -14.75, 56.75, 13, -14.75, 56.75, 13, -14.75, 0, 5, -14.75, 0, 13, 3, 56.75, 5, 3, 56.75, 5, 3, 0, 13, 3, 0)
@@ -1769,7 +1769,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30201, -4.81285)
 curve = SubResource("Curve3D_1g2j1")
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Environment/Path3D"]
-transform = Transform3D(-0.0922568, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97163e-07, 0.995733, 8.27696e-08, -0.0922568, -1.98959, 0, 2.30373)
+transform = Transform3D(-0.0922569, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97164e-07, 0.995733, 8.27696e-08, -0.0922569, -1.98959, 0, 2.30373)
 script = ExtResource("36_x7xeh")
 
 [node name="AnimatableBody3D" type="AnimatableBody3D" parent="Environment/Path3D/PathFollow3D"]
@@ -1894,7 +1894,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.82647, 2.89861, 0)
 Curve = SubResource("Curve3D_tbdd0")
 
 [node name="WaterFloater" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.62854, -0.771069, 59.0621)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.62854, -1.6134, 59.0621)
 script = ExtResource("29_nhfxh")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="WaterFloater"]

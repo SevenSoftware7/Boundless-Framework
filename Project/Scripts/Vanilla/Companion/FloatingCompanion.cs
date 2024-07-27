@@ -50,7 +50,7 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 
 
 	public void HandlePlayer(Player player) {
-		OnFace |= player.InputDevice.IsActionPressed(Inputs.Focus);
+		OnFace |= player.InputDevice.IsActionPressed(Inputs.Focus) || player.Entity?.CurrentBehaviour is SwimmingBehaviour;
 	}
 	public void DisavowPlayer() { }
 

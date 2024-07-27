@@ -11,12 +11,16 @@ using SevenDev.Utility;
 public abstract partial class EntityBehaviour : Node {
 	[Export] public Entity Entity;
 
+	public bool IsActive => _isActive && !Engine.IsEditorHint();
+	private bool _isActive = false;
+
 	protected abstract bool IsOneTime { get; }
 
 
 	protected EntityBehaviour() : this(null!) { }
 	public EntityBehaviour(Entity entity) : base() {
-		ProcessMode = ProcessModeEnum.Disabled;
+		_isActive = false;
+
 		Entity = entity;
 	}
 
@@ -28,17 +32,20 @@ public abstract partial class EntityBehaviour : Node {
 			return;
 		}
 
-		ProcessMode = ProcessModeEnum.Inherit;
+		_isActive = true;
+
 		_Start(previousBehaviour is null || previousBehaviour.IsOneTime ? null : previousBehaviour);
 	}
-	public void Stop() {
-		ProcessMode = ProcessModeEnum.Disabled;
-		_Stop();
+	public void Stop(EntityBehaviour? NextBehaviour = null) {
+		_isActive = false;
+
+		_Stop(NextBehaviour);
+
 		if (IsOneTime) {
 			this.UnparentAndQueueFree();
 		}
 	}
 
 	protected abstract void _Start(EntityBehaviour? previousBehaviour);
-	protected abstract void _Stop();
+	protected abstract void _Stop(EntityBehaviour? nextBehaviour);
 }

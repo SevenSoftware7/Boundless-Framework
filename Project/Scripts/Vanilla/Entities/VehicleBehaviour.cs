@@ -18,8 +18,8 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 	protected override void _Start(EntityBehaviour? previousBehaviour) {
 		base._Start(previousBehaviour);
 	}
-	protected override void _Stop() {
-		base._Stop();
+	protected override void _Stop(EntityBehaviour? nextBehaviour) {
+		base._Stop(nextBehaviour);
 
 		Driver?.Dismount();
 	}

@@ -27,14 +27,16 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 
 		Entity.MotionMode = MotionModeEnum.Grounded;
 	}
-	protected override void _Stop() {
+	protected override void _Stop(EntityBehaviour? nextBehaviour) {
 		DisavowPlayer();
 	}
 
 
 	public virtual void HandlePlayer(Player player) {
+		if (!IsActive) return;
+
 		if (player.InputDevice.IsActionJustPressed(Inputs.Jump)) {
-			Jump(Entity.UpDirection);
+			Jump();
 		}
 
 		Vector2 input = player.InputDevice.GetVector(
@@ -59,9 +61,14 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 		_moveDirection = direction;
 		return true;
 	}
-	public virtual bool Jump(Vector3 direction) {
-		_jumpDirection = direction;
-		jumpBuffer.Start();
+	public virtual bool Jump(bool force = false, Vector3? direction = null) {
+		_jumpDirection = direction ?? Entity.UpDirection;
+		if (force) {
+			ExecuteJump();
+		}
+		else {
+			jumpBuffer.Start();
+		}
 		return true;
 	}
 
@@ -161,7 +168,8 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 			Vector3.Zero,
 			(Entity.IsOnFloor() && ! coyoteTimer.IsDone
 				? 25f
-				: 0.5f) * (float)delta
+				: 0.5f
+			) * (float)delta
 		);
 	}
 
@@ -198,11 +206,17 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 			coyoteTimer.Start();
 		}
 
-		if (JumpAction is not null && !jumpBuffer.IsDone && jumpCooldown.IsDone && !coyoteTimer.IsDone) {
-			if (Entity.ExecuteAction(new JumpActionBuilder(JumpAction, _jumpDirection))) {
-				jumpBuffer.End();
-				jumpCooldown.Start();
-			}
+		if (!jumpBuffer.IsDone && jumpCooldown.IsDone && !coyoteTimer.IsDone) {
+			ExecuteJump();
+		}
+	}
+
+	private void ExecuteJump() {
+		if (JumpAction is null) return;
+
+		if (Entity.ExecuteAction(new JumpActionBuilder(JumpAction, _jumpDirection))) {
+			jumpBuffer.End();
+			jumpCooldown.Start();
 		}
 	}
 

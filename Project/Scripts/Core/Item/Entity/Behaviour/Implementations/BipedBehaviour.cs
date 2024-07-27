@@ -5,7 +5,7 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class BipedBehaviour : GroundedBehaviour {
+public partial class BipedBehaviour : GroundedBehaviour, IWaterCollisionNotifier {
 	private float _moveSpeed;
 	private MovementType _movementType;
 
@@ -25,10 +25,12 @@ public partial class BipedBehaviour : GroundedBehaviour {
 
 	protected override void _Start(EntityBehaviour? previousBehaviour) {
 		base._Start(previousBehaviour);
+
 		interactPointer?.Enable();
 	}
-	protected override void _Stop() {
-		base._Stop();
+	protected override void _Stop(EntityBehaviour? nextBehaviour) {
+		base._Stop(nextBehaviour);
+
 		interactPrompt?.Update(false);
 		interactPointer?.Disable();
 	}
@@ -36,6 +38,8 @@ public partial class BipedBehaviour : GroundedBehaviour {
 
 	public override void HandlePlayer(Player player) {
 		base.HandlePlayer(player);
+
+		if (!IsActive) return;
 
 		if (interactPrompt is null && interactPointer is null) {
 			interactPrompt ??= player.HudManager.AddPrompt(Entity?.HudPack.InteractPrompt);
@@ -133,4 +137,13 @@ public partial class BipedBehaviour : GroundedBehaviour {
 		Basis newRotation = Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection);
 		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * rotationSpeed);
 	}
+
+	public void Enter(WaterArea water) {
+		if (!IsActive) return;
+
+		Entity.SetBehaviour(() => new SwimmingBehaviour(Entity, water));
+	}
+
+	public void Exit(WaterArea water) { }
+
 }

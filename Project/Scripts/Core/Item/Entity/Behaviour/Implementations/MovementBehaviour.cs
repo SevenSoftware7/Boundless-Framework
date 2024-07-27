@@ -14,16 +14,19 @@ public abstract partial class MovementBehaviour : EntityBehaviour {
 	public abstract bool Move(Vector3 direction);
 
 	public sealed override void _Process(double delta) {
-		if (Engine.IsEditorHint()) return;
-
 		base._Process(delta);
 
-		HandleMovement(delta);
+		HandleProcess(delta);
 
-		Entity.Velocity = Entity.Inertia + Entity.Movement;
+		if (IsActive) {
+			HandleMovement(delta);
 
-		Entity.MoveAndSlide();
+			Entity.Velocity = Entity.Inertia + Entity.Movement;
+
+			Entity.MoveAndSlide();
+		}
 	}
 
+	protected virtual void HandleProcess(double delta) { }
 	protected abstract void HandleMovement(double delta);
 }

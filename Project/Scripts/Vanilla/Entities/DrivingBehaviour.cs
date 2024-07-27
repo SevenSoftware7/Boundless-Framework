@@ -19,8 +19,8 @@ public partial class DrivingBehaviour : SittingBehaviour {
 	}
 
 
-	protected override void _Stop() {
-		base._Stop();
+	protected override void _Stop(EntityBehaviour? nextBehaviour) {
+		base._Stop(nextBehaviour);
 		if (Entity is null || Vehicle?.Entity is null) return;
 
 		Entity.Inertia += Vehicle.Entity.Movement + Vehicle.Entity.Inertia;
