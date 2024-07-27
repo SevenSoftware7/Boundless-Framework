@@ -1894,7 +1894,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.82647, 2.89861, 0)
 Curve = SubResource("Curve3D_tbdd0")
 
 [node name="WaterFloater" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.62854, -0.796765, 59.0621)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.62854, -0.312261, 59.0621)
 script = ExtResource("29_nhfxh")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="WaterFloater"]

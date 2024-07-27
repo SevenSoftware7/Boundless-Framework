@@ -8,9 +8,9 @@ using static Godot.CharacterBody3D;
 [Tool]
 public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWaterCollisionNotifier, IWaterDisplacementSubscriber {
 	private const float SurfaceThreshold = 2f;
-	private const float CenterOfMassOffset = 3f;
+	private const float CenterOfMassOffset = 2f;
 
-	// private readonly TimeDuration inertiaPassThrough = new(1000);
+
 	private float floatingDisplacement = 0f;
 
 	private EntityBehaviour? previousBehaviour;
@@ -85,7 +85,7 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 
 		float floatDelta = (float)delta;
 
-		if (WaterArea.GetSurfaceAbove(Entity.GlobalPosition, 5f, out Collisions.IntersectRay3DResult result)) {
+		if (WaterArea.GetTopSurface(Entity.GlobalPosition, 5f, out Collisions.IntersectRay3DResult result)) {
 			WaterSurface = result.Point.Y;
 		}
 

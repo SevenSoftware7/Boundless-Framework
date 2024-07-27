@@ -13,24 +13,24 @@ public static class Collisions {
 	public static readonly uint Damage = 1 << 4;
 
 
-	public static bool IntersectRay3DExclusive<T>(this World3D world, T target, Vector3 from, Vector3 to, out IntersectRay3DResult result, uint collisionMask = uint.MaxValue, Array<Rid>? exclude = null, bool collideWithBodies = true, bool collideWithAreas = true, bool hitFromInside = false, bool hitBackFaces = false) where T : Node3D {
+	public static bool IntersectRay3DExclusive<T>(this World3D world, T target, Vector3 from, Vector3 to, out IntersectRay3DResult result, uint collisionMask = uint.MaxValue, Array<Rid>? exclude = null, bool collideWithBodies = true, bool collideWithAreas = true, bool hitFromInside = false, bool hitBackFaces = false, uint maxCollisions = 32) where T : Node3D {
 		PhysicsRayQueryParameters3D parameters = PhysicsRayQueryParameters3D.Create(from, to, collisionMask);
 		parameters.CollideWithBodies = collideWithBodies;
 		parameters.CollideWithAreas = collideWithAreas;
-		parameters.HitFromInside = false;
+		parameters.HitFromInside = hitFromInside;
 		parameters.HitBackFaces = hitBackFaces;
 
-		return world.IntersectRay3DExclusive(target, parameters, out result, exclude);
+		return world.IntersectRay3DExclusive(target, parameters, out result, exclude, maxCollisions);
 	}
-	public static bool IntersectRay3DExclusive<T>(this World3D world, T target, PhysicsRayQueryParameters3D parameters, out IntersectRay3DResult result, Array<Rid>? exclude = null) where T : Node3D {
+	public static bool IntersectRay3DExclusive<T>(this World3D world, T target, PhysicsRayQueryParameters3D parameters, out IntersectRay3DResult result, Array<Rid>? exclude = null, uint maxCollisions = 32) where T : Node3D {
 		exclude ??= [];
+
+		Vector3 direction = (parameters.To - parameters.From).Normalized();
 		PhysicsDirectSpaceState3D spaceState = world.DirectSpaceState;
 
 		IntersectRay3DResult? lastSuccessHit = null;
-		Vector3 direction = (parameters.To - parameters.From).Normalized();
 
-
-		while (true) {
+		for (int i = 0; i < maxCollisions; i++) {
 			parameters.Exclude = exclude;
 
 			Dictionary intersect = spaceState.IntersectRay(parameters);
@@ -50,6 +50,9 @@ public static class Collisions {
 			// And try to find another one, further behind
 			parameters.From = lastSuccessHit.Value.Point + direction * Mathf.Epsilon;
 		}
+
+		result = default;
+		return false;
 	}
 
 	public static bool IntersectRay3D(this World3D world, Vector3 from, Vector3 to, out IntersectRay3DResult result, uint collisionMask = uint.MaxValue, Array<Rid>? exclude = null, bool collideWithBodies = true, bool collideWithAreas = true, bool hitFromInside = false, bool hitBackFaces = false) {
