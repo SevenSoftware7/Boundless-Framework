@@ -17,7 +17,7 @@ public static class Collisions {
 		PhysicsRayQueryParameters3D parameters = PhysicsRayQueryParameters3D.Create(from, to, collisionMask);
 		parameters.CollideWithBodies = collideWithBodies;
 		parameters.CollideWithAreas = collideWithAreas;
-		parameters.HitFromInside = hitFromInside;
+		parameters.HitFromInside = false;
 		parameters.HitBackFaces = hitBackFaces;
 
 		return world.IntersectRay3DExclusive(target, parameters, out result, exclude);
@@ -27,13 +27,14 @@ public static class Collisions {
 		PhysicsDirectSpaceState3D spaceState = world.DirectSpaceState;
 
 		IntersectRay3DResult? lastSuccessHit = null;
+		Vector3 direction = (parameters.To - parameters.From).Normalized();
 
-		const int maxRetries = 15;
-		for (int i = 0; i < maxRetries; i++) {
+
+		while (true) {
 			parameters.Exclude = exclude;
 
 			Dictionary intersect = spaceState.IntersectRay(parameters);
-			if (!DictionaryToIntersectRay3DResult(intersect, out IntersectRay3DResult rayHit)) {
+			if (!DictionaryToIntersectRay3DResult(intersect, out IntersectRay3DResult rayHit) || rayHit.HitFromInside) {
 				result = lastSuccessHit ?? rayHit;
 				return lastSuccessHit is not null;
 			}
@@ -47,11 +48,8 @@ public static class Collisions {
 			// Store the success
 			lastSuccessHit = rayHit;
 			// And try to find another one, further behind
-			parameters.From = lastSuccessHit.Value.Point;
+			parameters.From = lastSuccessHit.Value.Point + direction * Mathf.Epsilon;
 		}
-
-		result = default;
-		return false;
 	}
 
 	public static bool IntersectRay3D(this World3D world, Vector3 from, Vector3 to, out IntersectRay3DResult result, uint collisionMask = uint.MaxValue, Array<Rid>? exclude = null, bool collideWithBodies = true, bool collideWithAreas = true, bool hitFromInside = false, bool hitBackFaces = false) {
