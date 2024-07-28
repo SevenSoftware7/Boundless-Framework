@@ -13,7 +13,7 @@ namespace LandlessSkies.Core;
 /// <param name="info">The Composite Charge Attack Parameters to use when setting up the Charge Attack</param>
 /// <param name="modifiers">Inherited from <see cref="EntityAction"/>.</param>
 public partial class CompositeChargeAttack(Entity entity, Weapon weapon, StringName library, CompositeChargeAttackInfo info, IEnumerable<AttributeModifier>? modifiers = null) : ChargeAttack(entity, weapon, modifiers) {
-	private readonly TimeDuration chargeTime = new(info.ChargeDuration);
+	private readonly TimeDuration chargeTime = new(true, info.ChargeDuration);
 	private bool isDone;
 
 
@@ -50,7 +50,7 @@ public partial class CompositeChargeAttack(Entity entity, Weapon weapon, StringN
 	protected virtual void _UnchargedAttack() { }
 
 	public override void HandlePlayer(Player player) {
-		if (!isDone && chargeTime.IsDone) {
+		if (!isDone && chargeTime.HasPassed) {
 			isDone = true;
 			_ChargeDone();
 		}

@@ -8,6 +8,7 @@ using SevenDev.Utility;
 public partial class DamageArea3D : Area3D {
 	private readonly List<IDamageable> hitBuffer = [];
 	public IDamageDealer? DamageDealer;
+
 	[Export] public float Damage = 1f;
 	public TimeDuration? LifeTime;
 	[Export] public bool SelfDamage = false;
@@ -21,9 +22,11 @@ public partial class DamageArea3D : Area3D {
 	}
 	public DamageArea3D(ulong lifeTime) : this() {
 		if (lifeTime != 0) {
-			LifeTime = new(lifeTime);
+			LifeTime = new(true, lifeTime);
 		}
 	}
+
+
 	public DamageArea3D(IDamageDealer? damageDealer, float damage = 1f, ulong lifeTime = 0, bool selfDamage = false) : this(lifeTime) {
 		DamageDealer = damageDealer;
 		Damage = damage;
@@ -67,7 +70,7 @@ public partial class DamageArea3D : Area3D {
 		if (LifeTime is null) return;
 
 
-		if (LifeTime.IsDone) {
+		if (LifeTime.HasPassed) {
 			EmitSignal(SignalName.OnDestroy);
 			QueueFree();
 		}

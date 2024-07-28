@@ -8,14 +8,13 @@ using Godot;
 public class TimeDuration {
 	public ulong DurationMsec;
 
-	public ulong StopTime { get; private set; } = Time.GetTicksMsec();
+	public ulong StopTime { get; private set; }
 
-	public bool IsDone => Time.GetTicksMsec() >= StopTime;
-	public ulong TimeLeft => IsDone ? 0 : StopTime - Time.GetTicksMsec();
-	public ulong Overtime => IsDone ? Time.GetTicksMsec() - StopTime : 0;
+	public bool HasPassed => Time.GetTicksMsec() >= StopTime;
+	public ulong TimeLeft => HasPassed ? 0 : StopTime - Time.GetTicksMsec();
+	public ulong Overtime => HasPassed ? Time.GetTicksMsec() - StopTime : 0;
 
-
-	public TimeDuration(ulong durationMsec = 1000, bool start = false) {
+	public TimeDuration(bool start, ulong durationMsec = 1000) {
 		DurationMsec = durationMsec;
 		if (start) Start();
 	}
@@ -29,6 +28,6 @@ public class TimeDuration {
 	}
 
 
-	public static implicit operator float(TimeDuration timeUntil) => timeUntil.TimeLeft;
-	public static implicit operator bool(TimeDuration timeUntil) => timeUntil.IsDone;
+	public static implicit operator float(TimeDuration timeDuration) => timeDuration.TimeLeft;
+	public static implicit operator bool(TimeDuration timeDuration) => timeDuration.HasPassed;
 }

@@ -5,7 +5,7 @@ using SevenDev.Utility;
 
 [GlobalClass]
 public abstract partial class GaugeControl : Control {
-	protected readonly TimeDuration DamagedTimer = new();
+	protected readonly TimeDuration DamagedTimer = new(false);
 
 	[Export]
 	public float DamageDelay {
