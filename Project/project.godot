@@ -213,7 +213,7 @@ interact={
 [layer_names]
 
 3d_render/layer_1="Terrain"
-3d_render/layer_2="Characters"
+3d_render/layer_2="Entity"
 3d_render/layer_3="Water"
 3d_physics/layer_1="Terrain"
 3d_physics/layer_2="Entity"

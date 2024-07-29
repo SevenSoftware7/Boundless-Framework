@@ -31,7 +31,7 @@ public partial class BipedBehaviour : GroundedBehaviour, IWaterCollisionNotifier
 	protected override void _Stop(EntityBehaviour? nextBehaviour) {
 		base._Stop(nextBehaviour);
 
-		interactPrompt?.Update(false);
+		interactPrompt?.SetEnabled(false);
 		interactPointer?.Disable();
 	}
 
@@ -41,9 +41,11 @@ public partial class BipedBehaviour : GroundedBehaviour, IWaterCollisionNotifier
 
 		if (!IsActive) return;
 
-		if (interactPrompt is null && interactPointer is null) {
-			interactPrompt ??= player.HudManager.AddPrompt(Entity?.HudPack.InteractPrompt);
-			interactPointer ??= player.HudManager.AddPointer(Entity?.HudPack.InteractPointer);
+		if (interactPrompt is null && Entity.HudPack.InteractPrompt is not null) {
+			interactPrompt ??= player.HudManager.AddPrompt(Entity.HudPack.InteractPrompt);
+		}
+		if (interactPointer is null && Entity.HudPack.InteractPointer is not null) {
+			interactPointer ??= player.HudManager.AddPointer(Entity.HudPack.InteractPointer);
 		}
 
 		float speedSquared = _moveDirection.LengthSquared();
@@ -78,7 +80,7 @@ public partial class BipedBehaviour : GroundedBehaviour, IWaterCollisionNotifier
 		InteractTarget? target = InteractTarget.GetBestTarget(Entity, 3.25f);
 
 		if (target is not null) {
-			if (player.InputDevice.IsActionJustPressed("interact") && target.Interactable.IsInteractable(Entity)) {
+			if (player.InputDevice.IsActionJustPressed(Inputs.Interact) && target.Interactable.IsInteractable(Entity)) {
 				target.Interactable.Interact(Entity, player, target.ShapeIndex);
 			}
 		}
@@ -86,7 +88,7 @@ public partial class BipedBehaviour : GroundedBehaviour, IWaterCollisionNotifier
 
 		if (interactPrompt is not null) {
 			interactPrompt.Update(target);
-			interactPrompt.SetKey(player.InputDevice.GetActionSymbol("interact"));
+			interactPrompt.SetKey(player.InputDevice.GetActionSymbol(Inputs.Interact));
 		}
 
 		if (interactPointer is not null) {
@@ -138,12 +140,12 @@ public partial class BipedBehaviour : GroundedBehaviour, IWaterCollisionNotifier
 		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * rotationSpeed);
 	}
 
-	public void Enter(WaterArea water) {
+	public void Enter(Water water) {
 		if (!IsActive) return;
 
 		Entity.SetBehaviour(() => new SwimmingBehaviour(Entity, water));
 	}
 
-	public void Exit(WaterArea water) { }
+	public void Exit(Water water) { }
 
 }

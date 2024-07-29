@@ -7,6 +7,13 @@ using Godot;
 public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
 	private Transform3D? lastTransform = null;
 
+
+	public WaterMesh() : base() {
+		Layers = VisualLayers.Water;
+	}
+
+
+
 	private void OnMeshChanged() {
 		Mesh? mesh = Mesh;
 		WaterMeshManager.UpdateTransform(mesh, GlobalTransform);

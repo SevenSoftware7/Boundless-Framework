@@ -42,9 +42,11 @@ _data = {
 [sub_resource type="BoxShape3D" id="BoxShape3D_iqmmo"]
 size = Vector3(0.3, 3.1, 0.3)
 
-[node name="Eos" type="CharacterBody3D" node_paths=PackedStringArray("CostumeHolder", "Skeleton", "AnimationPlayer", "Health")]
+[node name="Eos" type="CharacterBody3D" node_paths=PackedStringArray("CostumeHolder", "Skeleton", "AnimationPlayer", "Health", "CenterOfMass")]
 collision_layer = 2
 floor_constant_speed = true
+platform_floor_layers = 4294967265
+platform_wall_layers = 4294967265
 script = ExtResource("1_44rt4")
 DisplayName = "Eos"
 Stats = SubResource("Resource_v01j0")
@@ -54,6 +56,7 @@ Skeleton = NodePath("Skeleton3D")
 AnimationPlayer = NodePath("AnimationPlayer")
 Health = NodePath("Health")
 _attributeModifiers = [null]
+CenterOfMass = NodePath("Collisions/CenterOfMass")
 
 [node name="Health" type="Node" parent="."]
 script = ExtResource("8_emu8a")
@@ -73,6 +76,8 @@ transform = Transform3D(-1, 0, -1.50996e-07, 0, 1, 0, 1.50996e-07, 0, -1, 0, 0, 
 [node name="Collisions" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
 shape = SubResource("BoxShape3D_iqmmo")
+
+[node name="CenterOfMass" type="Node3D" parent="Collisions"]
 
 [node name="CostumeHolder" type="Node3D" parent="." node_paths=PackedStringArray("Model")]
 script = ExtResource("9_8kq40")

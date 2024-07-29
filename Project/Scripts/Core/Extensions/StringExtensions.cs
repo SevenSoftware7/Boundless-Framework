@@ -1,6 +1,6 @@
-using System.Text;
-
 namespace SevenDev.Utility;
+
+using System.Text;
 
 public static class StringExtensions {
 	public static string ToSnakeCase(this string str) {

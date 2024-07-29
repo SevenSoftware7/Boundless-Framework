@@ -1,6 +1,6 @@
-using Godot;
-
 namespace LandlessSkies.Core;
+
+using Godot;
 
 [Tool]
 public abstract partial class MovementBehaviour : EntityBehaviour {

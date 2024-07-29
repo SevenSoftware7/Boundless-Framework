@@ -18,7 +18,7 @@ script = ExtResource("4_8b0k0")
 cameraOriginPosition = Vector3(1, -0.12, 5.2)
 horizontalSmoothTime = 0.065
 verticalSmoothTime = 0.16
-CollisionMask = 4294967289
+CollisionMask = 4294967265
 Subject = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 LocalRotation = Basis(-0.730305, 0, -0.683121, 0, 1, 0, 0.683121, 0, -0.730305)
 

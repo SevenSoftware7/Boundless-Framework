@@ -121,16 +121,27 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 		set => _globalForward = Transform.Basis * value;
 	}
 
+	[ExportGroup("")]
+	[Export]
+	public Node3D? CenterOfMass { get; private set; }
+
+	protected virtual Func<EntityBehaviour> DefaultBehaviour => () => new BipedBehaviour(this);
+
 
 	[Signal] public delegate void DeathEventHandler(float fromHealth);
 
 
 	protected Entity() : base() {
-		CollisionLayer = Collisions.Entity;
+		CollisionLayer = CollisionLayers.Entity;
+		CollisionMask = CollisionLayers.Terrain;
+
+		uint movingPlatformLayers = uint.MaxValue & ~(CollisionLayers.Entity | CollisionLayers.Water | CollisionLayers.Interactable | CollisionLayers.Damage);
+		PlatformFloorLayers = movingPlatformLayers;
+		PlatformWallLayers = movingPlatformLayers;
 
 		Forward = Vector3.Forward;
 	}
-	public Entity(EntityCostume? costume = null) : base() {
+	public Entity(EntityCostume? costume = null) : this() {
 		CostumeHolder = new CostumeHolder(costume).ParentTo(this);
 	}
 
@@ -250,10 +261,12 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 		if (Engine.IsEditorHint()) return;
 
 		if (CurrentBehaviour is null) {
-			SetBehaviour(new BipedBehaviour(this));
+			SetBehaviour(DefaultBehaviour);
+		}
+		else {
+			CurrentBehaviour?.Start();
 		}
 
-		CurrentBehaviour?.Start();
 	}
 
 	public override void _ExitTree() {

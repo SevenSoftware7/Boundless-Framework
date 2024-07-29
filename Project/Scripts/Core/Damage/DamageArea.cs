@@ -5,7 +5,7 @@ using Godot;
 using SevenDev.Utility;
 
 [GlobalClass]
-public partial class DamageArea3D : Area3D {
+public partial class DamageArea : Area3D {
 	private readonly List<IDamageable> hitBuffer = [];
 	public IDamageDealer? DamageDealer;
 
@@ -16,18 +16,18 @@ public partial class DamageArea3D : Area3D {
 	[Signal] public delegate void OnDestroyEventHandler();
 
 
-	public DamageArea3D() : base() {
-		CollisionLayer = Collisions.Damage;
-		CollisionMask = Collisions.Damage | Collisions.Entity;
+	public DamageArea() : base() {
+		CollisionLayer = CollisionLayers.Damage;
+		CollisionMask = CollisionLayers.Damage | CollisionLayers.Entity;
 	}
-	public DamageArea3D(ulong lifeTime) : this() {
+	public DamageArea(ulong lifeTime) : this() {
 		if (lifeTime != 0) {
 			LifeTime = new(true, lifeTime);
 		}
 	}
 
 
-	public DamageArea3D(IDamageDealer? damageDealer, float damage = 1f, ulong lifeTime = 0, bool selfDamage = false) : this(lifeTime) {
+	public DamageArea(IDamageDealer? damageDealer, float damage = 1f, ulong lifeTime = 0, bool selfDamage = false) : this(lifeTime) {
 		DamageDealer = damageDealer;
 		Damage = damage;
 		SelfDamage = selfDamage;
@@ -41,13 +41,13 @@ public partial class DamageArea3D : Area3D {
 			}
 			hitBuffer.Add(damageable);
 		}
-		else if (body is DamageArea3D damageArea) {
+		else if (body is DamageArea damageArea) {
 			Parry(damageArea);
 			damageArea.Parry(this);
 		}
 	}
 
-	public void Parry(DamageArea3D other) {
+	public void Parry(DamageArea other) {
 		if (DamageDealer is IDamageable targetDealer) {
 			other.hitBuffer.Remove(targetDealer);
 		}
@@ -67,10 +67,7 @@ public partial class DamageArea3D : Area3D {
 
 	public override void _Process(double delta) {
 		base._Process(delta);
-		if (LifeTime is null) return;
-
-
-		if (LifeTime.HasPassed) {
+		if (LifeTime?.HasPassed ?? false) {
 			EmitSignal(SignalName.OnDestroy);
 			QueueFree();
 		}

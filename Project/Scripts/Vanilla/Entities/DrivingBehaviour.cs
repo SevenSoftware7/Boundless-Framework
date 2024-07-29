@@ -10,7 +10,7 @@ public partial class DrivingBehaviour : SittingBehaviour {
 
 	private EntityBehaviour? previousBehaviour;
 
-	protected override Transform3D SittingPosition => Vehicle?.Entity?.CostumeHolder?.Model?.GlobalTransform ?? Vehicle?.Entity?.GlobalTransform ?? Transform3D.Identity;
+	protected override Transform3D SittingPosition => Vehicle?.Entity.CostumeHolder?.Model?.GlobalTransform ?? Vehicle?.Entity.GlobalTransform ?? Transform3D.Identity;
 
 
 	protected DrivingBehaviour() : this(null!, null!) { }
@@ -18,11 +18,17 @@ public partial class DrivingBehaviour : SittingBehaviour {
 		Vehicle = vehicle;
 	}
 
+	protected override void _Start(EntityBehaviour? previousBehaviour) {
+		if (Vehicle is null) {
+			Stop();
+			return;
+		}
+
+		base._Start(previousBehaviour);
+	}
 
 	protected override void _Stop(EntityBehaviour? nextBehaviour) {
 		base._Stop(nextBehaviour);
-		if (Entity is null || Vehicle?.Entity is null) return;
-
 		Entity.Inertia += Vehicle.Entity.Movement + Vehicle.Entity.Inertia;
 	}
 

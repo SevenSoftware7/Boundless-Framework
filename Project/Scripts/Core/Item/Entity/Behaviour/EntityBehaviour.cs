@@ -32,17 +32,23 @@ public abstract partial class EntityBehaviour : Node {
 			return;
 		}
 
+		GD.Print($"Start {GetType().Name}");
+
 		_isActive = true;
 
 		_Start(previousBehaviour is null || previousBehaviour.IsOneTime ? null : previousBehaviour);
 	}
 	public void Stop(EntityBehaviour? NextBehaviour = null) {
+		GD.Print($"Stop {GetType().Name}");
 		_isActive = false;
 
 		_Stop(NextBehaviour);
 
 		if (IsOneTime) {
 			this.UnparentAndQueueFree();
+		}
+		else {
+			Name = $"{GetType().Name}_inactive";
 		}
 	}
 

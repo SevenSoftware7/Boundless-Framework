@@ -1,6 +1,6 @@
-using Godot;
-
 namespace LandlessSkies.Core;
+
+using Godot;
 
 public partial class BipedJumpActionInfo : JumpActionInfo {
 	private static readonly float PotentialJumpHeight = 1f;

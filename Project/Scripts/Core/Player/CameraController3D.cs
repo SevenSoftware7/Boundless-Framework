@@ -38,7 +38,7 @@ public partial class CameraController3D : Camera3D {
 
 	public void SetEntityAsSubject(Entity entity) {
 		Transform3D transform = entity.Transform;
-		Vector3 origin = transform.Origin;
+		Vector3 origin = entity.CenterOfMass?.GlobalPosition ?? transform.Origin;
 
 		if (entity.Skeleton is not null && entity.Skeleton.TryGetBonePosition("Head", out var bonePosition)) {
 			origin = bonePosition;

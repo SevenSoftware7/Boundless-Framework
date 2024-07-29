@@ -17,7 +17,7 @@ public abstract partial class Attack(Entity entity, Weapon weapon, IEnumerable<A
 	protected static StringName GetAnimationPath(StringName library, StringName attack) => library.IsEmpty ? attack : $"{library}/{attack}";
 
 	public void CreateHitBox(float damage, Vector3 size, Vector3 position, bool parented, ulong lifeTime = 0) {
-		DamageArea3D hitArea = CreateHurtArea(damage, lifeTime);
+		DamageArea hitArea = CreateHurtArea(damage, lifeTime);
 		if (parented) {
 			hitArea.ParentTo(Weapon);
 			hitArea.Transform = new() {
@@ -36,11 +36,11 @@ public abstract partial class Attack(Entity entity, Weapon weapon, IEnumerable<A
 	}
 
 
-	public virtual DamageArea3D CreateHurtArea(float damage, ulong lifeTime) {
+	public virtual DamageArea CreateHurtArea(float damage, ulong lifeTime) {
 		return new(Entity as IDamageDealer, damage, lifeTime);
 	}
 
-	public virtual void AddCollisionShapes(DamageArea3D damageArea, Vector3 size) {
+	public virtual void AddCollisionShapes(DamageArea damageArea, Vector3 size) {
 		new CollisionShape3D() {
 			Shape = new BoxShape3D() {
 				Size = size,

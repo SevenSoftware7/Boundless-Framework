@@ -1,6 +1,6 @@
-using Godot;
-
 namespace LandlessSkies.Core;
+
+using Godot;
 
 public sealed class SlashAttackInfo : AttackInfo {
 	public static readonly SlashAttackInfo Instance = new();

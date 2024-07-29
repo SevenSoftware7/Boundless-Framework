@@ -1,6 +1,6 @@
-using Godot;
-
 namespace LandlessSkies.Core;
+
+using Godot;
 
 public interface IWaterDisplacementSubscriber {
 	Vector3 GetLocation();

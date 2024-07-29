@@ -6,13 +6,6 @@ using Godot;
 using Godot.Collections;
 
 public static class Collisions {
-	public static readonly uint Terrain = 1 << 0;
-	public static readonly uint Entity = 1 << 1;
-	public static readonly uint Water = 1 << 2;
-	public static readonly uint Interactable = 1 << 3;
-	public static readonly uint Damage = 1 << 4;
-
-
 	public static bool IntersectRay3DExclusive<T>(this World3D world, T target, Vector3 from, Vector3 to, out IntersectRay3DResult result, uint collisionMask = uint.MaxValue, Array<Rid>? exclude = null, bool collideWithBodies = true, bool collideWithAreas = true, bool hitFromInside = false, bool hitBackFaces = false, uint maxCollisions = 32) where T : Node3D {
 		PhysicsRayQueryParameters3D parameters = PhysicsRayQueryParameters3D.Create(from, to, collisionMask);
 		parameters.CollideWithBodies = collideWithBodies;

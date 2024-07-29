@@ -1,7 +1,7 @@
+namespace LandlessSkies.Core;
+
 using Godot;
 using SevenDev.Utility;
-
-namespace LandlessSkies.Core;
 
 public partial class BipedJumpAction : JumpAction, IPlayerHandler {
 	public const float INITIAL_JUMP_HEIGHT_FRACTION = 2f / 3f;

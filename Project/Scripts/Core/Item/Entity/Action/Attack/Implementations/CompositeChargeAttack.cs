@@ -1,8 +1,8 @@
+namespace LandlessSkies.Core;
+
 using System.Collections.Generic;
 using Godot;
 using SevenDev.Utility;
-
-namespace LandlessSkies.Core;
 
 /// <summary>
 /// A Charge Attack composed of two Attacks, with a determinate charge time.
@@ -17,7 +17,7 @@ public partial class CompositeChargeAttack(Entity entity, Weapon weapon, StringN
 	private bool isDone;
 
 
-	protected sealed override bool IsChargeStopped(InputDevice inputDevice) => !inputDevice.IsActionPressed(info.ActionKey);
+	protected sealed override bool IsChargeStopped(InputDevice inputDevice) => !inputDevice.IsActionPressed(info.ActionInput);
 
 	/// <summary>
 	/// Called when the Attack finishes Charging.

@@ -17,20 +17,29 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 	private float _moveSpeed;
 	protected Vector3 _moveDirection;
 
-	private WaterArea WaterArea;
+	[Export] private Water WaterArea;
 	private float WaterSurface;
 	private float WaterDisplacement;
 
-	public float OffsetToWaterSurface => WaterSurface + WaterDisplacement - (Entity.GlobalPosition.Y + CenterOfMassOffset);
+	private bool _jumpInput;
+
+
+
+	public float OffsetToWaterSurface => WaterSurface + WaterDisplacement - (Entity.CenterOfMass is null ? (Entity.GlobalPosition.Y + CenterOfMassOffset) : Entity.CenterOfMass.GlobalPosition.Y);
 	public bool IsOnWaterSurface => Mathf.Abs(OffsetToWaterSurface) <= SurfaceThreshold;
 
 	protected SwimmingBehaviour() : this(null!, null!) { }
-	public SwimmingBehaviour(Entity entity, WaterArea waterArea) : base(entity) {
+	public SwimmingBehaviour(Entity entity, Water waterArea) : base(entity) {
 		WaterArea = waterArea;
 	}
 
 
 	protected override void _Start(EntityBehaviour? previousBehaviour) {
+		if (WaterArea is null) {
+			Stop();
+			return;
+		}
+
 		this.previousBehaviour = previousBehaviour;
 
 		Entity.GlobalForward = Entity.GlobalForward.SlideOnFace(Entity.UpDirection).Normalized();
@@ -41,7 +50,7 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 		WaterDisplacementEffect.Subscribers.Add(this);
 	}
 	protected override void _Stop(EntityBehaviour? nextBehaviour) {
-		if (nextBehaviour is GroundedBehaviour groundedBehaviour && OffsetToWaterSurface <= 0f) {
+		if (_jumpInput && OffsetToWaterSurface <= 0f && nextBehaviour is GroundedBehaviour groundedBehaviour) {
 			groundedBehaviour.Jump(true);
 		}
 
@@ -60,8 +69,8 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 		).ClampMagnitude(1f);
 		player.CameraController.RawInputToCameraRelativeMovement(input, out _, out Vector3 movement);
 
-
-		if (player.InputDevice.IsActionPressed(Inputs.Jump)) {
+		_jumpInput = player.InputDevice.IsActionPressed(Inputs.Jump);
+		if (_jumpInput) {
 			movement = (movement + Entity.UpDirection).ClampMagnitude(1f);
 		}
 
@@ -70,6 +79,7 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 
 	public virtual void DisavowPlayer() {
 		_moveDirection = Vector3.Zero;
+		_jumpInput = false;
 	}
 
 
@@ -85,7 +95,7 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 
 		float floatDelta = (float)delta;
 
-		if (WaterArea.GetTopSurface(Entity.GlobalPosition, 5f, out Collisions.IntersectRay3DResult result)) {
+		if (WaterArea.GetSurfaceInDirection(Entity.GlobalPosition, Vector3.Up, out Collisions.IntersectRay3DResult result)) {
 			WaterSurface = result.Point.Y;
 		}
 
@@ -142,9 +152,9 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 		}
 	}
 
-	public void Enter(WaterArea water) { }
+	public void Enter(Water water) { }
 
-	public void Exit(WaterArea water) {
+	public void Exit(Water water) {
 		if (!IsActive) return;
 		if (water != WaterArea) return;
 

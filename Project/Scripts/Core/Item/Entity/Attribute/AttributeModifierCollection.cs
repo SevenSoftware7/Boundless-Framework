@@ -1,3 +1,5 @@
+namespace LandlessSkies.Core;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -5,8 +7,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Godot;
-
-namespace LandlessSkies.Core;
 
 public sealed class AttributeModifierCollection : ICollection<AttributeModifier> {
 	private readonly Dictionary<EntityAttribute, AttributeModifierEntry> _dictionary = [];

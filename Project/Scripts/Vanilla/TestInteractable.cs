@@ -23,17 +23,17 @@ public partial class TestInteractable : Interactable {
 	private async void CloneEntity(Entity entity) {
 		ISaveData<Entity>? savedEntity = entity.Save();
 
+		await Task.Run(() => {
+			string path = @$"{OS.GetUserDataDir()}/SaveData1.dat";
+			BinarySerializationFormatter formatter = new(BinarySerializationOptions.CompactSerializationOfStructures);
 
-		// string path = @$"{OS.GetUserDataDir()}/SaveData1.dat";
-		// BinarySerializationFormatter formatter = new(BinarySerializationOptions.CompactSerializationOfStructures);
-
-		// using (FileStream stream = new(path, FileMode.Create)) {
-		// 	formatter.SerializeToStream(stream, savedEntity);
-		// }
-		// using (FileStream stream = new(path, FileMode.Open)) {
-		// 	savedEntity = formatter.DeserializeFromStream<ISaveData<Entity>?>(stream);
-		// }
-
+			using (FileStream stream = new(path, FileMode.Create)) {
+				formatter.SerializeToStream(stream, savedEntity);
+			}
+			using (FileStream stream = new(path, FileMode.Open)) {
+				savedEntity = formatter.DeserializeFromStream<ISaveData<Entity>?>(stream);
+			}
+		});
 
 		Entity? clonedEntity = savedEntity?.Load()?.SetOwnerAndParent(this);
 		if (clonedEntity is not null) {

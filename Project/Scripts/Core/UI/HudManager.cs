@@ -27,10 +27,7 @@ public partial class HudManager : Control {
 		return info;
 	}
 
-	public PromptControl? AddPrompt(PackedScene? prompt) {
-		if (prompt is null)
-			return null;
-
+	public PromptControl AddPrompt(PackedScene prompt) {
 		return AddPrompt(prompt.Instantiate<PromptControl>());
 	}
 	public PromptControl AddPrompt(PromptControl prompt) {
@@ -39,10 +36,7 @@ public partial class HudManager : Control {
 		return prompt;
 	}
 
-	public PointerControl? AddPointer(PackedScene? pointer) {
-		if (pointer is null)
-			return null;
-
+	public PointerControl AddPointer(PackedScene pointer) {
 		return AddPointer(pointer.Instantiate<PointerControl>());
 	}
 	public PointerControl AddPointer(PointerControl prompt) {

@@ -27,15 +27,19 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 
 
 	public virtual void Dismount() {
-		Entity?.SetBehaviour(previousBehaviour);
+		Entity.SetBehaviour(previousBehaviour);
 	}
 
 
 	public virtual void HandlePlayer(Player player) {
 		if (!IsActive) return;
-		dismountPrompt ??= player.HudManager.AddPrompt(player.Entity?.HudPack.InteractPrompt);
 
-		dismountPrompt?.Update(true, "Dismount", player.InputDevice.GetActionSymbol(Inputs.Interact));
+		if (dismountPrompt is null && Entity.HudPack.InteractPrompt is not null) {
+			dismountPrompt = player.HudManager.AddPrompt(Entity.HudPack.InteractPrompt);
+			dismountPrompt.Update(true, "Dismount");
+		}
+		dismountPrompt?.SetKey(player.InputDevice.GetActionSymbol(Inputs.Interact)); // TODO: update the key only when the InputDevice or the keybinding is changed
+
 		if (player.InputDevice.IsActionJustPressed(Inputs.Interact)) {
 			Dismount();
 		}
@@ -49,6 +53,7 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 	public override void _Process(double delta) {
 		base._Process(delta);
 
+		if (!IsActive) return;
 		if (Engine.IsEditorHint()) return;
 		if (Entity is not Entity entity) return;
 

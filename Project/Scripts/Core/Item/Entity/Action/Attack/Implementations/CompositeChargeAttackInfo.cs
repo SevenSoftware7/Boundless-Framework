@@ -12,13 +12,13 @@ public class CompositeChargeAttackInfo(
 	public AttackInfo ChargedAttack { get; init; } = chargedAttack;
 
 
-	public StringName ActionKey { get; init; } = actionKey ?? Inputs.AttackLight;
+	public StringName ActionInput { get; init; } = actionKey ?? Inputs.AttackLight;
 	public ulong ChargeDuration { get; init; } = chargeDuration ?? 1000;
 
 
 
 	public void ExecuteOnKeyJustPressed(Player player, Weapon weapon, StringName library) {
-		if (player.InputDevice.IsActionJustPressed(ActionKey)) {
+		if (player.InputDevice.IsActionJustPressed(ActionInput)) {
 			player?.Entity?.ExecuteAction(new AttackBuilder(this, weapon, library));
 		}
 	}

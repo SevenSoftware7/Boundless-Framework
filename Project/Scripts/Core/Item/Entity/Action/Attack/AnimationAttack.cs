@@ -82,7 +82,7 @@ public abstract partial class AnimationAttack(Entity entity, Weapon weapon, Stri
 		}
 	}
 	protected override void _Stop() {
-		if (Entity?.AnimationPlayer is null) return;
+		if (Entity.AnimationPlayer is null) return;
 
 		if (Entity.AnimationPlayer.CurrentAnimation == GetAnimationPath(library, AnimationName)) {
 			Entity.AnimationPlayer.Stop();

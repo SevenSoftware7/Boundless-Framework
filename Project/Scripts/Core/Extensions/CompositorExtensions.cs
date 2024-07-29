@@ -4,7 +4,6 @@ using System;
 using Godot;
 using Godot.Collections;
 
-
 public static class CompositorExtensions {
 	public static Rid IndexBufferCreate(this RenderingDevice renderingDevice, ushort[] indices) {
 		byte[] byteIndices = new byte[indices.Length * sizeof(ushort)];
