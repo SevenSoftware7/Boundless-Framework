@@ -15,8 +15,7 @@ public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
 
 
 	private void OnMeshChanged() {
-		Mesh? mesh = Mesh;
-		WaterMeshManager.UpdateTransform(mesh, GlobalTransform);
+		WaterMeshManager.UpdateMesh(this);
 	}
 
 
@@ -24,10 +23,8 @@ public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
 		base._Process(delta);
 		if (lastTransform is not null && GlobalTransform == lastTransform) return;
 
-		Mesh? mesh = Mesh;
-
 		lastTransform = GlobalTransform;
-		WaterMeshManager.UpdateTransform(mesh, lastTransform.Value);
+		WaterMeshManager.UpdateTransform(this);
 	}
 
 	public override void _EnterTree() {
@@ -35,8 +32,8 @@ public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
 
 		Mesh? mesh = Mesh;
 
+		WaterMeshManager.Add(this);
 		lastTransform = GlobalTransform;
-		WaterMeshManager.Add(mesh, lastTransform.Value);
 
 		if (mesh is not null) {
 			mesh.Changed += OnMeshChanged;
@@ -48,7 +45,7 @@ public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
 		Mesh? mesh = Mesh;
 
 		lastTransform = null;
-		WaterMeshManager.Remove(mesh);
+		WaterMeshManager.Remove(this);
 
 		if (mesh is not null) {
 			mesh.Changed -= OnMeshChanged;
@@ -57,19 +54,19 @@ public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
 	}
 
 	public override bool _Set(StringName property, Variant value) {
-		if (property != MeshInstance3D.PropertyName.Mesh) return base._Set(property, value);
+		if (property != MeshInstance3D.PropertyName.Mesh || !IsInsideTree()) return base._Set(property, value);
 
 		Mesh? mesh = Mesh;
 
 		if (mesh is not null) {
-			WaterMeshManager.Remove(mesh);
+			WaterMeshManager.Remove(this);
 			mesh.Changed -= OnMeshChanged;
 		}
 
 		mesh = Mesh = value.As<Mesh>();
 
 		if (mesh is not null) {
-			WaterMeshManager.Add(mesh, GlobalTransform);
+			WaterMeshManager.Add(this);
 			mesh.Changed += OnMeshChanged;
 		}
 
@@ -77,10 +74,14 @@ public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
 	}
 
 	public void OnBeforeSerialize() {
-		if (Mesh is Mesh mesh) mesh.Changed -= OnMeshChanged;
+		if (Mesh is Mesh mesh) {
+			mesh.Changed -= OnMeshChanged;
+		}
 	}
 
 	public void OnAfterDeserialize() {
-		if (Mesh is Mesh mesh) mesh.Changed += OnMeshChanged;
+		if (Mesh is Mesh mesh) {
+			mesh.Changed += OnMeshChanged;
+		}
 	}
 }

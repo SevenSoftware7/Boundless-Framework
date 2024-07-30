@@ -1,4 +1,4 @@
-[gd_scene load_steps=111 format=3 uid="uid://b505xodur2iff"]
+[gd_scene load_steps=110 format=3 uid="uid://b505xodur2iff"]
 
 [ext_resource type="RDShaderFile" uid="uid://br3hg0ejs6wif" path="res://Resources/Rendering/Shaders/FetchWaterData.glsl" id="2_5l7vn"]
 [ext_resource type="RDShaderFile" uid="uid://caumal2txsxfx" path="res://Resources/Rendering/Shaders/UnderwaterEffect.glsl" id="4_2f2ji"]
@@ -14,14 +14,13 @@
 [ext_resource type="Shader" path="res://Resources/Rendering/Shaders/Water.gdshader" id="11_cp2h1"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/Implementations/AkimboWeapon.cs" id="11_uqmxm"]
 [ext_resource type="PackedScene" uid="uid://fbs6dr24ss3g" path="res://Resources/Weapons/Epiphron/Epiphron.tscn" id="12_1jl3t"]
-[ext_resource type="Script" path="res://Scripts/Core/Water/Water.cs" id="12_fetsi"]
-[ext_resource type="Script" path="res://Scripts/Core/Water/WaterMesh.cs" id="13_c8te0"]
+[ext_resource type="PackedScene" uid="uid://ckd33ejkd5cqi" path="res://Resources/FX/Water.tscn" id="12_xdv3s"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/Implementations/MultiWeapon.cs" id="13_d6cna"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Attribute/AttributeModifierTrigger.cs" id="14_w4log"]
 [ext_resource type="PackedScene" uid="uid://b7b17ebmgtrfy" path="res://Resources/Weapons/Nemesis/Nemesis.tscn" id="15_x4bcq"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Attribute/AdditiveModifier.cs" id="15_y8l2d"]
 [ext_resource type="PackedScene" uid="uid://bp1e6thwkkcrr" path="res://Resources/Weapons/Eleos/Eleos.tscn" id="17_jhoyp"]
-[ext_resource type="Script" path="res://Scripts/Core/Damage/DamageArea3D.cs" id="19_77ura"]
+[ext_resource type="Script" path="res://Scripts/Core/Damage/DamageArea.cs" id="18_pbwgl"]
 [ext_resource type="PackedScene" uid="uid://bxcpbr13uyeh1" path="res://Resources/Entities/Bike/Bike.tscn" id="20_pcyav"]
 [ext_resource type="PackedScene" uid="uid://b7hcoc81x5g0i" path="res://Resources/Companions/Erebos.tscn" id="26_ds8t8"]
 [ext_resource type="PackedScene" uid="uid://7ic4jncm8p1a" path="res://Scenes/Player.tscn" id="26_rkn04"]
@@ -1420,14 +1419,14 @@ size = Vector3(3, 1, 6)
 [sub_resource type="BoxMesh" id="BoxMesh_juan7"]
 size = Vector3(3, 1, 6)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_asmth"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_tw615"]
 size = Vector3(60, 12, 58)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_nn348"]
 render_priority = 0
 shader = ExtResource("11_cp2h1")
 
-[sub_resource type="BoxMesh" id="BoxMesh_oe5ee"]
+[sub_resource type="BoxMesh" id="BoxMesh_ldjyn"]
 material = SubResource("ShaderMaterial_nn348")
 size = Vector3(60, 12, 58)
 subdivide_width = 32
@@ -1775,7 +1774,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30201, -4.81285)
 curve = SubResource("Curve3D_1g2j1")
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Environment/Path3D"]
-transform = Transform3D(-0.0922568, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97163e-07, 0.995733, 8.27696e-08, -0.0922568, -1.98959, 0, 2.30373)
+transform = Transform3D(-0.0922569, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97164e-07, 0.995733, 8.27696e-08, -0.0922569, -1.98959, 0, 2.30373)
 script = ExtResource("36_x7xeh")
 
 [node name="AnimatableBody3D" type="AnimatableBody3D" parent="Environment/Path3D/PathFollow3D"]
@@ -1788,21 +1787,17 @@ shape = SubResource("BoxShape3D_x4tkf")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/Path3D/PathFollow3D"]
 mesh = SubResource("BoxMesh_juan7")
 
-[node name="Water" type="Area3D" parent="Environment"]
+[node name="Water" parent="Environment" instance=ExtResource("12_xdv3s")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.25, -7, 70)
-collision_layer = 4
-collision_mask = 10
-monitorable = false
-gravity = 0.0
-script = ExtResource("12_fetsi")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Water"]
-shape = SubResource("BoxShape3D_asmth")
+[node name="CollisionShape3D" parent="Environment/Water" index="0"]
+shape = SubResource("BoxShape3D_tw615")
 
-[node name="WaterMesh" type="MeshInstance3D" parent="Environment/Water"]
-layers = 4
-mesh = SubResource("BoxMesh_oe5ee")
-script = ExtResource("13_c8te0")
+[node name="WaterMesh" parent="Environment/Water" index="1"]
+mesh = SubResource("BoxMesh_ldjyn")
+
+[node name="GPUParticlesCollisionBox3D" parent="Environment/Water" index="2"]
+size = Vector3(60, 12, 58)
 
 [node name="Player" parent="." node_paths=PackedStringArray("Entity") instance=ExtResource("26_rkn04")]
 Entity = NodePath("../Eos")
@@ -1822,16 +1817,16 @@ layers = 4
 mesh = SubResource("SphereMesh_xl38q")
 skeleton = NodePath("../..")
 
-[node name="DamageArea3D" type="Area3D" parent="."]
+[node name="DamageArea" type="Area3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.4761, 1.30216, -12.7711)
 collision_layer = 16
 collision_mask = 18
-script = ExtResource("19_77ura")
+script = ExtResource("18_pbwgl")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="DamageArea3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DamageArea"]
 shape = SubResource("SphereShape3D_d0jor")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="DamageArea3D/CollisionShape3D"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="DamageArea/CollisionShape3D"]
 mesh = SubResource("SphereMesh_c40qo")
 skeleton = NodePath("../..")
 
@@ -1916,10 +1911,9 @@ skeleton = NodePath("")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="FloaterSphere"]
 shape = SubResource("SphereShape3D_d6mbx")
 
-[node name="WaterFloater" type="Node" parent="FloaterSphere" node_paths=PackedStringArray("Body", "Water")]
+[node name="WaterFloater" type="Node" parent="FloaterSphere" node_paths=PackedStringArray("Body")]
 script = ExtResource("29_nhfxh")
 Body = NodePath("..")
-Water = NodePath("../../Environment/Water")
 
 [node name="FloaterCube" type="RigidBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.1564, 3.82672, 56.9495)
@@ -1947,10 +1941,9 @@ shape = SubResource("BoxShape3D_up76v")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="FloaterCube_2"]
 mesh = SubResource("BoxMesh_wxcg1")
 
-[node name="WaterFloater" type="Node" parent="FloaterCube_2" node_paths=PackedStringArray("Body", "Water")]
+[node name="WaterFloater" type="Node" parent="FloaterCube_2" node_paths=PackedStringArray("Body")]
 script = ExtResource("29_nhfxh")
 Body = NodePath("..")
-Water = NodePath("../../Environment/Water")
 
 [node name="FloaterSphere_2" type="RigidBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.508, -3.44575, 74.3085)
@@ -1964,10 +1957,9 @@ skeleton = NodePath("")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="FloaterSphere_2"]
 shape = SubResource("SphereShape3D_d6mbx")
 
-[node name="WaterFloater" type="Node" parent="FloaterSphere_2" node_paths=PackedStringArray("Body", "Water")]
+[node name="WaterFloater" type="Node" parent="FloaterSphere_2" node_paths=PackedStringArray("Body")]
 script = ExtResource("29_nhfxh")
 Body = NodePath("..")
-Water = NodePath("../../Environment/Water")
 
 [node name="FloaterSphere_3" type="RigidBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -31.4515, 1.66822, 74.3085)
@@ -1984,3 +1976,5 @@ shape = SubResource("SphereShape3D_d6mbx")
 [node name="WaterFloater" type="Node" parent="FloaterSphere_3" node_paths=PackedStringArray("Body")]
 script = ExtResource("29_nhfxh")
 Body = NodePath("..")
+
+[editable path="Environment/Water"]

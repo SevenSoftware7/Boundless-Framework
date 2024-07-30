@@ -240,7 +240,7 @@ lights_and_shadows/positional_shadow/atlas_quadrant_3_subdiv=5
 
 water_color={
 "type": "color",
-"value": Color(0.045, 0.099, 0.45, 1)
+"value": Color(0.068, 0.1274, 0.2, 1)
 }
 water_displacement={
 "type": "sampler2D",

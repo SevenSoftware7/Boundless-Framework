@@ -206,7 +206,7 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 			coyoteTimer.Start();
 		}
 
-		if (!jumpBuffer.HasPassed && jumpCooldown.HasPassed && !coyoteTimer.HasPassed) {
+		if (!jumpBuffer.HasPassed && !coyoteTimer.HasPassed) {
 			ExecuteJump();
 		}
 	}
@@ -214,7 +214,7 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 	private void ExecuteJump() {
 		if (JumpAction is null) return;
 
-		if (Entity.ExecuteAction(new JumpActionBuilder(JumpAction, _jumpDirection))) {
+		if (jumpCooldown.HasPassed && Entity.ExecuteAction(new JumpActionBuilder(JumpAction, _jumpDirection))) {
 			jumpBuffer.End();
 			jumpCooldown.Start();
 		}

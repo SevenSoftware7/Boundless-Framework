@@ -1,0 +1,39 @@
+[gd_scene load_steps=7 format=3 uid="uid://ckd33ejkd5cqi"]
+
+[ext_resource type="Script" path="res://Scripts/Core/Water/Water.cs" id="1_wguud"]
+[ext_resource type="Shader" path="res://Resources/Rendering/Shaders/Water.gdshader" id="2_13n3k"]
+[ext_resource type="Script" path="res://Scripts/Core/Water/WaterMesh.cs" id="3_wi2hl"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_asmth"]
+size = Vector3(20, 20, 20)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nn348"]
+render_priority = 0
+shader = ExtResource("2_13n3k")
+
+[sub_resource type="BoxMesh" id="BoxMesh_oe5ee"]
+material = SubResource("ShaderMaterial_nn348")
+size = Vector3(20, 20, 20)
+subdivide_width = 32
+subdivide_height = 32
+subdivide_depth = 32
+
+[node name="Water" type="Area3D"]
+collision_layer = 4
+collision_mask = 10
+monitorable = false
+gravity = 0.0
+script = ExtResource("1_wguud")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_asmth")
+
+[node name="WaterMesh" type="MeshInstance3D" parent="."]
+layers = 4
+mesh = SubResource("BoxMesh_oe5ee")
+script = ExtResource("3_wi2hl")
+
+[node name="GPUParticlesCollisionBox3D" type="GPUParticlesCollisionBox3D" parent="."]
+layers = 4
+cull_mask = 4293918724
+size = Vector3(20, 20, 20)
