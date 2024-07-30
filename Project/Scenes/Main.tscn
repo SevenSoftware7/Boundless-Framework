@@ -67,7 +67,7 @@ ComputeShaderFile = ExtResource("4_tdgd3")
 FetchShaderFile = ExtResource("2_5l7vn")
 FetchWaterDisplacement = true
 
-[sub_resource type="CompositorEffect" id="CompositorEffect_8kyyx"]
+[sub_resource type="CompositorEffect" id="CompositorEffect_mpcwl"]
 resource_local_to_scene = false
 resource_name = ""
 enabled = true
@@ -80,7 +80,7 @@ ComputeShaderFile = ExtResource("4_2f2ji")
 WaterDisplacementTexture = ExtResource("5_5pwvj")
 
 [sub_resource type="Compositor" id="Compositor_gp4nw"]
-compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_iivda"), SubResource("CompositorEffect_8kyyx")])
+compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_iivda"), SubResource("CompositorEffect_mpcwl")])
 
 [sub_resource type="Gradient" id="Gradient_rpn3q"]
 offsets = PackedFloat32Array(0.666667, 1)
@@ -1774,7 +1774,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30201, -4.81285)
 curve = SubResource("Curve3D_1g2j1")
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Environment/Path3D"]
-transform = Transform3D(-0.0922569, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97164e-07, 0.995733, 8.27696e-08, -0.0922569, -1.98959, 0, 2.30373)
+transform = Transform3D(-0.0922568, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97163e-07, 0.995733, 8.27696e-08, -0.0922568, -1.98959, 0, 2.30373)
 script = ExtResource("36_x7xeh")
 
 [node name="AnimatableBody3D" type="AnimatableBody3D" parent="Environment/Path3D/PathFollow3D"]

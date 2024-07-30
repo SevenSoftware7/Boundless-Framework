@@ -104,9 +104,10 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 		if (renderSize.X == 0.0 && renderSize.Y == 0.0) {
 			throw new ArgumentException("Render size is incorrect");
 		}
+		renderSize -= Vector2I.One; // RenderSize is off by one, maybe a backend specific range, maybe a godot bug
 
-		uint xGroups = (uint)((renderSize.X - 1) / 8) + 1;
-		uint yGroups = (uint)((renderSize.Y - 1) / 8) + 1;
+		uint xGroups = (uint)(renderSize.X / 8) + 1;
+		uint yGroups = (uint)(renderSize.Y / 8) + 1;
 
 
 		if (sceneBuffers.HasTexture(Context, WaterMapName)) {
@@ -146,8 +147,6 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 
 
 			Projection projection = sceneData.GetViewProjection(view);
-			float nearClippingPlane = projection.GetZNear();
-			float farClippingPlane = projection.GetZFar();
 			Projection transform = new(sceneData.GetCamTransform().Inverse());
 
 			// World-space -> Clip-space Matrix to be used in the rendering shader
@@ -189,6 +188,9 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			RenderingDevice.DrawCommandEndLabel();
 
 
+
+			float nearClippingPlane = projection.GetZNear();
+			float farClippingPlane = projection.GetZFar();
 
 			Color waterColor = ProjectSettings.GetSetting("shader_globals/water_color").AsGodotDictionary()["value"].AsColor();
 
