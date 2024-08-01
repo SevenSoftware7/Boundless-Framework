@@ -5,18 +5,54 @@ using Godot;
 using Godot.Collections;
 
 public static class CompositorExtensions {
-	public static Rid IndexBufferCreate(this RenderingDevice renderingDevice, ushort[] indices) {
-		byte[] byteIndices = new byte[indices.Length * sizeof(ushort)];
-		Buffer.BlockCopy(indices, 0, byteIndices, 0, byteIndices.Length);
 
-		return renderingDevice.IndexBufferCreate((uint)indices.Length, RenderingDevice.IndexBufferFormat.Uint16, byteIndices);
+	public static byte[] CreateByteBuffer(float[] floats) {
+		byte[] bytes = new byte[floats.Length * sizeof(float)];
+		Buffer.BlockCopy(floats, 0, bytes, 0, bytes.Length);
+		return bytes;
 	}
-	public static Rid IndexBufferCreate(this RenderingDevice renderingDevice, uint[] indices) {
-		byte[] byteIndices = new byte[indices.Length * sizeof(uint)];
-		Buffer.BlockCopy(indices, 0, byteIndices, 0, byteIndices.Length);
+	public static byte[] CreateByteBuffer(int[] ints) {
+		byte[] bytes = new byte[ints.Length * sizeof(float)];
+		Buffer.BlockCopy(ints, 0, bytes, 0, bytes.Length);
+		return bytes;
+	}
+	public static byte[] CreateByteBuffer(uint[] uints) {
+		byte[] bytes = new byte[uints.Length * sizeof(float)];
+		Buffer.BlockCopy(uints, 0, bytes, 0, bytes.Length);
+		return bytes;
+	}
+	public static byte[] CreateByteBuffer(ushort[] ushorts) {
+		byte[] bytes = new byte[ushorts.Length * sizeof(float)];
+		Buffer.BlockCopy(ushorts, 0, bytes, 0, bytes.Length);
+		return bytes;
+	}
 
-		return renderingDevice.IndexBufferCreate((uint)indices.Length, RenderingDevice.IndexBufferFormat.Uint32, byteIndices);
+	public static (Vector2I renderSize, uint xGroups, uint yGroups) GetRenderSize(this RenderSceneBuffersRD sceneBuffers, uint range = 8) {
+		Vector2I renderSize = sceneBuffers.GetInternalSize();
+		if (renderSize.X == 0.0 && renderSize.Y == 0.0) {
+			throw new ArgumentException("Render size is incorrect");
+		}
+		renderSize -= Vector2I.One; // RenderSize is off by one, maybe a backend specific range, maybe a godot bug
+
+		(uint xGroups, uint yGroups) = GetGroups(renderSize, range);
+
+		return (renderSize, xGroups, yGroups);
 	}
+
+	public static (uint xGroups, uint yGroups) GetGroups(Vector2I renderSize, uint range) {
+		uint xGroups = (uint)(renderSize.X / range) + 1;
+		uint yGroups = (uint)(renderSize.Y / range) + 1;
+
+		return (xGroups, yGroups);
+	}
+
+
+	public static Rid IndexBufferCreate(this RenderingDevice renderingDevice, ushort[] indices) =>
+		renderingDevice.IndexBufferCreate((uint)indices.Length, RenderingDevice.IndexBufferFormat.Uint16, CreateByteBuffer(indices));
+
+	public static Rid IndexBufferCreate(this RenderingDevice renderingDevice, uint[] indices) =>
+		renderingDevice.IndexBufferCreate((uint)indices.Length, RenderingDevice.IndexBufferFormat.Uint32, CreateByteBuffer(indices));
+
 
 	public static (Rid indexBuffer, Rid indexArray)? IndexArrayCreate(this RenderingDevice renderingDevice, ushort[] indices, uint indexOffset = 0) {
 		Rid indexBuffer = renderingDevice.IndexBufferCreate(indices);
@@ -46,8 +82,7 @@ public static class CompositorExtensions {
 
 	public static Rid VertexBufferCreate(this RenderingDevice renderingDevice, float[] vertices, uint vertexLength = 3) {
 		if (vertices.Length % vertexLength != 0) throw new ArgumentException($"Invalid number of values in the points buffer, there should be {vertexLength} float values per point.", nameof(vertices));
-		byte[] byteVertices = new byte[vertices.Length * sizeof(uint)];
-		Buffer.BlockCopy(vertices, 0, byteVertices, 0, byteVertices.Length);
+		byte[] byteVertices = CreateByteBuffer(vertices);
 
 		return renderingDevice.VertexBufferCreate((uint)byteVertices.Length, byteVertices);
 	}

@@ -1427,7 +1427,7 @@ render_priority = 0
 shader = ExtResource("11_cp2h1")
 shader_parameter/water_color = Color(0.068, 0.1274, 0.2, 1)
 shader_parameter/water_intensity = 1.0
-shader_parameter/water_scale = 70.0
+shader_parameter/water_scale = 50.0
 
 [sub_resource type="BoxMesh" id="BoxMesh_ldjyn"]
 material = SubResource("ShaderMaterial_nn348")
@@ -1798,6 +1798,7 @@ shape = SubResource("BoxShape3D_tw615")
 
 [node name="WaterMesh" parent="Environment/Water" index="1"]
 mesh = SubResource("BoxMesh_ldjyn")
+WaterScale = 50.0
 
 [node name="GPUParticlesCollisionBox3D" parent="Environment/Water" index="2"]
 size = Vector3(60, 12, 58)

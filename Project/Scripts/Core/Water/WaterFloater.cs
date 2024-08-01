@@ -18,6 +18,7 @@ public sealed partial class WaterFloater : Node, IWaterDisplacementSubscriber, I
 	public void Enter(Water water) {
 		if (Body is not null) {
 			oldConfig = (Body.LinearDamp, Body.AngularDamp, Body.CanSleep);
+
 			Body.LinearDamp = waterLinearDamp;
 			Body.AngularDamp = waterAngularDamp;
 			Body.CanSleep = false;
@@ -30,9 +31,7 @@ public sealed partial class WaterFloater : Node, IWaterDisplacementSubscriber, I
 
 		if (Body is not null) {
 			if (Body.LinearDamp == waterLinearDamp) Body.LinearDamp = oldConfig?.linearDamp ?? 0;
-
 			if (Body.AngularDamp == waterAngularDamp) Body.AngularDamp = oldConfig?.angularDamp ?? 0;
-
 			if (!Body.CanSleep) Body.CanSleep = oldConfig?.canSleep ?? true;
 		}
 		Water = null;
@@ -78,8 +77,8 @@ public sealed partial class WaterFloater : Node, IWaterDisplacementSubscriber, I
 		const float floatability = 1f;
 		Vector3 offset = Origin is null ? Vector3.Zero : Origin.GlobalPosition - position;
 		float distanceToWaterSurface = totalWaterHeight - position.Y;
-		float displacementMultiplier = distanceToWaterSurface + 1f;
+		float displacementMultiplier = Mathf.Clamp(distanceToWaterSurface * floatability, -floatability, floatability) + 1f;
 
-		Body.ApplyForce(new Vector3(0f, Mathf.Abs(Body.GetGravity().Y) * (displacementMultiplier * floatability), 0f), offset);
+		Body.ApplyForce(new Vector3(0f, Mathf.Abs(Body.GetGravity().Y) * displacementMultiplier, 0f), offset);
 	}
 }

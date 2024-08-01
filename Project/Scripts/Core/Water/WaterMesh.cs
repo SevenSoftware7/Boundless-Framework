@@ -93,13 +93,12 @@ public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
 	}
 
 	public void OnBeforeSerialize() {
-		if (Mesh is Mesh mesh) {
-			mesh.Changed -= OnMeshChanged;
-		}
 		WaterMeshManager.Remove(this);
 	}
 
 	public void OnAfterDeserialize() {
+		if (!IsInsideTree()) return;
+
 		if (Mesh is Mesh mesh) {
 			mesh.Changed += OnMeshChanged;
 		}

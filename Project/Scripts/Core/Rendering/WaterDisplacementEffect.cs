@@ -74,6 +74,7 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 	public static readonly HashSet<IWaterDisplacementSubscriber> Subscribers = [];
 
 
+
 	public WaterDisplacementEffect() : base() {
 		EffectCallbackType = EffectCallbackTypeEnum.PreTransparent;
 	}
@@ -86,104 +87,112 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 
 
 		Vector2I renderSize = new(128, 128);
-		if (renderSize.X == 0.0 && renderSize.Y == 0.0) {
-			throw new ArgumentException("Render size is incorrect");
+		(uint xGroups, uint yGroups) = CompositorExtensions.GetGroups(renderSize, 8);
+
+
+		ComputeDisplacement(renderSize, xGroups, yGroups);
+
+		FetchDisplacementData(xGroups, yGroups);
+
+
+
+		void ComputeDisplacement(Vector2I renderSize, uint xGroups, uint yGroups) {
+			// Unfolding into a push constant
+			int[] computePushConstantInts = [
+				renderSize.X, renderSize.Y,
+			];
+			int computeIntsByteCount = computePushConstantInts.Length * sizeof(int);
+
+			float[] computePushConstantFloats = [
+				Time.GetTicksMsec() / 1000f, 0
+			];
+			int computeFloatsByteCount = computePushConstantFloats.Length * sizeof(float);
+
+			byte[] computePushConstantBytes = new byte[computeIntsByteCount + computeFloatsByteCount];
+			Buffer.BlockCopy(computePushConstantInts, 0, computePushConstantBytes, 0, computeIntsByteCount);
+			Buffer.BlockCopy(computePushConstantFloats, 0, computePushConstantBytes, computeIntsByteCount, computeFloatsByteCount);
+
+
+			RenderingDevice.DrawCommandBeginLabel("Render Water Displacement", new Color(1f, 1f, 1f));
+			long computeList = RenderingDevice.ComputeListBegin();
+			RenderingDevice.ComputeListBindComputePipeline(computeList, computePipeline);
+
+			RenderingDevice.ComputeListBindImage(computeList, computeShader, waterDisplacementMap, 0);
+
+			RenderingDevice.ComputeListSetPushConstant(computeList, computePushConstantBytes, (uint)computePushConstantBytes.Length);
+
+			RenderingDevice.ComputeListDispatch(computeList, xGroups, yGroups, 1);
+			RenderingDevice.ComputeListEnd();
+			RenderingDevice.DrawCommandEndLabel();
 		}
 
-		uint xGroups = (uint)((renderSize.X - 1) / 8) + 1;
-		uint yGroups = (uint)((renderSize.Y - 1) / 8) + 1;
+		void FetchDisplacementData(uint xGroups, uint yGroups) {
+			if (!FetchWaterDisplacement || _fetchShaderFile is null) return;
 
 
-		// Unfolding into a push constant
-		int[] computePushConstantInts = [
-			renderSize.X, renderSize.Y,
-		];
-		int computeIntsByteCount = computePushConstantInts.Length * sizeof(int);
+			IWaterDisplacementSubscriber[] subs = [.. Subscribers];
+			if (subs.Length == 0) return;
 
-		float[] computePushConstantFloats = [
-			Time.GetTicksMsec() / 1000f, 0
-		];
-		int computeFloatsByteCount = computePushConstantFloats.Length * sizeof(float);
 
-		byte[] computePushConstantBytes = new byte[computeIntsByteCount + computeFloatsByteCount];
-		Buffer.BlockCopy(computePushConstantInts, 0, computePushConstantBytes, 0, computeIntsByteCount);
-		Buffer.BlockCopy(computePushConstantFloats, 0, computePushConstantBytes, computeIntsByteCount, computeFloatsByteCount);
+			float[] fetchInputs = new float[subs.Length * 4];
+			for (int i = 0; i < subs.Length; i++) {
+				IWaterDisplacementSubscriber reader = subs[i];
+				int index = i * 4;
+				(Vector3 location, WaterMesh mesh)? readerInfo = reader.GetInfo();
 
-		// Here we draw the Underwater effect, using the waterBuffer to know where there is water geometry
-		RenderingDevice.DrawCommandBeginLabel("Render Water Displacement", new Color(1f, 1f, 1f));
-		long computeList = RenderingDevice.ComputeListBegin();
-		RenderingDevice.ComputeListBindComputePipeline(computeList, computePipeline);
+				if (readerInfo is null) {
+					subs[i] = null!;
+					continue;
+				}
 
-		RenderingDevice.ComputeListBindImage(computeList, computeShader, waterDisplacementMap, 0);
-
-		RenderingDevice.ComputeListSetPushConstant(computeList, computePushConstantBytes, (uint)computePushConstantBytes.Length);
-
-		RenderingDevice.ComputeListDispatch(computeList, xGroups, yGroups, 1);
-		RenderingDevice.ComputeListEnd();
-		RenderingDevice.DrawCommandEndLabel();
+				fetchInputs[index] = readerInfo.Value.location.X;
+				fetchInputs[index + 1] = readerInfo.Value.location.Z;
+				fetchInputs[index + 2] = readerInfo.Value.mesh.WaterIntensity;
+				fetchInputs[index + 3] = readerInfo.Value.mesh.WaterScale;
+			}
+			byte[] fetchInputBytes = CompositorExtensions.CreateByteBuffer(fetchInputs);
 
 
 
-		if (!FetchWaterDisplacement || _fetchShaderFile is null ) return;
-		if (Subscribers.Count == 0) return;
+			float[] fetchOutputs = new float[subs.Length * 4]; // Pad 3 floats to 4
+			byte[] fetchOutputsBytes = new byte[fetchOutputs.Length * sizeof(float)];
 
 
-		IWaterDisplacementSubscriber[] subs = [.. Subscribers];
+			Rid inputBuffer = RenderingDevice.StorageBufferCreate((uint)fetchInputBytes.Length, fetchInputBytes);
+			Rid outputbuffer = RenderingDevice.StorageBufferCreate((uint)fetchOutputsBytes.Length, fetchOutputsBytes);
 
-		float[] fetchInputs = new float[subs.Length * 4];
-		for (int i = 0; i < subs.Length; i++) {
-			IWaterDisplacementSubscriber reader = subs[i];
-			int index = i * 4;
-			(Vector3 location, WaterMesh mesh)? readerInfo = reader.GetInfo();
 
-			if (readerInfo is null) {
-				subs[i] = null!;
-				continue;
+
+			RenderingDevice.DrawCommandBeginLabel("Fetch Water Displacement", new Color(1f, 1f, 1f));
+			long fetchList = RenderingDevice.ComputeListBegin();
+			RenderingDevice.ComputeListBindComputePipeline(fetchList, fetchPipeline);
+
+			RenderingDevice.ComputeListBindSampler(fetchList, fetchShader, waterDisplacementMap, displacementSampler, 0);
+			RenderingDevice.ComputeListBindStorageBuffer(fetchList, fetchShader, inputBuffer, 1);
+			RenderingDevice.ComputeListBindStorageBuffer(fetchList, fetchShader, outputbuffer, 2);
+
+			RenderingDevice.ComputeListDispatch(fetchList, xGroups, yGroups, 1);
+			RenderingDevice.ComputeListEnd();
+			RenderingDevice.DrawCommandEndLabel();
+
+
+
+			byte[] outputData = RenderingDevice.BufferGetData(outputbuffer);
+			Buffer.BlockCopy(outputData, 0, fetchOutputs, 0, outputData.Length);
+
+			for (int i = 0; i < subs.Length; i++) {
+				IWaterDisplacementSubscriber? reader = subs[i];
+				int index = i * 4;
+				if (reader is null) continue;
+
+				Vector3 displacement = new(fetchOutputs[index], fetchOutputs[index + 1], fetchOutputs[index + 2]);
+				reader.UpdateWaterDisplacement(displacement);
 			}
 
-			fetchInputs[index] = readerInfo.Value.location.X;
-			fetchInputs[index + 1] = readerInfo.Value.location.Z;
-			fetchInputs[index + 2] = readerInfo.Value.mesh.WaterIntensity;
-			fetchInputs[index + 3] = readerInfo.Value.mesh.WaterScale;
+			RenderingDevice.FreeRid(inputBuffer);
+			RenderingDevice.FreeRid(outputbuffer);
 		}
 
-		byte[] fetchInputBytes = new byte[fetchInputs.Length * sizeof(float)];
-		Buffer.BlockCopy(fetchInputs, 0, fetchInputBytes, 0, fetchInputBytes.Length);
-
-		float[] fetchOutputs = new float[subs.Length * 4]; // Pad 3 floats to 4
-		byte[] fetchOutputsBytes = new byte[fetchOutputs.Length * sizeof(float)];
-
-
-		Rid inputBuffer = RenderingDevice.StorageBufferCreate((uint)fetchInputBytes.Length, fetchInputBytes);
-		Rid outputbuffer = RenderingDevice.StorageBufferCreate((uint)fetchOutputsBytes.Length, fetchOutputsBytes);
-
-
-		RenderingDevice.DrawCommandBeginLabel("Fetch Water Displacement", new Color(1f, 1f, 1f));
-		long fetchList = RenderingDevice.ComputeListBegin();
-		RenderingDevice.ComputeListBindComputePipeline(fetchList, fetchPipeline);
-
-		RenderingDevice.ComputeListBindSampler(fetchList, fetchShader, waterDisplacementMap, displacementSampler, 0);
-		RenderingDevice.ComputeListBindStorageBuffer(fetchList, fetchShader, inputBuffer, 1);
-		RenderingDevice.ComputeListBindStorageBuffer(fetchList, fetchShader, outputbuffer, 2);
-
-		RenderingDevice.ComputeListDispatch(fetchList, xGroups, yGroups, 1);
-		RenderingDevice.ComputeListEnd();
-		RenderingDevice.DrawCommandEndLabel();
-
-		byte[] outputData = RenderingDevice.BufferGetData(outputbuffer);
-		Buffer.BlockCopy(outputData, 0, fetchOutputs, 0, outputData.Length);
-
-		for (int i = 0; i < subs.Length; i++) {
-			IWaterDisplacementSubscriber? reader = subs[i];
-			int index = i * 4;
-			if (reader is null) continue;
-
-			Vector3 displacement = new(fetchOutputs[index], fetchOutputs[index + 1], fetchOutputs[index + 2]);
-			reader.UpdateWaterDisplacement(displacement);
-		}
-
-		RenderingDevice.FreeRid(inputBuffer);
-		RenderingDevice.FreeRid(outputbuffer);
 	}
 
 
