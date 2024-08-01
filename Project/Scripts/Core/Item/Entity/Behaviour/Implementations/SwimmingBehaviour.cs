@@ -17,7 +17,7 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 	private float _moveSpeed;
 	protected Vector3 _moveDirection;
 
-	[Export] private Water WaterArea;
+	[Export] private Water Water;
 	private float WaterSurface;
 	private float WaterDisplacement;
 
@@ -30,12 +30,12 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 
 	protected SwimmingBehaviour() : this(null!, null!) { }
 	public SwimmingBehaviour(Entity entity, Water waterArea) : base(entity) {
-		WaterArea = waterArea;
+		Water = waterArea;
 	}
 
 
 	protected override void _Start(EntityBehaviour? previousBehaviour) {
-		if (WaterArea is null) {
+		if (Water is null) {
 			Stop();
 			return;
 		}
@@ -95,7 +95,7 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 
 		float floatDelta = (float)delta;
 
-		if (WaterArea.GetSurfaceInDirection(Entity.GlobalPosition, Vector3.Up, out Collisions.IntersectRay3DResult result)) {
+		if (Water.GetSurfaceInDirection(Entity.GlobalPosition, Vector3.Up, out Collisions.IntersectRay3DResult result)) {
 			WaterSurface = result.Point.Y;
 		}
 
@@ -156,7 +156,7 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 
 	public void Exit(Water water) {
 		if (!IsActive) return;
-		if (water != WaterArea) return;
+		if (water != Water) return;
 
 		if (previousBehaviour is null) {
 			Entity.SetBehaviour<GroundedBehaviour, BipedBehaviour>(() => new BipedBehaviour(Entity));
@@ -166,6 +166,6 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 		}
 	}
 
-	public Vector3 GetLocation() => Entity.GlobalPosition;
+	public (Vector3 location, WaterMesh mesh)? GetInfo() => Water?.Mesh is null ? null : (Entity.GlobalPosition, Water.Mesh);
 	public void UpdateWaterDisplacement(Vector3 waterDisplacement) => WaterDisplacement = waterDisplacement.Y;
 }

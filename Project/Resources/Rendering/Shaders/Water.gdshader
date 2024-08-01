@@ -1,9 +1,10 @@
 shader_type spatial;
 render_mode world_vertex_coords, depth_draw_always;
 
-global uniform vec4 water_color;
-global uniform float water_scale;
-global uniform float water_intensity;
+uniform vec3 water_color : source_color;
+uniform float water_intensity;
+uniform float water_scale;
+
 global uniform sampler2D water_displacement;
 
 void vertex() {
@@ -12,6 +13,6 @@ void vertex() {
 }
 
 void fragment() {
-	ALBEDO = water_color.rgb;
+	ALBEDO = water_color;
 	ALPHA = 0.95;
 }

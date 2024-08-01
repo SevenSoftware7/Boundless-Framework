@@ -10,7 +10,6 @@ layout(rgba32f, set = 2, binding = 0) uniform restrict readonly image2D water_ma
 layout(push_constant, std430) uniform Params {
 	restrict readonly vec2 screen_size; // x: screen width, y: screen height
 	restrict readonly vec2 clipping_planes; // x: near plane, y: far plane
-	restrict readonly vec3 water_color; // Color of the Water
 };
 
 
@@ -38,8 +37,9 @@ void main()
 	// a: W value of the water fragment (w)
 	vec4 water_map = imageLoad(water_map_image, uv);
 
-	if (water_map.r == 0) return; // Stop if there is no water to render
-	float water_depth = water_map.z;
+	vec3 water_color = water_map.rgb;
+	if (length(water_color) == 0) return; // Stop if there is no water to render
+	float water_depth = water_map.w;
 
 	vec2 depth_uv = vec2(uv) / screen_size;
 	float depth = texture(depth_image, depth_uv).r;
@@ -50,7 +50,7 @@ void main()
 
 	// Actual water color calculation
 	vec3 color = imageLoad(color_image, uv).rgb;
-	vec3 water_color = apply_underwater_fog(color, water_color, max_depth, 0.3, 7.0);
+	vec3 final_color = apply_underwater_fog(color, water_color, max_depth, 0.3, 7.0);
 
-	imageStore(color_image, uv, vec4(mix(color, water_color, water_map.r), 1));
+	imageStore(color_image, uv, vec4(final_color, 1));
 }

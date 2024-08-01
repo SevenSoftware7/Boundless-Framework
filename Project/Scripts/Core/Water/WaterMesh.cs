@@ -5,6 +5,42 @@ using Godot;
 [Tool]
 [GlobalClass]
 public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
+	[Export(PropertyHint.ColorNoAlpha)] public Color WaterColor {
+		get => _waterColor;
+		set {
+			_waterColor = value;
+
+			if (Mesh is not Mesh mesh) return;
+			if (mesh.SurfaceGetMaterial(0) is not ShaderMaterial shaderMaterial) return;
+			shaderMaterial.SetShaderParameter("water_color", _waterColor);
+		}
+	}
+	private Color _waterColor = new(0f, 0f, 1f, 1f);
+
+	[Export] public float WaterIntensity {
+		get => _waterIntensity;
+		set {
+			_waterIntensity = value;
+
+			if (Mesh is not Mesh mesh) return;
+			if (mesh.SurfaceGetMaterial(0) is not ShaderMaterial shaderMaterial) return;
+			shaderMaterial.SetShaderParameter("water_intensity", _waterIntensity);
+		}
+	}
+	private float _waterIntensity = 1f;
+
+	[Export] public float WaterScale {
+		get => _waterScale;
+		set {
+			_waterScale = value;
+
+			if (Mesh is not Mesh mesh) return;
+			if (mesh.SurfaceGetMaterial(0) is not ShaderMaterial shaderMaterial) return;
+			shaderMaterial.SetShaderParameter("water_scale", _waterScale);
+		}
+	}
+	private float _waterScale = 70f;
+
 	private Transform3D? lastTransform = null;
 
 

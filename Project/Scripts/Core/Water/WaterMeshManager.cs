@@ -4,12 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using KGySoft.CoreLibraries;
+
 
 public static class WaterMeshManager {
+	public static WaterMesh[] WaterMeshes { get; private set; } = [];
 	public static float[] WaterVertices { get; private set; } = [];
 	public static uint[] WaterIndices { get; private set; } = [];
 
-	private static readonly Dictionary<WaterMesh, WaterMeshEntry> WaterMeshes = [];
+	private static readonly Dictionary<WaterMesh, WaterMeshEntry> WaterMeshInfo = [];
 
 
 
@@ -23,7 +26,7 @@ public static class WaterMeshManager {
 	public static void AddInternal(WaterMesh mesh) {
 		if (mesh is null) return;
 
-		WaterMeshes[mesh] = new WaterMeshEntry(mesh.Mesh, mesh.GlobalTransform);
+		WaterMeshInfo[mesh] = new WaterMeshEntry(mesh.Mesh, mesh.GlobalTransform);
 	}
 
 	public static void Remove(WaterMesh mesh) {
@@ -36,14 +39,14 @@ public static class WaterMeshManager {
 	private static void RemoveInternal(WaterMesh mesh) {
 		if (mesh is null) return;
 
-		WaterMeshes.Remove(mesh);
+		WaterMeshInfo.Remove(mesh);
 	}
 
 
 	public static void UpdateMesh(WaterMesh mesh) {
 		if (mesh is null) return;
 
-		if (WaterMeshes.TryGetValue(mesh, out WaterMeshEntry? entry)) {
+		if (WaterMeshInfo.TryGetValue(mesh, out WaterMeshEntry? entry)) {
 			if (entry?.SetMesh(mesh.Mesh, mesh.GlobalTransform) ?? false) {
 				UpdateBuffer();
 			}
@@ -57,7 +60,7 @@ public static class WaterMeshManager {
 	public static void UpdateTransform(WaterMesh mesh) {
 		if (mesh is null) return;
 
-		if (WaterMeshes.TryGetValue(mesh, out WaterMeshEntry? entry)) {
+		if (WaterMeshInfo.TryGetValue(mesh, out WaterMeshEntry? entry)) {
 			if (entry?.SetTransform(mesh.GlobalTransform) ?? false) {
 				UpdateBuffer(mesh);
 			}
@@ -71,13 +74,15 @@ public static class WaterMeshManager {
 	private static void UpdateBuffer(WaterMesh mesh) {
 		// Find the offset for the specified mesh
 		int vertexOffset = 0;
-		foreach (KeyValuePair<WaterMesh, WaterMeshEntry> item in WaterMeshes) {
+		uint meshIndex = 0;
+		foreach (KeyValuePair<WaterMesh, WaterMeshEntry> item in WaterMeshInfo) {
 			if (item.Key == mesh) break;
-			vertexOffset += item.Value.Vertices.Length * 3; // 3 for X, Y, Z components
+			meshIndex++;
+			vertexOffset += item.Value.Vertices.Length * 4;
 		}
 
 		// Get the vertices of the specified mesh
-		if (WaterMeshes.TryGetValue(mesh, out WaterMeshEntry? entry)) {
+		if (WaterMeshInfo.TryGetValue(mesh, out WaterMeshEntry? entry)) {
 			Vector3[] vertices = entry.Vertices;
 
 			// Create a span for the WaterVertices array
@@ -88,17 +93,19 @@ public static class WaterMeshManager {
 				vertexSpan[vertexOffset++] = vertex.X;
 				vertexSpan[vertexOffset++] = vertex.Y;
 				vertexSpan[vertexOffset++] = vertex.Z;
+				vertexSpan[vertexOffset++] = meshIndex;
 			}
 		}
 	}
 
 	private static void UpdateBuffer() {
-		int totalVertexCount = WaterMeshes.Sum(item => item.Value.Vertices.Length * 3);
-		int totalIndexCount = WaterMeshes.Sum(item => item.Value.Indices.Length);
+		int totalVertexCount = WaterMeshInfo.Sum(item => item.Value.Vertices.Length * 4);
+		int totalIndexCount = WaterMeshInfo.Sum(item => item.Value.Indices.Length);
 
 		// Allocate arrays
 		WaterVertices = new float[totalVertexCount];
 		WaterIndices = new uint[totalIndexCount];
+		WaterMeshes = [.. WaterMeshInfo.Keys];
 
 		// Create spans for filling data
 		Span<float> vertexSpan = WaterVertices;
@@ -106,9 +113,10 @@ public static class WaterMeshManager {
 
 		int vertexOffset = 0;
 		int indexOffset = 0;
+		uint meshIndex = 0;
 		uint currentIndexOffset = 0;
 
-		foreach (KeyValuePair<WaterMesh, WaterMeshEntry> item in WaterMeshes) {
+		foreach (KeyValuePair<WaterMesh, WaterMeshEntry> item in WaterMeshInfo) {
 			Vector3[] vertices = item.Value.Vertices;
 			uint[] indices = item.Value.Indices;
 
@@ -117,6 +125,7 @@ public static class WaterMeshManager {
 				vertexSpan[vertexOffset++] = vertex.X;
 				vertexSpan[vertexOffset++] = vertex.Y;
 				vertexSpan[vertexOffset++] = vertex.Z;
+				vertexSpan[vertexOffset++] = meshIndex;
 			}
 
 			// Fill index span
@@ -125,6 +134,7 @@ public static class WaterMeshManager {
 			}
 
 			// Update the index offset
+			meshIndex++;
 			currentIndexOffset += (uint)vertices.Length;
 		}
 	}

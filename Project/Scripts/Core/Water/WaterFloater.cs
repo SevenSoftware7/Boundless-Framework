@@ -38,7 +38,7 @@ public sealed partial class WaterFloater : Node, IWaterDisplacementSubscriber, I
 		Water = null;
 	}
 
-	public Vector3 GetLocation() => Body?.GlobalPosition ?? Vector3.Zero;
+	public (Vector3, WaterMesh)? GetInfo() => Body is null || Water?.Mesh is null ? null : (Body.GlobalPosition, Water.Mesh);
 	public void UpdateWaterDisplacement(Vector3 waterDisplacement) => waterSurfaceDisplacement = waterDisplacement.Y;
 
 

@@ -4,19 +4,22 @@
 // Number of work groups
 layout(local_size_x = 1) in;
 
-// Input buffer containing vec2 UV coordinates
-layout(set = 0, binding = 0) buffer InputBuffer {
-	vec4 locations[];
+struct WaterInput {
+	highp vec2 location;
+	highp float intensity;
+	highp float water_scale;
 };
 
-// The texture to sample
-layout(set = 1, binding = 0) uniform sampler2D displacement_image;
+layout(set = 0, binding = 0) uniform sampler2D displacement_image;
 
+// Input buffer containing Subscriber XYZ coordinates
+layout(set = 1, binding = 0) readonly buffer InputBuffer {
+	WaterInput inputs[];
+};
 
-
-layout(push_constant, std430) uniform Params {
-	restrict readonly highp float water_scale;
-	restrict readonly highp float water_intensity;
+// Output buffer containing the requested XYZ Water displacement
+layout(set = 2, binding = 0) writeonly buffer OutputBuffer {
+	highp vec3 outputs[];
 };
 
 
@@ -25,11 +28,11 @@ void main() {
 	uint index = gl_GlobalInvocationID.x;
 
 	// Read UV coordinates from the buffer
-	highp vec3 location = locations[index].xyz;
+	WaterInput waterInput = inputs[index];
 
 	// Sample the texture at the given UV
-	highp vec3 displacement = (texture(displacement_image, location.xz / water_scale).xyz * 2.0 - 1.0) * water_intensity;
+	highp vec3 displacement = (texture(displacement_image, waterInput.location / waterInput.water_scale).xyz * 2.0 - 1.0) * waterInput.intensity;
 
 	// Write the displacement to the buffer
-	locations[index] = vec4(displacement, 0);
+	outputs[index] = displacement;
 }

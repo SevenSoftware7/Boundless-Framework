@@ -6,6 +6,9 @@ using SevenDev.Utility;
 [Tool]
 [GlobalClass]
 public sealed partial class Water : Area3D {
+	[Export] public WaterMesh? Mesh { get; private set; }
+
+
 	public Water() {
 		CollisionLayer = CollisionLayers.Water;
 		CollisionMask = CollisionLayers.Entity | CollisionLayers.Interactable;

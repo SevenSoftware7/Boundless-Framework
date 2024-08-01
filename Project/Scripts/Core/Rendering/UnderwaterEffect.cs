@@ -62,10 +62,11 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 	private long framebufferFormat;
 
 	private readonly RDVertexAttribute vertexAttribute = new() {
-		Format = RenderingDevice.DataFormat.R32G32B32Sfloat,
+		Format = RenderingDevice.DataFormat.R32G32B32A32Sfloat,
 		Location = 0,
-		Stride = sizeof(float) * 3,
+		Stride = sizeof(float) * 4,
 	};
+	private readonly uint vertexLength = 4;
 	private long vertexFormat;
 
 	private Rid renderPipeline;
@@ -82,12 +83,13 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 	public override void _RenderCallback(int effectCallbackType, RenderData renderData) {
 		base._RenderCallback(effectCallbackType, renderData);
 
+
 		if (WaterDisplacementTexture is null || !WaterDisplacementTexture.TextureRdRid.IsValid) return;
 
 		// if (effectCallbackType != (long)EffectCallbackTypeEnum.PostTransparent) return;
 		float[] waterMeshVertices = WaterMeshManager.WaterVertices;
 		uint[] waterMeshIndices = WaterMeshManager.WaterIndices;
-		if (waterMeshVertices.Length == 0 || waterMeshVertices.Length % 3 != 0 || waterMeshIndices.Length == 0 || waterMeshIndices.Length % 3 != 0) return;
+		if (waterMeshVertices.Length == 0 || waterMeshVertices.Length % vertexLength != 0 || waterMeshIndices.Length == 0 || waterMeshIndices.Length % 3 != 0) return;
 
 		if (RenderingDevice is null || _renderShaderFile is null || _computeShaderFile is null) return;
 
@@ -130,7 +132,33 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 		}
 
 
-		(Rid vertexBuffer, Rid vertexArray) = RenderingDevice.VertexArrayCreate(waterMeshVertices, vertexFormat);
+		WaterMesh[] waterMeshes = WaterMeshManager.WaterMeshes;
+		float[] waterInfoBuffer = new float[waterMeshes.Length * 8]; // Pad 5 floats to 8
+		for (int i = 0; i < waterMeshes.Length; i++) {
+			WaterMesh mesh = waterMeshes[i];
+			int index = i * 8;
+
+			Projection transform = new(mesh.GlobalTransform);
+			Color color = mesh.WaterColor;
+			float intensity = mesh.WaterIntensity;
+			float scale = mesh.WaterScale;
+
+			// waterInfoBuffer[index] = transform.X.X;      waterInfoBuffer[index + 1] = transform.X.Y;  waterInfoBuffer[index + 2] = transform.X.Z;  waterInfoBuffer[index + 3] = transform.X.W;
+			// waterInfoBuffer[index + 4] = transform.Y.X;  waterInfoBuffer[index + 5] = transform.Y.Y;  waterInfoBuffer[index + 6] = transform.Y.Z;  waterInfoBuffer[index + 7] = transform.Y.W;
+			// waterInfoBuffer[index + 8] = transform.Z.X;  waterInfoBuffer[index + 9] = transform.Z.Y;  waterInfoBuffer[index + 10] = transform.Z.Z; waterInfoBuffer[index + 11] = transform.Z.W;
+			// waterInfoBuffer[index + 12] = transform.W.X; waterInfoBuffer[index + 13] = transform.W.Y; waterInfoBuffer[index + 14] = transform.W.Z; waterInfoBuffer[index + 15] = transform.W.W;
+
+			waterInfoBuffer[index] = color.R;       waterInfoBuffer[index + 1] = color.G;       waterInfoBuffer[index + 2] = color.B;
+			waterInfoBuffer[index + 3] = intensity;
+			waterInfoBuffer[index + 4] = scale;
+		}
+
+		byte[] infoBytes = new byte[waterInfoBuffer.Length * sizeof(float)];
+		Buffer.BlockCopy(waterInfoBuffer, 0, infoBytes, 0, infoBytes.Length);
+
+		Rid infoBuffer = RenderingDevice.StorageBufferCreate((uint)infoBytes.Length, infoBytes);
+
+		(Rid vertexBuffer, Rid vertexArray) = RenderingDevice.VertexArrayCreate(waterMeshVertices, vertexFormat, vertexLength);
 		(Rid indexBuffer, Rid indexArray) = RenderingDevice.IndexArrayCreate(waterMeshIndices);
 
 		Color[] clearColors = [new Color(0, 0, 0, 0)];
@@ -154,10 +182,6 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			// Eye Offset for fancy VR multi-view
 			Vector3 eyeOffset = sceneData.GetViewEyeOffset(view);
 
-			float waterScale = ProjectSettings.GetSetting("shader_globals/water_scale").AsGodotDictionary()["value"].As<float>();
-
-			float waterIntensity = ProjectSettings.GetSetting("shader_globals/water_intensity").AsGodotDictionary()["value"].As<float>();
-
 			// Unfolding into a push constant
 			float[] renderPushConstant = [
 				WorldToClip.X.X, WorldToClip.X.Y, WorldToClip.X.Z, WorldToClip.X.W,
@@ -165,8 +189,8 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 				WorldToClip.Z.X, WorldToClip.Z.Y, WorldToClip.Z.Z, WorldToClip.Z.W,
 				WorldToClip.W.X, WorldToClip.W.Y, WorldToClip.W.Z, WorldToClip.W.W,
 
-				eyeOffset.X, eyeOffset.Y, // Don't pad for these two because they get packed together with the next values
-				waterScale, waterIntensity
+				eyeOffset.X, eyeOffset.Y,
+				0, 0
 			];
 			byte[] renderPushConstantBytes = new byte[renderPushConstant.Length * sizeof(float)];
 			Buffer.BlockCopy(renderPushConstant, 0, renderPushConstantBytes, 0, renderPushConstantBytes.Length);
@@ -179,7 +203,9 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 
 			RenderingDevice.DrawListBindVertexArray(drawList, vertexArray);
 			RenderingDevice.DrawListBindIndexArray(drawList, indexArray);
+
 			RenderingDevice.DrawListBindSampler(drawList, renderShader, WaterDisplacementTexture.TextureRdRid, displacementSampler, 0);
+			RenderingDevice.DrawListBindStorageBuffer(drawList, renderShader, infoBuffer, 1);
 
 			RenderingDevice.DrawListSetPushConstant(drawList, renderPushConstantBytes, (uint)renderPushConstantBytes.Length);
 
@@ -192,14 +218,10 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			float nearClippingPlane = projection.GetZNear();
 			float farClippingPlane = projection.GetZFar();
 
-			Color waterColor = ProjectSettings.GetSetting("shader_globals/water_color").AsGodotDictionary()["value"].AsColor();
-
 			// Unfolding into a push constant
 			float[] computePushConstant = [
 				renderSize.X, renderSize.Y,
 				nearClippingPlane, farClippingPlane,
-
-				waterColor.R, waterColor.G, waterColor.B, 0,
 			];
 			byte[] computePushConstantBytes = new byte[computePushConstant.Length * sizeof(float)];
 			Buffer.BlockCopy(computePushConstant, 0, computePushConstantBytes, 0, computePushConstantBytes.Length);
@@ -208,10 +230,13 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			RenderingDevice.DrawCommandBeginLabel("Render Underwater Effect", new Color(1f, 1f, 1f));
 			long computeList = RenderingDevice.ComputeListBegin();
 			RenderingDevice.ComputeListBindComputePipeline(computeList, computePipeline);
+
 			RenderingDevice.ComputeListBindColor(computeList, computeShader, sceneBuffers, view, 0);
 			RenderingDevice.ComputeListBindDepth(computeList, computeShader, sceneBuffers, view, depthSampler, 1);
 			RenderingDevice.ComputeListBindImage(computeList, computeShader, waterMap, 2);
+
 			RenderingDevice.ComputeListSetPushConstant(computeList, computePushConstantBytes, (uint)computePushConstantBytes.Length);
+
 			RenderingDevice.ComputeListDispatch(computeList, xGroups, yGroups, 1);
 			RenderingDevice.ComputeListEnd();
 			RenderingDevice.DrawCommandEndLabel();

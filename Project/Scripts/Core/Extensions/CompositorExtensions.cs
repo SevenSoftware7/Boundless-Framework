@@ -44,20 +44,20 @@ public static class CompositorExtensions {
 		return (indexBuffer, indexArray);
 	}
 
-	public static Rid VertexBufferCreate(this RenderingDevice renderingDevice, float[] vertices) {
-		if (vertices.Length % 3 != 0) throw new ArgumentException("Invalid number of values in the points buffer, there should be three float values per point.", nameof(vertices));
+	public static Rid VertexBufferCreate(this RenderingDevice renderingDevice, float[] vertices, uint vertexLength = 3) {
+		if (vertices.Length % vertexLength != 0) throw new ArgumentException($"Invalid number of values in the points buffer, there should be {vertexLength} float values per point.", nameof(vertices));
 		byte[] byteVertices = new byte[vertices.Length * sizeof(uint)];
 		Buffer.BlockCopy(vertices, 0, byteVertices, 0, byteVertices.Length);
 
 		return renderingDevice.VertexBufferCreate((uint)byteVertices.Length, byteVertices);
 	}
 
-	public static (Rid vertexBuffer, Rid vertexArray) VertexArrayCreate(this RenderingDevice renderingDevice, float[] points, long vertexFormat) {
+	public static (Rid vertexBuffer, Rid vertexArray) VertexArrayCreate(this RenderingDevice renderingDevice, float[] points, long vertexFormat, uint vertexLength = 3) {
 		Rid vertexBuffer = renderingDevice.VertexBufferCreate(points);
 		if (!vertexBuffer.IsValid) {
 			throw new ArgumentException("Vertex Buffer is Invalid");
 		}
-		Rid vertexArray = renderingDevice.VertexArrayCreate((uint)(points.Length / 3), vertexFormat, [vertexBuffer]);
+		Rid vertexArray = renderingDevice.VertexArrayCreate((uint)(points.Length / vertexLength), vertexFormat, [vertexBuffer]);
 		if (!vertexArray.IsValid) {
 			throw new ArgumentException("Vertex Array is Invalid");
 		}
@@ -147,6 +147,9 @@ public static class CompositorExtensions {
 
 	public static void DrawListBindDepth(this RenderingDevice device, long drawList, Rid shaderRid, RenderSceneBuffersRD sceneBuffers, uint view, Rid sampler, uint setIndex, int binding = 0) =>
 		device.DrawListBindSampler(drawList, shaderRid, sceneBuffers.GetDepthLayer(view), sampler, setIndex, binding);
+
+	public static void DrawListBindStorageBuffer(this RenderingDevice device, long drawList, Rid shaderRid, Rid buffer, uint setIndex, int binding = 0) =>
+		device.DrawListBind(drawList, shaderRid, [buffer], RenderingDevice.UniformType.StorageBuffer, setIndex, binding);
 
 
 	public static void DrawListBindUniform(this RenderingDevice device, long drawList, RDUniform uniform, Rid shaderRid, uint setIndex) {
