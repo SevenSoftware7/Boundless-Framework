@@ -133,24 +133,24 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 
 
 		WaterMesh[] waterMeshes = WaterMeshManager.WaterMeshes;
-		float[] waterInfoBuffer = new float[waterMeshes.Length * 8]; // Pad 5 floats to 8
+		float[] waterInfoBuffer = new float[waterMeshes.Length * 24]; // Pad 21 floats to 24
 		for (int i = 0; i < waterMeshes.Length; i++) {
 			WaterMesh mesh = waterMeshes[i];
-			int index = i * 8;
+			int index = i * 24;
 
 			Projection transform = new(mesh.GlobalTransform);
 			Color color = mesh.WaterColor;
 			float intensity = mesh.WaterIntensity;
 			float scale = mesh.WaterScale;
 
-			// waterInfoBuffer[index] = transform.X.X;      waterInfoBuffer[index + 1] = transform.X.Y;  waterInfoBuffer[index + 2] = transform.X.Z;  waterInfoBuffer[index + 3] = transform.X.W;
-			// waterInfoBuffer[index + 4] = transform.Y.X;  waterInfoBuffer[index + 5] = transform.Y.Y;  waterInfoBuffer[index + 6] = transform.Y.Z;  waterInfoBuffer[index + 7] = transform.Y.W;
-			// waterInfoBuffer[index + 8] = transform.Z.X;  waterInfoBuffer[index + 9] = transform.Z.Y;  waterInfoBuffer[index + 10] = transform.Z.Z; waterInfoBuffer[index + 11] = transform.Z.W;
-			// waterInfoBuffer[index + 12] = transform.W.X; waterInfoBuffer[index + 13] = transform.W.Y; waterInfoBuffer[index + 14] = transform.W.Z; waterInfoBuffer[index + 15] = transform.W.W;
+			waterInfoBuffer[index] = transform.X.X;      waterInfoBuffer[index + 1] = transform.X.Y;  waterInfoBuffer[index + 2] = transform.X.Z;  waterInfoBuffer[index + 3] = transform.X.W;
+			waterInfoBuffer[index + 4] = transform.Y.X;  waterInfoBuffer[index + 5] = transform.Y.Y;  waterInfoBuffer[index + 6] = transform.Y.Z;  waterInfoBuffer[index + 7] = transform.Y.W;
+			waterInfoBuffer[index + 8] = transform.Z.X;  waterInfoBuffer[index + 9] = transform.Z.Y;  waterInfoBuffer[index + 10] = transform.Z.Z; waterInfoBuffer[index + 11] = transform.Z.W;
+			waterInfoBuffer[index + 12] = transform.W.X; waterInfoBuffer[index + 13] = transform.W.Y; waterInfoBuffer[index + 14] = transform.W.Z; waterInfoBuffer[index + 15] = transform.W.W;
 
-			waterInfoBuffer[index] = color.R;       waterInfoBuffer[index + 1] = color.G;       waterInfoBuffer[index + 2] = color.B;
-			waterInfoBuffer[index + 3] = intensity;
-			waterInfoBuffer[index + 4] = scale;
+			waterInfoBuffer[index + 16] = color.R;       waterInfoBuffer[index + 17] = color.G;       waterInfoBuffer[index + 18] = color.B;
+			waterInfoBuffer[index + 19] = intensity;
+			waterInfoBuffer[index + 20] = scale;
 		}
 
 		byte[] infoBytes = new byte[waterInfoBuffer.Length * sizeof(float)];

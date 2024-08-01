@@ -13,6 +13,6 @@ public sealed partial class SlashAttack(Entity entity, Weapon weapon, StringName
 
 	protected override void _Start() {
 		base._Start();
-		GD.Print($"{Weapon.DisplayName} Slash Attack (from {Entity})");
+		GD.Print($"{Weapon.DisplayName} Slash Attack (from {Entity.Name})");
 	}
 }

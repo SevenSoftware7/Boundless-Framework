@@ -19,14 +19,22 @@ public static class WaterMeshManager {
 	public static void Add(WaterMesh mesh) {
 		if (mesh is null) return;
 
-		AddInternal(mesh);
+		if (WaterMeshInfo.TryGetValue(mesh, out WaterMeshEntry? entry) && entry is not null) {
+			if (entry.SetMesh(mesh.Mesh)) {
+				UpdateBuffer();
+			}
+		}
+		else {
+			AddInternal(mesh);
+			UpdateBuffer();
+		}
 
 		UpdateBuffer();
 	}
 	public static void AddInternal(WaterMesh mesh) {
 		if (mesh is null) return;
 
-		WaterMeshInfo[mesh] = new WaterMeshEntry(mesh.Mesh, mesh.GlobalTransform);
+		WaterMeshInfo[mesh] = new WaterMeshEntry(mesh.Mesh);
 	}
 
 	public static void Remove(WaterMesh mesh) {
@@ -42,61 +50,6 @@ public static class WaterMeshManager {
 		WaterMeshInfo.Remove(mesh);
 	}
 
-
-	public static void UpdateMesh(WaterMesh mesh) {
-		if (mesh is null) return;
-
-		if (WaterMeshInfo.TryGetValue(mesh, out WaterMeshEntry? entry)) {
-			if (entry?.SetMesh(mesh.Mesh, mesh.GlobalTransform) ?? false) {
-				UpdateBuffer();
-			}
-		}
-		else {
-			AddInternal(mesh);
-			UpdateBuffer();
-		}
-	}
-
-	public static void UpdateTransform(WaterMesh mesh) {
-		if (mesh is null) return;
-
-		if (WaterMeshInfo.TryGetValue(mesh, out WaterMeshEntry? entry)) {
-			if (entry?.SetTransform(mesh.GlobalTransform) ?? false) {
-				UpdateBuffer(mesh);
-			}
-		}
-		else {
-			AddInternal(mesh);
-			UpdateBuffer();
-		}
-	}
-
-	private static void UpdateBuffer(WaterMesh mesh) {
-		// Find the offset for the specified mesh
-		int vertexOffset = 0;
-		uint meshIndex = 0;
-		foreach (KeyValuePair<WaterMesh, WaterMeshEntry> item in WaterMeshInfo) {
-			if (item.Key == mesh) break;
-			meshIndex++;
-			vertexOffset += item.Value.Vertices.Length * 4;
-		}
-
-		// Get the vertices of the specified mesh
-		if (WaterMeshInfo.TryGetValue(mesh, out WaterMeshEntry? entry)) {
-			Vector3[] vertices = entry.Vertices;
-
-			// Create a span for the WaterVertices array
-			Span<float> vertexSpan = WaterVertices;
-
-			// Fill the relevant part of the vertex span
-			foreach (Vector3 vertex in vertices) {
-				vertexSpan[vertexOffset++] = vertex.X;
-				vertexSpan[vertexOffset++] = vertex.Y;
-				vertexSpan[vertexOffset++] = vertex.Z;
-				vertexSpan[vertexOffset++] = meshIndex;
-			}
-		}
-	}
 
 	private static void UpdateBuffer() {
 		int totalVertexCount = WaterMeshInfo.Sum(item => item.Value.Vertices.Length * 4);
@@ -143,22 +96,18 @@ public static class WaterMeshManager {
 
 	private class WaterMeshEntry {
 		public Mesh Mesh { get; private set; } = null!;
-		public Transform3D Transform { get; private set; }
 		public Vector3[] Vertices { get; private set; } = [];
 		public uint[] Indices { get; private set; } = [];
 
 
-		public WaterMeshEntry(Mesh mesh, Transform3D transform) {
-			SetMesh(mesh, transform);
+		public WaterMeshEntry(Mesh mesh) {
+			SetMesh(mesh);
 		}
 
 
-		public bool SetMesh(Mesh mesh, Transform3D? transform = null) {
+		public bool SetMesh(Mesh mesh) {
 			if (mesh is null) return false;
-			if (transform == Transform || mesh == Mesh) return false;
 
-			Mesh = mesh;
-			Transform = transform ?? Transform;
 
 			for (int i = 0; i < mesh.GetSurfaceCount(); ++i) {
 				Godot.Collections.Array surfaceArrays = mesh.SurfaceGetArrays(i);
@@ -167,27 +116,12 @@ public static class WaterMeshManager {
 
 				Vertices = new Vector3[vertices.Length];
 				for (int j = 0; j < vertices.Length; j++) {
-					Vertices[j] = Transform * vertices[j];
+					Vertices[j] = vertices[j];
 				}
 
 				Indices = [.. surfaceArrays[(int)Mesh.ArrayType.Index].As<Godot.Collections.Array>().Select(i => i.AsUInt32())];
 			}
 
-			return true;
-		}
-
-		public bool SetTransform(Transform3D newTransform) {
-			if (Transform == newTransform) return false;
-
-			Transform3D oldInverseTransform = Transform == default ? Transform3D.Identity : Transform.Inverse();
-
-			Span<Vector3> vertices = Vertices;
-
-			for (int i = 0; i < vertices.Length; i++) {
-				Vertices[i] = newTransform * (oldInverseTransform * vertices[i]);
-			}
-
-			Transform = newTransform;
 			return true;
 		}
 	}

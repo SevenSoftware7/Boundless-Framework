@@ -17,7 +17,7 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 	private float _moveSpeed;
 	protected Vector3 _moveDirection;
 
-	[Export] private Water Water;
+	[Export] private Water? Water;
 	private float WaterSurface;
 	private float WaterDisplacement;
 
@@ -95,7 +95,7 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 
 		float floatDelta = (float)delta;
 
-		if (Water.GetSurfaceInDirection(Entity.GlobalPosition, Vector3.Up, out Collisions.IntersectRay3DResult result)) {
+		if (Water?.GetSurfaceInDirection(Entity.GlobalPosition, Vector3.Up, out Collisions.IntersectRay3DResult result) ?? false) {
 			WaterSurface = result.Point.Y;
 		}
 
@@ -152,6 +152,10 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 		}
 	}
 
+	public void UpdateWater(Water water) {
+		Water ??= water;
+	}
+
 	public void Enter(Water water) { }
 
 	public void Exit(Water water) {
@@ -164,6 +168,7 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 		else {
 			Entity.SetBehaviour(previousBehaviour);
 		}
+		Water = null;
 	}
 
 	public (Vector3 location, WaterMesh mesh)? GetInfo() => Water?.Mesh is null ? null : (Entity.GlobalPosition, Water.Mesh);

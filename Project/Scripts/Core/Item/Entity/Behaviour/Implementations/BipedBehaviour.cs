@@ -59,6 +59,30 @@ public partial class BipedBehaviour : GroundedBehaviour, IWaterCollisionNotifier
 
 
 		HandleInteraction(player);
+
+
+
+		void HandleInteraction(Player player) {
+			if (Entity is null) return;
+
+			InteractTarget? target = InteractTarget.GetBestTarget(Entity, 3.25f);
+
+			if (target is not null) {
+				if (player.InputDevice.IsActionJustPressed(Inputs.Interact) && target.Interactable.IsInteractable(Entity)) {
+					target.Interactable.Interact(Entity, player, target.ShapeIndex);
+				}
+			}
+
+
+			if (interactPrompt is not null) {
+				interactPrompt.Update(target);
+				interactPrompt.SetKey(player.InputDevice.GetActionSymbol(Inputs.Interact));
+			}
+
+			if (interactPointer is not null) {
+				interactPointer.Target = target?.Interactable.GlobalTransform;
+			}
+		}
 	}
 
 	public override void DisavowPlayer() {
@@ -72,28 +96,6 @@ public partial class BipedBehaviour : GroundedBehaviour, IWaterCollisionNotifier
 
 		_lastDirection = Vector3.Zero;
 		_movementType = MovementType.Idle;
-	}
-
-	private void HandleInteraction(Player player) {
-		if (Entity is null) return;
-
-		InteractTarget? target = InteractTarget.GetBestTarget(Entity, 3.25f);
-
-		if (target is not null) {
-			if (player.InputDevice.IsActionJustPressed(Inputs.Interact) && target.Interactable.IsInteractable(Entity)) {
-				target.Interactable.Interact(Entity, player, target.ShapeIndex);
-			}
-		}
-
-
-		if (interactPrompt is not null) {
-			interactPrompt.Update(target);
-			interactPrompt.SetKey(player.InputDevice.GetActionSymbol(Inputs.Interact));
-		}
-
-		if (interactPointer is not null) {
-			interactPointer.Target = target?.Interactable.GlobalTransform;
-		}
 	}
 
 	public override bool SetMovementType(MovementType speed) {
@@ -143,7 +145,7 @@ public partial class BipedBehaviour : GroundedBehaviour, IWaterCollisionNotifier
 	public void Enter(Water water) {
 		if (!IsActive) return;
 
-		Entity.SetBehaviour(() => new SwimmingBehaviour(Entity, water));
+		Entity.SetBehaviour(() => new SwimmingBehaviour(Entity, water), b => b.UpdateWater(water));
 	}
 
 	public void Exit(Water water) { }
