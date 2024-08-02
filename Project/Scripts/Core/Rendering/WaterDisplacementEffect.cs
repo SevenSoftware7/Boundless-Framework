@@ -97,7 +97,6 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 
 
 		void ComputeDisplacement(Vector2I renderSize, uint xGroups, uint yGroups) {
-			// Unfolding into a push constant
 			int[] computePushConstantInts = [
 				renderSize.X, renderSize.Y,
 			];
@@ -129,11 +128,12 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 		void FetchDisplacementData(uint xGroups, uint yGroups) {
 			if (!FetchWaterDisplacement || _fetchShaderFile is null) return;
 
-
+			// ----- Get WaterDisplacementSubscriber Info -----
 			IWaterDisplacementSubscriber[] subs = [.. Subscribers];
 			if (subs.Length == 0) return;
 
 
+			// ----- Create Input Buffer -----
 			float[] fetchInputs = new float[subs.Length * 4];
 			for (int i = 0; i < subs.Length; i++) {
 				IWaterDisplacementSubscriber reader = subs[i];
@@ -151,14 +151,12 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 				fetchInputs[index + 3] = readerInfo.Value.mesh.WaterScale;
 			}
 			byte[] fetchInputBytes = CompositorExtensions.CreateByteBuffer(fetchInputs);
+			Rid inputBuffer = RenderingDevice.StorageBufferCreate((uint)fetchInputBytes.Length, fetchInputBytes);
 
 
-
+			// ----- Create Output Buffer -----
 			float[] fetchOutputs = new float[subs.Length * 4]; // Pad 3 floats to 4
 			byte[] fetchOutputsBytes = new byte[fetchOutputs.Length * sizeof(float)];
-
-
-			Rid inputBuffer = RenderingDevice.StorageBufferCreate((uint)fetchInputBytes.Length, fetchInputBytes);
 			Rid outputbuffer = RenderingDevice.StorageBufferCreate((uint)fetchOutputsBytes.Length, fetchOutputsBytes);
 
 
@@ -176,10 +174,11 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 			RenderingDevice.DrawCommandEndLabel();
 
 
-
+			// ----- Read Output buffer -----
 			byte[] outputData = RenderingDevice.BufferGetData(outputbuffer);
 			Buffer.BlockCopy(outputData, 0, fetchOutputs, 0, outputData.Length);
 
+			// ----- Notify WaterDisplacementSubscribers -----
 			for (int i = 0; i < subs.Length; i++) {
 				IWaterDisplacementSubscriber? reader = subs[i];
 				int index = i * 4;

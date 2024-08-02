@@ -3,8 +3,6 @@
 
 struct WaterInfo {
 	mat4 transform;
-
-	vec3 water_color;
 	float water_intensity;
 	float water_scale;
 };
@@ -21,16 +19,17 @@ layout(push_constant, std430) uniform Params {
 	restrict readonly highp vec2 eye_offset; // Eye offset from Multi-view
 };
 
-
-layout(location = 0) out vec3 water_color;
+layout(location = 0) out float mesh_id_float;
 
 void main()
 {
-	WaterInfo water_info = water_infos[uint(world_vertex.w)];
-	water_color = water_info.water_color;
+	uint mesh_id = uint(world_vertex.w);
+	mesh_id_float = uintBitsToFloat(mesh_id);
+	WaterInfo water_info = water_infos[mesh_id];
+
+	mat4 transform = water_info.transform;
 	float water_intensity = water_info.water_intensity;
 	float water_scale = water_info.water_scale;
-	mat4 transform = water_info.transform;
 
 	highp vec3 transformed_vertex = (transform * vec4(world_vertex.xyz, 1)).xyz;
 	highp vec3 water_displacement = (texture(water_displacement_image, transformed_vertex.xz / water_scale).xyz * 2.0 - 1.0) * water_intensity;
@@ -45,12 +44,11 @@ void main()
 #[fragment]
 #version 450 core
 
-layout(location = 0) in vec3 water_color;
+layout(location = 0) in float mesh_id_float;
 layout(location = 0) out highp vec4 frag_color;
 
 
 void main()
 {
-	vec3 color = 1 - float(gl_FrontFacing) > 0 ? water_color : vec3(0);
-	frag_color = vec4(color, gl_FragCoord.z);
+	frag_color = vec4(1 - float(gl_FrontFacing), mesh_id_float, gl_FragCoord.z, gl_FragCoord.w);
 }

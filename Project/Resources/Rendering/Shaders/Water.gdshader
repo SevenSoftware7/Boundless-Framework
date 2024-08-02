@@ -1,7 +1,9 @@
 shader_type spatial;
 render_mode world_vertex_coords, depth_draw_always;
 
-uniform vec3 water_color : source_color;
+uniform vec3 shallow_color : source_color;
+uniform vec3 deep_color : source_color;
+
 uniform float water_intensity;
 uniform float water_scale;
 
@@ -13,6 +15,6 @@ void vertex() {
 }
 
 void fragment() {
-	ALBEDO = water_color;
+	ALBEDO = shallow_color;
 	ALPHA = 0.95;
 }

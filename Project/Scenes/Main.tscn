@@ -43,7 +43,6 @@ background_mode = 2
 sky = SubResource("Sky_21y3k")
 ambient_light_source = 3
 glow_enabled = true
-volumetric_fog_enabled = true
 volumetric_fog_density = 0.0
 volumetric_fog_emission_energy = 389.28
 volumetric_fog_detail_spread = 0.5
@@ -78,6 +77,9 @@ script = ExtResource("6_7qu10")
 RenderShaderFile = ExtResource("5_gw1ln")
 ComputeShaderFile = ExtResource("4_2f2ji")
 WaterDisplacementTexture = ExtResource("5_5pwvj")
+FogStart = 15.0
+FogEnd = 45.0
+TransparencyPower = 2.502
 
 [sub_resource type="Compositor" id="Compositor_gp4nw"]
 compositor_effects = Array[CompositorEffect]([SubResource("CompositorEffect_iivda"), SubResource("CompositorEffect_mpcwl")])
@@ -1422,15 +1424,16 @@ size = Vector3(3, 1, 6)
 [sub_resource type="BoxShape3D" id="BoxShape3D_tw615"]
 size = Vector3(60, 12, 58)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_nn348"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_u0aa7"]
 render_priority = 0
 shader = ExtResource("11_cp2h1")
-shader_parameter/water_color = Color(0.068, 0.1274, 0.2, 1)
-shader_parameter/water_intensity = 1.0
-shader_parameter/water_scale = 50.0
+shader_parameter/shallow_color = Color(0.1395, 0.279225, 0.45, 1)
+shader_parameter/deep_color = Color(0.068, 0.1274, 0.2, 1)
+shader_parameter/water_intensity = 0.5
+shader_parameter/water_scale = 0.567
 
-[sub_resource type="BoxMesh" id="BoxMesh_ldjyn"]
-material = SubResource("ShaderMaterial_nn348")
+[sub_resource type="BoxMesh" id="BoxMesh_eyrr3"]
+material = SubResource("ShaderMaterial_u0aa7")
 size = Vector3(60, 12, 58)
 subdivide_width = 32
 subdivide_height = 32
@@ -1777,7 +1780,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30201, -4.81285)
 curve = SubResource("Curve3D_1g2j1")
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Environment/Path3D"]
-transform = Transform3D(-0.0922569, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97164e-07, 0.995733, 8.27696e-08, -0.0922569, -1.98959, 0, 2.30373)
+transform = Transform3D(-0.0922568, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97163e-07, 0.995733, 8.27696e-08, -0.0922568, -1.98959, 0, 2.30373)
 script = ExtResource("36_x7xeh")
 
 [node name="AnimatableBody3D" type="AnimatableBody3D" parent="Environment/Path3D/PathFollow3D"]
@@ -1797,8 +1800,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.25, -7, 70)
 shape = SubResource("BoxShape3D_tw615")
 
 [node name="WaterMesh" parent="Environment/Water" index="1"]
-mesh = SubResource("BoxMesh_ldjyn")
-WaterScale = 50.0
+mesh = SubResource("BoxMesh_eyrr3")
+ShallowColor = Color(0.1395, 0.279225, 0.45, 1)
+DeepColor = Color(0.068, 0.1274, 0.2, 1)
+WaterIntensity = 0.5
+WaterScale = 0.567
 
 [node name="GPUParticlesCollisionBox3D" parent="Environment/Water" index="2"]
 size = Vector3(60, 12, 58)
@@ -1877,7 +1883,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.10534, 2, 32.9924)
 
 [node name="Eos" parent="." instance=ExtResource("9_0jt21")]
 process_priority = -10
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.62958, 2, 33.2576)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.2013, -6.16261, 87.303)
 
 [node name="Weapon" type="Node" parent="Eos"]
 script = ExtResource("11_uqmxm")
@@ -1886,16 +1892,16 @@ script = ExtResource("11_uqmxm")
 script = ExtResource("13_d6cna")
 
 [node name="Epiphron" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton") instance=ExtResource("12_1jl3t")]
-transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, -0.5368, 4.61968, 33.2478)
+transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, -11.1085, -3.54293, 87.2932)
 Skeleton = NodePath("../../../Skeleton3D")
 
 [node name="Nemesis" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton") instance=ExtResource("15_x4bcq")]
-transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, -0.5368, 4.61968, 33.2478)
+transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, -11.1085, -3.54293, 87.2932)
 IsHolstered = true
 Skeleton = NodePath("../../../Skeleton3D")
 
 [node name="Eleos" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton") instance=ExtResource("17_jhoyp")]
-transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, -0.5368, 4.61968, 33.2478)
+transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, -11.1085, -3.54293, 87.2932)
 IsHolstered = true
 Skeleton = NodePath("../../../Skeleton3D")
 

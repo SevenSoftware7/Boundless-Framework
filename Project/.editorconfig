@@ -6,6 +6,9 @@ tab_width = 4
 indent_style = space
 trim_trailing_whitespace = true
 
+[*.glsl]
+indent_style = tab
+
 [*.cs]
 indent_style = tab
 

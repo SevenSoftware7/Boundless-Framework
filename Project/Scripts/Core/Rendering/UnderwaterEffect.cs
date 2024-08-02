@@ -48,6 +48,10 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 
 	[Export] private Texture2Drd? WaterDisplacementTexture;
 
+	[Export] public float FogStart { get; private set; } = 20f;
+	[Export] public float FogEnd { get; private set; } = 40f;
+	[Export] public float TransparencyPower { get; private set; } = 1f;
+
 
 	private readonly RDAttachmentFormat waterMapAttachmentFormat = new() {
 		Format = RenderingDevice.DataFormat.R32G32B32A32Sfloat,
@@ -83,7 +87,6 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 	public override void _RenderCallback(int effectCallbackType, RenderData renderData) {
 		base._RenderCallback(effectCallbackType, renderData);
 
-
 		if (RenderingDevice is null || _renderShaderFile is null || _computeShaderFile is null) return;
 		if (WaterDisplacementTexture is null || !WaterDisplacementTexture.TextureRdRid.IsValid) return;
 
@@ -95,13 +98,10 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 
 		uint viewCount = sceneBuffers.GetViewCount();
 
-
 		(Vector2I renderSize, uint xGroups, uint yGroups) = sceneBuffers.GetRenderSize(8);
 
 
 		// ----- Get Water Mesh Data -----
-
-
 		float[] waterMeshVertices = WaterMeshManager.WaterVertices;
 		uint[] waterMeshIndices = WaterMeshManager.WaterIndices;
 		if (waterMeshVertices.Length == 0 || waterMeshVertices.Length % vertexLength != 0 || waterMeshIndices.Length == 0 || waterMeshIndices.Length % 3 != 0) return;
@@ -109,62 +109,13 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 		(Rid vertexBuffer, Rid vertexArray) = RenderingDevice.VertexArrayCreate(waterMeshVertices, vertexFormat, vertexLength);
 		(Rid indexBuffer, Rid indexArray) = RenderingDevice.IndexArrayCreate(waterMeshIndices);
 
+		// ----- Water Mesh Info -----
+		WaterMesh[] waterMeshes = WaterMeshManager.WaterMeshes;
+		(Rid infoBuffer, Rid parametersBuffer) = GetStorageBuffers(waterMeshes);
+
 
 		// ----- Create Water Map -----
-
-
-		if (sceneBuffers.HasTexture(Context, WaterMapName)) {
-			// Reset the Color and Depth textures if their sizes are wrong
-
-			RDTextureFormat textureFormat = sceneBuffers.GetTextureFormat(Context, WaterMapName);
-			if (textureFormat.Width != renderSize.X || textureFormat.Height != renderSize.Y
-#if TOOLS
-				// Should only happen when actively changing the Format in the Editor
-
-				|| textureFormat.Format != waterMapAttachmentFormat.Format
-
-#endif
-			) {
-				sceneBuffers.ClearContext(Context);
-			}
-		}
-
-		if (!sceneBuffers.HasTexture(Context, WaterMapName)) {
-			// Create and cache the Map and Depth to create the Water Buffer
-
-			sceneBuffers.CreateTexture(Context, WaterMapName, waterMapAttachmentFormat.Format, waterMapAttachmentFormat.UsageFlags, waterMapAttachmentFormat.Samples, renderSize, viewCount, 1, true);
-			sceneBuffers.CreateTexture(Context, WaterDepthName, waterDepthAttachmentFormat.Format, waterDepthAttachmentFormat.UsageFlags, waterDepthAttachmentFormat.Samples, renderSize, viewCount, 1, true);
-		}
-
-
-		// ----- Water Mesh Info -----
-
-
-		WaterMesh[] waterMeshes = WaterMeshManager.WaterMeshes;
-		float[] waterInfoBuffer = new float[waterMeshes.Length * 24]; // Pad 21 floats to 24
-
-		for (int i = 0; i < waterMeshes.Length; i++) {
-			WaterMesh mesh = waterMeshes[i];
-			int index = i * 24;
-
-			Projection transform = new(mesh.GlobalTransform);
-			Color color = mesh.WaterColor;
-			float intensity = mesh.WaterIntensity;
-			float scale = mesh.WaterScale;
-
-			waterInfoBuffer[index] = transform.X.X;      waterInfoBuffer[index + 1] = transform.X.Y;  waterInfoBuffer[index + 2] = transform.X.Z;  waterInfoBuffer[index + 3] = transform.X.W;
-			waterInfoBuffer[index + 4] = transform.Y.X;  waterInfoBuffer[index + 5] = transform.Y.Y;  waterInfoBuffer[index + 6] = transform.Y.Z;  waterInfoBuffer[index + 7] = transform.Y.W;
-			waterInfoBuffer[index + 8] = transform.Z.X;  waterInfoBuffer[index + 9] = transform.Z.Y;  waterInfoBuffer[index + 10] = transform.Z.Z; waterInfoBuffer[index + 11] = transform.Z.W;
-			waterInfoBuffer[index + 12] = transform.W.X; waterInfoBuffer[index + 13] = transform.W.Y; waterInfoBuffer[index + 14] = transform.W.Z; waterInfoBuffer[index + 15] = transform.W.W;
-
-			waterInfoBuffer[index + 16] = color.R;       waterInfoBuffer[index + 17] = color.G;       waterInfoBuffer[index + 18] = color.B;
-			waterInfoBuffer[index + 19] = intensity;
-			waterInfoBuffer[index + 20] = scale;
-		}
-
-		byte[] infoBytes = CompositorExtensions.CreateByteBuffer(waterInfoBuffer);
-
-		Rid infoBuffer = RenderingDevice.StorageBufferCreate((uint)infoBytes.Length, infoBytes);
+		CreateWaterMap(sceneBuffers, viewCount, renderSize);
 
 
 		Color[] clearColors = [new Color(0, 0, 0, 0)];
@@ -174,40 +125,16 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			Rid waterMap = sceneBuffers.GetTextureSlice(Context, WaterMapName, view, 0, 1, 1);
 			Rid waterDepth = sceneBuffers.GetTextureSlice(Context, WaterDepthName, view, 0, 1, 1);
 
-			// Include the Map and Depth from earlier
-
-
 			Rid waterBuffer = RenderingDevice.FramebufferCreate([waterMap, waterDepth], framebufferFormat);
 			if (!waterBuffer.IsValid) {
 				throw new ArgumentException("Water Mask Frame Buffer is Invalid");
 			}
 
-
 			Projection projection = sceneData.GetViewProjection(view);
-			Projection transform = new(sceneData.GetCamTransform().Inverse());
-
-			Projection WorldToClip = projection * transform; // World-space -> Clip-space Matrix to be used in the rendering shader
 
 
-			Vector3 eyeOffset = sceneData.GetViewEyeOffset(view); // Eye Offset for fancy VR multi-view
-
-
-
-
-			float[] renderPushConstant = [
-				WorldToClip.X.X, WorldToClip.X.Y, WorldToClip.X.Z, WorldToClip.X.W,
-				WorldToClip.Y.X, WorldToClip.Y.Y, WorldToClip.Y.Z, WorldToClip.Y.W,
-				WorldToClip.Z.X, WorldToClip.Z.Y, WorldToClip.Z.Z, WorldToClip.Z.W,
-				WorldToClip.W.X, WorldToClip.W.Y, WorldToClip.W.Z, WorldToClip.W.W,
-
-				eyeOffset.X, eyeOffset.Y,
-				0, 0
-			];
-			byte[] renderPushConstantBytes = CompositorExtensions.CreateByteBuffer(renderPushConstant);
-
-
-			// Render the Geometry (see vertCoords and vertIndices) to an intermediate framebuffer To use later
-
+			// ----- Render the Water Mask -----
+			byte[] renderPushConstantBytes = GetDrawPushConstant(sceneData, view, projection);
 
 			RenderingDevice.DrawCommandBeginLabel("Render Water Mask", new Color(1f, 1f, 1f));
 			long drawList = RenderingDevice.DrawListBegin(waterBuffer, RenderingDevice.InitialAction.Clear, RenderingDevice.FinalAction.Store, RenderingDevice.InitialAction.Clear, RenderingDevice.FinalAction.Discard, clearColors, clearDepth);
@@ -226,21 +153,8 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			RenderingDevice.DrawCommandEndLabel();
 
 
-
-			float nearClippingPlane = projection.GetZNear();
-			float farClippingPlane = projection.GetZFar();
-
-			// Unfolding into a push constant
-
-
-			float[] computePushConstant = [
-				renderSize.X, renderSize.Y,
-				nearClippingPlane, farClippingPlane,
-			];
-			byte[] computePushConstantBytes = CompositorExtensions.CreateByteBuffer(computePushConstant);
-
-			// Here we draw the Underwater effect, using the waterBuffer to know where there is water geometry
-
+			// ----- Render the Effect -----
+			byte[] computePushConstantBytes = GetComputePushConstant(renderSize, projection);
 
 			RenderingDevice.DrawCommandBeginLabel("Render Underwater Effect", new Color(1f, 1f, 1f));
 			long computeList = RenderingDevice.ComputeListBegin();
@@ -249,12 +163,14 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			RenderingDevice.ComputeListBindColor(computeList, computeShader, sceneBuffers, view, 0);
 			RenderingDevice.ComputeListBindDepth(computeList, computeShader, sceneBuffers, view, depthSampler, 1);
 			RenderingDevice.ComputeListBindImage(computeList, computeShader, waterMap, 2);
+			RenderingDevice.ComputeListBindStorageBuffer(computeList, computeShader, parametersBuffer, 3);
 
 			RenderingDevice.ComputeListSetPushConstant(computeList, computePushConstantBytes, (uint)computePushConstantBytes.Length);
 
 			RenderingDevice.ComputeListDispatch(computeList, xGroups, yGroups, 1);
 			RenderingDevice.ComputeListEnd();
 			RenderingDevice.DrawCommandEndLabel();
+
 
 			RenderingDevice.FreeRid(waterBuffer);
 		}
@@ -265,6 +181,123 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 		RenderingDevice.FreeRid(indexBuffer);
 
 		RenderingDevice.FreeRid(infoBuffer);
+		RenderingDevice.FreeRid(parametersBuffer);
+
+
+
+		void CreateWaterMap(RenderSceneBuffersRD sceneBuffers, uint viewCount, Vector2I renderSize) {
+			if (sceneBuffers.HasTexture(Context, WaterMapName)) {
+				// Reset the Color and Depth textures if their sizes are wrong
+
+				RDTextureFormat textureFormat = sceneBuffers.GetTextureFormat(Context, WaterMapName);
+				if (textureFormat.Width != renderSize.X || textureFormat.Height != renderSize.Y
+#if TOOLS
+					// Should only happen when actively changing the Format in the Editor
+
+					|| textureFormat.Format != waterMapAttachmentFormat.Format
+
+#endif
+				) {
+					sceneBuffers.ClearContext(Context);
+				}
+			}
+
+			if (!sceneBuffers.HasTexture(Context, WaterMapName)) {
+				// Create and cache the Map and Depth to create the Water Buffer
+
+				sceneBuffers.CreateTexture(Context, WaterMapName, waterMapAttachmentFormat.Format, waterMapAttachmentFormat.UsageFlags, waterMapAttachmentFormat.Samples, renderSize, viewCount, 1, true);
+				sceneBuffers.CreateTexture(Context, WaterDepthName, waterDepthAttachmentFormat.Format, waterDepthAttachmentFormat.UsageFlags, waterDepthAttachmentFormat.Samples, renderSize, viewCount, 1, true);
+			}
+		}
+
+		(Rid infoBuffer, Rid parametersBuffer) GetStorageBuffers(WaterMesh[] waterMeshes) {
+			const int waterInfoStride = 20;
+			float[] waterInfoBuffer = new float[waterMeshes.Length * waterInfoStride]; // Pad 18 floats to 20
+
+
+			const int waterParametersStride = 8;
+			float[] waterParametersBuffer = new float[waterMeshes.Length * waterParametersStride]; // Pad 6 floats to 8
+
+
+			for (int i = 0; i < waterMeshes.Length; i++) {
+				WaterMesh mesh = waterMeshes[i];
+				int waterInfoIndex = i * waterInfoStride;
+				int waterParameterIndex = i * waterParametersStride;
+
+				// Water Info for rendering the Water Mask
+
+				Projection transform = new(mesh.GlobalTransform);
+				float intensity = mesh.WaterIntensity;
+				float scale = mesh.WaterScale;
+
+				waterInfoBuffer[waterInfoIndex] = transform.X.X; waterInfoBuffer[waterInfoIndex + 1] = transform.X.Y; waterInfoBuffer[waterInfoIndex + 2] = transform.X.Z; waterInfoBuffer[waterInfoIndex + 3] = transform.X.W;
+				waterInfoBuffer[waterInfoIndex + 4] = transform.Y.X; waterInfoBuffer[waterInfoIndex + 5] = transform.Y.Y; waterInfoBuffer[waterInfoIndex + 6] = transform.Y.Z; waterInfoBuffer[waterInfoIndex + 7] = transform.Y.W;
+				waterInfoBuffer[waterInfoIndex + 8] = transform.Z.X; waterInfoBuffer[waterInfoIndex + 9] = transform.Z.Y; waterInfoBuffer[waterInfoIndex + 10] = transform.Z.Z; waterInfoBuffer[waterInfoIndex + 11] = transform.Z.W;
+				waterInfoBuffer[waterInfoIndex + 12] = transform.W.X; waterInfoBuffer[waterInfoIndex + 13] = transform.W.Y; waterInfoBuffer[waterInfoIndex + 14] = transform.W.Z; waterInfoBuffer[waterInfoIndex + 15] = transform.W.W;
+
+				waterInfoBuffer[waterInfoIndex + 16] = intensity;
+				waterInfoBuffer[waterInfoIndex + 17] = scale;
+
+				// Water Parameters for the Post-Processing effect
+
+				Color shallowColor = mesh.ShallowColor.SrgbToLinear();
+				Color deepColor = mesh.DeepColor.SrgbToLinear();
+
+				waterParametersBuffer[waterParameterIndex] = shallowColor.R; waterParametersBuffer[waterParameterIndex + 1] = shallowColor.G; waterParametersBuffer[waterParameterIndex + 2] = shallowColor.B;
+				waterParametersBuffer[waterParameterIndex + 4] = deepColor.R; waterParametersBuffer[waterParameterIndex + 5] = deepColor.G; waterParametersBuffer[waterParameterIndex + 6] = deepColor.B;
+			}
+
+			byte[] infoBytes = CompositorExtensions.CreateByteBuffer(waterInfoBuffer);
+			infoBuffer = RenderingDevice.StorageBufferCreate((uint)infoBytes.Length, infoBytes);
+
+			byte[] parametersBytes = CompositorExtensions.CreateByteBuffer(waterParametersBuffer);
+			parametersBuffer = RenderingDevice.StorageBufferCreate((uint)parametersBytes.Length, parametersBytes);
+
+			return (infoBuffer, parametersBuffer);
+		}
+
+
+		byte[] GetDrawPushConstant(RenderSceneDataRD sceneData, uint view, Projection projection) {
+			Projection transform = new(sceneData.GetCamTransform().Inverse());
+
+			Projection WorldToClip = projection * transform; // World-space -> Clip-space Matrix to be used in the rendering shader
+			Vector3 eyeOffset = sceneData.GetViewEyeOffset(view); // Eye Offset for fancy VR multi-view
+
+			float[] renderPushConstant = [
+				WorldToClip.X.X, WorldToClip.X.Y, WorldToClip.X.Z, WorldToClip.X.W,
+				WorldToClip.Y.X, WorldToClip.Y.Y, WorldToClip.Y.Z, WorldToClip.Y.W,
+				WorldToClip.Z.X, WorldToClip.Z.Y, WorldToClip.Z.Z, WorldToClip.Z.W,
+				WorldToClip.W.X, WorldToClip.W.Y, WorldToClip.W.Z, WorldToClip.W.W,
+
+				eyeOffset.X, eyeOffset.Y,
+				0, 0
+			];
+			byte[] renderPushConstantBytes = CompositorExtensions.CreateByteBuffer(renderPushConstant);
+			return renderPushConstantBytes;
+		}
+
+		byte[] GetComputePushConstant(Vector2I renderSize, Projection projection) {
+			float nearClippingPlane = projection.GetZNear();
+			float farClippingPlane = projection.GetZFar();
+
+			int[] computePushConstantInts = [
+				renderSize.X, renderSize.Y,
+			];
+			int computeIntsByteCount = computePushConstantInts.Length * sizeof(int);
+
+			float[] computePushConstantFloats = [
+				nearClippingPlane, farClippingPlane,
+				FogStart, FogEnd,
+				TransparencyPower,
+				0
+			];
+			int computeFloatsByteCount = computePushConstantFloats.Length * sizeof(float);
+
+			byte[] computePushConstantBytes = new byte[computeIntsByteCount + computeFloatsByteCount];
+			Buffer.BlockCopy(computePushConstantInts, 0, computePushConstantBytes, 0, computeIntsByteCount);
+			Buffer.BlockCopy(computePushConstantFloats, 0, computePushConstantBytes, computeIntsByteCount, computeFloatsByteCount);
+			return computePushConstantBytes;
+		}
 	}
 
 	protected override void ConstructBehaviour(RenderingDevice renderingDevice) {
@@ -287,56 +320,56 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 
 		ConstructRenderPipeline(renderingDevice);
 		ConstructComputePipeline(renderingDevice);
+
+
+
+		void ConstructRenderPipeline(RenderingDevice renderingDevice) {
+			if (RenderShaderFile is null) return;
+
+			renderShader = renderingDevice.ShaderCreateFromSpirV(RenderShaderFile.GetSpirV());
+			if (!renderShader.IsValid) {
+				throw new ArgumentException("Render Shader is Invalid");
+			}
+
+
+			RDPipelineColorBlendState blend = new() {
+				Attachments = [new RDPipelineColorBlendStateAttachment()]
+			};
+
+			renderPipeline = renderingDevice.RenderPipelineCreate(
+				renderShader,
+				framebufferFormat,
+				vertexFormat,
+				RenderingDevice.RenderPrimitive.Triangles,
+				new RDPipelineRasterizationState(),
+				new RDPipelineMultisampleState(),
+				new RDPipelineDepthStencilState() {
+					// Enable Self-occlusion via Depth Test
+					EnableDepthTest = true,
+					EnableDepthWrite = true,
+					DepthCompareOperator = RenderingDevice.CompareOperator.GreaterOrEqual
+				},
+				blend
+			);
+			if (!renderPipeline.IsValid) {
+				throw new ArgumentException("Render Pipeline is Invalid");
+			}
+		}
+
+		void ConstructComputePipeline(RenderingDevice renderingDevice) {
+			if (ComputeShaderFile is null) return;
+
+			computeShader = renderingDevice.ShaderCreateFromSpirV(ComputeShaderFile.GetSpirV());
+			if (!computeShader.IsValid) {
+				throw new ArgumentException("Compute Shader is Invalid");
+			}
+
+			computePipeline = renderingDevice.ComputePipelineCreate(computeShader);
+			if (!computePipeline.IsValid) {
+				throw new ArgumentException("Compute Pipeline is Invalid");
+			}
+		}
 	}
-
-	private void ConstructRenderPipeline(RenderingDevice renderingDevice) {
-		if (RenderShaderFile is null) return;
-
-		renderShader = renderingDevice.ShaderCreateFromSpirV(RenderShaderFile.GetSpirV());
-		if (!renderShader.IsValid) {
-			throw new ArgumentException("Render Shader is Invalid");
-		}
-
-
-		RDPipelineColorBlendState blend = new() {
-			Attachments = [new RDPipelineColorBlendStateAttachment()]
-		};
-
-		renderPipeline = renderingDevice.RenderPipelineCreate(
-			renderShader,
-			framebufferFormat,
-			vertexFormat,
-			RenderingDevice.RenderPrimitive.Triangles,
-			new RDPipelineRasterizationState(),
-			new RDPipelineMultisampleState(),
-			new RDPipelineDepthStencilState() {
-				// Enable Self-occlusion via Depth Test
-				EnableDepthTest = true,
-				EnableDepthWrite = true,
-				DepthCompareOperator = RenderingDevice.CompareOperator.GreaterOrEqual
-			},
-			blend
-		);
-		if (!renderPipeline.IsValid) {
-			throw new ArgumentException("Render Pipeline is Invalid");
-		}
-	}
-
-
-	private void ConstructComputePipeline(RenderingDevice renderingDevice) {
-		if (ComputeShaderFile is null) return;
-
-		computeShader = renderingDevice.ShaderCreateFromSpirV(ComputeShaderFile.GetSpirV());
-		if (!computeShader.IsValid) {
-			throw new ArgumentException("Compute Shader is Invalid");
-		}
-
-		computePipeline = renderingDevice.ComputePipelineCreate(computeShader);
-		if (!computePipeline.IsValid) {
-			throw new ArgumentException("Compute Pipeline is Invalid");
-		}
-	}
-
 
 	protected override void DestructBehaviour(RenderingDevice renderingDevice) {
 		if (displacementSampler.IsValid) {
