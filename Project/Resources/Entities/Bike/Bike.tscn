@@ -31,9 +31,9 @@ size = Vector3(1, 1.6, 2.75)
 size = Vector3(1, 1, 3)
 
 [node name="Bike" type="CharacterBody3D" node_paths=PackedStringArray("CostumeHolder", "CurrentBehaviour", "CenterOfMass")]
-collision_layer = 2
-platform_floor_layers = 4294967265
-platform_wall_layers = 4294967265
+collision_layer = 256
+platform_floor_layers = 4294963965
+platform_wall_layers = 4294963965
 script = ExtResource("1_46ioo")
 DisplayName = "Bike"
 Stats = SubResource("Resource_jjk82")

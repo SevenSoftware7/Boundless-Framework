@@ -30,6 +30,9 @@ script = ExtResource("5_y0ifp")
 HealthBar = ExtResource("3_uuynt")
 InteractPrompt = ExtResource("4_qonq2")
 InteractPointer = ExtResource("3_qcq8b")
+ToggleButton = null
+OptionList = null
+OptionButton = null
 
 [sub_resource type="Animation" id="Animation_2ppbj"]
 length = 0.001
@@ -42,11 +45,11 @@ _data = {
 [sub_resource type="BoxShape3D" id="BoxShape3D_iqmmo"]
 size = Vector3(0.3, 3.1, 0.3)
 
-[node name="Eos" type="CharacterBody3D" node_paths=PackedStringArray("CostumeHolder", "Skeleton", "AnimationPlayer", "Health", "CenterOfMass")]
-collision_layer = 2
+[node name="Eos" type="CharacterBody3D" node_paths=PackedStringArray("CostumeHolder", "Skeleton", "AnimationPlayer", "Health", "CenterOfMass", "_skeleton", "_animationPlayer", "_health")]
+collision_layer = 256
 floor_constant_speed = true
-platform_floor_layers = 4294967265
-platform_wall_layers = 4294967265
+platform_floor_layers = 4294963965
+platform_wall_layers = 4294963965
 script = ExtResource("1_44rt4")
 DisplayName = "Eos"
 Stats = SubResource("Resource_v01j0")
@@ -56,13 +59,22 @@ Skeleton = NodePath("Skeleton3D")
 AnimationPlayer = NodePath("AnimationPlayer")
 Health = NodePath("Health")
 _attributeModifiers = [null]
+Forward = Vector3(0, 0, -1)
 CenterOfMass = NodePath("Collisions/CenterOfMass")
+healthBar = null
+_handedness = 0
+_skeleton = NodePath("Skeleton3D")
+_animationPlayer = NodePath("AnimationPlayer")
+_health = NodePath("Health")
+_globalForward = Vector3(0, 0, -1)
 
 [node name="Health" type="Node" parent="."]
 script = ExtResource("8_emu8a")
 Maximum = 25.0
 Value = 25.0
 Ratio = 1.0
+_maximum = 25.0
+_value = 25.0
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -83,5 +95,4 @@ shape = SubResource("BoxShape3D_iqmmo")
 script = ExtResource("9_8kq40")
 Costume = ExtResource("10_lfyyx")
 Model = NodePath("Model - Eos (base)")
-
-[connection signal="Emptied" from="Health" to="." method="OnKill"]
+_costume = ExtResource("10_lfyyx")

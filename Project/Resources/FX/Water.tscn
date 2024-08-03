@@ -22,8 +22,8 @@ subdivide_height = 32
 subdivide_depth = 32
 
 [node name="Water" type="Area3D" node_paths=PackedStringArray("Mesh")]
-collision_layer = 4
-collision_mask = 10
+collision_layer = 2
+collision_mask = 768
 monitorable = false
 gravity = 0.0
 script = ExtResource("1_wguud")

@@ -216,10 +216,11 @@ interact={
 3d_render/layer_2="Entity"
 3d_render/layer_3="Water"
 3d_physics/layer_1="Terrain"
-3d_physics/layer_2="Entity"
-3d_physics/layer_3="Water"
-3d_physics/layer_4="Interactable"
-3d_physics/layer_5="Damage"
+3d_physics/layer_2="Water"
+3d_physics/layer_9="Entity"
+3d_physics/layer_10="Prop"
+3d_physics/layer_11="Interactable"
+3d_physics/layer_12="Damage"
 
 [rendering]
 
