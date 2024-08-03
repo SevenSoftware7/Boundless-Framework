@@ -2,7 +2,6 @@ namespace LandlessSkies.Core;
 
 using System;
 using Godot;
-using Godot.Collections;
 using SevenDev.Utility;
 
 [Tool]
@@ -50,7 +49,6 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 
 	[Export] public float FogStart { get; private set; } = 20f;
 	[Export] public float FogEnd { get; private set; } = 40f;
-	[Export] public float TransparencyPower { get; private set; } = 1f;
 
 
 	private readonly RDAttachmentFormat waterMapAttachmentFormat = new() {
@@ -242,9 +240,11 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 
 				Color shallowColor = mesh.ShallowColor.SrgbToLinear();
 				Color deepColor = mesh.DeepColor.SrgbToLinear();
+				float thickness = mesh.WaterThickness;
 
 				waterParametersBuffer[waterParameterIndex] = shallowColor.R; waterParametersBuffer[waterParameterIndex + 1] = shallowColor.G; waterParametersBuffer[waterParameterIndex + 2] = shallowColor.B;
 				waterParametersBuffer[waterParameterIndex + 4] = deepColor.R; waterParametersBuffer[waterParameterIndex + 5] = deepColor.G; waterParametersBuffer[waterParameterIndex + 6] = deepColor.B;
+				waterParametersBuffer[waterParameterIndex + 7] = thickness;
 			}
 
 			byte[] infoBytes = CompositorExtensions.CreateByteBuffer(waterInfoBuffer);
@@ -288,8 +288,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			float[] computePushConstantFloats = [
 				nearClippingPlane, farClippingPlane,
 				FogStart, FogEnd,
-				TransparencyPower,
-				0
+				0, 0
 			];
 			int computeFloatsByteCount = computePushConstantFloats.Length * sizeof(float);
 

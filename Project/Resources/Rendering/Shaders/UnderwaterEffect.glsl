@@ -4,6 +4,7 @@
 struct WaterParams {
 	vec3 shallow_color;
 	vec3 deep_color;
+	float thickness;
 };
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
@@ -20,7 +21,6 @@ layout(push_constant, std430) uniform Params {
 	restrict readonly vec2 clipping_planes; // x: near plane, y: far plane
 	restrict readonly float fog_start;
 	restrict readonly float fog_end;
-	restrict readonly float transparency_power;
 };
 
 
@@ -47,12 +47,12 @@ void main()
 	// The amount of water we are looking through is either the end of the water volume (water_depth) or the closest surface (depth)
 	float max_depth = max(depth, water_depth);
 
-	float depth_factor = clamp(max_depth * fog_end, 0, 1);
+	float depth_factor = clamp(max_depth * fog_end / water_parameters.thickness, 0, 1);
 	vec3 water_color = mix(water_parameters.deep_color, water_parameters.shallow_color, depth_factor);
 
 
 	// Actual water color calculation
-	float transparency_factor = clamp(max_depth * fog_start, 0, 1) * depth_factor;
+	float transparency_factor = clamp(max_depth * fog_start / water_parameters.thickness, 0, 1) * depth_factor;
 
 	vec3 color = imageLoad(color_image, uv).rgb;
 	vec3 final_color = mix(water_color, color, transparency_factor);

@@ -22,7 +22,6 @@ subsurf_scatter_texture = SubResource("CurveTexture_glj2w")
 subsurf_scatter_transmittance_enabled = true
 subsurf_scatter_transmittance_depth = 10.0
 subsurf_scatter_transmittance_boost = 1.0
-backlight_enabled = true
 billboard_keep_scale = true
 distance_fade_max_distance = 0.4
 

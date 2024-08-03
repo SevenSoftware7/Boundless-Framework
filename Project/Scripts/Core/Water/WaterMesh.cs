@@ -50,6 +50,17 @@ public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
 	}
 	private float _waterScale = 70f;
 
+	[Export] public float WaterThickness {
+		get => _waterThickness;
+		set {
+			_waterThickness = value;
+
+			if (Mesh?.SurfaceGetMaterial(0) is not ShaderMaterial shaderMaterial) return;
+			shaderMaterial.SetShaderParameter("water_thickness", _waterThickness);
+		}
+	}
+	private float _waterThickness = 1f;
+
 
 	public WaterMesh() : base() {
 		Layers = VisualLayers.Water;

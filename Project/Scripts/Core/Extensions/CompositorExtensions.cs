@@ -81,7 +81,7 @@ public static class CompositorExtensions {
 	}
 
 	public static Rid VertexBufferCreate(this RenderingDevice renderingDevice, float[] vertices, uint vertexLength = 3) {
-		if (vertices.Length % vertexLength != 0) throw new ArgumentException($"Invalid number of values in the points buffer, there should be {vertexLength} float values per point.", nameof(vertices));
+		if (vertices.Length % vertexLength != 0) throw new ArgumentException($"Invalid number of values in the points buffer, there should be {vertexLength} float values per point. Actual count : {vertices.Length}", nameof(vertices));
 		byte[] byteVertices = CreateByteBuffer(vertices);
 
 		return renderingDevice.VertexBufferCreate((uint)byteVertices.Length, byteVertices);
