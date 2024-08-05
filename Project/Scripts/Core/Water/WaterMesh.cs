@@ -50,16 +50,39 @@ public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
 	}
 	private float _waterScale = 70f;
 
-	[Export] public float WaterThickness {
-		get => _waterThickness;
+
+	[Export] public float FogStart {
+		get => _fogStart;
 		set {
-			_waterThickness = value;
+			_fogStart = value;
 
 			if (Mesh?.SurfaceGetMaterial(0) is not ShaderMaterial shaderMaterial) return;
-			shaderMaterial.SetShaderParameter("water_thickness", _waterThickness);
+			shaderMaterial.SetShaderParameter("water_fog_start", _fogStart);
 		}
 	}
-	private float _waterThickness = 1f;
+	private float _fogStart = 45f;
+
+	[Export] public float FogEnd {
+		get => _fogEnd;
+		set {
+			_fogEnd = value;
+
+			if (Mesh?.SurfaceGetMaterial(0) is not ShaderMaterial shaderMaterial) return;
+			shaderMaterial.SetShaderParameter("water_fog_end", _fogEnd);
+		}
+	}
+	private float _fogEnd = 90f;
+
+	[Export(PropertyHint.Range, "0,20,0.01")] public float WaterTransparency {
+		get => _waterTransparency;
+		set {
+			_waterTransparency = value;
+
+			if (Mesh?.SurfaceGetMaterial(0) is not ShaderMaterial shaderMaterial) return;
+			shaderMaterial.SetShaderParameter("water_transparency", _waterTransparency);
+		}
+	}
+	private float _waterTransparency = 0.2f;
 
 
 	public WaterMesh() : base() {

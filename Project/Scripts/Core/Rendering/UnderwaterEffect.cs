@@ -47,9 +47,6 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 
 	[Export] private Texture2Drd? WaterDisplacementTexture;
 
-	[Export] public float FogStart { get; private set; } = 20f;
-	[Export] public float FogEnd { get; private set; } = 40f;
-
 
 	private readonly RDAttachmentFormat waterMapAttachmentFormat = new() {
 		Format = RenderingDevice.DataFormat.R32G32B32A32Sfloat,
@@ -77,7 +74,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 
 
 	public UnderwaterEffect() : base() {
-		EffectCallbackType = EffectCallbackTypeEnum.PostTransparent;
+		EffectCallbackType = EffectCallbackTypeEnum.PreTransparent;
 	}
 
 
@@ -102,10 +99,10 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 		// ----- Get Water Mesh Data -----
 		float[] waterMeshVertices = WaterMeshManager.WaterVertices;
 		uint[] waterMeshIndices = WaterMeshManager.WaterIndices;
-		if (waterMeshVertices.Length == 0 || waterMeshVertices.Length % vertexLength != 0 || waterMeshIndices.Length == 0 || waterMeshIndices.Length % 3 != 0) return;
+		if (waterMeshVertices.Length == 0 || waterMeshIndices.Length == 0) return;
 
 		(Rid vertexBuffer, Rid vertexArray) = RenderingDevice.VertexArrayCreate(waterMeshVertices, vertexFormat, vertexLength);
-		(Rid indexBuffer, Rid indexArray) = RenderingDevice.IndexArrayCreate(waterMeshIndices);
+		(Rid indexBuffer, Rid indexArray) = RenderingDevice.IndexArrayCreate(waterMeshIndices, 3);
 
 		// ----- Water Mesh Info -----
 		WaterMesh[] waterMeshes = WaterMeshManager.WaterMeshes;
@@ -129,10 +126,11 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			}
 
 			Projection projection = sceneData.GetViewProjection(view);
-
+			float nearPlane = projection.GetZNear();
+			float farPlane = projection.GetZFar();
 
 			// ----- Render the Water Mask -----
-			byte[] renderPushConstantBytes = GetDrawPushConstant(sceneData, view, projection);
+			byte[] renderPushConstantBytes = GetDrawPushConstant(sceneData, projection);
 
 			RenderingDevice.DrawCommandBeginLabel("Render Water Mask", new Color(1f, 1f, 1f));
 			long drawList = RenderingDevice.DrawListBegin(waterBuffer, RenderingDevice.InitialAction.Clear, RenderingDevice.FinalAction.Store, RenderingDevice.InitialAction.Clear, RenderingDevice.FinalAction.Discard, clearColors, clearDepth);
@@ -152,7 +150,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 
 
 			// ----- Render the Effect -----
-			byte[] computePushConstantBytes = GetComputePushConstant(renderSize, projection);
+			byte[] computePushConstantBytes = GetComputePushConstant(projection, nearPlane, farPlane, renderSize);
 
 			RenderingDevice.DrawCommandBeginLabel("Render Underwater Effect", new Color(1f, 1f, 1f));
 			long computeList = RenderingDevice.ComputeListBegin();
@@ -191,9 +189,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 				if (textureFormat.Width != renderSize.X || textureFormat.Height != renderSize.Y
 #if TOOLS
 					// Should only happen when actively changing the Format in the Editor
-
 					|| textureFormat.Format != waterMapAttachmentFormat.Format
-
 #endif
 				) {
 					sceneBuffers.ClearContext(Context);
@@ -209,12 +205,12 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 		}
 
 		(Rid infoBuffer, Rid parametersBuffer) GetStorageBuffers(WaterMesh[] waterMeshes) {
-			const int waterInfoStride = 20;
-			float[] waterInfoBuffer = new float[waterMeshes.Length * waterInfoStride]; // Pad 18 floats to 20
+			const int waterInfoStride = 20; // Pad 18 floats to 20
+			float[] waterInfoBuffer = new float[waterMeshes.Length * waterInfoStride];
 
 
-			const int waterParametersStride = 8;
-			float[] waterParametersBuffer = new float[waterMeshes.Length * waterParametersStride]; // Pad 6 floats to 8
+			const int waterParametersStride = 12; // Pad 10 floats to 12
+			float[] waterParametersBuffer = new float[waterMeshes.Length * waterParametersStride];
 
 
 			for (int i = 0; i < waterMeshes.Length; i++) {
@@ -240,11 +236,12 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 
 				Color shallowColor = mesh.ShallowColor.SrgbToLinear();
 				Color deepColor = mesh.DeepColor.SrgbToLinear();
-				float thickness = mesh.WaterThickness;
 
 				waterParametersBuffer[waterParameterIndex] = shallowColor.R; waterParametersBuffer[waterParameterIndex + 1] = shallowColor.G; waterParametersBuffer[waterParameterIndex + 2] = shallowColor.B;
+				waterParametersBuffer[waterParameterIndex + 3] = mesh.FogStart;
 				waterParametersBuffer[waterParameterIndex + 4] = deepColor.R; waterParametersBuffer[waterParameterIndex + 5] = deepColor.G; waterParametersBuffer[waterParameterIndex + 6] = deepColor.B;
-				waterParametersBuffer[waterParameterIndex + 7] = thickness;
+				waterParametersBuffer[waterParameterIndex + 7] = mesh.FogEnd;
+				waterParametersBuffer[waterParameterIndex + 8] = mesh.WaterTransparency;
 			}
 
 			byte[] infoBytes = CompositorExtensions.CreateByteBuffer(waterInfoBuffer);
@@ -257,44 +254,41 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 		}
 
 
-		byte[] GetDrawPushConstant(RenderSceneDataRD sceneData, uint view, Projection projection) {
+		byte[] GetDrawPushConstant(RenderSceneDataRD sceneData, Projection projection) {
 			Projection transform = new(sceneData.GetCamTransform().Inverse());
 
 			Projection WorldToClip = projection * transform; // World-space -> Clip-space Matrix to be used in the rendering shader
-			Vector3 eyeOffset = sceneData.GetViewEyeOffset(view); // Eye Offset for fancy VR multi-view
 
 			float[] renderPushConstant = [
 				WorldToClip.X.X, WorldToClip.X.Y, WorldToClip.X.Z, WorldToClip.X.W,
 				WorldToClip.Y.X, WorldToClip.Y.Y, WorldToClip.Y.Z, WorldToClip.Y.W,
 				WorldToClip.Z.X, WorldToClip.Z.Y, WorldToClip.Z.Z, WorldToClip.Z.W,
 				WorldToClip.W.X, WorldToClip.W.Y, WorldToClip.W.Z, WorldToClip.W.W,
-
-				eyeOffset.X, eyeOffset.Y,
-				0, 0
 			];
 			byte[] renderPushConstantBytes = CompositorExtensions.CreateByteBuffer(renderPushConstant);
 			return renderPushConstantBytes;
 		}
 
-		byte[] GetComputePushConstant(Vector2I renderSize, Projection projection) {
-			float nearClippingPlane = projection.GetZNear();
-			float farClippingPlane = projection.GetZFar();
+		byte[] GetComputePushConstant(Projection projection, float nearPlane, float farPlane, Vector2I renderSize) {
+			projection = projection.Inverse();
+
+			float[] computePushConstantFloats = [
+				projection.X.X, projection.X.Y, projection.X.Z, projection.X.W,
+				projection.Y.X, projection.Y.Y, projection.Y.Z, projection.Y.W,
+				projection.Z.X, projection.Z.Y, projection.Z.Z, projection.Z.W,
+				projection.W.X, projection.W.Y, projection.W.Z, projection.W.W,
+				nearPlane, farPlane,
+			];
+			int computeFloatsByteCount = computePushConstantFloats.Length * sizeof(float);
 
 			int[] computePushConstantInts = [
 				renderSize.X, renderSize.Y,
 			];
 			int computeIntsByteCount = computePushConstantInts.Length * sizeof(int);
 
-			float[] computePushConstantFloats = [
-				nearClippingPlane, farClippingPlane,
-				FogStart, FogEnd,
-				0, 0
-			];
-			int computeFloatsByteCount = computePushConstantFloats.Length * sizeof(float);
-
 			byte[] computePushConstantBytes = new byte[computeIntsByteCount + computeFloatsByteCount];
-			Buffer.BlockCopy(computePushConstantInts, 0, computePushConstantBytes, 0, computeIntsByteCount);
-			Buffer.BlockCopy(computePushConstantFloats, 0, computePushConstantBytes, computeIntsByteCount, computeFloatsByteCount);
+			Buffer.BlockCopy(computePushConstantFloats, 0, computePushConstantBytes, 0, computeFloatsByteCount);
+			Buffer.BlockCopy(computePushConstantInts, 0, computePushConstantBytes, computeFloatsByteCount, computeIntsByteCount);
 			return computePushConstantBytes;
 		}
 	}

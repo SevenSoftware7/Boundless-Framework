@@ -129,15 +129,16 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 			if (!FetchWaterDisplacement || _fetchShaderFile is null) return;
 
 			// ----- Get WaterDisplacementSubscriber Info -----
-			IWaterDisplacementSubscriber[] subs = [.. Subscribers];
+			Span<IWaterDisplacementSubscriber> subs = [.. Subscribers];
 			if (subs.Length == 0) return;
 
 
 			// ----- Create Input Buffer -----
-			float[] fetchInputs = new float[subs.Length * 4];
+			const int fetchInputStride = 4;
+			float[] fetchInputs = new float[subs.Length * fetchInputStride];
 			for (int i = 0; i < subs.Length; i++) {
 				IWaterDisplacementSubscriber reader = subs[i];
-				int index = i * 4;
+				int index = i * fetchInputStride;
 				(Vector3 location, WaterMesh mesh)? readerInfo = reader.GetInfo();
 
 				if (readerInfo is null) {
@@ -155,10 +156,10 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 
 
 			// ----- Create Output Buffer -----
-			float[] fetchOutputs = new float[subs.Length * 4]; // Pad 3 floats to 4
+			const int fetchOutputStride = 4; // Pad 3 floats to 4
+			float[] fetchOutputs = new float[subs.Length * fetchOutputStride];
 			byte[] fetchOutputsBytes = new byte[fetchOutputs.Length * sizeof(float)];
 			Rid outputbuffer = RenderingDevice.StorageBufferCreate((uint)fetchOutputsBytes.Length, fetchOutputsBytes);
-
 
 
 			RenderingDevice.DrawCommandBeginLabel("Fetch Water Displacement", new Color(1f, 1f, 1f));
@@ -181,7 +182,7 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 			// ----- Notify WaterDisplacementSubscribers -----
 			for (int i = 0; i < subs.Length; i++) {
 				IWaterDisplacementSubscriber? reader = subs[i];
-				int index = i * 4;
+				int index = i * fetchOutputStride;
 				if (reader is null) continue;
 
 				Vector3 displacement = new(fetchOutputs[index], fetchOutputs[index + 1], fetchOutputs[index + 2]);

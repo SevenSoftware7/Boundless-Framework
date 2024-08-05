@@ -10,9 +10,12 @@ size = Vector3(20, 20, 20)
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_nn348"]
 render_priority = 0
 shader = ExtResource("2_13n3k")
-shader_parameter/water_color = Color(0.068, 0.1274, 0.2, 1)
+shader_parameter/shallow_color = null
+shader_parameter/deep_color = null
 shader_parameter/water_intensity = 1.0
 shader_parameter/water_scale = 70.0
+shader_parameter/water_fog_start = null
+shader_parameter/water_fog_end = null
 
 [sub_resource type="BoxMesh" id="BoxMesh_oe5ee"]
 material = SubResource("ShaderMaterial_nn348")
@@ -36,7 +39,6 @@ shape = SubResource("BoxShape3D_asmth")
 layers = 4
 mesh = SubResource("BoxMesh_oe5ee")
 script = ExtResource("3_wi2hl")
-WaterColor = Color(0.068, 0.1274, 0.2, 1)
 
 [node name="GPUParticlesCollisionBox3D" type="GPUParticlesCollisionBox3D" parent="."]
 layers = 4

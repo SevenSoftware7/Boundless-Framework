@@ -47,15 +47,19 @@ public static class CompositorExtensions {
 	}
 
 
-	public static Rid IndexBufferCreate(this RenderingDevice renderingDevice, ushort[] indices) =>
-		renderingDevice.IndexBufferCreate((uint)indices.Length, RenderingDevice.IndexBufferFormat.Uint16, CreateByteBuffer(indices));
+	public static Rid IndexBufferCreate(this RenderingDevice renderingDevice, ushort[] indices, uint shapeVertices = 3) {
+		if (indices.Length % shapeVertices != 0) throw new ArgumentException($"Invalid number of values in the index buffer, there should be {shapeVertices} vertices in a shape. Total count : {indices.Length}", nameof(indices));
+		return renderingDevice.IndexBufferCreate((uint)indices.Length, RenderingDevice.IndexBufferFormat.Uint16, CreateByteBuffer(indices));
+	}
 
-	public static Rid IndexBufferCreate(this RenderingDevice renderingDevice, uint[] indices) =>
-		renderingDevice.IndexBufferCreate((uint)indices.Length, RenderingDevice.IndexBufferFormat.Uint32, CreateByteBuffer(indices));
+	public static Rid IndexBufferCreate(this RenderingDevice renderingDevice, uint[] indices, uint shapeVertices = 3) {
+		if (indices.Length % shapeVertices != 0) throw new ArgumentException($"Invalid number of values in the index buffer, there should be {shapeVertices} vertices in a shape. Total count : {indices.Length}", nameof(indices));
+		return renderingDevice.IndexBufferCreate((uint)indices.Length, RenderingDevice.IndexBufferFormat.Uint32, CreateByteBuffer(indices));
+	}
 
 
-	public static (Rid indexBuffer, Rid indexArray)? IndexArrayCreate(this RenderingDevice renderingDevice, ushort[] indices, uint indexOffset = 0) {
-		Rid indexBuffer = renderingDevice.IndexBufferCreate(indices);
+	public static (Rid indexBuffer, Rid indexArray)? IndexArrayCreate(this RenderingDevice renderingDevice, ushort[] indices, uint shapeVertices = 3, uint indexOffset = 0) {
+		Rid indexBuffer = renderingDevice.IndexBufferCreate(indices, shapeVertices);
 		if (!indexBuffer.IsValid) {
 			throw new ArgumentException("Index Buffer is Invalid");
 		}
@@ -67,8 +71,8 @@ public static class CompositorExtensions {
 		return (indexBuffer, indexArray);
 	}
 
-	public static (Rid indexBuffer, Rid indexArray) IndexArrayCreate(this RenderingDevice renderingDevice, uint[] indices, uint indexOffset = 0) {
-		Rid indexBuffer = renderingDevice.IndexBufferCreate(indices);
+	public static (Rid indexBuffer, Rid indexArray) IndexArrayCreate(this RenderingDevice renderingDevice, uint[] indices, uint shapeVertices = 3, uint indexOffset = 0) {
+		Rid indexBuffer = renderingDevice.IndexBufferCreate(indices, shapeVertices);
 		if (!indexBuffer.IsValid) {
 			throw new ArgumentException("Index Buffer is Invalid");
 		}
@@ -81,7 +85,7 @@ public static class CompositorExtensions {
 	}
 
 	public static Rid VertexBufferCreate(this RenderingDevice renderingDevice, float[] vertices, uint vertexLength = 3) {
-		if (vertices.Length % vertexLength != 0) throw new ArgumentException($"Invalid number of values in the points buffer, there should be {vertexLength} float values per point. Actual count : {vertices.Length}", nameof(vertices));
+		if (vertices.Length % vertexLength != 0) throw new ArgumentException($"Invalid number of values in the points buffer, there should be {vertexLength} float values per point. Total count : {vertices.Length}", nameof(vertices));
 		byte[] byteVertices = CreateByteBuffer(vertices);
 
 		return renderingDevice.VertexBufferCreate((uint)byteVertices.Length, byteVertices);
