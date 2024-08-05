@@ -42,6 +42,7 @@ sky_material = SubResource("ProceduralSkyMaterial_4yjue")
 background_mode = 2
 sky = SubResource("Sky_21y3k")
 ambient_light_source = 3
+glow_enabled = true
 volumetric_fog_density = 0.0
 volumetric_fog_emission_energy = 389.28
 volumetric_fog_detail_spread = 0.5
@@ -1429,9 +1430,9 @@ shader_parameter/shallow_color = Color(0.1395, 0.279225, 0.45, 1)
 shader_parameter/deep_color = Color(0.068, 0.1274, 0.2, 1)
 shader_parameter/water_intensity = 0.5
 shader_parameter/water_scale = 70.0
-shader_parameter/water_fog_start = 0.298
+shader_parameter/water_fog_start = 5.0
 shader_parameter/water_fog_end = 20.0
-shader_parameter/water_transparency = 1.63
+shader_parameter/water_transparency = 2.0
 
 [sub_resource type="BoxMesh" id="BoxMesh_eyrr3"]
 material = SubResource("ShaderMaterial_u0aa7")
@@ -1500,7 +1501,7 @@ environment = SubResource("Environment_0pxe2")
 camera_attributes = SubResource("CameraAttributesPractical_8wcfk")
 compositor = SubResource("Compositor_gp4nw")
 
-[node name="FogVolume" type="FogVolume" parent="Environment"]
+[node name="WorldFogVolume" type="FogVolume" parent="Environment"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = 4
 material = SubResource("FogMaterial_2f08y")
@@ -1520,7 +1521,7 @@ shape = 0
 material = SubResource("FogMaterial_yr7ll")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="Environment/Lights"]
-transform = Transform3D(0.568835, 0.383618, -0.727505, 0.822452, -0.265323, 0.503167, 1.20427e-08, -0.884557, -0.466432, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, -0.151502, 0.988457, 0, -0.988457, -0.151502, 0, 0, 0)
 light_color = Color(1, 0.964706, 0.878431, 1)
 light_energy = 2.0
 light_indirect_energy = 0.0
@@ -1851,9 +1852,9 @@ mesh = SubResource("BoxMesh_eyrr3")
 ShallowColor = Color(0.1395, 0.279225, 0.45, 1)
 DeepColor = Color(0.068, 0.1274, 0.2, 1)
 WaterIntensity = 0.5
-FogStart = 0.298
+FogStart = 5.0
 FogEnd = 20.0
-WaterTransparency = 1.63
+WaterTransparency = 2.0
 
 [node name="GPUParticlesCollisionBox3D" parent="Environment/Water" index="2"]
 size = Vector3(60, 12, 58)

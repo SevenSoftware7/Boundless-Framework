@@ -95,9 +95,9 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 
 		float floatDelta = (float)delta;
 
-		if (Water?.GetSurfaceInDirection(Entity.GlobalPosition, Vector3.Up, out Collisions.IntersectRay3DResult result) ?? false) {
-			WaterSurface = result.Point.Y;
-		}
+		WaterSurface = Water?.GetSurfaceInDirection(Entity.GlobalPosition, Vector3.Up, out Collisions.IntersectRay3DResult result) ?? false
+			? result.Point.Y
+			: Mathf.Inf;
 
 		float offsetToWaterSurface = OffsetToWaterSurface;
 		float distanceToWaterSurface = Mathf.Abs(offsetToWaterSurface);

@@ -116,7 +116,15 @@ public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
 		if (mesh is not null) {
 			mesh.Changed -= OnMeshChanged;
 		}
+	}
 
+	public override void _Notification(int what) {
+		base._Notification(what);
+		switch((ulong)what) {
+			case NotificationVisibilityChanged:
+				WaterMeshManager.SetEnabled(this, Visible);
+				break;
+		}
 	}
 
 	public override bool _Set(StringName property, Variant value) {

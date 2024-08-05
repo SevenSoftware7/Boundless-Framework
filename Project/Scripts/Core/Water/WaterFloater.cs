@@ -67,9 +67,11 @@ public sealed partial class WaterFloater : Node, IWaterDisplacementSubscriber, I
 
 		Vector3 position = Body.GlobalPosition;
 
-		Water.GetSurfaceInDirection(position, Vector3.Up, out Collisions.IntersectRay3DResult res);
+		float waterSurface = Water.GetSurfaceInDirection(position, Vector3.Up, out Collisions.IntersectRay3DResult res)
+			? res.Point.Y
+			: Mathf.Inf;
 
-		float totalWaterHeight = res.Point.Y + waterSurfaceDisplacement;
+		float totalWaterHeight = waterSurface + waterSurfaceDisplacement;
 
 
 		if (position.Y > totalWaterHeight) return;

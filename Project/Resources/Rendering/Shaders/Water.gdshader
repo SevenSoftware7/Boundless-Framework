@@ -48,6 +48,7 @@ void fragment() {
 
 		// if (new_world_depth <= water_depth) {
 		// 	screen_uv = refract_uv;
+		// 	ndc = screen_uv * 2.0 - 1.0;
 		// 	world = new_world;
 		// 	world_depth = new_world_depth;
 		// 	water_thickness = water_depth - world_depth;
