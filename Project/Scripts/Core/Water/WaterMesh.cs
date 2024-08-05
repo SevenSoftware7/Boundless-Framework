@@ -122,7 +122,7 @@ public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
 		base._Notification(what);
 		switch((ulong)what) {
 			case NotificationVisibilityChanged:
-				WaterMeshManager.SetEnabled(this, Visible);
+				WaterMeshManager.SetEnabled(this, IsVisibleInTree());
 				break;
 		}
 	}
