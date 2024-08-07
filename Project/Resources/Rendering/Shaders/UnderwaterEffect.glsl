@@ -3,10 +3,11 @@
 
 struct WaterParams {
 	vec3 shallow_color;
-	float fog_start;
+	float fog_distance;
 	vec3 deep_color;
-	float fog_end;
-	float transparency;
+	float fog_fade;
+	float transparency_distance;
+	float transparency_fade;
 };
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
@@ -60,11 +61,11 @@ void main()
 	WaterParams water_parameters = water_params[floatBitsToUint(water_map.g)];
 
 
-	float fog_blend = smoothstep(water_thickness, water_thickness + water_parameters.fog_end, near_plane);
-	fog_blend = clamp(exp(fog_blend * -water_parameters.transparency), 0.0, 1.0);
+	float fog_blend = smoothstep(water_thickness, water_thickness + water_parameters.fog_distance, near_plane);
+	fog_blend = clamp(exp(fog_blend * -water_parameters.fog_fade), 0.0, 1.0);
 
-	float alpha_blend = smoothstep(water_thickness, water_thickness + water_parameters.fog_start, near_plane);
-	alpha_blend = clamp(exp(alpha_blend * -water_parameters.transparency), 0.0, 1.0);
+	float alpha_blend = smoothstep(water_thickness, water_thickness + water_parameters.transparency_distance, near_plane);
+	alpha_blend = clamp(exp(alpha_blend * -water_parameters.transparency_fade), 0.0, 1.0);
 
 	vec3 world_color = imageLoad(color_image, uv).rgb;
 	world_color = mix(water_parameters.shallow_color, world_color, alpha_blend);

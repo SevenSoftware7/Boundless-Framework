@@ -1,6 +1,6 @@
 namespace LandlessSkies.Core;
 
 public interface IWaterCollisionNotifier {
-	void Enter(Water water);
-	void Exit(Water water);
+	void OnEnterWater(Water water);
+	void OnExitWater(Water water);
 }

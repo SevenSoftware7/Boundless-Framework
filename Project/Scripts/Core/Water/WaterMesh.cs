@@ -50,39 +50,50 @@ public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
 	}
 	private float _waterScale = 70f;
 
-
-	[Export] public float FogStart {
-		get => _fogStart;
+	[Export] public float FogDistance {
+		get => _fogDistance;
 		set {
-			_fogStart = value;
+			_fogDistance = value;
 
 			if (Mesh?.SurfaceGetMaterial(0) is not ShaderMaterial shaderMaterial) return;
-			shaderMaterial.SetShaderParameter("water_fog_start", _fogStart);
+			shaderMaterial.SetShaderParameter("water_fog_distance", _fogDistance);
 		}
 	}
-	private float _fogStart = 45f;
+	private float _fogDistance = 90f;
 
-	[Export] public float FogEnd {
-		get => _fogEnd;
+	[Export(PropertyHint.Range, "0,20,0.01")] public float FogFade {
+		get => _fogFade;
 		set {
-			_fogEnd = value;
+			_fogFade = value;
 
 			if (Mesh?.SurfaceGetMaterial(0) is not ShaderMaterial shaderMaterial) return;
-			shaderMaterial.SetShaderParameter("water_fog_end", _fogEnd);
+			shaderMaterial.SetShaderParameter("water_fog_fade", _fogFade);
 		}
 	}
-	private float _fogEnd = 90f;
+	private float _fogFade = 1f;
 
-	[Export(PropertyHint.Range, "0,20,0.01")] public float WaterTransparency {
-		get => _waterTransparency;
+
+	[Export] public float TransparencyDistance {
+		get => _transparencyDistance;
 		set {
-			_waterTransparency = value;
+			_transparencyDistance = value;
 
 			if (Mesh?.SurfaceGetMaterial(0) is not ShaderMaterial shaderMaterial) return;
-			shaderMaterial.SetShaderParameter("water_transparency", _waterTransparency);
+			shaderMaterial.SetShaderParameter("water_transparency_distance", _transparencyDistance);
 		}
 	}
-	private float _waterTransparency = 0.2f;
+	private float _transparencyDistance = 45f;
+
+	[Export(PropertyHint.Range, "0,20,0.01")] public float TransparencyFade {
+		get => _transparencyFade;
+		set {
+			_transparencyFade = value;
+
+			if (Mesh?.SurfaceGetMaterial(0) is not ShaderMaterial shaderMaterial) return;
+			shaderMaterial.SetShaderParameter("water_transparency_fade", _transparencyFade);
+		}
+	}
+	private float _transparencyFade = 1f;
 
 
 	public WaterMesh() : base() {

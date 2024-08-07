@@ -63,11 +63,11 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 		}
 	}
 
-	public void Enter(Water water) {
+	public void OnEnterWater(Water water) {
 		Driver?.Dismount();
 		Entity.VoidOut();
 	}
 
-	public void Exit(Water water) { }
+	public void OnExitWater(Water water) { }
 
 }

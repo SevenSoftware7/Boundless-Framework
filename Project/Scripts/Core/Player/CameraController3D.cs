@@ -13,7 +13,7 @@ public partial class CameraController3D : Camera3D {
 
 	[Export] private float horizontalSmoothTime = 0.02f;
 	[Export] private float verticalSmoothTime = 0.04f;
-	[Export(PropertyHint.Layers3DPhysics)] private uint CollisionMask = uint.MaxValue;
+	[Export(PropertyHint.Layers3DPhysics)] private uint CollisionMask = uint.MaxValue & ~(CollisionLayers.Water | CollisionLayers.Entity | CollisionLayers.Prop | CollisionLayers.Interactable | CollisionLayers.Damage);
 	[ExportGroup("")]
 
 
@@ -33,7 +33,6 @@ public partial class CameraController3D : Camera3D {
 	private float distanceVelocity;
 
 	private float verticalTime;
-
 
 
 	public void SetEntityAsSubject(Entity entity) {

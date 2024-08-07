@@ -209,7 +209,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			float[] waterInfoBuffer = new float[waterMeshes.Length * waterInfoStride];
 
 
-			const int waterParametersStride = 12; // Pad 10 floats to 12
+			const int waterParametersStride = 12; // Pad 11 floats to 12
 			float[] waterParametersBuffer = new float[waterMeshes.Length * waterParametersStride];
 
 
@@ -238,10 +238,11 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 				Color deepColor = mesh.DeepColor.SrgbToLinear();
 
 				waterParametersBuffer[waterParameterIndex] = shallowColor.R; waterParametersBuffer[waterParameterIndex + 1] = shallowColor.G; waterParametersBuffer[waterParameterIndex + 2] = shallowColor.B;
-				waterParametersBuffer[waterParameterIndex + 3] = mesh.FogStart;
+				waterParametersBuffer[waterParameterIndex + 3] = mesh.FogDistance;
 				waterParametersBuffer[waterParameterIndex + 4] = deepColor.R; waterParametersBuffer[waterParameterIndex + 5] = deepColor.G; waterParametersBuffer[waterParameterIndex + 6] = deepColor.B;
-				waterParametersBuffer[waterParameterIndex + 7] = mesh.FogEnd;
-				waterParametersBuffer[waterParameterIndex + 8] = mesh.WaterTransparency;
+				waterParametersBuffer[waterParameterIndex + 7] = mesh.FogFade;
+				waterParametersBuffer[waterParameterIndex + 8] = mesh.TransparencyDistance;
+				waterParametersBuffer[waterParameterIndex + 9] = mesh.TransparencyFade;
 			}
 
 			byte[] infoBytes = CompositorExtensions.CreateByteBuffer(waterInfoBuffer);
@@ -271,6 +272,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 
 		byte[] GetComputePushConstant(Projection projection, float nearPlane, float farPlane, Vector2I renderSize) {
 			projection = projection.Inverse();
+			renderSize -= Vector2I.One; // RenderSize is off by one, maybe a backend specific range, maybe a godot bug
 
 			float[] computePushConstantFloats = [
 				projection.X.X, projection.X.Y, projection.X.Z, projection.X.W,

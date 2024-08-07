@@ -1,5 +1,6 @@
 namespace LandlessSkies.Core;
 
+using System;
 using System.Reflection.Metadata;
 using Godot;
 using SevenDev.Utility;
@@ -30,16 +31,12 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 
 	protected SwimmingBehaviour() : this(null!, null!) { }
 	public SwimmingBehaviour(Entity entity, Water waterArea) : base(entity) {
+		ArgumentNullException.ThrowIfNull(waterArea);
 		Water = waterArea;
 	}
 
 
 	protected override void _Start(EntityBehaviour? previousBehaviour) {
-		if (Water is null) {
-			Stop();
-			return;
-		}
-
 		this.previousBehaviour = previousBehaviour;
 
 		Entity.GlobalForward = Entity.GlobalForward.SlideOnFace(Entity.UpDirection).Normalized();
@@ -68,6 +65,10 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 			Inputs.MoveForward, Inputs.MoveBackward
 		).ClampMagnitude(1f);
 		player.CameraController.RawInputToCameraRelativeMovement(input, out _, out Vector3 movement);
+
+		if (IsOnWaterSurface) {
+			movement = movement.SlideOnFace(-Entity.UpDirection);
+		}
 
 		_jumpInput = player.InputDevice.IsActionPressed(Inputs.Jump);
 		if (_jumpInput) {
@@ -152,13 +153,11 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 		}
 	}
 
-	public void UpdateWater(Water water) {
+	public void OnEnterWater(Water water) {
 		Water ??= water;
 	}
 
-	public void Enter(Water water) { }
-
-	public void Exit(Water water) {
+	public void OnExitWater(Water water) {
 		if (!IsActive) return;
 		if (water != Water) return;
 

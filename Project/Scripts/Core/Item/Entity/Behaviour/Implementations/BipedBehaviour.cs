@@ -142,12 +142,12 @@ public partial class BipedBehaviour : GroundedBehaviour, IWaterCollisionNotifier
 		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * rotationSpeed);
 	}
 
-	public void Enter(Water water) {
+	public void OnEnterWater(Water water) {
 		if (!IsActive) return;
 
-		Entity.SetBehaviour(() => new SwimmingBehaviour(Entity, water), b => b.UpdateWater(water));
+		Entity.SetBehaviour(() => new SwimmingBehaviour(Entity, water)/* , b => b.UpdateWater(water) */);
 	}
 
-	public void Exit(Water water) { }
+	public void OnExitWater(Water water) { }
 
 }

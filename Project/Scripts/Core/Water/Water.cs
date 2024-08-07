@@ -11,7 +11,7 @@ public sealed partial class Water : Area3D {
 
 	public Water() {
 		CollisionLayer = CollisionLayers.Water;
-		CollisionMask = CollisionLayers.Entity | CollisionLayers.Interactable;
+		CollisionMask = CollisionLayers.Entity | CollisionLayers.Prop;
 		Monitorable = false;
 	}
 
@@ -19,13 +19,13 @@ public sealed partial class Water : Area3D {
 
 	private void OnBodyEntered(Node3D body) {
 		body.PropagateAction<IWaterCollisionNotifier>(c => {
-			c.Enter(this);
+			c.OnEnterWater(this);
 		});
 	}
 
 	private void OnBodyExited(Node3D body) {
 		body.PropagateAction<IWaterCollisionNotifier>(c => {
-			c.Exit(this);
+			c.OnExitWater(this);
 		});
 	}
 

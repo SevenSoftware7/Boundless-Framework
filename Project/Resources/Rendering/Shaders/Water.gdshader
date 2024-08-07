@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode unshaded, world_vertex_coords, cull_disabled, depth_draw_always;
+render_mode unshaded, world_vertex_coords/* , cull_disabled */, depth_draw_always;
 
 uniform sampler2D depth_texture : hint_depth_texture;
 uniform sampler2D screen_texture : hint_screen_texture, repeat_disable;
@@ -9,9 +9,10 @@ uniform vec3 deep_color : source_color;
 
 uniform float water_intensity = 1.0;
 uniform float water_scale = 1.0;
-uniform float water_fog_start;
-uniform float water_fog_end;
-uniform float water_transparency : hint_range(0.0, 20.0, 0.01) = 0.2;
+uniform float water_fog_distance;
+uniform float water_fog_fade : hint_range(0.0, 20.0, 0.01) = 0.2;
+uniform float water_transparency_distance;
+uniform float water_transparency_fade : hint_range(0.0, 20.0, 0.01) = 0.2;
 
 global uniform sampler2D water_displacement;
 
@@ -54,11 +55,11 @@ void fragment() {
 		// 	water_thickness = water_depth - world_depth;
 		// }
 
-		float fog_blend = smoothstep(world_depth, world_depth + water_fog_end, water_depth);
-		fog_blend = clamp(exp(fog_blend * -water_transparency), 0.0, 1.0);
+		float fog_blend = smoothstep(world_depth, world_depth + water_fog_distance, water_depth);
+		fog_blend = clamp(exp(fog_blend * -water_fog_fade), 0.0, 1.0);
 
-		float alpha_blend = smoothstep(world_depth, world_depth + water_fog_start, water_depth);
-		alpha_blend = clamp(exp(alpha_blend * -water_transparency), 0.0, 1.0);
+		float alpha_blend = smoothstep(world_depth, world_depth + water_transparency_distance, water_depth);
+		alpha_blend = clamp(exp(alpha_blend * -water_transparency_fade), 0.0, 1.0);
 
 		vec3 world_color = textureLod(screen_texture, screen_uv, 0.0).rgb;
 		world_color = mix(shallow_color, world_color, alpha_blend);
@@ -66,12 +67,14 @@ void fragment() {
 
 
 		ALBEDO = world_color;
+		NORMAL = NORMAL;
 	}
 	else {
 		// TODO
 		ALBEDO = shallow_color;
-		ALPHA = 1.0;
+		// ALPHA = 1.0;
 	}
 
+	SPECULAR = 1.0;
 	ROUGHNESS = 1.0;
 }

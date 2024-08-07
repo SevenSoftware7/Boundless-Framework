@@ -7,38 +7,55 @@ using SevenDev.Utility;
 public sealed partial class WaterFloater : Node, IWaterDisplacementSubscriber, IWaterCollisionNotifier {
 	[Export] public RigidBody3D? Body;
 	[Export] public Node3D? Origin;
-	[Export] public Water? Water;
 	[Export] public uint floaterCount = 1;
+
+	private Water? Water;
 	private float waterSurfaceDisplacement = 0f;
+	private bool ShouldExitWater = false;
+
 	private const float waterLinearDamp = 2.5f;
 	private const float waterAngularDamp = 1f;
 
 	private (float linearDamp, float angularDamp, bool canSleep)? oldConfig;
 
-	public void Enter(Water water) {
-		if (Body is not null) {
-			oldConfig = (Body.LinearDamp, Body.AngularDamp, Body.CanSleep);
+	public (Vector3, WaterMesh)? GetInfo() => Body is null || Water?.Mesh is null ? null : (Body.GlobalPosition, Water.Mesh);
+	public void UpdateWaterDisplacement(Vector3 waterDisplacement) => waterSurfaceDisplacement = waterDisplacement.Y;
 
-			Body.LinearDamp = waterLinearDamp;
-			Body.AngularDamp = waterAngularDamp;
-			Body.CanSleep = false;
-		}
-		Water = water;
-	}
+	private void ExitWater() {
+		ShouldExitWater = false;
 
-	public void Exit(Water water) {
-		if (water != Water) return;
+		Water = null;
 
 		if (Body is not null) {
 			if (Body.LinearDamp == waterLinearDamp) Body.LinearDamp = oldConfig?.linearDamp ?? 0;
 			if (Body.AngularDamp == waterAngularDamp) Body.AngularDamp = oldConfig?.angularDamp ?? 0;
 			if (!Body.CanSleep) Body.CanSleep = oldConfig?.canSleep ?? true;
 		}
-		Water = null;
+		oldConfig = null;
 	}
 
-	public (Vector3, WaterMesh)? GetInfo() => Body is null || Water?.Mesh is null ? null : (Body.GlobalPosition, Water.Mesh);
-	public void UpdateWaterDisplacement(Vector3 waterDisplacement) => waterSurfaceDisplacement = waterDisplacement.Y;
+	public void OnEnterWater(Water water) {
+		if (water == Water && oldConfig is not null) {
+			ShouldExitWater = false;
+			return;
+		}
+
+		Water = water;
+
+		if (Body is not null && oldConfig is null) {
+			oldConfig = (Body.LinearDamp, Body.AngularDamp, Body.CanSleep);
+
+			Body.LinearDamp = waterLinearDamp;
+			Body.AngularDamp = waterAngularDamp;
+			Body.CanSleep = false;
+		}
+	}
+
+	public void OnExitWater(Water water) {
+		if (water != Water) return;
+
+		ShouldExitWater = true;
+	}
 
 
 
@@ -68,17 +85,17 @@ public sealed partial class WaterFloater : Node, IWaterDisplacementSubscriber, I
 		Vector3 position = Body.GlobalPosition;
 
 		float waterSurface = Water.GetSurfaceInDirection(position, Vector3.Up, out Collisions.IntersectRay3DResult res)
-			? res.Point.Y
+			? res.Point.Y + waterSurfaceDisplacement
 			: Mathf.Inf;
 
-		float totalWaterHeight = waterSurface + waterSurfaceDisplacement;
-
-
-		if (position.Y > totalWaterHeight) return;
+		if (ShouldExitWater && (position.Y > waterSurface + 1f || waterSurface == Mathf.Inf)) {
+			ExitWater();
+			return;
+		}
 
 		const float floatability = 1f;
 		Vector3 offset = Origin is null ? Vector3.Zero : Origin.GlobalPosition - position;
-		float distanceToWaterSurface = totalWaterHeight - position.Y;
+		float distanceToWaterSurface = waterSurface - position.Y;
 		float displacementMultiplier = Mathf.Clamp(distanceToWaterSurface * floatability, -floatability, floatability) + 1f;
 
 		Body.ApplyForce(new Vector3(0f, Mathf.Abs(Body.GetGravity().Y) * displacementMultiplier, 0f), offset);

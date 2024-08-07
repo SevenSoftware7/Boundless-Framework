@@ -11,19 +11,41 @@ public static class CompositorExtensions {
 		Buffer.BlockCopy(floats, 0, bytes, 0, bytes.Length);
 		return bytes;
 	}
+	public static byte[] CreateByteBuffer(double[] doubles) {
+		byte[] bytes = new byte[doubles.Length * sizeof(double)];
+		Buffer.BlockCopy(doubles, 0, bytes, 0, bytes.Length);
+		return bytes;
+	}
+
 	public static byte[] CreateByteBuffer(int[] ints) {
-		byte[] bytes = new byte[ints.Length * sizeof(float)];
+		byte[] bytes = new byte[ints.Length * sizeof(int)];
 		Buffer.BlockCopy(ints, 0, bytes, 0, bytes.Length);
 		return bytes;
 	}
 	public static byte[] CreateByteBuffer(uint[] uints) {
-		byte[] bytes = new byte[uints.Length * sizeof(float)];
+		byte[] bytes = new byte[uints.Length * sizeof(uint)];
 		Buffer.BlockCopy(uints, 0, bytes, 0, bytes.Length);
 		return bytes;
 	}
+	public static byte[] CreateByteBuffer(short[] shorts) {
+		byte[] bytes = new byte[shorts.Length * sizeof(short)];
+		Buffer.BlockCopy(shorts, 0, bytes, 0, bytes.Length);
+		return bytes;
+	}
 	public static byte[] CreateByteBuffer(ushort[] ushorts) {
-		byte[] bytes = new byte[ushorts.Length * sizeof(float)];
+		byte[] bytes = new byte[ushorts.Length * sizeof(ushort)];
 		Buffer.BlockCopy(ushorts, 0, bytes, 0, bytes.Length);
+		return bytes;
+	}
+
+	public static byte[] CreateByteBuffer(long[] longs) {
+		byte[] bytes = new byte[longs.Length * sizeof(long)];
+		Buffer.BlockCopy(longs, 0, bytes, 0, bytes.Length);
+		return bytes;
+	}
+	public static byte[] CreateByteBuffer(ulong[] ulongs) {
+		byte[] bytes = new byte[ulongs.Length * sizeof(ulong)];
+		Buffer.BlockCopy(ulongs, 0, bytes, 0, bytes.Length);
 		return bytes;
 	}
 
@@ -32,7 +54,6 @@ public static class CompositorExtensions {
 		if (renderSize.X == 0.0 && renderSize.Y == 0.0) {
 			throw new ArgumentException("Render size is incorrect");
 		}
-		renderSize -= Vector2I.One; // RenderSize is off by one, maybe a backend specific range, maybe a godot bug
 
 		(uint xGroups, uint yGroups) = GetGroups(renderSize, range);
 
@@ -47,17 +68,32 @@ public static class CompositorExtensions {
 	}
 
 
-	public static Rid IndexBufferCreate(this RenderingDevice renderingDevice, ushort[] indices, uint shapeVertices = 3) {
-		if (indices.Length % shapeVertices != 0) throw new ArgumentException($"Invalid number of values in the index buffer, there should be {shapeVertices} vertices in a shape. Total count : {indices.Length}", nameof(indices));
-		return renderingDevice.IndexBufferCreate((uint)indices.Length, RenderingDevice.IndexBufferFormat.Uint16, CreateByteBuffer(indices));
-	}
-
 	public static Rid IndexBufferCreate(this RenderingDevice renderingDevice, uint[] indices, uint shapeVertices = 3) {
 		if (indices.Length % shapeVertices != 0) throw new ArgumentException($"Invalid number of values in the index buffer, there should be {shapeVertices} vertices in a shape. Total count : {indices.Length}", nameof(indices));
 		return renderingDevice.IndexBufferCreate((uint)indices.Length, RenderingDevice.IndexBufferFormat.Uint32, CreateByteBuffer(indices));
 	}
+	public static Rid IndexBufferCreate(this RenderingDevice renderingDevice, ushort[] indices, uint shapeVertices = 3) {
+		if (indices.Length % shapeVertices != 0) throw new ArgumentException($"Invalid number of values in the index buffer, there should be {shapeVertices} vertices in a shape. Total count : {indices.Length}", nameof(indices));
+		return renderingDevice.IndexBufferCreate((uint)indices.Length, RenderingDevice.IndexBufferFormat.Uint16, CreateByteBuffer(indices));
+	}
+	public static Rid IndexBufferCreate(this RenderingDevice renderingDevice, ulong[] indices, uint shapeVertices = 3) {
+		if (indices.Length % shapeVertices != 0) throw new ArgumentException($"Invalid number of values in the index buffer, there should be {shapeVertices} vertices in a shape. Total count : {indices.Length}", nameof(indices));
+		return renderingDevice.IndexBufferCreate((uint)indices.Length, RenderingDevice.IndexBufferFormat.Uint16, CreateByteBuffer(indices));
+	}
 
 
+	public static (Rid indexBuffer, Rid indexArray) IndexArrayCreate(this RenderingDevice renderingDevice, uint[] indices, uint shapeVertices = 3, uint indexOffset = 0) {
+		Rid indexBuffer = renderingDevice.IndexBufferCreate(indices, shapeVertices);
+		if (!indexBuffer.IsValid) {
+			throw new ArgumentException("Index Buffer is Invalid");
+		}
+		Rid indexArray = renderingDevice.IndexArrayCreate(indexBuffer, indexOffset, (uint)indices.Length);
+		if (!indexArray.IsValid) {
+			throw new ArgumentException("Index Array is Invalid");
+		}
+
+		return (indexBuffer, indexArray);
+	}
 	public static (Rid indexBuffer, Rid indexArray)? IndexArrayCreate(this RenderingDevice renderingDevice, ushort[] indices, uint shapeVertices = 3, uint indexOffset = 0) {
 		Rid indexBuffer = renderingDevice.IndexBufferCreate(indices, shapeVertices);
 		if (!indexBuffer.IsValid) {
@@ -70,8 +106,7 @@ public static class CompositorExtensions {
 
 		return (indexBuffer, indexArray);
 	}
-
-	public static (Rid indexBuffer, Rid indexArray) IndexArrayCreate(this RenderingDevice renderingDevice, uint[] indices, uint shapeVertices = 3, uint indexOffset = 0) {
+	public static (Rid indexBuffer, Rid indexArray)? IndexArrayCreate(this RenderingDevice renderingDevice, ulong[] indices, uint shapeVertices = 3, uint indexOffset = 0) {
 		Rid indexBuffer = renderingDevice.IndexBufferCreate(indices, shapeVertices);
 		if (!indexBuffer.IsValid) {
 			throw new ArgumentException("Index Buffer is Invalid");
@@ -90,6 +125,12 @@ public static class CompositorExtensions {
 
 		return renderingDevice.VertexBufferCreate((uint)byteVertices.Length, byteVertices);
 	}
+	public static Rid VertexBufferCreate(this RenderingDevice renderingDevice, double[] vertices, uint vertexLength = 3) {
+		if (vertices.Length % vertexLength != 0) throw new ArgumentException($"Invalid number of values in the points buffer, there should be {vertexLength} float values per point. Total count : {vertices.Length}", nameof(vertices));
+		byte[] byteVertices = CreateByteBuffer(vertices);
+
+		return renderingDevice.VertexBufferCreate((uint)byteVertices.Length, byteVertices);
+	}
 
 	public static (Rid vertexBuffer, Rid vertexArray) VertexArrayCreate(this RenderingDevice renderingDevice, float[] points, long vertexFormat, uint vertexLength = 3) {
 		Rid vertexBuffer = renderingDevice.VertexBufferCreate(points);
@@ -103,6 +144,19 @@ public static class CompositorExtensions {
 
 		return (vertexBuffer, vertexArray);
 	}
+	public static (Rid vertexBuffer, Rid vertexArray) VertexArrayCreate(this RenderingDevice renderingDevice, double[] points, long vertexFormat, uint vertexLength = 3) {
+		Rid vertexBuffer = renderingDevice.VertexBufferCreate(points);
+		if (!vertexBuffer.IsValid) {
+			throw new ArgumentException("Vertex Buffer is Invalid");
+		}
+		Rid vertexArray = renderingDevice.VertexArrayCreate((uint)(points.Length / vertexLength), vertexFormat, [vertexBuffer]);
+		if (!vertexArray.IsValid) {
+			throw new ArgumentException("Vertex Array is Invalid");
+		}
+
+		return (vertexBuffer, vertexArray);
+	}
+
 
 	public static (Rid framebufferTexture, Rid framebuffer) FramebufferCreate(this RenderingDevice renderingDevice, RDTextureFormat textureFormat, RDTextureView textureView, RenderingDevice.TextureSamples textureSamples = RenderingDevice.TextureSamples.Samples1) {
 		Rid frameBufferTexture = renderingDevice.TextureCreate(textureFormat, textureView);
