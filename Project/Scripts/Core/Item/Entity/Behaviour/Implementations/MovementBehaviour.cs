@@ -13,7 +13,7 @@ public abstract partial class MovementBehaviour : EntityBehaviour {
 
 	public abstract bool Move(Vector3 direction);
 
-	public sealed override void _Process(double delta) {
+	public override void _Process(double delta) {
 		base._Process(delta);
 
 		HandleProcess(delta);

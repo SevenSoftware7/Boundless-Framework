@@ -7,18 +7,20 @@ using SevenDev.Utility;
 [GlobalClass]
 public partial class DamageArea : Area3D {
 	private readonly List<IDamageable> hitBuffer = [];
-	public IDamageDealer? DamageDealer;
 
-	[Export] public float Damage = 1f;
 	public TimeDuration? LifeTime;
+
+	public IDamageDealer? DamageDealer { get; init; }
+	[Export] public float Damage = 1f;
 	[Export] public bool SelfDamage = false;
 
 	[Signal] public delegate void OnDestroyEventHandler();
 
 
+
 	public DamageArea() : base() {
 		CollisionLayer = CollisionLayers.Damage;
-		CollisionMask = CollisionLayers.Damage | CollisionLayers.Entity;
+		CollisionMask = CollisionLayers.Damage | CollisionLayers.Entity | CollisionLayers.Prop;
 	}
 	public DamageArea(ulong lifeTime) : this() {
 		if (lifeTime != 0) {
@@ -27,11 +29,20 @@ public partial class DamageArea : Area3D {
 	}
 
 
-	public DamageArea(IDamageDealer? damageDealer, float damage = 1f, ulong lifeTime = 0, bool selfDamage = false) : this(lifeTime) {
-		DamageDealer = damageDealer;
-		Damage = damage;
-		SelfDamage = selfDamage;
+
+	public void GetParriedBy(DamageArea other) {
+		if (other.DamageDealer is IDamageable target) {
+			hitBuffer.Remove(target);
+		}
 	}
+
+	private void ApplyBufferedDamage() {
+		foreach (IDamageable hit in hitBuffer) {
+			hit.Damage(Damage);
+		}
+		hitBuffer.Clear();
+	}
+
 
 
 	private void OnBodyEntered(Node3D body) {
@@ -42,39 +53,29 @@ public partial class DamageArea : Area3D {
 			hitBuffer.Add(damageable);
 		}
 		else if (body is DamageArea damageArea) {
-			Parry(damageArea);
-			damageArea.Parry(this);
-		}
-	}
-
-	public void Parry(DamageArea other) {
-		if (DamageDealer is IDamageable targetDealer) {
-			other.hitBuffer.Remove(targetDealer);
-		}
-	}
-
-	private void ApplyBufferedDamage() {
-		foreach (IDamageable hit in hitBuffer) {
-			ApplyDamage(hit);
-		}
-		hitBuffer.Clear();
-	}
-
-	protected virtual void ApplyDamage(IDamageable hit) {
-		hit.Damage(Damage);
-	}
-
-
-	public override void _Process(double delta) {
-		base._Process(delta);
-		if (LifeTime?.HasPassed ?? false) {
-			EmitSignal(SignalName.OnDestroy);
-			QueueFree();
+			damageArea.GetParriedBy(this);
+			this.GetParriedBy(damageArea);
 		}
 	}
 
 	public override void _Ready() {
 		base._Ready();
 		BodyEntered += OnBodyEntered;
+	}
+	public override void _Notification(int what) {
+		base._Notification(what);
+		switch((ulong)what) {
+			case NotificationPredelete:
+				ApplyBufferedDamage();
+				EmitSignal(SignalName.OnDestroy);
+				break;
+		}
+	}
+
+	public override void _Process(double delta) {
+		base._Process(delta);
+		if (LifeTime is not null && LifeTime.HasPassed) {
+			QueueFree();
+		}
 	}
 }

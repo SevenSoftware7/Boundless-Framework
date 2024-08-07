@@ -130,6 +130,27 @@ public static class NodeExtensions {
 		return child;
 	}
 
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static T SafeReparentToAndRename<T>(this T child, Node? newParent, StringName name, bool keepGlobalTransform = true) where T : Node {
+		if (child.GetParent() == newParent) return child;
+
+		if (!child.IsInsideTree()) {
+			child.Unparent();
+		}
+		if (child.GetParent() is null) {
+			newParent?.AddChild(child);
+			child.Name = name;
+			return child;
+		}
+
+		if (newParent is not null) {
+			child.Reparent(newParent, keepGlobalTransform);
+			child.Name = name;
+		}
+		return child;
+	}
+
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static T AddChildAndSetOwner<T>(this T obj, Node child, bool forceReadableName = false) where T : Node {
 		obj.AddChild(child, forceReadableName);

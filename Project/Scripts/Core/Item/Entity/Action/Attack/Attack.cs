@@ -37,7 +37,10 @@ public abstract partial class Attack(Entity entity, Weapon weapon, IEnumerable<A
 
 
 	public virtual DamageArea CreateHurtArea(float damage, ulong lifeTime) {
-		return new(Entity as IDamageDealer, damage, lifeTime);
+		return new(lifeTime) {
+			Damage = damage,
+			DamageDealer = Entity as IDamageDealer,
+		};
 	}
 
 	public virtual void AddCollisionShapes(DamageArea damageArea, Vector3 size) {

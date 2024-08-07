@@ -5,7 +5,7 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class BipedBehaviour : GroundedBehaviour, IWaterCollisionNotifier {
+public partial class BipedBehaviour : GroundedBehaviour {
 	private float _moveSpeed;
 	private MovementType _movementType;
 
@@ -141,13 +141,5 @@ public partial class BipedBehaviour : GroundedBehaviour, IWaterCollisionNotifier
 		Basis newRotation = Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection);
 		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * rotationSpeed);
 	}
-
-	public void OnEnterWater(Water water) {
-		if (!IsActive) return;
-
-		Entity.SetBehaviour(() => new SwimmingBehaviour(Entity, water)/* , b => b.UpdateWater(water) */);
-	}
-
-	public void OnExitWater(Water water) { }
 
 }

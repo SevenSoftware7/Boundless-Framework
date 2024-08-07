@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://b7rhbgw2dujty"]
+[gd_scene load_steps=19 format=3 uid="uid://b7rhbgw2dujty"]
 
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Implementations/ArmedEntity.cs" id="1_44rt4"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/EntityStats.cs" id="2_lubr1"]
@@ -11,6 +11,8 @@
 [ext_resource type="AnimationLibrary" uid="uid://caafq3ok75ukn" path="res://Resources/Weapons/Nemesis/NemesisAnimations.tres" id="8_uaax8"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="9_8kq40"]
 [ext_resource type="Resource" uid="uid://dvcjw3gon7rak" path="res://Resources/Entities/Eos/Costumes/Eos_base.tres" id="10_lfyyx"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Behaviour/Implementations/BipedBehaviour.cs" id="12_0ikht"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Behaviour/Implementations/SwimmingBehaviour.cs" id="13_ecggl"]
 
 [sub_resource type="Resource" id="Resource_v01j0"]
 script = ExtResource("2_lubr1")
@@ -30,9 +32,6 @@ script = ExtResource("5_y0ifp")
 HealthBar = ExtResource("3_uuynt")
 InteractPrompt = ExtResource("4_qonq2")
 InteractPointer = ExtResource("3_qcq8b")
-ToggleButton = null
-OptionList = null
-OptionButton = null
 
 [sub_resource type="Animation" id="Animation_2ppbj"]
 length = 0.001
@@ -45,7 +44,7 @@ _data = {
 [sub_resource type="BoxShape3D" id="BoxShape3D_iqmmo"]
 size = Vector3(0.3, 3.1, 0.3)
 
-[node name="Eos" type="CharacterBody3D" node_paths=PackedStringArray("CostumeHolder", "Skeleton", "AnimationPlayer", "Health", "CenterOfMass", "_skeleton", "_animationPlayer", "_health")]
+[node name="Eos" type="CharacterBody3D" node_paths=PackedStringArray("CostumeHolder", "Skeleton", "AnimationPlayer", "Health", "CurrentBehaviour", "CenterOfMass")]
 collision_layer = 256
 floor_constant_speed = true
 platform_floor_layers = 4294963965
@@ -58,23 +57,15 @@ CostumeHolder = NodePath("CostumeHolder")
 Skeleton = NodePath("Skeleton3D")
 AnimationPlayer = NodePath("AnimationPlayer")
 Health = NodePath("Health")
+CurrentBehaviour = NodePath("BipedBehaviour")
 _attributeModifiers = [null]
-Forward = Vector3(0, 0, -1)
 CenterOfMass = NodePath("Collisions/CenterOfMass")
-healthBar = null
-_handedness = 0
-_skeleton = NodePath("Skeleton3D")
-_animationPlayer = NodePath("AnimationPlayer")
-_health = NodePath("Health")
-_globalForward = Vector3(0, 0, -1)
 
 [node name="Health" type="Node" parent="."]
 script = ExtResource("8_emu8a")
 Maximum = 25.0
 Value = 25.0
 Ratio = 1.0
-_maximum = 25.0
-_value = 25.0
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -95,4 +86,11 @@ shape = SubResource("BoxShape3D_iqmmo")
 script = ExtResource("9_8kq40")
 Costume = ExtResource("10_lfyyx")
 Model = NodePath("Model - Eos (base)")
-_costume = ExtResource("10_lfyyx")
+
+[node name="BipedBehaviour" type="Node" parent="." node_paths=PackedStringArray("Entity")]
+script = ExtResource("12_0ikht")
+Entity = NodePath("..")
+
+[node name="SwimmingBehaviour" type="Node" parent="." node_paths=PackedStringArray("Entity")]
+script = ExtResource("13_ecggl")
+Entity = NodePath("..")

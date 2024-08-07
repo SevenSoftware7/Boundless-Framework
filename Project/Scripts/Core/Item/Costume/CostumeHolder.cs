@@ -39,11 +39,13 @@ public partial class CostumeHolder : Node3D, ISerializationListener {
 		Model = Costume?.Instantiate()?.ParentTo(this);
 	}
 	public void Unload() {
-		Model?.QueueFree();
+		Model?.Free();
 		Model = null;
 	}
 
-	public void OnBeforeSerialize() { }
+	public void OnBeforeSerialize() {
+		Unload();
+	}
 
 	public void OnAfterDeserialize() {
 		Load();

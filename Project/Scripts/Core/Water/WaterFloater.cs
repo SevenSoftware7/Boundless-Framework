@@ -82,7 +82,7 @@ public sealed partial class WaterFloater : Node, IWaterDisplacementSubscriber, I
 		base._PhysicsProcess(delta);
 		if (Body is null || Water is null) return;
 
-		Vector3 position = Body.GlobalPosition;
+		Vector3 position = Origin?.GlobalPosition ?? Body.GlobalPosition;
 
 		float waterSurface = Water.GetSurfaceInDirection(position, Vector3.Up, out Collisions.IntersectRay3DResult res)
 			? res.Point.Y + waterSurfaceDisplacement
@@ -94,10 +94,10 @@ public sealed partial class WaterFloater : Node, IWaterDisplacementSubscriber, I
 		}
 
 		const float floatability = 1f;
-		Vector3 offset = Origin is null ? Vector3.Zero : Origin.GlobalPosition - position;
+		Vector3 offset = Origin is null ? Vector3.Zero : Origin.GlobalPosition - Body.GlobalPosition;
 		float distanceToWaterSurface = waterSurface - position.Y;
 		float displacementMultiplier = Mathf.Clamp(distanceToWaterSurface * floatability, -floatability, floatability) + 1f;
 
-		Body.ApplyForce(new Vector3(0f, Mathf.Abs(Body.GetGravity().Y) * displacementMultiplier, 0f), offset);
+		Body.ApplyForce(new Vector3(0f, Mathf.Abs(Body.GetGravity().Y * Body.Mass) * displacementMultiplier / floaterCount, 0f), offset);
 	}
 }
