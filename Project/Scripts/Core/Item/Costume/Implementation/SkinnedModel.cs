@@ -41,6 +41,14 @@ public partial class SkinnedModel : Model, IInjectable<Skeleton3D?>, IInjectable
 		GlobalTransform = Skeleton.GlobalTransform;
 	}
 
+	public override void _Ready() {
+		base._Ready();
+		if (IsInsideTree()) {
+			this.RequestInjection<Skeleton3D?>();
+			this.RequestInjection<Handedness>();
+		}
+	}
+
 	public override void _Notification(int what) {
 		base._Notification(what);
 		switch ((ulong)what) {

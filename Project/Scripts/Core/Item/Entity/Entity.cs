@@ -13,7 +13,7 @@ using SevenDev.Utility;
 /// </summary>
 [Tool]
 [GlobalClass]
-public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICostumable, ICustomizable, ISaveable<Entity>, IInjectionProvider<Skeleton3D?>, IInjectionProvider<Handedness> {
+public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICostumable, ICustomizable, ISaveable<Entity>, IInjectionProvider<Entity?>, IInjectionProvider<Skeleton3D?>, IInjectionProvider<Handedness> {
 	public readonly List<Vector3> RecoverLocationBuffer = [];
 	public const int RECOVER_LOCATION_BUFFER_SIZE = 5;
 
@@ -83,7 +83,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 
 
 	[ExportGroup("State")]
-	[Export] public EntityAction? CurrentAction { get; private set; }
+	[Export] public Action? CurrentAction { get; private set; }
 	[Export] public EntityBehaviour? CurrentBehaviour { get; private set; }
 	[Export] private Godot.Collections.Array<AttributeModifier> _attributeModifiers {
 		get => [.. AttributeModifiers, null];
@@ -146,7 +146,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 	}
 
 
-	public bool ExecuteAction(EntityActionBuilder action, bool forceExecute = false) {
+	public bool ExecuteAction(ActionBuilder action, bool forceExecute = false) {
 		if (!forceExecute && !CurrentAction.CanCancel()) return false;
 
 		CurrentAction?.Stop();
@@ -252,6 +252,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 	public override void _Ready() {
 		base._Ready();
 
+		this.PropagateInject<Entity?>();
 		this.PropagateInject<Skeleton3D?>();
 		this.PropagateInject<Handedness>();
 
@@ -283,6 +284,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 
 	public ISaveData<Entity> Save() => new EntitySaveData<Entity>(this);
 
+	Entity? IInjectionProvider<Entity?>.GetInjection() => this;
 	Skeleton3D? IInjectionProvider<Skeleton3D?>.GetInjection() => Skeleton;
 	Handedness IInjectionProvider<Handedness>.GetInjection() => Handedness;
 

@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using SevenDev.Utility;
 
 
 public static class WaterMeshManager {
@@ -12,7 +11,7 @@ public static class WaterMeshManager {
 	public static float[] WaterVertices { get; private set; } = [];
 	public static uint[] WaterIndices { get; private set; } = [];
 
-	private static readonly Dictionary<WaterMesh, WaterMeshEntry> WaterMeshInfo = [];
+	public static readonly Dictionary<WaterMesh, WaterMeshEntry> WaterMeshInfo = [];
 
 
 
@@ -105,7 +104,7 @@ public static class WaterMeshManager {
 
 
 
-	private class WaterMeshEntry {
+	public class WaterMeshEntry {
 		public Mesh Mesh { get; private set; } = null!;
 		public Vector3[] Vertices { get; private set; } = [];
 		public uint[] Indices { get; private set; } = [];

@@ -8,10 +8,10 @@ using SevenDev.Utility;
 /// <summary>
 /// An Attack that an Entity can execute, using a given Weapon.
 /// </summary>
-/// <param name="entity">Inherited from <see cref="EntityAction"/>.</param>
+/// <param name="entity">Inherited from <see cref="Action"/>.</param>
 /// <param name="weapon">The Weapon which will be used in the Attack.</param>
-/// <param name="modifiers">Inherited from <see cref="EntityAction"/>.</param>
-public abstract partial class Attack(Entity entity, Weapon weapon, IEnumerable<AttributeModifier>? modifiers = null) : EntityAction(entity, modifiers) {
+/// <param name="modifiers">Inherited from <see cref="Action"/>.</param>
+public abstract partial class Attack(Entity entity, Weapon weapon, IEnumerable<AttributeModifier>? modifiers = null) : Action(entity, modifiers) {
 	public Weapon Weapon { get; private set; } = weapon;
 
 	protected static StringName GetAnimationPath(StringName library, StringName attack) => library.IsEmpty ? attack : $"{library}/{attack}";

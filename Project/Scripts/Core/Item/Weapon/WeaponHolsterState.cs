@@ -1,10 +1,10 @@
 namespace LandlessSkies.Core;
 
-public struct WeaponHolsterState {
+public readonly struct WeaponHolsterState {
 	public static readonly WeaponHolsterState Unholstered = new(false);
 	public static readonly WeaponHolsterState Holstered = new(true);
 
-	public bool IsHolstered = false;
+	public readonly bool IsHolstered = false;
 
 	private WeaponHolsterState(bool isHolstered) {
 		IsHolstered = isHolstered;

@@ -1405,6 +1405,28 @@ active_edge = -1
 active_face = -1
 active_face_vertex = 0
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_tw615"]
+size = Vector3(60, 12, 58)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_u0aa7"]
+render_priority = 0
+shader = ExtResource("11_cp2h1")
+shader_parameter/shallow_color = Color(0.1395, 0.279225, 0.45, 1)
+shader_parameter/deep_color = Color(0.068, 0.127, 0.2, 1)
+shader_parameter/water_intensity = 0.5
+shader_parameter/water_scale = 2.0
+shader_parameter/water_fog_distance = 60.0
+shader_parameter/water_fog_fade = 2.5
+shader_parameter/water_transparency_distance = 3.0
+shader_parameter/water_transparency_fade = 2.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_eyrr3"]
+material = SubResource("ShaderMaterial_u0aa7")
+size = Vector3(60, 12, 58)
+subdivide_width = 32
+subdivide_height = 32
+subdivide_depth = 32
+
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_n387p"]
 
 [sub_resource type="Curve3D" id="Curve3D_1g2j1"]
@@ -1419,28 +1441,6 @@ size = Vector3(3, 1, 6)
 
 [sub_resource type="BoxMesh" id="BoxMesh_juan7"]
 size = Vector3(3, 1, 6)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_tw615"]
-size = Vector3(60, 12, 58)
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_u0aa7"]
-render_priority = 0
-shader = ExtResource("11_cp2h1")
-shader_parameter/shallow_color = Color(0.1395, 0.279225, 0.45, 1)
-shader_parameter/deep_color = Color(0.068, 0.127, 0.2, 1)
-shader_parameter/water_intensity = 0.5
-shader_parameter/water_scale = 50.0
-shader_parameter/water_fog_distance = 60.0
-shader_parameter/water_fog_fade = 5.0
-shader_parameter/water_transparency_distance = 3.0
-shader_parameter/water_transparency_fade = 7.0
-
-[sub_resource type="BoxMesh" id="BoxMesh_eyrr3"]
-material = SubResource("ShaderMaterial_u0aa7")
-size = Vector3(60, 12, 58)
-subdivide_width = 32
-subdivide_height = 32
-subdivide_depth = 32
 
 [sub_resource type="Resource" id="Resource_tocgr"]
 resource_name = "+ 20 generic_max_health"
@@ -1501,7 +1501,7 @@ size = Vector3(3, 1, 5)
 
 [node name="Node3D" type="Node3D"]
 
-[node name="Environment" type="Node" parent="."]
+[node name="Environment" type="Node3D" parent="."]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="Environment"]
 environment = SubResource("Environment_0pxe2")
@@ -1513,7 +1513,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = 4
 material = SubResource("FogMaterial_2f08y")
 
-[node name="Lights" type="Node" parent="Environment"]
+[node name="Lights" type="Node3D" parent="Environment"]
 
 [node name="OmniLight3D" type="OmniLight3D" parent="Environment/Lights"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.4054, 3.06073, 3.27479)
@@ -1541,288 +1541,310 @@ directional_shadow_split_3 = 0.75
 directional_shadow_blend_splits = true
 directional_shadow_max_distance = 110.0
 
-[node name="Geometry" type="Node3D" parent="Environment"]
+[node name="Terrain" type="Node3D" parent="Environment"]
 
-[node name="Block_1" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_1" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -16)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_7w584")
 collision_mask = 0
 
-[node name="Block_2" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_2" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -15.5)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_o7js0")
 collision_mask = 0
 
-[node name="Block_3" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_3" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -15)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_qj8my")
 collision_mask = 0
 
-[node name="Block_4" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_4" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -14.5)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_5vy63")
 collision_mask = 0
 
-[node name="Block_5" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_5" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -14)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_rqrvx")
 collision_mask = 0
 
-[node name="Block_6" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_6" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -13.5)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_j1up8")
 collision_mask = 0
 
-[node name="Block_7" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_7" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -13)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_645y6")
 collision_mask = 0
 
-[node name="Block_8" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_8" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -12.5)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_64ahj")
 collision_mask = 0
 
-[node name="Block_9" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_9" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -12)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_4j4a5")
 collision_mask = 0
 
-[node name="Block_10" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_10" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -11.5)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_k73ej")
 collision_mask = 0
 
-[node name="Block_11" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_11" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -11)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_qhhiu")
 collision_mask = 0
 
-[node name="Block_12" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_12" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10.5)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_g74si")
 collision_mask = 0
 
-[node name="Block_13" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_13" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_evfrp")
 collision_mask = 0
 
-[node name="Block_14" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_14" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -9.5)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_nytoc")
 collision_mask = 0
 
-[node name="Block_15" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_15" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -9)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_ck7kb")
 collision_mask = 0
 
-[node name="Block_16" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_16" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -8.5)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_lgics")
 collision_mask = 0
 
-[node name="Block_34" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_34" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, -16)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_thvx1")
 collision_mask = 0
 
-[node name="Block_0" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_0" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, -1, 8)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_xw20i")
 collision_mask = 0
 
-[node name="Block_17" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_17" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -16)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_v2nih")
 collision_mask = 0
 
-[node name="Block_19" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_19" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -15)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_5lp8u")
 collision_mask = 0
 
-[node name="Block_20" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_20" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -14)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_0oobb")
 collision_mask = 0
 
-[node name="Block_21" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_21" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -13)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_efya6")
 collision_mask = 0
 
-[node name="Block_22" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_22" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -12)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_4rsqx")
 collision_mask = 0
 
-[node name="Block_23" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_23" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -11)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_62cc7")
 collision_mask = 0
 
-[node name="Block_24" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_24" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -10)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_uo6rx")
 collision_mask = 0
 
-[node name="Block_25" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_25" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -9)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_diajh")
 collision_mask = 0
 
-[node name="Block_28" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_28" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 5, 4, -19)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_rgsgx")
 collision_mask = 0
 
-[node name="Block_27" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_27" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 6, 4, -24)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_lhsxd")
 collision_mask = 0
 
-[node name="Block_26" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_26" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 2, 4, -28)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_jl2iu")
 collision_mask = 0
 
-[node name="Block_29" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_29" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -4, 6, -30)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_imwm5")
 collision_mask = 0
 
-[node name="Block_30" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_30" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -10, 8, -28)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_7xdkl")
 collision_mask = 0
 
-[node name="Block_31" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_31" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -14, 10, -24)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_ryfet")
 collision_mask = 0
 
-[node name="Block_32" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_32" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, -1, -22)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_g7c6q")
 collision_mask = 0
 
-[node name="Block_18" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_18" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -16)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_en70j")
 collision_mask = 0
 
-[node name="Block_33" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_33" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -14)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_5i3x7")
 collision_mask = 0
 
-[node name="Block_35" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_35" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -12)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_8kn7d")
 collision_mask = 0
 
-[node name="Block_36" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_36" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -10)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_dxejf")
 collision_mask = 0
 
-[node name="Block_37" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_37" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, -1, 24)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_jhkky")
 collision_mask = 0
 
-[node name="Block_39" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_39" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32, -1, -16)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_cyh82")
 collision_mask = 0
 
-[node name="Block_38" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_38" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32, -1, -16)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_7gqcj")
 collision_mask = 0
 
-[node name="Block_40" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_40" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, -1, 24)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_rv60d")
 collision_mask = 0
 
-[node name="Block_41" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_41" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40, -1, -16)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_cjkd2")
 collision_mask = 0
 
-[node name="Block_42" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_42" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -69, -3, 40)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_dwlvh")
 collision_mask = 0
 
-[node name="Block_43" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_43" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -69, -3, 40)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_s1yey")
 collision_mask = 0
 
-[node name="Block_44" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_44" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -69, -3, 40)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_8b644")
 collision_mask = 0
 
-[node name="Block_45" type="Node3D" parent="Environment/Geometry"]
+[node name="Block_45" type="Node3D" parent="Environment/Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, -3, 40)
 script = ExtResource("4_xwxtm")
 block_data = SubResource("Resource_asqcq")
 collision_mask = 0
 
+[node name="Water" type="Node3D" parent="Environment"]
+
+[node name="Water" parent="Environment/Water" instance=ExtResource("12_xdv3s")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.25, -7, 70)
+
+[node name="CollisionShape3D" parent="Environment/Water/Water" index="0"]
+shape = SubResource("BoxShape3D_tw615")
+
+[node name="WaterMesh" parent="Environment/Water/Water" index="1"]
+mesh = SubResource("BoxMesh_eyrr3")
+ShallowColor = Color(0.1395, 0.279225, 0.45, 1)
+DeepColor = Color(0.068, 0.127, 0.2, 1)
+WaterIntensity = 0.5
+WaterScale = 2.0
+FogDistance = 60.0
+FogFade = 2.5
+TransparencyDistance = 3.0
+TransparencyFade = 2.5
+
+[node name="GPUParticlesCollisionBox3D" parent="Environment/Water/Water" index="2"]
+size = Vector3(60, 12, 58)
+
 [node name="EntityVoidoutTrigger" type="Area3D" parent="Environment"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -30, 0)
 collision_layer = 0
-collision_mask = 2
+collision_mask = 256
 monitorable = false
 script = ExtResource("5_aiymr")
 
@@ -1834,7 +1856,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30201, -4.81285)
 curve = SubResource("Curve3D_1g2j1")
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Environment/Path3D"]
-transform = Transform3D(-0.0922568, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97163e-07, 0.995733, 8.27696e-08, -0.0922568, -1.98959, 0, 2.30373)
+transform = Transform3D(-0.0922569, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97164e-07, 0.995733, 8.27696e-08, -0.0922569, -1.98959, 0, 2.30373)
 script = ExtResource("36_x7xeh")
 
 [node name="AnimatableBody3D" type="AnimatableBody3D" parent="Environment/Path3D/PathFollow3D"]
@@ -1847,101 +1869,81 @@ shape = SubResource("BoxShape3D_x4tkf")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/Path3D/PathFollow3D"]
 mesh = SubResource("BoxMesh_juan7")
 
-[node name="Water" parent="Environment" instance=ExtResource("12_xdv3s")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.25, -7, 70)
-
-[node name="CollisionShape3D" parent="Environment/Water" index="0"]
-shape = SubResource("BoxShape3D_tw615")
-
-[node name="WaterMesh" parent="Environment/Water" index="1"]
-mesh = SubResource("BoxMesh_eyrr3")
-ShallowColor = Color(0.1395, 0.279225, 0.45, 1)
-DeepColor = Color(0.068, 0.127, 0.2, 1)
-WaterIntensity = 0.5
-WaterScale = 50.0
-FogDistance = 60.0
-FogFade = 5.0
-TransparencyDistance = 3.0
-TransparencyFade = 7.0
-
-[node name="GPUParticlesCollisionBox3D" parent="Environment/Water" index="2"]
-size = Vector3(60, 12, 58)
-
-[node name="Player" parent="." node_paths=PackedStringArray("Entity") instance=ExtResource("26_rkn04")]
-Entity = NodePath("../Eos")
-
-[node name="WitherArea3D" type="Area3D" parent="."]
+[node name="WitherArea3D" type="Area3D" parent="Environment"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.4761, 1.30216, -12.7711)
 collision_layer = 2048
 collision_mask = 2304
 script = ExtResource("14_w4log")
 _attributeModifiers = [SubResource("Resource_tocgr")]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="WitherArea3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/WitherArea3D"]
 shape = SubResource("SphereShape3D_d0jor")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="WitherArea3D/CollisionShape3D"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/WitherArea3D/CollisionShape3D"]
 layers = 4
 mesh = SubResource("SphereMesh_xl38q")
 skeleton = NodePath("../..")
 
-[node name="DamageArea" type="Area3D" parent="."]
+[node name="DamageArea" type="Area3D" parent="Environment"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.4761, 1.30216, -12.7711)
 collision_layer = 2048
-collision_mask = 2304
+collision_mask = 2816
 script = ExtResource("18_pbwgl")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="DamageArea"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/DamageArea"]
 shape = SubResource("SphereShape3D_d0jor")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="DamageArea/CollisionShape3D"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/DamageArea/CollisionShape3D"]
 mesh = SubResource("SphereMesh_c40qo")
 skeleton = NodePath("../..")
 
-[node name="TestInteractable" type="Area3D" parent="."]
+[node name="TestInteractable" type="Area3D" parent="Environment"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -53.1233, 0.5, -10.6023)
 collision_layer = 8
 collision_mask = 0
 script = ExtResource("35_lrkn5")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="TestInteractable"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/TestInteractable"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
 shape = SubResource("SphereShape3D_ycdom")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="TestInteractable/CollisionShape3D"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/TestInteractable/CollisionShape3D"]
 mesh = SubResource("SphereMesh_nkuww")
 skeleton = NodePath("../..")
 
-[node name="CollisionShape3D_2" type="CollisionShape3D" parent="TestInteractable"]
+[node name="CollisionShape3D_2" type="CollisionShape3D" parent="Environment/TestInteractable"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
 shape = SubResource("SphereShape3D_ycdom")
 
-[node name="MeshInstance3D_2" type="MeshInstance3D" parent="TestInteractable/CollisionShape3D_2"]
+[node name="MeshInstance3D_2" type="MeshInstance3D" parent="Environment/TestInteractable/CollisionShape3D_2"]
 mesh = SubResource("SphereMesh_nkuww")
 skeleton = NodePath("../../CollisionShape3D/MeshInstance3D")
 
-[node name="CollisionShape3D_3" type="CollisionShape3D" parent="TestInteractable"]
+[node name="CollisionShape3D_3" type="CollisionShape3D" parent="Environment/TestInteractable"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
 shape = SubResource("SphereShape3D_ycdom")
 
-[node name="MeshInstance3D_3" type="MeshInstance3D" parent="TestInteractable/CollisionShape3D_3"]
+[node name="MeshInstance3D_3" type="MeshInstance3D" parent="Environment/TestInteractable/CollisionShape3D_3"]
 mesh = SubResource("SphereMesh_nkuww")
 skeleton = NodePath("../../CollisionShape3D/MeshInstance3D")
 
-[node name="CollisionShape3D_4" type="CollisionShape3D" parent="TestInteractable"]
+[node name="CollisionShape3D_4" type="CollisionShape3D" parent="Environment/TestInteractable"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
 shape = SubResource("SphereShape3D_ycdom")
 
-[node name="MeshInstance3D_4" type="MeshInstance3D" parent="TestInteractable/CollisionShape3D_4"]
+[node name="MeshInstance3D_4" type="MeshInstance3D" parent="Environment/TestInteractable/CollisionShape3D_4"]
 mesh = SubResource("SphereMesh_nkuww")
 skeleton = NodePath("../../CollisionShape3D/MeshInstance3D")
+
+[node name="Player" parent="." node_paths=PackedStringArray("Entity") instance=ExtResource("26_rkn04")]
+Entity = NodePath("../Eos")
 
 [node name="Bike" parent="." instance=ExtResource("20_pcyav")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.10534, 2, 32.9924)
 
 [node name="Eos" parent="." instance=ExtResource("9_0jt21")]
 process_priority = -10
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 34)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.873384, 2, 34.141)
 
 [node name="Weapon" type="Node" parent="Eos"]
 script = ExtResource("11_uqmxm")
@@ -1950,16 +1952,16 @@ script = ExtResource("11_uqmxm")
 script = ExtResource("13_d6cna")
 
 [node name="Epiphron" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton") instance=ExtResource("12_1jl3t")]
-transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.09278, 4.61968, 33.9902)
+transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1312)
 Skeleton = NodePath("../../../Skeleton3D")
 
 [node name="Nemesis" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton") instance=ExtResource("15_x4bcq")]
-transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.09278, 4.61968, 33.9902)
+transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1312)
 IsHolstered = true
 Skeleton = NodePath("../../../Skeleton3D")
 
 [node name="Eleos" parent="Eos/Weapon/Main" node_paths=PackedStringArray("Skeleton") instance=ExtResource("17_jhoyp")]
-transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.09278, 4.61968, 33.9902)
+transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1312)
 IsHolstered = true
 Skeleton = NodePath("../../../Skeleton3D")
 
@@ -2109,4 +2111,4 @@ Body = NodePath("../..")
 Origin = NodePath("..")
 floaterCount = 4
 
-[editable path="Environment/Water"]
+[editable path="Environment/Water/Water"]

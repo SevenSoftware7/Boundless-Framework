@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode unshaded, world_vertex_coords/* , cull_disabled */, depth_draw_always;
+render_mode unshaded, world_vertex_coords, cull_disabled, depth_draw_always;
 
 uniform sampler2D depth_texture : hint_depth_texture;
 uniform sampler2D screen_texture : hint_screen_texture, repeat_disable;

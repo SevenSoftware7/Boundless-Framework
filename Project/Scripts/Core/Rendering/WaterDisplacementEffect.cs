@@ -88,22 +88,20 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 
 		Vector2I renderSize = new(128, 128);
 		(uint xGroups, uint yGroups) = CompositorExtensions.GetGroups(renderSize, 8);
-
-
-		ComputeDisplacement(renderSize, xGroups, yGroups);
+		ComputeDisplacement(renderSize, xGroups, yGroups, 0.2f, waterDisplacementMap);
 
 		FetchDisplacementData(xGroups, yGroups);
 
 
 
-		void ComputeDisplacement(Vector2I renderSize, uint xGroups, uint yGroups) {
+		void ComputeDisplacement(Vector2I renderSize, uint xGroups, uint yGroups, float frequency, Rid map) {
 			int[] computePushConstantInts = [
 				renderSize.X, renderSize.Y,
 			];
 			int computeIntsByteCount = computePushConstantInts.Length * sizeof(int);
 
 			float[] computePushConstantFloats = [
-				Time.GetTicksMsec() / 1000f, 0
+				Time.GetTicksMsec() / 1000f, frequency
 			];
 			int computeFloatsByteCount = computePushConstantFloats.Length * sizeof(float);
 
@@ -116,7 +114,7 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 			long computeList = RenderingDevice.ComputeListBegin();
 			RenderingDevice.ComputeListBindComputePipeline(computeList, computePipeline);
 
-			RenderingDevice.ComputeListBindImage(computeList, computeShader, waterDisplacementMap, 0);
+			RenderingDevice.ComputeListBindImage(computeList, computeShader, map, 0);
 
 			RenderingDevice.ComputeListSetPushConstant(computeList, computePushConstantBytes, (uint)computePushConstantBytes.Length);
 

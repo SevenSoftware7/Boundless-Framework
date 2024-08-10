@@ -82,11 +82,6 @@ shape = SubResource("BoxShape3D_iqmmo")
 
 [node name="CenterOfMass" type="Node3D" parent="Collisions"]
 
-[node name="CostumeHolder" type="Node3D" parent="." node_paths=PackedStringArray("Model")]
-script = ExtResource("9_8kq40")
-Costume = ExtResource("10_lfyyx")
-Model = NodePath("Model - Eos (base)")
-
 [node name="BipedBehaviour" type="Node" parent="." node_paths=PackedStringArray("Entity")]
 script = ExtResource("12_0ikht")
 Entity = NodePath("..")
@@ -94,3 +89,7 @@ Entity = NodePath("..")
 [node name="SwimmingBehaviour" type="Node" parent="." node_paths=PackedStringArray("Entity")]
 script = ExtResource("13_ecggl")
 Entity = NodePath("..")
+
+[node name="CostumeHolder" type="Node3D" parent="."]
+script = ExtResource("9_8kq40")
+Costume = ExtResource("10_lfyyx")

@@ -8,6 +8,7 @@ layout(rgba32f, set = 0, binding = 0) uniform image2D displacement_image; // Ima
 layout(push_constant, std430) uniform Params {
 	restrict readonly ivec2 size; // x: texture width, y: texture height
 	restrict readonly float time;
+	restrict readonly float frequency;
 };
 
 
@@ -97,9 +98,9 @@ vec3 noise3D(vec2 uv, float time)
 }
 
 
-vec3 generate_displacement(vec2 uv)
+vec3 generate_displacement(vec2 uv, float frequency)
 {
-	return noise3D(uv, time * 0.2);
+	return noise3D(uv, time * frequency);
 }
 
 void main()
@@ -107,7 +108,7 @@ void main()
 	ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
 	vec2 scaled_uv = vec2(uv) / size;
 
-	vec3 displacement = generate_displacement(scaled_uv);
+	vec3 displacement = generate_displacement(scaled_uv, frequency);
 	displacement = clamp(displacement * 0.5 + 0.5, 0, 1); // keep values in range [-1, 1] and store as [0, 1]
 
 	imageStore(displacement_image, uv, vec4(displacement, 0));

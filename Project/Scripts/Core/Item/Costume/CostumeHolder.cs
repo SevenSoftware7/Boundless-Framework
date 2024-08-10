@@ -6,14 +6,13 @@ using SevenDev.Utility;
 [Tool]
 [GlobalClass]
 public partial class CostumeHolder : Node3D, ISerializationListener {
-	[Export]
-	public Costume? Costume {
+	public Model? Model { get; private set; }
+
+	[Export] public Costume? Costume {
 		get => _costume;
 		set => SetCostume(value);
 	}
 	private Costume? _costume;
-
-	[Export] public Model? Model { get; private set; }
 
 
 	public CostumeHolder() { }
@@ -39,16 +38,14 @@ public partial class CostumeHolder : Node3D, ISerializationListener {
 		Model = Costume?.Instantiate()?.ParentTo(this);
 	}
 	public void Unload() {
-		Model?.Free();
+		Model?.QueueFree();
 		Model = null;
 	}
 
 	public void OnBeforeSerialize() {
 		Unload();
 	}
-
 	public void OnAfterDeserialize() {
-		Load();
+		Callable.From(() => Load()).CallDeferred();
 	}
-
 }

@@ -3,7 +3,6 @@ namespace LandlessSkies.Core;
 using Godot;
 using SevenDev.Utility;
 
-[Tool]
 [GlobalClass]
 public sealed partial class Water : Area3D {
 	[Export] public WaterMesh? Mesh { get; private set; }
@@ -32,7 +31,6 @@ public sealed partial class Water : Area3D {
 
 	public override void _Ready() {
 		base._Ready();
-		if (Engine.IsEditorHint()) return;
 
 		BodyEntered += OnBodyEntered;
 		BodyExited += OnBodyExited;

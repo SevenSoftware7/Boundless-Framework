@@ -109,22 +109,18 @@ public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
 	public override void _EnterTree() {
 		base._EnterTree();
 
-		Mesh? mesh = Mesh;
-
 		WaterMeshManager.Add(this);
 
-		if (mesh is not null) {
+		if (Mesh is Mesh mesh) {
 			mesh.Changed += OnMeshChanged;
 		}
 	}
 	public override void _ExitTree() {
 		base._ExitTree();
 
-		Mesh? mesh = Mesh;
-
 		WaterMeshManager.Remove(this);
 
-		if (mesh is not null) {
+		if (Mesh is Mesh mesh) {
 			mesh.Changed -= OnMeshChanged;
 		}
 	}
@@ -138,35 +134,42 @@ public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
 		}
 	}
 
-	public override bool _Set(StringName property, Variant value) {
-		if (property != MeshInstance3D.PropertyName.Mesh || !IsInsideTree()) return base._Set(property, value);
+	// public override bool _Set(StringName property, Variant value) {
+	// 	if (property != MeshInstance3D.PropertyName.Mesh || !IsInsideTree()) return base._Set(property, value);
 
-		Mesh? mesh = Mesh;
+	// 	Mesh? mesh = Mesh;
 
-		if (mesh is not null) {
-			mesh.Changed -= OnMeshChanged;
-		}
+	// 	if (mesh is not null) {
+	// 		mesh.Changed -= OnMeshChanged;
+	// 	}
 
-		mesh = Mesh = value.As<Mesh>();
-		WaterMeshManager.Add(this);
+	// 	mesh = Mesh = value.As<Mesh>();
+	// 	WaterMeshManager.Add(this);
 
-		if (mesh is not null) {
-			mesh.Changed += OnMeshChanged;
-		}
+	// 	if (mesh is not null) {
+	// 		mesh.Changed += OnMeshChanged;
+	// 	}
 
-		return true;
-	}
+	// 	return true;
+	// }
 
 	public void OnBeforeSerialize() {
+		if (!IsInsideTree()) return;
+
+		if (Mesh is Mesh mesh) {
+			mesh.Changed -= OnMeshChanged;
+		}
 		WaterMeshManager.Remove(this);
 	}
 
 	public void OnAfterDeserialize() {
 		if (!IsInsideTree()) return;
 
-		if (Mesh is Mesh mesh) {
-			mesh.Changed += OnMeshChanged;
-		}
-		WaterMeshManager.Add(this);
+		Callable.From(() => {
+			if (Mesh is Mesh mesh) {
+				mesh.Changed += OnMeshChanged;
+			}
+			WaterMeshManager.Add(this);
+		}).CallDeferred();
 	}
 }

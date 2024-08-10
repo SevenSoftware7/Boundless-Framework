@@ -1,6 +1,5 @@
 namespace LandlessSkies.Core;
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +16,7 @@ public sealed class AttributeModifierCollection : ICollection<AttributeModifier>
 	// Ideally, this would be of type Action<EntityAttribute>? so we can optimize when we refresh data,
 	// But Godot Signals don't play nice with Lambdas so we can't inject parameters in the event invocations.
 	// -----> https://github.com/godotengine/godot/issues/76690
-	public event Action? OnModifiersUpdated;
+	public event System.Action? OnModifiersUpdated;
 
 
 	public float ApplyTo(EntityAttribute target, float baseValue) {
