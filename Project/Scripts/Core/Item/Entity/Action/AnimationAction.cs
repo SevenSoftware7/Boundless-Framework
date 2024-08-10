@@ -3,23 +3,29 @@ namespace LandlessSkies.Core;
 using System;
 using System.Collections.Generic;
 using Godot;
+using SevenDev.Utility;
+
 
 /// <summary>
 /// An Attack that mainly functions as an Animation, with callback events.
 /// </summary>
-/// <param name="entity">Inherited from <see cref="EntityAction"/>.</param>
-/// <param name="weapon">Inherited from <see cref="Attack"/>.</param>
-/// <param name="library">The Animation library used to play the corresponding animation.</param>
-/// <param name="modifiers">Inherited from <see cref="EntityAction"/>.</param>
-public abstract partial class AnimationAttack(Entity entity, Weapon weapon, StringName library, IEnumerable<AttributeModifier>? modifiers = null) : Attack(entity, weapon, modifiers) {
-
+/// <param name="entity">Inherited from <see cref="Action"/>.</param>
+/// <param name="path">The AnimationPath used to play the corresponding animation.</param>
+/// <param name="modifiers">Inherited from <see cref="Action"/>.</param>
+public abstract partial class AnimationAction(Entity entity, AnimationPath path, IEnumerable<AttributeModifier>? modifiers = null) : Action(entity, modifiers) {
 	public override bool IsCancellable => _isCancellable;
 	private bool _isCancellable = false;
 
 	public override bool IsInterruptable => _isInterruptable;
 	private bool _isInterruptable = false;
 
-	protected abstract StringName AnimationName { get; }
+	private AnimationPlayer AnimPlayer = entity.AnimationPlayer is AnimationPlayer animPlayer
+		? animPlayer
+		: throw new InvalidOperationException($"Could not initialize AnimationAction, because no AnimationPlayer could be found");
+	protected AnimationPath AnimationPath = path;
+
+
+
 
 
 	/// <summary>
@@ -51,41 +57,34 @@ public abstract partial class AnimationAttack(Entity entity, Weapon weapon, Stri
 	protected virtual void _SetInterruptable(bool interruptable) { }
 
 
-	private void OnStarted(StringName name) {
-		if (name != GetAnimationPath(library, AnimationName)) Stop();
+	private void OnAnimationStarted(StringName path) {
+		if (path != AnimationPath) Stop();
 	}
-	private void OnChanged(StringName oldName, StringName newName) {
+	private void OnAnimationChanged(StringName oldName, StringName newName) {
 		Stop();
 	}
-	private void OnFinished(StringName name) {
+	private void OnAnimationFinished(StringName name) {
 		Stop();
 	}
 
 
 	protected override void _Start() {
-		if (Entity.AnimationPlayer is null) {
-			GD.PushError($"Could not start {GetType().Name} AnimationAttack, because no AnimationPlayer could be found");
-			Stop();
-			return;
-		}
-
-		Entity.AnimationPlayer.Stop();
+		GD.Print($"Starting animation: {AnimationPath}");
+		AnimPlayer.Stop();
 		try {
-			Entity.AnimationPlayer.Play(GetAnimationPath(library, AnimationName));
-			Entity.AnimationPlayer.AnimationStarted += OnStarted;
-			Entity.AnimationPlayer.AnimationChanged += OnChanged;
-			Entity.AnimationPlayer.AnimationFinished += OnFinished;
+			AnimPlayer.Play(AnimationPath);
+			AnimPlayer.AnimationStarted += OnAnimationStarted;
+			AnimPlayer.AnimationChanged += OnAnimationChanged;
+			AnimPlayer.AnimationFinished += OnAnimationFinished;
 		}
 		catch (Exception e) {
-			GD.PushError($"{GetType().Name} AnimationAttack error: {e}");
+			GD.PushError($"{GetType().Name} AnimationAction error: {e}");
 			Stop();
 		}
 	}
 	protected override void _Stop() {
-		if (Entity.AnimationPlayer is null) return;
-
-		if (Entity.AnimationPlayer.CurrentAnimation == GetAnimationPath(library, AnimationName)) {
-			Entity.AnimationPlayer.Stop();
+		if (AnimPlayer.CurrentAnimation == AnimationPath) {
+			AnimPlayer.Stop();
 		}
 	}
 }

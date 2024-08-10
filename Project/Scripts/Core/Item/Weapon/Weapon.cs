@@ -11,10 +11,14 @@ using SevenDev.Utility;
 /// </summary>
 [Tool]
 [GlobalClass]
-public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, IPlayerHandler, IInjectable<Skeleton3D?>, IInjectable<Handedness>, IInjectable<WeaponHolsterState> {
+public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, IInjectable<Entity?>, IInjectable<Skeleton3D?>, IInjectable<Handedness>, IInjectable<WeaponHolsterState> {
+	private static readonly StringName LeftWeapon = "LeftWeapon";
+	private static readonly StringName RightWeapon = "RightWeapon";
+	private static readonly StringName LeftHand = "LeftHand";
+	private static readonly StringName RightHand = "RightHand";
+
 	public static readonly Basis rightHandBoneBasis = Basis.FromEuler(new(Mathfs.Deg2Rad(-90f), 0f, Mathfs.Deg2Rad(-90f)));
 	public static readonly Basis leftHandBoneBasis = Basis.FromEuler(new(Mathfs.Deg2Rad(-90f), 0f, Mathfs.Deg2Rad(90f)));
-
 
 	public WeaponHolsterState HolsterState {
 		get => _holsterState;
@@ -41,18 +45,19 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 	public abstract WeaponSize Size { get; }
 
 
+
 	[Export]
 	public AnimationLibrary? AnimationLibrary {
 		get => _animationLibrary;
 		set {
 			_animationLibrary = value;
-			LibraryName = _animationLibrary?.GetFileName() ?? "";
+			LibraryName = _animationLibrary?.ResourceName ?? "";
 		}
 	}
 	private AnimationLibrary? _animationLibrary;
-	protected StringName LibraryName { get; private set; } = "";
 
-	private AnimationPlayer? animPlayer;
+	public StringName LibraryName { get; protected set; } = "";
+
 
 
 	[Export] private string _displayName = string.Empty;
@@ -66,8 +71,10 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 
 
 	[ExportGroup("Dependencies")]
-	[Export] public virtual Handedness Handedness { get; protected set; }
-	[Export] public virtual Skeleton3D? Skeleton { get; protected set; }
+
+	public virtual Entity? Entity { get; protected set; }
+	public virtual Skeleton3D? Skeleton { get; protected set; }
+	public virtual Handedness Handedness { get; protected set; }
 
 	public int Style {
 		get => _style;
@@ -79,10 +86,12 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 	[Signal] public delegate void CostumeChangedEventHandler(WeaponCostume? newCostume, WeaponCostume? oldCostume);
 
 
-	protected Weapon() : base() { }
-	public Weapon(WeaponCostume? costume = null) {
+	protected Weapon() : this(null) { }
+	public Weapon(WeaponCostume? costume = null) : base() {
 		CostumeHolder = new CostumeHolder(costume).ParentTo(this);
 	}
+
+	public abstract Vector3 GetTipPosition();
 
 
 	public virtual List<ICustomization> GetCustomizations() => [];
@@ -96,28 +105,38 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 
 	public ISaveData<IWeapon> Save() => new WeaponSaveData<Weapon>(this);
 
+	public virtual void Inject(Entity? entity) {
+		if (AnimationLibrary is null || entity == Entity) {
+			Entity = entity;
+			Inject(entity?.Skeleton);
+			Inject(entity?.Handedness ?? default);
+			return;
+		}
+
+		AnimationPlayer? animPlayer = Entity?.AnimationPlayer;
+		if (animPlayer is not null && animPlayer.HasAnimationLibrary(LibraryName)) {
+			animPlayer.Stop(); // Prevents AccessViolationException
+			GD.Print($"Removing Library {LibraryName}");
+			animPlayer.RemoveAnimationLibrary(LibraryName);
+		}
+
+		Entity = entity;
+		Inject(entity?.Skeleton);
+		Inject(entity?.Handedness ?? default);
+
+		animPlayer = Entity?.AnimationPlayer;
+		if (animPlayer is not null && !animPlayer.HasAnimationLibrary(LibraryName)) {
+			GD.Print($"Adding Library {LibraryName}");
+			animPlayer.AddAnimationLibrary(LibraryName, AnimationLibrary);
+		}
+	}
 	public virtual void Inject(Skeleton3D? skeleton) => Skeleton = skeleton;
 	public virtual void Inject(Handedness handedness) => Handedness = handedness;
 	public virtual void Inject(WeaponHolsterState value) => HolsterState = value;
-
-
-	public virtual void HandlePlayer(Player player) {
-		if (animPlayer is null && player.Entity?.AnimationPlayer is not null && AnimationLibrary is not null) {
-			animPlayer = player.Entity.AnimationPlayer;
-
-			GD.Print($"Adding Library {LibraryName}");
-			if (!animPlayer.HasAnimationLibrary(LibraryName)) {
-				animPlayer.AddAnimationLibrary(LibraryName, AnimationLibrary);
-			}
-		}
-	}
-	public virtual void DisavowPlayer() {
-		if (animPlayer is not null && AnimationLibrary is not null) {
-			if (animPlayer.HasAnimationLibrary(LibraryName)) {
-				animPlayer.RemoveAnimationLibrary(LibraryName);
-			}
-
-			animPlayer = null;
+	public virtual void RequestInjection() {
+		if (!this.RequestInjection<Entity?>()) {
+			this.RequestInjection<Skeleton3D?>();
+			this.RequestInjection<Handedness>();
 		}
 	}
 
@@ -127,8 +146,8 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 
 
 		string boneName = Handedness switch {
-			Handedness.Left => "LeftWeapon",
-			Handedness.Right or _ => "RightWeapon",
+			Handedness.Left => LeftWeapon,
+			Handedness.Right or _ => RightWeapon,
 		};
 		if (Skeleton.TryGetBoneTransform(boneName, out Transform3D weaponBoneTransform)) {
 			GlobalTransform = weaponBoneTransform;
@@ -136,8 +155,8 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 		}
 
 		boneName = Handedness switch {
-			Handedness.Left => "LeftHand",
-			Handedness.Right or _ => "RightHand",
+			Handedness.Left => LeftHand,
+			Handedness.Right or _ => RightHand,
 		};
 		if (Skeleton.TryGetBoneTransform(boneName, out Transform3D handBoneTransform)) {
 			GlobalTransform = handBoneTransform with { Basis = handBoneTransform.Basis * (Handedness == Handedness.Right ? rightHandBoneBasis : leftHandBoneBasis) };
@@ -147,21 +166,17 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 		GlobalTransform = Skeleton.GlobalTransform;
 	}
 
+	public override void _Ready() {
+		base._Ready();
 
-	public override void _Notification(int what) {
-		base._Notification(what);
-		switch ((ulong)what) {
-			case NotificationPathRenamed:
-				if (IsNodeReady()) {
-					this.RequestInjection<Skeleton3D?>();
-					this.RequestInjection<Handedness>();
-				}
-				break;
+		if (GetParent()?.IsNodeReady() ?? false) {
+			RequestInjection();
 		}
 	}
 
 	public override void _Process(double delta) {
 		base._Process(delta);
+			RequestReady();
 
 		if (/* OnHand */true) {
 			StickToSkeletonBone();
@@ -170,7 +185,5 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 
 
 	[Serializable]
-	public class WeaponSaveData<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] T>(T weapon) : CostumableSaveData<T, WeaponCostume>(weapon) where T : Weapon {
-
-	}
+	public class WeaponSaveData<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] T>(T weapon) : CostumableSaveData<T, WeaponCostume>(weapon) where T : Weapon;
 }

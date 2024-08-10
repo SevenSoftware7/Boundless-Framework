@@ -28,7 +28,8 @@ public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
 	private Color _deepColor = new(0f, 0f, 1f, 1f);
 
 
-	[Export] public float WaterIntensity {
+	[Export]
+	public float WaterIntensity {
 		get => _waterIntensity;
 		set {
 			_waterIntensity = value;
@@ -39,7 +40,8 @@ public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
 	}
 	private float _waterIntensity = 1f;
 
-	[Export] public float WaterScale {
+	[Export]
+	public float WaterScale {
 		get => _waterScale;
 		set {
 			_waterScale = value;
@@ -50,7 +52,8 @@ public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
 	}
 	private float _waterScale = 70f;
 
-	[Export] public float FogDistance {
+	[Export]
+	public float FogDistance {
 		get => _fogDistance;
 		set {
 			_fogDistance = value;

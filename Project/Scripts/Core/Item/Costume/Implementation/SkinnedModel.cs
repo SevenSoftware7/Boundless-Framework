@@ -8,8 +8,8 @@ public partial class SkinnedModel : Model, IInjectable<Skeleton3D?>, IInjectable
 	[Export] protected GeometryInstance3D Model { get; private set; } = null!;
 
 	[ExportGroup("Dependencies")]
-	[Export] public Skeleton3D? Skeleton { get; private set; }
-	[Export] public Handedness Handedness { get; private set; }
+	public Skeleton3D? Skeleton { get; private set; }
+	public Handedness Handedness { get; private set; }
 
 
 	protected SkinnedModel() : base() { }
@@ -33,6 +33,11 @@ public partial class SkinnedModel : Model, IInjectable<Skeleton3D?>, IInjectable
 		meshInstance.Skeleton = meshInstance.GetPathTo(Skeleton);
 	}
 
+	public void RequestInjection() {
+		this.RequestInjection<Skeleton3D?>();
+		this.RequestInjection<Handedness>();
+	}
+
 
 	public override void _Process(double delta) {
 		base._Process(delta);
@@ -43,21 +48,9 @@ public partial class SkinnedModel : Model, IInjectable<Skeleton3D?>, IInjectable
 
 	public override void _Ready() {
 		base._Ready();
-		if (IsInsideTree()) {
-			this.RequestInjection<Skeleton3D?>();
-			this.RequestInjection<Handedness>();
-		}
-	}
 
-	public override void _Notification(int what) {
-		base._Notification(what);
-		switch ((ulong)what) {
-			case NotificationParented:
-				if (IsNodeReady()) {
-					this.RequestInjection<Skeleton3D?>();
-					this.RequestInjection<Handedness>();
-				}
-				break;
+		if (GetParent()?.IsNodeReady() ?? false) {
+			RequestInjection();
 		}
 	}
 }

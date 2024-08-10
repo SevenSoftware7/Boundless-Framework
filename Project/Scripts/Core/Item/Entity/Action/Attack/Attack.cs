@@ -11,52 +11,63 @@ using SevenDev.Utility;
 /// <param name="entity">Inherited from <see cref="Action"/>.</param>
 /// <param name="weapon">The Weapon which will be used in the Attack.</param>
 /// <param name="modifiers">Inherited from <see cref="Action"/>.</param>
-public abstract partial class Attack(Entity entity, Weapon weapon, IEnumerable<AttributeModifier>? modifiers = null) : Action(entity, modifiers) {
+public abstract partial class Attack(Entity entity, Weapon weapon, AnimationPath path, IEnumerable<AttributeModifier>? modifiers = null) : AnimationAction(entity, path, modifiers) {
+	private readonly List<DamageArea?> damageAreas = [];
+
 	public Weapon Weapon { get; private set; } = weapon;
+
 
 	protected static StringName GetAnimationPath(StringName library, StringName attack) => library.IsEmpty ? attack : $"{library}/{attack}";
 
-	public void CreateHitBox(float damage, Vector3 size, Vector3 position, bool parented, ulong lifeTime = 0) {
-		DamageArea hitArea = CreateHurtArea(damage, lifeTime);
-		if (parented) {
-			hitArea.ParentTo(Weapon);
-			hitArea.Transform = new() {
-				Origin = position,
-				Basis = Basis.Identity
-			};
-		}
-		else {
-			hitArea.GlobalTransform = new() {
-				Origin = Weapon.GlobalTransform * position,
-				Basis = Weapon.GlobalBasis
-			};
-		}
+	public void CreateHitBox(DamageAreaBuilder builder) {
+		DamageArea hitArea = builder.Build(this);
 
-		AddCollisionShapes(hitArea, size);
-	}
+		damageAreas.Add(hitArea);
+		hitArea.OnDestroy += () => {
+			int index = damageAreas.IndexOf(hitArea);
+			if (index < 0) return;
 
-
-	public virtual DamageArea CreateHurtArea(float damage, ulong lifeTime) {
-		return new(lifeTime) {
-			Damage = damage,
-			DamageDealer = Entity as IDamageDealer,
+			damageAreas[index] = null!; // Replace by null to keep the index order intact
 		};
 	}
 
-	public virtual void AddCollisionShapes(DamageArea damageArea, Vector3 size) {
-		new CollisionShape3D() {
-			Shape = new BoxShape3D() {
-				Size = size,
-			}
-		}.ParentTo(damageArea);
+	/// <summary>
+	/// Method to enable or disable an Attack hitbox's Parriability, mainly for Animations, but can be used via script too.
+	/// </summary>
+	/// <param name="parriable">Whether the Attack hitbox should be parriable</param>
+	public void SetParriable(bool parriable, int damageAreaIndex) {
+		if (damageAreaIndex > damageAreas.Count) return;
+		DamageArea? damageArea = damageAreas[damageAreaIndex];
+		if (damageArea is null) return;
 
-		new MeshInstance3D() {
-			Mesh = new BoxMesh() {
-				Size = size
-			}
-		}.ParentTo(damageArea);
+		damageArea.Parriable = parriable;
+		_SetParriable(parriable, damageArea);
 	}
+	/// <summary>
+	/// Callback method when updating the Parriability of an Attack hitbox
+	/// </summary>
+	/// <param name="parriable">Whether the attack hitbox was set to be parriable or not</param>
+	/// <param name="damageArea">The DamageArea which had its parriability changed</param>
+	protected virtual void _SetParriable(bool parriable, DamageArea damageArea) { }
 
+	/// <summary>
+	/// Method to enable or disable an Attack hitbox's ability to parry others, mainly for Animations, but can be used via script too.
+	/// </summary>
+	/// <param name="canParry">Whether the Attack hitbox should be able to Parry other Attacks</param>
+	public void SetCanParry(bool canParry, int damageAreaIndex) {
+		if (damageAreaIndex > damageAreas.Count) return;
+		DamageArea? damageArea = damageAreas[damageAreaIndex];
+		if (damageArea is null) return;
+
+		damageArea.CanParry = canParry;
+		_SetCanParry(canParry, damageArea);
+	}
+	/// <summary>
+	/// Callback method when updating the ability of an Attack hitbox to Parry other Attacks
+	/// </summary>
+	/// <param name="canParry">Whether the attack hitbox was set to be able to Parry or not</param>
+	/// <param name="damageArea">The DamageArea which had its ability to Parry changed</param>
+	protected virtual void _SetCanParry(bool canParry, DamageArea damageArea) { }
 
 
 	[Flags]

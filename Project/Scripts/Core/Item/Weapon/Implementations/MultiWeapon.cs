@@ -10,7 +10,7 @@ using SevenDev.Utility;
 
 [Tool]
 [GlobalClass]
-public sealed partial class MultiWeapon : WeaponCollection, IInjectionInterceptor<WeaponHolsterState>, IInjectable<WeaponHolsterState> {
+public sealed partial class MultiWeapon : WeaponCollection, IInjectionInterceptor<WeaponHolsterState> {
 	private List<IWeapon> _weapons = [];
 	public IWeapon? CurrentWeapon {
 		get => IndexInBounds(_currentIndex) ? _weapons[_currentIndex] : null;
@@ -97,9 +97,10 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 	}
 
 
-	public void Inject(WeaponHolsterState value) => HolsterState = value;
-	public WeaponHolsterState Intercept(Node child, WeaponHolsterState value) =>
-		child == CurrentWeapon ? value : WeaponHolsterState.Holstered;
+	public WeaponHolsterState Intercept(Node child, WeaponHolsterState value) {
+		HolsterState = value;
+		return child == CurrentWeapon ? value : WeaponHolsterState.Holstered;
+	}
 
 
 	public override List<ICustomization> GetCustomizations() => base.GetCustomizations();

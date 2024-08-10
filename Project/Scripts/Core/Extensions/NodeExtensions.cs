@@ -7,6 +7,13 @@ using Godot;
 
 public static class NodeExtensions {
 
+	public static T SafeRename<T>(this T node, StringName name) where T : Node {
+		if (node.Name != name) {
+			node.Name = name;
+		}
+		return node;
+	}
+
 	public static bool IsEnabled(this Node node) => node.ProcessMode == Node.ProcessModeEnum.Inherit || node.ProcessMode == Node.ProcessModeEnum.Always;
 
 	public static void Enable(this Node node) {
@@ -132,7 +139,7 @@ public static class NodeExtensions {
 
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static T SafeReparentToAndRename<T>(this T child, Node? newParent, StringName name, bool keepGlobalTransform = true) where T : Node {
+	public static T SafeReparentAndRename<T>(this T child, Node? newParent, StringName name, bool keepGlobalTransform = true) where T : Node {
 		if (child.GetParent() == newParent) return child;
 
 		if (!child.IsInsideTree()) {
@@ -140,13 +147,13 @@ public static class NodeExtensions {
 		}
 		if (child.GetParent() is null) {
 			newParent?.AddChild(child);
-			child.Name = name;
+			child.SafeRename(name);
 			return child;
 		}
 
 		if (newParent is not null) {
 			child.Reparent(newParent, keepGlobalTransform);
-			child.Name = name;
+			child.SafeRename(name);
 		}
 		return child;
 	}

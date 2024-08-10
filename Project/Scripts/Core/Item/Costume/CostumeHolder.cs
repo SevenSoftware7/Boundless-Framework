@@ -8,7 +8,8 @@ using SevenDev.Utility;
 public partial class CostumeHolder : Node3D, ISerializationListener {
 	public Model? Model { get; private set; }
 
-	[Export] public Costume? Costume {
+	[Export]
+	public Costume? Costume {
 		get => _costume;
 		set => SetCostume(value);
 	}

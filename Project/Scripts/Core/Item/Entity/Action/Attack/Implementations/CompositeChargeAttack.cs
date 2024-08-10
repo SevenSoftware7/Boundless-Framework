@@ -7,14 +7,15 @@ using SevenDev.Utility;
 /// <summary>
 /// A Charge Attack composed of two Attacks, with a determinate charge time.
 /// </summary>
-/// <param name="entity">Inherited from <see cref="EntityAction"/>.</param>
+/// <param name="entity">Inherited from <see cref="Action"/>.</param>
 /// <param name="weapon">Inherited from <see cref="Attack"/>.</param>
 /// <param name="library">The Animation Library of the attacks</param>
 /// <param name="info">The Composite Charge Attack Parameters to use when setting up the Charge Attack</param>
-/// <param name="modifiers">Inherited from <see cref="EntityAction"/>.</param>
-public partial class CompositeChargeAttack(Entity entity, Weapon weapon, StringName library, CompositeChargeAttackInfo info, IEnumerable<AttributeModifier>? modifiers = null) : ChargeAttack(entity, weapon, modifiers) {
+/// <param name="modifiers">Inherited from <see cref="Action"/>.</param>
+public partial class CompositeChargeAttack(Entity entity, Weapon weapon, AnimationPath animationPath, CompositeChargeAttackInfo info, IEnumerable<AttributeModifier>? modifiers = null) : ChargeAttack(entity, weapon, animationPath, modifiers) {
 	private readonly TimeDuration chargeTime = new(true, info.ChargeDuration);
 	private bool isDone;
+
 
 
 	protected sealed override bool IsChargeStopped(InputDevice inputDevice) => !inputDevice.IsActionPressed(info.ActionInput);
@@ -28,12 +29,12 @@ public partial class CompositeChargeAttack(Entity entity, Weapon weapon, StringN
 
 	protected override void _Attack() {
 		if (isDone) {
-			Entity.ExecuteAction(new AttackBuilder(info.ChargedAttack, Weapon, library), true);
+			Entity.ExecuteAction(new AttackBuilder(info.ChargedAttack, Weapon), true);
 			_ChargedAttack();
 			GD.Print("Full Charge Attack");
 		}
 		else {
-			Entity.ExecuteAction(new AttackBuilder(info.UnchargedAttack, Weapon, library), true);
+			Entity.ExecuteAction(new AttackBuilder(info.UnchargedAttack, Weapon), true);
 			_UnchargedAttack();
 			GD.Print("Premature Charge Attack");
 		}

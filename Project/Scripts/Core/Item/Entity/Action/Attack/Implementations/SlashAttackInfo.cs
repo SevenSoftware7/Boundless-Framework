@@ -7,5 +7,5 @@ public sealed class SlashAttackInfo : AttackInfo {
 
 	private SlashAttackInfo() : base() { }
 
-	protected internal override SlashAttack Create(Entity entity, Weapon weapon, StringName library) => new(entity, weapon, library);
+	protected internal override SlashAttack Create(Entity entity, Weapon weapon) => new(entity, weapon);
 }

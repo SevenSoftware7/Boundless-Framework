@@ -3,11 +3,14 @@ namespace LandlessSkies.Core;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using SevenDev.Utility;
+
 
 [Tool]
 [GlobalClass]
-public partial class ArmedEntity : Entity, IDamageDealer {
+public partial class ArmedEntity : Entity, IDamageDealer, ISerializationListener {
 	private readonly List<int> styleSwitchBuffer = [];
+
 
 	[ExportGroup("Weapon")]
 	public IWeapon? Weapon {
@@ -15,7 +18,7 @@ public partial class ArmedEntity : Entity, IDamageDealer {
 		set {
 			_weapon = value;
 			if (_weapon is Node nodeWeapon) {
-				nodeWeapon.Name = "Weapon";
+				nodeWeapon.SafeRename("Weapon");
 			}
 		}
 	}
@@ -86,8 +89,15 @@ public partial class ArmedEntity : Entity, IDamageDealer {
 		base._Notification(what);
 		switch ((ulong)what) {
 			case NotificationChildOrderChanged:
-				Weapon = GetChildren().OfType<IWeapon>().FirstOrDefault();
+				GetWeapon();
 				break;
 		}
 	}
+
+	public override void OnAfterDeserialize() {
+		base.OnAfterDeserialize();
+		GetWeapon();
+	}
+
+	private void GetWeapon() => Weapon = GetChildren().OfType<IWeapon>().FirstOrDefault();
 }

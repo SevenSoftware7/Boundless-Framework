@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AttackHitboxBuilder" load_steps=2 format=3 uid="uid://dmixbdjpq1yyt"]
+
+[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Action/Attack/AttackHitboxBuilder.cs" id="1_inc3j"]
+
+[resource]
+script = ExtResource("1_inc3j")
+Damage = 1.0
+Offset = Vector3(0, -0.2, 0)
+Size = Vector3(0.25, 2.75, 1.25)
+Bound = 1
+Attached = true
+LifeTime = 250
+Parriable = true
+CanParry = true

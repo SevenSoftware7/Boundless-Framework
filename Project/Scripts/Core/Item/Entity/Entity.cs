@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using KGySoft.CoreLibraries;
+using LandlessSkies.Vanilla;
 using SevenDev.Utility;
 
 /// <summary>
@@ -13,7 +14,7 @@ using SevenDev.Utility;
 /// </summary>
 [Tool]
 [GlobalClass]
-public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICostumable, ICustomizable, ISaveable<Entity>, IInjectionProvider<Entity?>, IInjectionProvider<Skeleton3D?>, IInjectionProvider<Handedness> {
+public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICostumable, ICustomizable, ISaveable<Entity>, IInjectionProvider<Entity?>, IInjectionProvider<Skeleton3D?>, IInjectionProvider<Handedness>, ISerializationListener {
 	public readonly List<Vector3> RecoverLocationBuffer = [];
 	public const int RECOVER_LOCATION_BUFFER_SIZE = 5;
 
@@ -85,7 +86,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 	[ExportGroup("State")]
 	[Export] public Action? CurrentAction { get; private set; }
 	[Export] public EntityBehaviour? CurrentBehaviour { get; private set; }
-	[Export] private Godot.Collections.Array<AttributeModifier> _attributeModifiers {
+	[Export]
+	private Godot.Collections.Array<AttributeModifier> _attributeModifiers {
 		get => [.. AttributeModifiers, null];
 		set => AttributeModifiers.Set([.. value.Where(a => a is not null)]);
 	}
@@ -154,8 +156,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 
 		action.AfterExecute += () => CurrentAction = null;
 
-		CurrentAction = action.Build(this).ParentTo(this);
-		CurrentAction.Name = "Action";
+		CurrentAction = action.Build(this).ParentTo(this).SafeRename("Action");
 
 		CurrentAction.Start();
 
@@ -178,7 +179,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 
 		if (behaviour is null) return;
 
-		CurrentBehaviour = behaviour.SafeReparentToAndRename(this, "Behaviour");
+		CurrentBehaviour = behaviour.SafeReparentAndRename(this, "Behaviour");
 
 		behaviour.Start(oldBehaviour);
 	}
@@ -287,6 +288,17 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 	Entity? IInjectionProvider<Entity?>.GetInjection() => this;
 	Skeleton3D? IInjectionProvider<Skeleton3D?>.GetInjection() => Skeleton;
 	Handedness IInjectionProvider<Handedness>.GetInjection() => Handedness;
+
+	public virtual void OnBeforeSerialize() { }
+
+	public virtual void OnAfterDeserialize() {
+		Callable.From(() => {
+			this.PropagateInject<Entity?>();
+			this.PropagateInject<Skeleton3D?>();
+			this.PropagateInject<Handedness>();
+		}).CallDeferred();
+	}
+
 
 	[Serializable]
 	public class EntitySaveData<T>(T entity) : CostumableSaveData<Entity, EntityCostume>(entity) where T : Entity {

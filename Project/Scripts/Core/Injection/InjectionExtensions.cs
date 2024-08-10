@@ -24,21 +24,20 @@ public static class InjectionExtensions {
 	}
 
 
-	public static void RequestInjection<T>(this IInjectable<T> requester) {
-		if (requester is not Node nodeRequester) return;
+	public static bool RequestInjection<T>(this IInjectable<T> requester) {
+		if (requester is not Node nodeRequester) return false;
 
 		requester.Inject(default!);
-		nodeRequester.PropagateInject<T>(default!);
 
-		nodeRequester.GetParent()?.RequestInjection<T>();
+		return nodeRequester.GetParent()?.RequestInjection<T>() ?? false;
 	}
 
-	private static void RequestInjection<T>(this Node requester) {
+	private static bool RequestInjection<T>(this Node requester) {
 		if (requester is not IInjectionProvider<T> provider) {
-			requester.GetParent().RequestInjection<T>();
-			return;
+			return requester.GetParent()?.RequestInjection<T>() ?? false;
 		}
 
 		provider.PropagateInject();
+		return true;
 	}
 }
