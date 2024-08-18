@@ -148,7 +148,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 	}
 
 
-	public bool ExecuteAction(ActionBuilder action, bool forceExecute = false) {
+	public bool ExecuteAction(Action.Wrapper action, bool forceExecute = false) {
 		if (!forceExecute && !CurrentAction.CanCancel()) return false;
 
 		CurrentAction?.Stop();

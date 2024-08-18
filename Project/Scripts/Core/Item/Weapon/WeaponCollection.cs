@@ -22,7 +22,7 @@ public abstract partial class WeaponCollection : Node, IWeapon, ISerializationLi
 	protected abstract void UpdateWeapons();
 
 
-	public virtual IEnumerable<AttackBuilder> GetAttacks(Entity target) => [];
+	public virtual IEnumerable<Attack.Wrapper> GetAttacks(Entity target) => [];
 
 	public virtual List<ICustomization> GetCustomizations() => [];
 	public virtual List<ICustomizable> GetSubCustomizables() => [];

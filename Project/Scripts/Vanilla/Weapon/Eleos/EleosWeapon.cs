@@ -7,8 +7,8 @@ using Godot;
 [Tool]
 [GlobalClass]
 public sealed partial class EleosWeapon : Weapon, IPlayerHandler {
-	private readonly CompositeChargeAttackInfo chargeAttack = new(
-		SlashAttackInfo.Instance, SlashAttackInfo.Instance,
+	private readonly CompositeChargeAttack.Builder chargeAttack = new(
+		SlashAttack.Builder.Instance, SlashAttack.Builder.Instance,
 		"Charge",
 		Inputs.AttackHeavy, 750,
 		[new PercentileModifier(Attributes.GenericMoveSpeed, -0.7f), new PercentileModifier(Attributes.GenericjumpHeight, -0.5f)]
@@ -26,10 +26,10 @@ public sealed partial class EleosWeapon : Weapon, IPlayerHandler {
 	public override Vector3 GetTipPosition() => new(0f, 5.3f, 0f);
 
 
-	public override IEnumerable<AttackBuilder> GetAttacks(Entity target) {
+	public override IEnumerable<Attack.Wrapper> GetAttacks(Entity target) {
 		return [
-			new AttackBuilder(SlashAttackInfo.Instance, this),
-			new AttackBuilder(chargeAttack, this)
+			new Attack.Wrapper(SlashAttack.Builder.Instance, this),
+			new Attack.Wrapper(chargeAttack, this)
 		];
 	}
 
@@ -40,7 +40,7 @@ public sealed partial class EleosWeapon : Weapon, IPlayerHandler {
 		switch (player.Entity.CurrentBehaviour) {
 			case GroundedBehaviour grounded:
 				if (player.InputDevice.IsActionJustPressed(Inputs.AttackLight)) {
-					player.Entity.ExecuteAction(new AttackBuilder(SlashAttackInfo.Instance, this));
+					player.Entity.ExecuteAction(new Attack.Wrapper(SlashAttack.Builder.Instance, this));
 				}
 
 				chargeAttack.ExecuteOnKeyJustPressed(player, this);

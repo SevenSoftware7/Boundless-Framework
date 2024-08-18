@@ -1,8 +1,6 @@
 namespace LandlessSkies.Core;
 
 using Godot;
-using SevenDev.Utility;
-
 
 public sealed partial class SlashAttack(Entity entity, Weapon weapon) : Attack(entity, weapon, new(weapon.LibraryName, "Slash"), [slowRotation, slowMovement, lowGravity]) {
 	private static readonly AttributeModifier slowRotation = new MultiplicativeModifier(Attributes.GenericTurnSpeed, 0.175f);
@@ -12,5 +10,15 @@ public sealed partial class SlashAttack(Entity entity, Weapon weapon) : Attack(e
 	protected override void _Start() {
 		base._Start();
 		GD.Print($"{Weapon.DisplayName} Slash Attack (from {Entity.Name})");
+	}
+
+
+
+	public new sealed class Builder : Attack.Builder {
+		public static readonly Builder Instance = new();
+
+		private Builder() : base() { }
+
+		protected internal override SlashAttack Create(Entity entity, Weapon weapon) => new(entity, weapon);
 	}
 }

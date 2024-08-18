@@ -84,15 +84,31 @@ public abstract partial class Attack(Entity entity, Weapon weapon, AnimationPath
 
 
 	public static class Comparers {
-		public static readonly IComparer<AttackInfo> PureDamage = new ComparisonComparer<AttackInfo>(
+		public static readonly IComparer<Builder> PureDamage = new ComparisonComparer<Builder>(
 			(a, b) => a?.PotentialDamage.CompareTo(b?.PotentialDamage ?? 0) ?? 0
 		);
+	}
+
+
+
+	public abstract class Builder() {
+		public float PotentialDamage { get; }
+		public AttackType Type { get; }
+
+		protected internal abstract Attack Create(Entity entity, Weapon weapon);
+	}
+
+	public new sealed class Wrapper(Builder info, Weapon weapon) : Action.Wrapper() {
+		public readonly Builder Info = info;
+		public readonly Weapon Weapon = weapon;
+
+		protected internal override Attack Create(Entity entity) => Info.Create(entity, Weapon);
 	}
 }
 
 
 public static class AttackExtensions {
-	public static AttackInfo SelectAttack(this AttackInfo[] attacks, IComparer<AttackInfo> priority, float skillLevel = 0.5f) {
+	public static Attack.Builder SelectAttack(this Attack.Builder[] attacks, IComparer<Attack.Builder> priority, float skillLevel = 0.5f) {
 		skillLevel = Mathf.Clamp(skillLevel, 0, 1);
 
 		Array.Sort(attacks, priority);

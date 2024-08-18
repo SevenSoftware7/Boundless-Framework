@@ -18,9 +18,9 @@ public sealed partial class EpiphronWeapon : Weapon, IPlayerHandler {
 
 	public override Vector3 GetTipPosition() => new(0f, 1.6f, 0f);
 
-	public override IEnumerable<AttackBuilder> GetAttacks(Entity target) {
+	public override IEnumerable<Attack.Wrapper> GetAttacks(Entity target) {
 		return [
-			new AttackBuilder(SlashAttackInfo.Instance, this),
+			new Attack.Builder(SlashAttackInfo.Instance, this),
 		];
 	}
 
@@ -32,7 +32,7 @@ public sealed partial class EpiphronWeapon : Weapon, IPlayerHandler {
 		switch (player.Entity.CurrentBehaviour) {
 			case GroundedBehaviour grounded:
 				if (player.InputDevice.IsActionJustPressed(Inputs.AttackLight)) {
-					player.Entity.ExecuteAction(new AttackBuilder(SlashAttackInfo.Instance, this));
+					player.Entity.ExecuteAction((Action.Wrapper)new Attack.Builder(SlashAttackInfo.Instance, this));
 				}
 				break;
 		}

@@ -12,7 +12,7 @@ using SevenDev.Utility;
 /// <param name="library">The Animation Library of the attacks</param>
 /// <param name="info">The Composite Charge Attack Parameters to use when setting up the Charge Attack</param>
 /// <param name="modifiers">Inherited from <see cref="Action"/>.</param>
-public partial class CompositeChargeAttack(Entity entity, Weapon weapon, AnimationPath animationPath, CompositeChargeAttackInfo info, IEnumerable<AttributeModifier>? modifiers = null) : ChargeAttack(entity, weapon, animationPath, modifiers) {
+public partial class CompositeChargeAttack(Entity entity, Weapon weapon, AnimationPath animationPath, CompositeChargeAttack.Builder info, IEnumerable<AttributeModifier>? modifiers = null) : ChargeAttack(entity, weapon, animationPath, modifiers) {
 	private readonly TimeDuration chargeTime = new(true, info.ChargeDuration);
 	private bool isDone;
 
@@ -29,12 +29,12 @@ public partial class CompositeChargeAttack(Entity entity, Weapon weapon, Animati
 
 	protected override void _Attack() {
 		if (isDone) {
-			Entity.ExecuteAction(new AttackBuilder(info.ChargedAttack, Weapon), true);
+			Entity.ExecuteAction(new Wrapper(info.ChargedAttack, Weapon), true);
 			_ChargedAttack();
 			GD.Print("Full Charge Attack");
 		}
 		else {
-			Entity.ExecuteAction(new AttackBuilder(info.UnchargedAttack, Weapon), true);
+			Entity.ExecuteAction(new Wrapper(info.UnchargedAttack, Weapon), true);
 			_UnchargedAttack();
 			GD.Print("Premature Charge Attack");
 		}
@@ -57,5 +57,30 @@ public partial class CompositeChargeAttack(Entity entity, Weapon weapon, Animati
 		}
 
 		base.HandlePlayer(player);
+	}
+
+
+
+	public new sealed class Builder(Attack.Builder unchargedAttack, Attack.Builder chargedAttack, StringName AnimationName, StringName? actionKey = null, ulong? chargeDuration = null, IEnumerable<AttributeModifier>? modifiers = null) : ChargeAttack.Builder {
+		public Attack.Builder UnchargedAttack { get; init; } = unchargedAttack;
+		public Attack.Builder ChargedAttack { get; init; } = chargedAttack;
+
+
+		public StringName ActionInput { get; init; } = actionKey ?? Inputs.AttackLight;
+		public ulong ChargeDuration { get; init; } = chargeDuration ?? 1000;
+		public AnimationPath AnimationPath = new();
+
+
+
+		public void ExecuteOnKeyJustPressed(Player player, Weapon weapon) {
+			if (player.InputDevice.IsActionJustPressed(ActionInput)) {
+				player?.Entity?.ExecuteAction(new Wrapper(this, weapon));
+			}
+		}
+
+
+		protected internal override CompositeChargeAttack Create(Entity entity, Weapon weapon) {
+			return new CompositeChargeAttack(entity, weapon, new(weapon.LibraryName, AnimationName), this, modifiers);
+		}
 	}
 }

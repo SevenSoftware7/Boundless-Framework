@@ -82,7 +82,7 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 	}
 
 
-	public override IEnumerable<AttackBuilder> GetAttacks(Entity target) {
+	public override IEnumerable<Attack.Wrapper> GetAttacks(Entity target) {
 		IWeapon? currentWeapon = CurrentWeapon;
 		return _weapons
 			.SelectMany((w) => w?.GetAttacks(target) ?? [])

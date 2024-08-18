@@ -50,4 +50,14 @@ public partial class BipedJumpAction : JumpAction, IPlayerHandler {
 			remainingDistance -= travelDistance / maxDistance;
 		}
 	}
+
+
+
+	public new class Builder : JumpAction.Builder {
+		private static readonly float PotentialJumpHeight = 1f;
+		public override float PotentialHeight => PotentialJumpHeight;
+
+
+		protected internal override JumpAction Create(Entity entity, Vector3 direction) => new BipedJumpAction(entity, direction);
+	}
 }

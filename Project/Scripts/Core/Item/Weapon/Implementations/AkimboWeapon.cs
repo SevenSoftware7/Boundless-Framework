@@ -49,7 +49,7 @@ public sealed partial class AkimboWeapon : WeaponCollection, IInjectionIntercept
 		return list;
 	}
 
-	public override IEnumerable<AttackBuilder> GetAttacks(Entity target) {
+	public override IEnumerable<Attack.Wrapper> GetAttacks(Entity target) {
 		IWeapon? currentWeapon = MainWeapon;
 		return new IWeapon?[] { MainWeapon, SideWeapon }
 			.OfType<IWeapon>()

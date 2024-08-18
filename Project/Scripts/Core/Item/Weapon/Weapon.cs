@@ -101,7 +101,7 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 		return list;
 	}
 
-	public abstract IEnumerable<AttackBuilder> GetAttacks(Entity target);
+	public abstract IEnumerable<Attack.Wrapper> GetAttacks(Entity target);
 
 	public ISaveData<IWeapon> Save() => new WeaponSaveData<Weapon>(this);
 

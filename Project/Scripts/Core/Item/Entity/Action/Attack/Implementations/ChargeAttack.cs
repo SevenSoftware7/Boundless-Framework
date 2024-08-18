@@ -38,4 +38,10 @@ public abstract partial class ChargeAttack(Entity entity, Weapon weapon, Animati
 		}
 	}
 	public virtual void DisavowPlayer() { }
+
+
+
+	public new abstract class Builder : Attack.Builder {
+		protected internal abstract override ChargeAttack Create(Entity entity, Weapon weapon);
+	}
 }

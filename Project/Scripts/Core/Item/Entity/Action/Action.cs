@@ -81,4 +81,29 @@ public abstract partial class Action : Node {
 	/// Callback method when the Action is stopped, i.e. when it is destroyed
 	/// </summary>
 	protected virtual void _Stop() { }
+
+
+	/// <summary>
+	/// 	An Action Wrapper is a wrapper for use in configuration pre-execution, sets up and starts an Action.
+	/// 	<para>It is passed to <see cref="Entity.ExecuteAction(Wrapper, bool)"/> to execute the given Action.</para>
+	/// </summary>
+	public abstract class Wrapper {
+		public System.Action? BeforeExecute { get; set; }
+		public System.Action? AfterExecute { get; set; }
+
+		/// <summary>
+		/// Instantiates and sets up the Action, using the given Entity as the Target of the Action.
+		/// </summary>
+		/// <param name="entity">The Entity which will execute the Action</param>
+		/// <returns></returns>
+		protected internal abstract Action Create(Entity entity);
+
+		internal Action Build(Entity entity) {
+			Action action = Create(entity);
+			action.OnStart += BeforeExecute;
+			action.OnStop += AfterExecute;
+
+			return action;
+		}
+	}
 }
