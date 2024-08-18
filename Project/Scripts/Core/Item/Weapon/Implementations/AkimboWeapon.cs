@@ -51,7 +51,7 @@ public sealed partial class AkimboWeapon : WeaponCollection, IInjectionIntercept
 
 	public override IEnumerable<AttackBuilder> GetAttacks(Entity target) {
 		IWeapon? currentWeapon = MainWeapon;
-		return new List<IWeapon?>() { MainWeapon, SideWeapon }
+		return new IWeapon?[] { MainWeapon, SideWeapon }
 			.OfType<IWeapon>()
 			.SelectMany(w => w.GetAttacks(target))
 			.Concat(base.GetAttacks(target));
@@ -59,9 +59,7 @@ public sealed partial class AkimboWeapon : WeaponCollection, IInjectionIntercept
 
 
 	public Handedness Intercept(Node child, Handedness value) {
-		if (child == SideWeapon) {
-			return value.Reverse();
-		}
+		if (child == SideWeapon) return value.Reverse();
 		return value;
 	}
 
@@ -74,12 +72,12 @@ public sealed partial class AkimboWeapon : WeaponCollection, IInjectionIntercept
 		IWeapon[] weapons = GetChildren().OfType<IWeapon>().ToArray();
 		MainWeapon = weapons.Length > 0 ? weapons[0] : null;
 		if (MainWeapon is Node nodeMainWeapon) {
-			nodeMainWeapon.Name = "Main";
+			nodeMainWeapon.SafeRename("Main");
 		}
 
 		SideWeapon = weapons.Length > 1 ? weapons[1] : null;
 		if (SideWeapon is Node nodeSideWeapon) {
-			nodeSideWeapon.Name = "Side";
+			nodeSideWeapon.SafeRename("Side");
 		}
 	}
 

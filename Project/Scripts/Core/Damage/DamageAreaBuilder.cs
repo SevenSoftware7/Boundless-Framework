@@ -20,34 +20,31 @@ public sealed partial class DamageAreaBuilder : Resource {
 	public DamageArea Build(Attack attack) {
 		DamageArea damageArea = new(LifeTime) {
 			Damage = Damage,
-			DamageDealer = attack.Entity as IDamageDealer,
+			DamageDealer = attack,
 			Parriable = Parriable,
 			CanParry = CanParry,
 		};
 
 		Node3D parent = AttachmentTarget switch {
 			HitBoxAttachment.Weapon or HitBoxAttachment.WeaponTip => attack.Weapon,
-			HitBoxAttachment.Entity or _ => attack.Entity,
+			HitBoxAttachment.Entity or HitBoxAttachment.EntityCenterOfMass or _ => attack.Entity,
 		};
 
 		Vector3 offset = AttachmentTarget switch {
 			HitBoxAttachment.WeaponTip => attack.Weapon.GetTipPosition(),
+			HitBoxAttachment.EntityCenterOfMass => attack.Entity.CenterOfMass is null
+				? Vector3.Zero
+				: attack.Entity.GlobalTransform.Inverse() * attack.Entity.CenterOfMass.GlobalPosition,
 			_ => Vector3.Zero,
 		};
 
 		if (Attached) {
 			damageArea.ParentTo(parent);
-			damageArea.Transform = new() {
-				Origin = offset,
-				Basis = Basis.Identity
-			};
+			damageArea.Transform = new(Basis.Identity, offset);
 		}
 		else {
 			damageArea.ParentTo(attack.GetTree().Root);
-			damageArea.GlobalTransform = new() {
-				Origin = parent.GlobalTransform * offset,
-				Basis = parent.GlobalBasis
-			};
+			damageArea.GlobalTransform = parent.GlobalTransform.TranslatedLocal(offset);
 		}
 
 		foreach (DamageHitboxBuilder hitboxBuilder in HitboxBuilders) {
@@ -64,5 +61,6 @@ public sealed partial class DamageAreaBuilder : Resource {
 		Weapon = 0,
 		WeaponTip = 1,
 		Entity = 2,
+		EntityCenterOfMass = 3,
 	}
 }

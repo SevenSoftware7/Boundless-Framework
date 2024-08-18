@@ -36,8 +36,8 @@ public partial class DamageArea : Area3D {
 	public void GetParriedBy(DamageArea other) {
 		if (!Parriable) return;
 
-		if (other.DamageDealer is IDamageable target) {
-			hitBuffer.Remove(target);
+		if (other.DamageDealer?.Damageable is IDamageable damageable) {
+			hitBuffer.Remove(damageable);
 		}
 	}
 

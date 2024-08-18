@@ -1,27 +1,22 @@
 namespace LandlessSkies.Core;
 
-using System;
 using Godot;
 
-public sealed partial class JoypadInputDevice : InputDevice {
+public sealed partial class JoypadInputDevice(int DeviceId) : InputDevice() {
 	public override float Sensitivity => 0.025f;
 
-	public int Id { get; init; }
-	public new string Name { get; private set; } = string.Empty;
-	public string GUID { get; private set; } = Guid.Empty.ToString();
+	protected override StringName DeviceSuffix => _deviceSuffix;
+	private readonly StringName _deviceSuffix = $"joy{DeviceId}";
 
-	protected override StringName ActionSuffix => $"joy{Id}";
+	public int DeviceId { get; init; } = DeviceId;
+	public string DeviceName { get; private set; } = string.Empty;
+	public string DeviceGUID { get; private set; } = string.Empty;
 
-
-	private JoypadInputDevice() : base() { }
-	public JoypadInputDevice(int DeviceId) : base() {
-		Id = DeviceId;
-	}
 
 
 	protected override InputEvent ConvertEvent(InputEvent @event) {
 		InputEvent newEvent = (@event.Duplicate() as InputEvent)!;
-		newEvent.Device = Id;
+		newEvent.Device = DeviceId;
 		return newEvent;
 	}
 	protected override bool IsEventSupported(InputEvent @event) => @event is InputEventJoypadButton || @event is InputEventJoypadMotion;
@@ -30,15 +25,15 @@ public sealed partial class JoypadInputDevice : InputDevice {
 	public override void Connect() {
 		base.Connect();
 
-		Name = Input.GetJoyName(Id);
-		GUID = Input.GetJoyGuid(Id);
-		GD.Print($"Device {Id} ({Name}) Connected");
+		DeviceName = Input.GetJoyName(DeviceId);
+		DeviceGUID = Input.GetJoyGuid(DeviceId);
+		GD.Print($"Device {DeviceId} ({DeviceName}) Connected");
 	}
 
 	public override void Disconnect() {
 		base.Disconnect();
 
-		GD.Print($"Device {Id} ({Name}) Disconnected");
+		GD.Print($"Device {DeviceId} ({DeviceName}) Disconnected");
 	}
 
 }

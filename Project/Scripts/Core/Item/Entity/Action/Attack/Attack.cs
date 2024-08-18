@@ -11,10 +11,13 @@ using SevenDev.Utility;
 /// <param name="entity">Inherited from <see cref="Action"/>.</param>
 /// <param name="weapon">The Weapon which will be used in the Attack.</param>
 /// <param name="modifiers">Inherited from <see cref="Action"/>.</param>
-public abstract partial class Attack(Entity entity, Weapon weapon, AnimationPath path, IEnumerable<AttributeModifier>? modifiers = null) : AnimationAction(entity, path, modifiers) {
+public abstract partial class Attack(Entity entity, Weapon weapon, AnimationPath path, IEnumerable<AttributeModifier>? modifiers = null) : AnimationAction(entity, path, modifiers), IDamageDealer {
 	private readonly List<DamageArea?> damageAreas = [];
 
 	public Weapon Weapon { get; private set; } = weapon;
+
+
+	IDamageable IDamageDealer.Damageable => Entity;
 
 
 	protected static StringName GetAnimationPath(StringName library, StringName attack) => library.IsEmpty ? attack : $"{library}/{attack}";

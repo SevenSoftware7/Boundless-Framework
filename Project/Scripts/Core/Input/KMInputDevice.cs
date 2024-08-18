@@ -3,12 +3,12 @@ namespace LandlessSkies.Core;
 using Godot;
 
 public sealed partial class KMInputDevice : InputDevice {
+	private static readonly StringName suffix = "km";
 	private static InputEventMouseMotion mouseMotion = new();
 
 	public override float Sensitivity => 0.00325f;
 
-	protected override StringName ActionSuffix => suffix;
-	private static readonly StringName suffix = "km";
+	protected override StringName DeviceSuffix => suffix;
 
 
 	protected override bool IsEventSupported(InputEvent @event) => @event is InputEventMouse || @event is InputEventKey;

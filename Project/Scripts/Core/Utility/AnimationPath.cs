@@ -20,7 +20,7 @@ public struct AnimationPath : IEquatable<AnimationPath>, IEquatable<StringName> 
 		switch (split.Length) {
 			case 1:
 				LibraryName = split[0];
-				AnimationName = "";
+				AnimationName = string.Empty;
 				break;
 			case 2:
 				LibraryName = split[0];

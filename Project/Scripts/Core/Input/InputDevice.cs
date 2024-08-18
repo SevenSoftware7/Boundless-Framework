@@ -8,7 +8,7 @@ public abstract partial class InputDevice : Node {
 
 
 	public abstract float Sensitivity { get; }
-	protected abstract StringName ActionSuffix { get; }
+	protected abstract StringName DeviceSuffix { get; }
 
 	protected static void RebindInput(StringName actionName, float deadzone = 0.5f, params InputEvent[] events) {
 		if (actionName.IsEmpty) return;
@@ -46,7 +46,7 @@ public abstract partial class InputDevice : Node {
 	}
 
 
-	protected StringName GetActionName(StringName action) => $"{action}_{ActionSuffix}";
+	protected StringName GetActionName(StringName action) => $"{action}_{DeviceSuffix}";
 
 	public Vector2 GetVector(StringName negativeX, StringName positiveX, StringName negativeY, StringName positiveY/* , float deadzone = -1 */) =>
 		DeviceConnected
@@ -102,6 +102,7 @@ public abstract partial class InputDevice : Node {
 
 			UnbindInput(newAction);
 		}
+
 		DeviceConnected = false;
 	}
 }

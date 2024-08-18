@@ -51,12 +51,12 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 		get => _animationLibrary;
 		set {
 			_animationLibrary = value;
-			LibraryName = _animationLibrary?.ResourceName ?? "";
+			LibraryName = _animationLibrary?.ResourceName ?? string.Empty;
 		}
 	}
 	private AnimationLibrary? _animationLibrary;
 
-	public StringName LibraryName { get; protected set; } = "";
+	public StringName LibraryName { get; protected set; } = string.Empty;
 
 
 

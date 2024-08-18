@@ -12,7 +12,6 @@ public partial class ArmedEntity : Entity, IDamageDealer, ISerializationListener
 	private readonly List<int> styleSwitchBuffer = [];
 
 
-	[ExportGroup("Weapon")]
 	public IWeapon? Weapon {
 		get => _weapon;
 		set {
@@ -23,6 +22,13 @@ public partial class ArmedEntity : Entity, IDamageDealer, ISerializationListener
 		}
 	}
 	private IWeapon? _weapon;
+
+
+	IDamageable? IDamageDealer.Damageable => this;
+
+
+
+	private void GetWeapon() => Weapon = GetChildren().OfType<IWeapon>().FirstOrDefault();
 
 
 	public override void HandlePlayer(Player player) {
@@ -64,7 +70,7 @@ public partial class ArmedEntity : Entity, IDamageDealer, ISerializationListener
 		}
 
 		if (bufferStyle != -1) {
-			if (CurrentAction is Attack) {
+			if (CurrentAction is Attack attack && !attack.CanCancel()) {
 				styleSwitchBuffer.Add(bufferStyle);
 			}
 			else {
@@ -76,10 +82,11 @@ public partial class ArmedEntity : Entity, IDamageDealer, ISerializationListener
 
 	public override void _Process(double delta) {
 		base._Process(delta);
-		if (CurrentAction is Attack || _weapon is null) return;
+		if (_weapon is null) return;
+		if (CurrentAction is Attack attack && !attack.CanCancel()) return;
 
-		for (int i = 0; i < styleSwitchBuffer.Count; i++) {
-			_weapon.Style = styleSwitchBuffer[i];
+		foreach (int bufferedStyle in styleSwitchBuffer) {
+			_weapon.Style = bufferedStyle;
 		}
 
 		styleSwitchBuffer.Clear();
@@ -98,6 +105,4 @@ public partial class ArmedEntity : Entity, IDamageDealer, ISerializationListener
 		base.OnAfterDeserialize();
 		GetWeapon();
 	}
-
-	private void GetWeapon() => Weapon = GetChildren().OfType<IWeapon>().FirstOrDefault();
 }
