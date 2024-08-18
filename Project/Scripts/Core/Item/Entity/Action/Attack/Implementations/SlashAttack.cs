@@ -14,11 +14,7 @@ public sealed partial class SlashAttack(Entity entity, Weapon weapon) : Attack(e
 
 
 
-	public new sealed class Builder : Attack.Builder {
-		public static readonly Builder Instance = new();
-
-		private Builder() : base() { }
-
-		protected internal override SlashAttack Create(Entity entity, Weapon weapon) => new(entity, weapon);
+	public new sealed class Builder(Weapon weapon) : Attack.Builder(weapon) {
+		public override SlashAttack Build(Entity entity) => new(entity, Weapon);
 	}
 }

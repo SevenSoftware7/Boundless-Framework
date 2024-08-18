@@ -83,27 +83,29 @@ public abstract partial class Action : Node {
 	protected virtual void _Stop() { }
 
 
+
+	public abstract class Builder {
+		public abstract Action Build(Entity entity);
+	}
+
 	/// <summary>
-	/// 	An Action Wrapper is a wrapper for use in configuration pre-execution, sets up and starts an Action.
+	/// 	An Action Wrapper is a wrapper for use in pre-execution Action configuration, sets up and starts an Action.
 	/// 	<para>It is passed to <see cref="Entity.ExecuteAction(Wrapper, bool)"/> to execute the given Action.</para>
 	/// </summary>
-	public abstract class Wrapper {
+	public sealed class Wrapper(Builder builder) {
+		public readonly Builder Builder = builder;
 		public System.Action? BeforeExecute { get; set; }
 		public System.Action? AfterExecute { get; set; }
 
-		/// <summary>
-		/// Instantiates and sets up the Action, using the given Entity as the Target of the Action.
-		/// </summary>
-		/// <param name="entity">The Entity which will execute the Action</param>
-		/// <returns></returns>
-		protected internal abstract Action Create(Entity entity);
 
-		internal Action Build(Entity entity) {
-			Action action = Create(entity);
+		internal Action Create(Entity entity) {
+			Action action = Builder.Build(entity);
 			action.OnStart += BeforeExecute;
 			action.OnStop += AfterExecute;
 
 			return action;
 		}
+
+		public static implicit operator Wrapper(Builder from) => new(from);
 	}
 }

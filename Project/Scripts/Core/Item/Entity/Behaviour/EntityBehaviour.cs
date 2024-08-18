@@ -17,11 +17,11 @@ public abstract partial class EntityBehaviour : Node {
 	protected abstract bool IsOneTime { get; }
 
 
-	protected EntityBehaviour() : this(null!) { }
-	public EntityBehaviour(Entity entity) : base() {
+	protected EntityBehaviour() : this(null) { }
+	public EntityBehaviour(Entity? entity) : base() {
 		_isActive = false;
 
-		Entity = entity;
+		Entity = entity!;
 	}
 
 

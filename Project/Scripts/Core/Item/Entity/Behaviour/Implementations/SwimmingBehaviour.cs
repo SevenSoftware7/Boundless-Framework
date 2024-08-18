@@ -30,8 +30,8 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 	public float OffsetToWaterSurface => WaterSurface + WaterDisplacement - EntityCenterOfMass;
 	public bool IsOnWaterSurface => Mathf.Abs(OffsetToWaterSurface) <= SurfaceThreshold;
 
-	protected SwimmingBehaviour() : this(null!, null!) { }
-	public SwimmingBehaviour(Entity entity, Water waterArea) : base(entity) {
+	protected SwimmingBehaviour() : this(null, null!) { }
+	public SwimmingBehaviour(Entity? entity, Water waterArea) : base(entity) {
 		Water = waterArea;
 	}
 

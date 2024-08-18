@@ -17,6 +17,21 @@ public partial class BipedJumpAction : JumpAction, IPlayerHandler {
 	}
 
 
+	public override void _Process(double delta) {
+		base._Process(delta);
+
+		if (remainingDistance <= 0 || Entity.IsOnFloor()) {
+			Stop();
+		}
+
+		if (maxDistance != 0) {
+			float travelDistance = Mathf.Min(maxDistance * (float)delta * 5f, remainingDistance * maxDistance);
+			Entity.Inertia += Direction * travelDistance;
+			remainingDistance -= travelDistance / maxDistance;
+		}
+	}
+
+
 	public void HandlePlayer(Player player) {
 		if (!player.InputDevice.IsActionPressed(Inputs.Jump)) {
 			Stop();
@@ -37,27 +52,12 @@ public partial class BipedJumpAction : JumpAction, IPlayerHandler {
 	protected override void _Stop() { }
 
 
-	public override void _Process(double delta) {
-		base._Process(delta);
-
-		if (remainingDistance <= 0 || Entity.IsOnFloor()) {
-			Stop();
-		}
-
-		if (maxDistance != 0) {
-			float travelDistance = Mathf.Min(maxDistance * (float)delta * 5f, remainingDistance * maxDistance);
-			Entity.Inertia += Direction * travelDistance;
-			remainingDistance -= travelDistance / maxDistance;
-		}
-	}
-
-
 
 	public new class Builder : JumpAction.Builder {
-		private static readonly float PotentialJumpHeight = 1f;
-		public override float PotentialHeight => PotentialJumpHeight;
+		public Vector3? Direction;
 
 
-		protected internal override JumpAction Create(Entity entity, Vector3 direction) => new BipedJumpAction(entity, direction);
+
+		public override JumpAction Build(Entity entity) => new BipedJumpAction(entity, Direction ?? entity.UpDirection);
 	}
 }

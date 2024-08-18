@@ -10,5 +10,5 @@ public interface IWeapon : ICustomizable, ISaveable<IWeapon> {
 	abstract int Style { get; set; }
 	virtual int StyleCount => 1;
 
-	IEnumerable<Attack.Wrapper> GetAttacks(Entity target);
+	IEnumerable<Action.Wrapper> GetAttacks(Entity target);
 }

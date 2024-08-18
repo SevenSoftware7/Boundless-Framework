@@ -15,12 +15,8 @@ public partial class BipedBehaviour : GroundedBehaviour {
 	private PointerControl? interactPointer;
 
 
-	protected BipedBehaviour() : base() {
-		JumpAction = new BipedJumpActionInfo();
-	}
-	public BipedBehaviour(Entity entity) : base(entity) {
-		JumpAction = new BipedJumpActionInfo();
-	}
+	protected BipedBehaviour() : this(null) { }
+	public BipedBehaviour(Entity? entity) : base(entity, new BipedJumpAction.Builder()) { }
 
 
 	protected override void _Start(EntityBehaviour? previousBehaviour) {

@@ -13,7 +13,8 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 
 
 	protected VehicleBehaviour() : this(null!) { }
-	public VehicleBehaviour(Entity entity) : base(entity, new BipedJumpActionInfo()) { }
+	public VehicleBehaviour(Entity entity) : base(entity, new BipedJumpAction.Builder()) { }
+
 
 	protected override void _Start(EntityBehaviour? previousBehaviour) {
 		base._Start(previousBehaviour);

@@ -12,8 +12,8 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 	protected sealed override bool IsOneTime => true;
 
 
-	protected SittingBehaviour() : this(null!) { }
-	public SittingBehaviour(Entity entity, EntityBehaviour? previousBehaviour = null) : base(entity) {
+	protected SittingBehaviour() : this(null) { }
+	public SittingBehaviour(Entity? entity, EntityBehaviour? previousBehaviour = null) : base(entity) {
 		this.previousBehaviour = previousBehaviour;
 	}
 

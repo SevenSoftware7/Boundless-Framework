@@ -1,7 +1,6 @@
 namespace LandlessSkies.Core;
 
 using System.Collections.Generic;
-using Godot;
 using SevenDev.Utility;
 
 
@@ -41,7 +40,7 @@ public abstract partial class ChargeAttack(Entity entity, Weapon weapon, Animati
 
 
 
-	public new abstract class Builder : Attack.Builder {
-		protected internal abstract override ChargeAttack Create(Entity entity, Weapon weapon);
+	public new abstract class Builder(Weapon weapon) : Attack.Builder(weapon) {
+		public abstract override ChargeAttack Build(Entity entity);
 	}
 }

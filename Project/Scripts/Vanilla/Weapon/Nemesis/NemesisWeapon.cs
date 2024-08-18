@@ -7,20 +7,23 @@ using Godot;
 [Tool]
 [GlobalClass]
 public sealed partial class NemesisWeapon : Weapon, IPlayerHandler {
+	private readonly SlashAttack.Builder slashAttack;
 	public override WeaponType Type => WeaponType.Sword;
 	public override WeaponUsage Usage => WeaponUsage.Slash | WeaponUsage.Strike;
 	public override WeaponSize Size => WeaponSize.TwoHanded;
 
 
-	private NemesisWeapon() : base() { }
-	public NemesisWeapon(WeaponCostume? costume = null) : base(costume) { }
+	private NemesisWeapon() : this(null) { }
+	public NemesisWeapon(WeaponCostume? costume = null) : base(costume) {
+		slashAttack = new(this);
+	}
 
 
 	public override Vector3 GetTipPosition() => new(0f, 3.2f, 0f);
 
-	public override IEnumerable<Attack.Wrapper> GetAttacks(Entity target) {
+	public override IEnumerable<Action.Wrapper> GetAttacks(Entity target) {
 		return [
-			new Attack.Builder(SlashAttackInfo.Instance, this),
+			slashAttack
 		];
 	}
 
@@ -32,7 +35,7 @@ public sealed partial class NemesisWeapon : Weapon, IPlayerHandler {
 		switch (player.Entity.CurrentBehaviour) {
 			case GroundedBehaviour grounded:
 				if (player.InputDevice.IsActionJustPressed(Inputs.AttackLight)) {
-					player.Entity.ExecuteAction((Action.Wrapper)new Attack.Builder(SlashAttackInfo.Instance, this));
+					player.Entity.ExecuteAction(slashAttack);
 				}
 				break;
 		}

@@ -148,6 +148,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 	}
 
 
+	public bool ExecuteAction(Action.Builder builder, bool forceExecute = false) => ExecuteAction(new Action.Wrapper(builder), forceExecute);
 	public bool ExecuteAction(Action.Wrapper action, bool forceExecute = false) {
 		if (!forceExecute && !CurrentAction.CanCancel()) return false;
 
@@ -156,7 +157,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 
 		action.AfterExecute += () => CurrentAction = null;
 
-		CurrentAction = action.Build(this).ParentTo(this).SafeRename("Action");
+		CurrentAction = action.Create(this).ParentTo(this).SafeRename("Action");
 
 		CurrentAction.Start();
 

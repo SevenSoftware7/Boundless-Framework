@@ -7,12 +7,8 @@ using Godot;
 [Tool]
 [GlobalClass]
 public sealed partial class EleosWeapon : Weapon, IPlayerHandler {
-	private readonly CompositeChargeAttack.Builder chargeAttack = new(
-		SlashAttack.Builder.Instance, SlashAttack.Builder.Instance,
-		"Charge",
-		Inputs.AttackHeavy, 750,
-		[new PercentileModifier(Attributes.GenericMoveSpeed, -0.7f), new PercentileModifier(Attributes.GenericjumpHeight, -0.5f)]
-	);
+	private readonly SlashAttack.Builder slashAttack;
+	private readonly CompositeChargeAttack.Builder chargeAttack;
 
 	public override WeaponType Type => WeaponType.Sword;
 	public override WeaponUsage Usage => WeaponUsage.Slash | WeaponUsage.Thrust;
@@ -20,16 +16,25 @@ public sealed partial class EleosWeapon : Weapon, IPlayerHandler {
 
 
 	private EleosWeapon() : this(null) { }
-	public EleosWeapon(WeaponCostume? costume = null) : base(costume) { }
+	public EleosWeapon(WeaponCostume? costume = null) : base(costume) {
+		slashAttack = new(this);
+		chargeAttack = new(
+			this,
+			slashAttack, slashAttack,
+			"Charge",
+			Inputs.AttackHeavy, 750,
+			[new PercentileModifier(Attributes.GenericMoveSpeed, -0.7f), new PercentileModifier(Attributes.GenericjumpHeight, -0.5f)]
+		);
+	}
 
 
 	public override Vector3 GetTipPosition() => new(0f, 5.3f, 0f);
 
 
-	public override IEnumerable<Attack.Wrapper> GetAttacks(Entity target) {
+	public override IEnumerable<Action.Wrapper> GetAttacks(Entity target) {
 		return [
-			new Attack.Wrapper(SlashAttack.Builder.Instance, this),
-			new Attack.Wrapper(chargeAttack, this)
+			slashAttack,
+			chargeAttack
 		];
 	}
 
@@ -40,10 +45,10 @@ public sealed partial class EleosWeapon : Weapon, IPlayerHandler {
 		switch (player.Entity.CurrentBehaviour) {
 			case GroundedBehaviour grounded:
 				if (player.InputDevice.IsActionJustPressed(Inputs.AttackLight)) {
-					player.Entity.ExecuteAction(new Attack.Wrapper(SlashAttack.Builder.Instance, this));
+					player.Entity.ExecuteAction(slashAttack);
 				}
 
-				chargeAttack.ExecuteOnKeyJustPressed(player, this);
+				chargeAttack.ExecuteOnKeyJustPressed(player);
 				break;
 		}
 	}

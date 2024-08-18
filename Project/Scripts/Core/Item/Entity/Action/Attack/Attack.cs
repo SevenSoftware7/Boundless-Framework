@@ -91,18 +91,13 @@ public abstract partial class Attack(Entity entity, Weapon weapon, AnimationPath
 
 
 
-	public abstract class Builder() {
+	public new abstract class Builder(Weapon weapon) : Action.Builder() {
+		public readonly Weapon Weapon = weapon;
 		public float PotentialDamage { get; }
 		public AttackType Type { get; }
 
-		protected internal abstract Attack Create(Entity entity, Weapon weapon);
-	}
 
-	public new sealed class Wrapper(Builder info, Weapon weapon) : Action.Wrapper() {
-		public readonly Builder Info = info;
-		public readonly Weapon Weapon = weapon;
-
-		protected internal override Attack Create(Entity entity) => Info.Create(entity, Weapon);
+		public abstract override Attack Build(Entity entity);
 	}
 }
 

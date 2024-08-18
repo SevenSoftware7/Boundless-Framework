@@ -6,7 +6,7 @@ using static Godot.CharacterBody3D;
 
 [Tool]
 public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHandler {
-	protected JumpActionInfo? JumpAction { get; init; }
+	protected JumpAction.Builder? JumpAction { get; init; }
 	protected Vector3 _jumpDirection;
 	protected Vector3 _moveDirection;
 
@@ -15,8 +15,8 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 	protected readonly TimeDuration jumpCooldown = new(false, 500);
 
 
-	protected GroundedBehaviour() : base() { }
-	public GroundedBehaviour(Entity entity, JumpActionInfo? jumpAction = null) : base(entity) {
+	protected GroundedBehaviour() : this(null) { }
+	public GroundedBehaviour(Entity? entity, JumpAction.Builder? jumpAction = null) : base(entity) {
 		JumpAction = jumpAction;
 	}
 
@@ -214,7 +214,7 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 	private void ExecuteJump() {
 		if (JumpAction is null) return;
 
-		if (jumpCooldown.HasPassed && Entity.ExecuteAction(new JumpActionBuilder(JumpAction, _jumpDirection))) {
+		if (jumpCooldown.HasPassed && Entity.ExecuteAction(JumpAction)) {
 			jumpBuffer.End();
 			jumpCooldown.Start();
 		}
