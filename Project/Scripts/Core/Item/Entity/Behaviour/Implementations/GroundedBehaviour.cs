@@ -107,7 +107,7 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 			KinematicCollision3D? stepObstacleCollision = Entity.MoveAndCollide(movement, true);
 
 			// Not a valid step if the obstacle's surface is not steep
-			if (stepObstacleCollision is not null && Mathf.Abs(stepObstacleCollision.GetNormal().Dot(Entity.UpDirection)) >= 0.25f)
+			if (stepObstacleCollision is not null && Mathf.Abs(stepObstacleCollision.GetNormal().Dot(Entity.UpDirection)) >= Mathfs.RadToDot(Entity.FloorMaxAngle))
 				return false;
 
 			float margin = Mathf.Epsilon;
@@ -132,8 +132,8 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 			);
 
 			if (!findStep) return false;
-			// If the step was not the same collider as the obstacle, we stop here
-			if (stepObstacleCollision is not null && stepTestResult.GetColliderRid() != stepObstacleCollision.GetColliderRid()) return false;
+			// // If the step was not the same collider as the obstacle, we stop here
+			// if (stepObstacleCollision is not null && stepTestResult.GetColliderRid() != stepObstacleCollision.GetColliderRid()) return false;
 
 
 			Vector3 point = stepTestResult.GetCollisionPoint();

@@ -5,6 +5,10 @@ using System.Runtime.CompilerServices;
 using Godot;
 
 public static class Mathfs {
+	public static float RadToDot(this float radians) => 1f - radians * 2f / Mathf.Pi;
+	public static double RadToDot(this double radians) => 1 - radians * 2 / Math.PI;
+
+
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static float Clamp01(this float value) {
 		return Mathf.Clamp(value, 0f, 1f);
