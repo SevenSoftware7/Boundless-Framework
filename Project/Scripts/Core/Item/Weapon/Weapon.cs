@@ -17,8 +17,8 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 	private static readonly StringName LeftHand = "LeftHand";
 	private static readonly StringName RightHand = "RightHand";
 
-	public static readonly Basis rightHandBoneBasis = Basis.FromEuler(new(Mathfs.Deg2Rad(-90f), 0f, Mathfs.Deg2Rad(-90f)));
-	public static readonly Basis leftHandBoneBasis = Basis.FromEuler(new(Mathfs.Deg2Rad(-90f), 0f, Mathfs.Deg2Rad(90f)));
+	public static readonly Basis rightHandBoneBasis = Basis.FromEuler(new(Mathf.DegToRad(-90f), 0f, Mathf.DegToRad(-90f)));
+	public static readonly Basis leftHandBoneBasis = Basis.FromEuler(new(Mathf.DegToRad(-90f), 0f, Mathf.DegToRad(90f)));
 
 	public WeaponHolsterState HolsterState {
 		get => _holsterState;

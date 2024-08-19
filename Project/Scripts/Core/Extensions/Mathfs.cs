@@ -55,10 +55,4 @@ public static class Mathfs {
 		}
 		return num8;
 	}
-
-
-	public static double Deg2Rad(double degrees) => degrees * (Math.PI / 180.0);
-	public static double Rad2Deg(double radians) => radians * (180.0 / Math.PI);
-	public static float Deg2Rad(float degrees) => degrees * (Mathf.Pi / 180f);
-	public static float Rad2Deg(float radians) => radians * (180f / Mathf.Pi);
 }

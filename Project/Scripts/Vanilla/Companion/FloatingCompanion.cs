@@ -66,7 +66,7 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 		Subject = Entity.GlobalTransform;
 
 		if (Entity.Skeleton is not null && Entity.Skeleton.TryGetBoneTransform("Head", out Transform3D boneTransform)) {
-			Head = boneTransform.RotatedLocal(Vector3.Up, Mathfs.Deg2Rad(180f));
+			Head = boneTransform.RotatedLocal(Vector3.Up, Mathf.DegToRad(180f));
 		}
 
 		if (OnFace && Entity?.Health is not null) {
