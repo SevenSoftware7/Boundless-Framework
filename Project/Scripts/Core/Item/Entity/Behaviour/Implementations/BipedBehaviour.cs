@@ -37,13 +37,6 @@ public partial class BipedBehaviour : GroundedBehaviour {
 
 		if (!IsActive) return;
 
-		if (interactPrompt is null && Entity.HudPack.InteractPrompt is not null) {
-			interactPrompt ??= player.HudManager.AddPrompt(Entity.HudPack.InteractPrompt);
-		}
-		if (interactPointer is null && Entity.HudPack.InteractPointer is not null) {
-			interactPointer ??= player.HudManager.AddPointer(Entity.HudPack.InteractPointer);
-		}
-
 		float speedSquared = _moveDirection.LengthSquared();
 		MovementType speed = speedSquared switch {
 			_ when Mathf.IsZeroApprox(speedSquared) => MovementType.Idle,
@@ -53,6 +46,13 @@ public partial class BipedBehaviour : GroundedBehaviour {
 		};
 		SetMovementType(speed);
 
+
+		if (interactPrompt is null && Entity.HudPack.InteractPrompt is not null) {
+			interactPrompt ??= player.HudManager.AddPrompt(Entity.HudPack.InteractPrompt);
+		}
+		if (interactPointer is null && Entity.HudPack.InteractPointer is not null) {
+			interactPointer ??= player.HudManager.AddPointer(Entity.HudPack.InteractPointer);
+		}
 
 		HandleInteraction(player);
 

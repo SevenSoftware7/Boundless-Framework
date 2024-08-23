@@ -13,19 +13,32 @@ public sealed partial class KMInputDevice : InputDevice {
 
 	protected override bool IsEventSupported(InputEvent @event) => @event is InputEventMouse || @event is InputEventKey;
 
-	public override float GetActionStrength(StringName action) => action.ToString() switch {
+	public override float GetActionStrength(StringName action)/*  => action.ToString() switch {
 		_ when !DeviceConnected => base.GetActionStrength(action),
-		"look_up" => Mathf.Max(-mouseMotion.ScreenRelative.Y, base.GetActionStrength(action)),
-		"look_down" => Mathf.Max(mouseMotion.ScreenRelative.Y, base.GetActionStrength(action)),
-		"look_left" => Mathf.Max(-mouseMotion.ScreenRelative.X, base.GetActionStrength(action)),
-		"look_right" => Mathf.Max(mouseMotion.ScreenRelative.X, base.GetActionStrength(action)),
+		"look_up" => Mathf.Max(-mouseMotion.ScreenRelative.Y, 0f),
+		"look_down" => Mathf.Max(mouseMotion.ScreenRelative.Y, 0f),
+		"look_left" => Mathf.Max(-mouseMotion.ScreenRelative.X, 0f),
+		"look_right" => Mathf.Max(mouseMotion.ScreenRelative.X, 0f),
 		_ => base.GetActionStrength(action),
-	};
+	}; */ {
+		if (!DeviceConnected) return 0f;
+		if (action == Inputs.LookUp) return Mathf.Max(-mouseMotion.ScreenRelative.Y, 0f);
+		if (action == Inputs.LookDown) return Mathf.Max(mouseMotion.ScreenRelative.Y, 0f);
+		if (action == Inputs.LookLeft) return Mathf.Max(-mouseMotion.ScreenRelative.X, 0f);
+		if (action == Inputs.LookRight) return Mathf.Max(mouseMotion.ScreenRelative.X, 0f);
+		return base.GetActionStrength(action);
+	}
 
-	public override float GetActionRawStrength(StringName action) => action.ToString() switch {
+	public override float GetActionRawStrength(StringName action)/*  => action.ToString() switch {
 		"look_up" or "look_down" or "look_left" or "look_right" => GetActionStrength(action),
 		_ => base.GetActionRawStrength(action),
-	};
+	}; */ {
+		if (!DeviceConnected) return 0f;
+		if (action == Inputs.LookUp || action == Inputs.LookDown || action == Inputs.LookLeft || action == Inputs.LookRight)
+			return GetActionStrength(action);
+
+		return base.GetActionRawStrength(action);
+	}
 
 
 	public override void _Process(double delta) {

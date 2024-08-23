@@ -15,13 +15,9 @@ HudManager = NodePath("HUD")
 
 [node name="CameraController3D" type="Camera3D" parent="."]
 transform = Transform3D(-0.730305, 0, -0.683121, -0.683105, -0.00694631, 0.730287, -0.00474517, 0.999976, 0.00507293, 0, 3.01904, 3.4167)
+current = true
 fov = 90.0
 script = ExtResource("4_8b0k0")
-cameraOriginPosition = Vector3(1, -0.12, 5.2)
-horizontalSmoothTime = 0.065
-verticalSmoothTime = 0.16
-Subject = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-LocalRotation = Basis(-0.730305, 0, -0.683121, 0, 1, 0, 0.683121, 0, -0.730305)
 
 [node name="FX" type="Node3D" parent="CameraController3D"]
 transform = Transform3D(-0.730305, -0.683105, -0.00474517, 2.32831e-09, -0.00694631, 0.999976, -0.683121, 0.730287, 0.00507292, 0, 0, 0)

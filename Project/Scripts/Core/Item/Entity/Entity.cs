@@ -175,14 +175,17 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 
 	public void SetBehaviour<TBehaviour>(TBehaviour? behaviour) where TBehaviour : EntityBehaviour {
 		CurrentBehaviour?.Stop(behaviour);
+
 		EntityBehaviour? oldBehaviour = CurrentBehaviour;
 		CurrentBehaviour = null;
 
 		if (behaviour is null) return;
 
-		CurrentBehaviour = behaviour.SafeReparentAndRename(this, "Behaviour");
+		behaviour.SafeReparentAndRename(this, "Behaviour");
 
 		behaviour.Start(oldBehaviour);
+
+		CurrentBehaviour = behaviour;
 	}
 
 
@@ -234,10 +237,6 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 				healthBar.Value = Health;
 			}
 		}
-		player.CameraController.SetEntityAsSubject(this);
-		player.CameraController.MoveCamera(
-			player.InputDevice.GetVector("look_left", "look_right", "look_down", "look_up") * player.InputDevice.Sensitivity
-		);
 	}
 
 	public virtual void DisavowPlayer() {

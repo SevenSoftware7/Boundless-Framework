@@ -9,9 +9,7 @@ public static class PlayerHandlerExtensions {
 		}
 
 		if (parent is IPlayerHandler handlerParent) {
-			if (parent.IsInsideTree() && parent.CanProcess()) {
-				handlerParent.HandlePlayer(player);
-			}
+			handlerParent.HandlePlayer(player);
 		}
 	}
 	public static void PropagatePlayerDisavowing(this Node parent) {

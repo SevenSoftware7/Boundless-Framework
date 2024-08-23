@@ -8,7 +8,7 @@ using static Godot.CharacterBody3D;
 public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHandler {
 	protected JumpAction.Builder? JumpAction { get; init; }
 	protected Vector3 _jumpDirection;
-	protected Vector3 _moveDirection;
+	protected Vector3 _moveDirection = Vector3.Zero;
 
 	protected readonly TimeDuration jumpBuffer = new(false, 125);
 	protected readonly TimeDuration coyoteTimer = new(false, 150);
@@ -43,10 +43,17 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 			Inputs.MoveLeft, Inputs.MoveRight,
 			Inputs.MoveForward, Inputs.MoveBackward
 		).ClampMagnitude(1f);
-		player.CameraController.RawInputToGroundedMovement(Entity, input, out _, out Vector3 movement);
-
+		player.CameraController.GetGroundedMovement(Entity.UpDirection, input, out _, out Vector3 movement);
 
 		Move(movement);
+
+
+		if (player.Entity == Entity && player.CameraController.SetOrAddBehaviour<GravitatedCameraBehaviour>(() => new(player.CameraController), out var cameraBehaviour)) {
+			cameraBehaviour.SetEntityAsSubject(Entity);
+			cameraBehaviour.MoveCamera(
+				player.InputDevice.GetVector(Inputs.LookLeft, Inputs.LookRight, Inputs.LookDown, Inputs.LookUp) * player.InputDevice.Sensitivity
+			);
+		}
 	}
 
 	public virtual void DisavowPlayer() {

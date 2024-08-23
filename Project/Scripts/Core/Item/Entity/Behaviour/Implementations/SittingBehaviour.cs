@@ -43,6 +43,13 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 		if (player.InputDevice.IsActionJustPressed(Inputs.Interact)) {
 			Dismount();
 		}
+
+		if (player.Entity == Entity && player.CameraController.SetOrAddBehaviour<GravitatedCameraBehaviour>(() => new(player.CameraController), out var cameraBehaviour)) {
+			cameraBehaviour.SetEntityAsSubject(Entity);
+			cameraBehaviour.MoveCamera(
+				player.InputDevice.GetVector(Inputs.LookLeft, Inputs.LookRight, Inputs.LookDown, Inputs.LookUp) * player.InputDevice.Sensitivity
+			);
+		}
 	}
 
 	public virtual void DisavowPlayer() {

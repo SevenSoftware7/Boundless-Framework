@@ -3,6 +3,11 @@ namespace LandlessSkies.Core;
 using Godot;
 
 public static class Inputs {
+	public static readonly StringName LookUp = "look_up";
+	public static readonly StringName LookRight = "look_right";
+	public static readonly StringName LookDown = "look_down";
+	public static readonly StringName LookLeft = "look_left";
+
 	public static readonly StringName MoveForward = "move_forward";
 	public static readonly StringName MoveRight = "move_right";
 	public static readonly StringName MoveBackward = "move_backward";

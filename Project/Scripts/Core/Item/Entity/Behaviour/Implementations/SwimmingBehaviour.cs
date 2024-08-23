@@ -71,8 +71,7 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 		// 	_ => 0f
 		// };
 
-		float newSpeed = Entity.Stats.BaseSpeed;
-		newSpeed = Entity.AttributeModifiers.ApplyTo(Attributes.GenericMoveSpeed, newSpeed);
+		float newSpeed = Entity.AttributeModifiers.ApplyTo(Attributes.GenericMoveSpeed, Entity.Stats.BaseSpeed);
 
 		float speedDelta = _moveSpeed < newSpeed ? Entity.Stats.Acceleration : Entity.Stats.Deceleration;
 		_moveSpeed = Mathf.MoveToward(_moveSpeed, newSpeed, speedDelta * floatDelta);
@@ -97,8 +96,7 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 
 		Entity.Movement = _moveDirection * _moveSpeed;
 
-		Basis newRotation = Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection);
-		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * rotationSpeed);
+		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection), (float)delta * rotationSpeed);
 
 
 		// ----- Floating at the Surface -----
@@ -167,7 +165,14 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 			Inputs.MoveLeft, Inputs.MoveRight,
 			Inputs.MoveForward, Inputs.MoveBackward
 		).ClampMagnitude(1f);
-		player.CameraController.RawInputToCameraRelativeMovement(input, out _, out Vector3 movement);
+		player.CameraController.GetCameraRelativeMovement(input, out _, out Vector3 movement);
+
+		if (player.CameraController.SetOrAddBehaviour<GravitatedCameraBehaviour>(() => new(player.CameraController), out var cameraBehaviour)) {
+			cameraBehaviour.SetEntityAsSubject(Entity);
+			cameraBehaviour.MoveCamera(
+				player.InputDevice.GetVector(Inputs.LookLeft, Inputs.LookRight, Inputs.LookDown, Inputs.LookUp) * player.InputDevice.Sensitivity
+			);
+		}
 
 		if (IsOnWaterSurface) {
 			movement = movement.SlideOnFace(-Entity.UpDirection);

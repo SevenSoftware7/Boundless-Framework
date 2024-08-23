@@ -5,15 +5,14 @@ using Godot;
 
 public static class Vector3Extensions {
 	public static Vector3 SafeSlerp(this Vector3 from, Vector3 to, float weight) {
-		if (from.IsEqualApprox(to)) {
-			return from;
-		}
+		if (!from.IsFinite() || !to.IsFinite()) return from;
+		if (from.IsEqualApprox(to)) return from;
 
 		// Avoid error on both vectors being inverses of each other, breaking a Cross Product operation in the Slerp method
-
-		if ((from + to) == Vector3.Zero) {
+		if ((from + to).IsEqualApprox(Vector3.Zero)) {
 			return from.Lerp(to, weight);
 		}
+
 
 		return from.Slerp(to, weight);
 	}

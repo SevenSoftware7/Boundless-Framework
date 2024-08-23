@@ -20,9 +20,8 @@ public sealed partial class EleosWeapon : Weapon, IPlayerHandler {
 		slashAttack = new(this);
 		chargeAttack = new(
 			this,
-			slashAttack, slashAttack,
-			"Charge",
-			Inputs.AttackHeavy, 750,
+			unchargedAttack: slashAttack, chargedAttack: slashAttack,
+			AnimationName: "Charge", actionKey: Inputs.AttackHeavy, chargeDuration: 750,
 			[new PercentileModifier(Attributes.GenericMoveSpeed, -0.7f), new PercentileModifier(Attributes.GenericjumpHeight, -0.5f)]
 		);
 	}

@@ -59,9 +59,6 @@ public sealed partial class Player : Node {
 	public override void _Process(double delta) {
 		base._Process(delta);
 
-		if (Engine.IsEditorHint()) return;
-
-
 		if (_lastEntity != _entity) {
 			_lastEntity?.PropagatePlayerDisavowing();
 			_lastEntity = _entity;
@@ -73,18 +70,16 @@ public sealed partial class Player : Node {
 	public override void _Ready() {
 		base._Ready();
 
-		if (!Engine.IsEditorHint()) {
-			int index = System.Array.FindIndex(Players, p => p is null);
-			if (index == -1) {
-				QueueFree();
-				return;
-			}
-			Players[index] = this;
+		int index = System.Array.FindIndex(Players, p => p is null);
+		if (index == -1) {
+			QueueFree();
+			return;
 		}
+		Players[index] = this;
 
-		if (CameraController is not null && Entity is not null) {
-			CameraController.LocalRotation = Entity.GlobalBasis;
-		}
+		// if (CameraController is not null && Entity is not null) {
+		// 	CameraController.LocalRotation = Entity.GlobalBasis;
+		// }
 	}
 
 
