@@ -10,6 +10,7 @@ public abstract partial class EntityCameraBehaviour : CameraBehaviour {
 	[Export] public Vector3 CameraOffset = new(1f, -0.12f, 5.2f);
 	[Export] public Transform3D Subject { get; protected set; } = Transform3D.Identity;
 	[Export] public Basis LocalRotation { get; protected set; } = Basis.Identity;
+	private float _smoothDistance = 0f;
 
 	private Transform3D transform = Transform3D.Identity;
 
@@ -46,6 +47,10 @@ public abstract partial class EntityCameraBehaviour : CameraBehaviour {
 			LocalRotation = other.LocalRotation;
 			TargetPosition = other.TargetPosition;
 			Velocity = other.Velocity;
+			_smoothDistance = other._smoothDistance;
+		}
+		else if (previousBehaviour is null) {
+			_smoothDistance = CameraOffset.Length();
 		}
 
 		transform = CameraController.GlobalTransform;
@@ -70,10 +75,10 @@ public abstract partial class EntityCameraBehaviour : CameraBehaviour {
 		Vector3 absoluteOffset = targetBasis * offsetDirection;
 
 
-		ComputeWallCollision(position, absoluteOffset, targetDistance, ref targetDistance, floatDelta);
+		ComputeWallCollision(position, absoluteOffset, targetDistance, ref _smoothDistance, floatDelta);
 
 
-		Vector3 finalPos = position + absoluteOffset * targetDistance;
+		Vector3 finalPos = position + absoluteOffset * _smoothDistance;
 
 		transform = new(targetBasis, finalPos);
 	}
