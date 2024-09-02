@@ -7,7 +7,16 @@ public abstract partial class EntityCameraBehaviour : CameraBehaviour {
 	public sealed override Transform3D Transform => transform;
 	public abstract Vector3 Velocity { get; protected set; }
 
-	[Export] public Vector3 CameraOffset = new(1f, -0.12f, 5.2f);
+	[Export] public Vector3 CameraOffset {
+		get => _cameraOffset;
+		set {
+			_cameraOffset = value;
+			_offsetMagnitude = _cameraOffset.Length();
+		}
+	}
+	private Vector3 _cameraOffset;
+	private float _offsetMagnitude;
+
 	[Export] public Transform3D Subject { get; protected set; } = Transform3D.Identity;
 	[Export] public Basis LocalRotation { get; protected set; } = Basis.Identity;
 	private float _smoothDistance = 0f;
@@ -16,7 +25,9 @@ public abstract partial class EntityCameraBehaviour : CameraBehaviour {
 
 
 	private EntityCameraBehaviour() : this(null) { }
-	protected EntityCameraBehaviour(CameraController3D? camera) : base(camera) { }
+	protected EntityCameraBehaviour(CameraController3D? camera) : base(camera) {
+		CameraOffset = new(1f, -0.12f, 5.2f);
+	}
 
 
 	public abstract void MoveCamera(Vector2 cameraInput);
@@ -47,10 +58,6 @@ public abstract partial class EntityCameraBehaviour : CameraBehaviour {
 			LocalRotation = other.LocalRotation;
 			TargetPosition = other.TargetPosition;
 			Velocity = other.Velocity;
-			_smoothDistance = other._smoothDistance;
-		}
-		else if (previousBehaviour is null) {
-			_smoothDistance = CameraOffset.Length();
 		}
 
 		transform = CameraController.GlobalTransform;
@@ -62,24 +69,19 @@ public abstract partial class EntityCameraBehaviour : CameraBehaviour {
 
 		float floatDelta = (float)delta;
 
-		Vector3 position = TargetPosition;
-
 
 		Basis targetBasis = Subject.Basis * LocalRotation;
 
-		float targetDistance = CameraOffset.Length();
-		Vector3 offsetDirection = Mathf.IsZeroApprox(targetDistance)
+		Vector3 offsetDirection = Mathf.IsZeroApprox(_offsetMagnitude)
 			? Vector3.Zero
-			: (CameraOffset / targetDistance);
+			: (_cameraOffset / _offsetMagnitude);
 
 		Vector3 absoluteOffset = targetBasis * offsetDirection;
 
 
-		ComputeWallCollision(position, absoluteOffset, targetDistance, ref _smoothDistance, floatDelta);
+		ComputeWallCollision(TargetPosition, absoluteOffset, _offsetMagnitude, ref _smoothDistance, floatDelta);
 
-
-		Vector3 finalPos = position + absoluteOffset * _smoothDistance;
-
+		Vector3 finalPos = TargetPosition + absoluteOffset * _smoothDistance;
 		transform = new(targetBasis, finalPos);
 	}
 }

@@ -27,8 +27,6 @@ public static class WaterMeshManager {
 			AddInternal(mesh, enabled);
 			UpdateBuffer();
 		}
-
-		UpdateBuffer();
 	}
 	public static void AddInternal(WaterMesh mesh, bool enabled = true) {
 		if (mesh is null) return;
@@ -62,7 +60,7 @@ public static class WaterMeshManager {
 		IEnumerable<WaterMesh> waterMeshes = infos.Select(i => i.Key);
 		IEnumerable<WaterMeshEntry> entries = infos.Select(i => i.Value);
 
-		int totalVertexCount = entries.Sum(e => e.Vertices.Length * 4);
+		int totalVertexCount = entries.Sum(e => e.Vertices.Length) * 4;
 		int totalIndexCount = entries.Sum(e => e.Indices.Length);
 
 		// Allocate arrays
@@ -76,7 +74,7 @@ public static class WaterMeshManager {
 
 		int vertexIndex = 0;
 		int indexIndex = 0; // lol
-		uint currentIndexOffset = 0;
+		uint vertexIndexOffset = 0;
 
 		uint meshIndex = 0;
 		foreach (KeyValuePair<WaterMesh, WaterMeshEntry> item in infos) {
@@ -93,12 +91,12 @@ public static class WaterMeshManager {
 
 			// Fill index span
 			for (int i = 0; i < indices.Length; i++) {
-				indexSpan[indexIndex++] = indices[i] + currentIndexOffset;
+				indexSpan[indexIndex++] = indices[i] + vertexIndexOffset;
 			}
 
 			// Update the index offset
 			meshIndex++;
-			currentIndexOffset += (uint)vertices.Length;
+			vertexIndexOffset += (uint)vertices.Length;
 		}
 	}
 

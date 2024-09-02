@@ -16,7 +16,7 @@ public static class Mathfs {
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static double Clamp01(this double value) {
-		return Mathf.Clamp(value, 0f, 1f);
+		return Mathf.Clamp(value, 0, 1);
 	}
 
 

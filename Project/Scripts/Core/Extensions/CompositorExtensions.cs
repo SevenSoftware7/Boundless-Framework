@@ -76,10 +76,6 @@ public static class CompositorExtensions {
 		if (indices.Length % shapeVertices != 0) throw new ArgumentException($"Invalid number of values in the index buffer, there should be {shapeVertices} vertices in a shape. Total count : {indices.Length}", nameof(indices));
 		return renderingDevice.IndexBufferCreate((uint)indices.Length, RenderingDevice.IndexBufferFormat.Uint16, CreateByteBuffer(indices));
 	}
-	public static Rid IndexBufferCreate(this RenderingDevice renderingDevice, ulong[] indices, uint shapeVertices = 3) {
-		if (indices.Length % shapeVertices != 0) throw new ArgumentException($"Invalid number of values in the index buffer, there should be {shapeVertices} vertices in a shape. Total count : {indices.Length}", nameof(indices));
-		return renderingDevice.IndexBufferCreate((uint)indices.Length, RenderingDevice.IndexBufferFormat.Uint16, CreateByteBuffer(indices));
-	}
 
 
 	public static (Rid indexBuffer, Rid indexArray) IndexArrayCreate(this RenderingDevice renderingDevice, uint[] indices, uint shapeVertices = 3, uint indexOffset = 0) {
@@ -95,18 +91,6 @@ public static class CompositorExtensions {
 		return (indexBuffer, indexArray);
 	}
 	public static (Rid indexBuffer, Rid indexArray)? IndexArrayCreate(this RenderingDevice renderingDevice, ushort[] indices, uint shapeVertices = 3, uint indexOffset = 0) {
-		Rid indexBuffer = renderingDevice.IndexBufferCreate(indices, shapeVertices);
-		if (!indexBuffer.IsValid) {
-			throw new ArgumentException("Index Buffer is Invalid");
-		}
-		Rid indexArray = renderingDevice.IndexArrayCreate(indexBuffer, indexOffset, (uint)indices.Length);
-		if (!indexArray.IsValid) {
-			throw new ArgumentException("Index Array is Invalid");
-		}
-
-		return (indexBuffer, indexArray);
-	}
-	public static (Rid indexBuffer, Rid indexArray)? IndexArrayCreate(this RenderingDevice renderingDevice, ulong[] indices, uint shapeVertices = 3, uint indexOffset = 0) {
 		Rid indexBuffer = renderingDevice.IndexBufferCreate(indices, shapeVertices);
 		if (!indexBuffer.IsValid) {
 			throw new ArgumentException("Index Buffer is Invalid");
