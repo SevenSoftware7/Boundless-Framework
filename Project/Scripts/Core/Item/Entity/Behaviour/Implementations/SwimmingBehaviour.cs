@@ -198,10 +198,9 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 	}
 
 	public void OnExitWater(Water water) {
-		if (!IsActive) return;
 		if (water != Water) return;
 
-		ExitWater();
 		Water = null;
+		ExitWater();
 	}
 }
