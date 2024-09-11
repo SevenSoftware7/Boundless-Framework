@@ -19,6 +19,47 @@ public static class Mathfs {
 		return Mathf.Clamp(value, 0, 1);
 	}
 
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static bool IsEqualApprox(this float value, float other) {
+		return Mathf.IsEqualApprox(value, other);
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static bool IsEqualApprox(this double value, double other) {
+		return Mathf.IsEqualApprox(value, other);
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static bool IsZeroApprox(this float value) {
+		return Mathf.IsZeroApprox(value);
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static bool IsZeroApprox(this double value) {
+		return Mathf.IsZeroApprox(value);
+	}
+
+
+	public static float MoveToward(this float from, float to, float delta) => Mathf.MoveToward(from, to, delta);
+	public static double MoveToward(this double from, double to, double delta) => Mathf.MoveToward(from, to, delta);
+
+	public static float Lerp(this float from, float to, float amount) => Mathf.Lerp(from, to, amount);
+	public static float ClampedLerp(this float from, float to, float amount) {
+		float res = from + (to - from) * amount;
+		if (amount > Mathf.Epsilon && from.IsEqualApprox(res)) {
+			return to;
+		}
+		return res;
+	}
+
+	public static double Lerp(this double from, double to, double amount) => Mathf.Lerp(from, to, amount);
+	public static double ClampedLerp(this double from, double to, double amount) {
+		double res = from + (to - from) * amount;
+		if (amount > Mathf.Epsilon && from.IsEqualApprox(res)) {
+			return to;
+		}
+		return res;
+	}
 
 	public static double SmoothDamp(this double current, double target, ref double currentVelocity, double smoothTime, double maxSpeed, double deltaTime) {
 		smoothTime = Math.Max(0.0001, smoothTime);

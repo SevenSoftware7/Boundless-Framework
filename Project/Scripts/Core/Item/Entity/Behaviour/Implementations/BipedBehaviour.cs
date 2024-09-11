@@ -7,7 +7,6 @@ using SevenDev.Utility;
 [GlobalClass]
 public partial class BipedBehaviour : GroundedBehaviour {
 	private float _moveSpeed;
-	private MovementType _movementType;
 
 	private Vector3 _lastDirection;
 
@@ -36,16 +35,6 @@ public partial class BipedBehaviour : GroundedBehaviour {
 		base.HandlePlayer(player);
 
 		if (!IsActive) return;
-
-		float speedSquared = _moveDirection.LengthSquared();
-		MovementType speed = speedSquared switch {
-			_ when Mathf.IsZeroApprox(speedSquared) => MovementType.Idle,
-			_ when speedSquared <= 0.25f || player.InputDevice.IsActionPressed(Inputs.Walk) => MovementType.Walk,
-			_ when player.InputDevice.IsActionPressed(Inputs.Evade) => MovementType.Sprint,
-			_ => MovementType.Run
-		};
-		SetMovementType(speed);
-
 
 		if (interactPrompt is null && Entity.HudPack.InteractPrompt is not null) {
 			interactPrompt ??= player.HudManager.AddPrompt(Entity.HudPack.InteractPrompt);
@@ -89,53 +78,37 @@ public partial class BipedBehaviour : GroundedBehaviour {
 
 		interactPointer?.QueueFree();
 		interactPointer = null;
-
-		_lastDirection = Vector3.Zero;
-		_movementType = MovementType.Idle;
 	}
 
-	public override bool SetMovementType(MovementType speed) {
-		if (!base.SetMovementType(speed)) return false;
-		if (speed == _movementType) return false;
-
-		_movementType = speed;
-		return true;
-	}
-
-	protected override void HandleGroundedMovement(double delta) {
+	protected override Vector3 ProcessGroundedMovement(double delta) {
 		float floatDelta = (float)delta;
 
 		// ---- Speed Calculation ----
-		float newSpeed = _movementType switch {
-			MovementType.Walk => Entity.Stats.SlowSpeed,
-			MovementType.Run => Entity.Stats.BaseSpeed,
-			MovementType.Sprint => Entity.Stats.SprintSpeed,
-			_ => 0f
-		};
-		newSpeed = Entity.AttributeModifiers.ApplyTo(Attributes.GenericMoveSpeed, newSpeed);
+		float newSpeed = Mathf.Min(_movement.Length(), Entity.Stats.SprintSpeed);
 
 		float speedDelta = _moveSpeed < newSpeed ? Entity.Stats.Acceleration : Entity.Stats.Deceleration;
-		_moveSpeed = Mathf.MoveToward(_moveSpeed, newSpeed, speedDelta * floatDelta);
-
+		_moveSpeed = _moveSpeed.MoveToward(newSpeed, speedDelta * floatDelta);
 
 		// ----- Rotation & Movement -----
 		float rotationSpeed = Entity.AttributeModifiers.ApplyTo(Attributes.GenericTurnSpeed, Entity.Stats.RotationSpeed);
+		float finalSpeed = Entity.AttributeModifiers.ApplyTo(Attributes.GenericMoveSpeed, _moveSpeed);
 
-		if (_movementType != MovementType.Idle) {
-			Vector3 normalizedInput = _moveDirection.Normalized();
+		if (!_movement.IsZeroApprox()) {
+			Vector3 normalizedInput = _movement.Normalized();
 
 			_lastDirection = _lastDirection.Lerp(normalizedInput, rotationSpeed * floatDelta);
 			Entity.GlobalForward = Entity.GlobalForward.SafeSlerp(normalizedInput, rotationSpeed * floatDelta);
 
-			Entity.Movement = _lastDirection * _moveSpeed * Mathf.Clamp(_lastDirection.Dot(Entity.GlobalForward), 0f, 1f);
+			finalSpeed *= Mathf.Clamp(_lastDirection.Dot(Entity.GlobalForward), 0f, 1f);
 		}
-		else {
-			Entity.Movement = _lastDirection * _moveSpeed;
-		}
+
+		_movement = Vector3.Zero;
 
 
 		Basis newRotation = Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection);
 		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * rotationSpeed);
+
+		return _lastDirection * finalSpeed;
 	}
 
 }

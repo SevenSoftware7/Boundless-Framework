@@ -79,8 +79,8 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 			OnRight = !OnRight;
 
 
-		T = Mathf.MoveToward(T, GetCurveT(), 6f * floatDelta);
-		TFace = Mathf.Lerp(TFace, OnFace ? 1f : 0f, 12f * floatDelta);
+		T = T.MoveToward(GetCurveT(), 6f * floatDelta);
+		TFace = TFace.Lerp(OnFace ? 1f : 0f, 12f * floatDelta);
 
 		Vector3 tPosition = GetPosition(T);
 

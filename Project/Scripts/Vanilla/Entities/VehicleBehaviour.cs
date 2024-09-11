@@ -8,12 +8,14 @@ using SevenDev.Utility;
 [GlobalClass]
 public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifier {
 	[Export] public DrivingBehaviour? Driver;
+
 	private float _moveSpeed;
 	private Vector3 _modelUp = Vector3.Up;
 
 
 	protected VehicleBehaviour() : this(null!) { }
 	public VehicleBehaviour(Entity entity) : base(entity, new BipedJumpAction.Builder()) { }
+
 
 
 	protected override void _Start(EntityBehaviour? previousBehaviour) {
@@ -25,22 +27,22 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 		Driver?.Dismount();
 	}
 
-	protected override void HandleGroundedMovement(double delta) {
+	protected override Vector3 ProcessGroundedMovement(double delta) {
 		float floatDelta = (float)delta;
 
 
 		float newSpeed = 0f;
-		if (!_moveDirection.IsEqualApprox(Vector3.Zero)) {
-			Vector3 direction = _moveDirection.Normalized();
+		Vector3 direction = Vector3.Zero;
+		if (!_movement.IsEqualApprox(Vector3.Zero)) {
+			direction = _movement.Normalized();
 
 			newSpeed = Entity.GlobalForward.Dot(direction) * Entity.AttributeModifiers.ApplyTo(Attributes.GenericMoveSpeed, Entity.Stats.BaseSpeed);
 			Entity.GlobalForward = Entity.GlobalForward.Slerp(direction, floatDelta * 3f);
 		}
 
 		float speedDelta = newSpeed > _moveSpeed ? 1f : 0.25f;
-		_moveSpeed = Mathf.MoveToward(_moveSpeed, newSpeed, speedDelta * Entity.Stats.Acceleration * floatDelta);
+		_moveSpeed = _moveSpeed.MoveToward(newSpeed, speedDelta * Entity.Stats.Acceleration * floatDelta);
 
-		Entity.Movement = Entity.GlobalForward * _moveSpeed;
 
 		Vector3 normal = Entity.GetFloorNormal();
 		float groundFlatness = normal.Dot(Entity.UpDirection);
@@ -49,7 +51,7 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 			Vector3 groundUp = groundFlatness > 0.5f ? normal : Entity.UpDirection;
 			Vector3 rightDir = Entity.GlobalForward.Cross(groundUp).Normalized();
 
-			_modelUp = _modelUp.SafeSlerp((groundUp * 4f + _moveDirection.Dot(rightDir) * rightDir).Normalized(), 7f * floatDelta);
+			_modelUp = _modelUp.SafeSlerp((groundUp * 4f + direction.Dot(rightDir) * rightDir).Normalized(), 7f * floatDelta);
 			Vector3 modelForward = _modelUp.Cross(rightDir);
 
 			Basis modelRotation = Basis.LookingAt(modelForward, _modelUp);
@@ -62,6 +64,9 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 			Basis newRotation = Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection);
 			Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * Entity.Stats.RotationSpeed);
 		}
+
+		_movement = Vector3.Zero;
+		return Entity.GlobalForward * _moveSpeed;
 	}
 
 	public void OnEnterWater(Water water) {
@@ -70,5 +75,4 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 	}
 
 	public void OnExitWater(Water water) { }
-
 }

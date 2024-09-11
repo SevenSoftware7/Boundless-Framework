@@ -20,6 +20,14 @@ public static class Vector4Extensions {
 		return vector3;
 	}
 
+	public static Vector4 ClampedLerp(this Vector4 from, Vector4 to, float amount) {
+		Vector4 res = from + (to - from) * amount;
+		if (amount > Mathf.Epsilon && from.IsEqualApprox(res)) {
+			return to;
+		}
+		return res;
+	}
+
 	public static Vector4 To(this Vector4 vector, Vector4 to)
 		=> new(to.X - vector.X, to.Y - vector.Y, to.Z - vector.Z, to.W - vector.W);
 

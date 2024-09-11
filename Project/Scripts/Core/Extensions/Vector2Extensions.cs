@@ -24,6 +24,14 @@ public static class Vector2Extensions {
 		return vector2;
 	}
 
+	public static Vector2 ClampedLerp(this Vector2 from, Vector2 to, float amount) {
+		Vector2 res = from + (to - from) * amount;
+		if (amount > Mathf.Epsilon && from.IsEqualApprox(res)) {
+			return to;
+		}
+		return res;
+	}
+
 
 	/// <summary>
 	/// Returns the target vector after being "flattened" against a surface defined by the given normal.

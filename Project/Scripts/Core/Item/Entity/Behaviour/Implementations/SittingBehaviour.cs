@@ -61,10 +61,8 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 		base._Process(delta);
 
 		if (!IsActive) return;
-		if (Engine.IsEditorHint()) return;
-		if (Entity is not Entity entity) return;
 
-		entity.GlobalTransform = SittingPosition;
-		entity.GlobalForward = SittingPosition.Basis.Forward();
+		Entity.GlobalTransform = SittingPosition;
+		Entity.GlobalForward = SittingPosition.Basis.Forward();
 	}
 }

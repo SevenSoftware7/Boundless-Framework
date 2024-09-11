@@ -12,22 +12,23 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 	private const float CenterOfMassOffset = 2f;
 
 
-	private float floatingDisplacement = 0f;
-
-	private EntityBehaviour? previousBehaviour;
-	private float _moveSpeed;
-	protected Vector3 _moveDirection;
 
 	[Export] private Water? Water;
-	private float WaterSurface;
-	private float WaterDisplacement;
+	private EntityBehaviour? previousBehaviour;
+
+	private float _moveSpeed;
+
+	private float _floatingDisplacement = 0f;
+
+	private float _waterSurface;
+	private float _waterDisplacement;
 
 	private bool _jumpInput;
 
 
 
 	public float EntityCenterOfMass => Entity.CenterOfMass is null ? (Entity.GlobalPosition.Y + CenterOfMassOffset) : Entity.CenterOfMass.GlobalPosition.Y;
-	public float OffsetToWaterSurface => WaterSurface + WaterDisplacement - EntityCenterOfMass;
+	public float OffsetToWaterSurface => _waterSurface + _waterDisplacement - EntityCenterOfMass;
 	public bool IsOnWaterSurface => Mathf.Abs(OffsetToWaterSurface) <= SurfaceThreshold;
 
 	protected SwimmingBehaviour() : this(null, null!) { }
@@ -37,24 +38,21 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 
 
 	public (Vector3 location, WaterMesh mesh)? GetInfo() => Water?.Mesh is null ? null : (Entity.GlobalPosition, Water.Mesh);
-	public void UpdateWaterDisplacement(Vector3 waterDisplacement) => WaterDisplacement = waterDisplacement.Y;
+	public void UpdateWaterDisplacement(Vector3 waterDisplacement) => _waterDisplacement = waterDisplacement.Y;
 
 	private void UpdateWaterSurfaceHeight() {
-		WaterSurface = Water?.GetSurfaceInDirection(Entity.GlobalPosition, Vector3.Up, out Collisions.IntersectRay3DResult result) ?? false
+		_waterSurface = Water?.GetSurfaceInDirection(Entity.GlobalPosition, Vector3.Up, out Collisions.IntersectRay3DResult result) ?? false
 			? result.Point.Y
 			: Mathf.Inf;
 	}
 
 
-	// public virtual bool SetMovementType(MovementType speed) => true;
-	public override bool Move(Vector3 direction) {
-		_moveDirection = direction;
-		return true;
+
+	protected override Vector3 ProcessInertia(double delta) {
+		return Entity.Inertia *= Mathf.Max(1 - 6f * (float)delta, 0f);
 	}
 
-	protected override void HandleMovement(double delta) {
-		Entity.Inertia *= Mathf.Max(1 - 6f * (float)delta, 0f);
-
+	protected override Vector3 ProcessMovement(double delta) {
 		float floatDelta = (float)delta;
 		UpdateWaterSurfaceHeight();
 
@@ -63,7 +61,6 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 		bool isOnWaterSurface = distanceToWaterSurface <= SurfaceThreshold;
 
 		// ---- Speed Calculation ----
-
 		// float newSpeed = _movementType switch {
 		// 	MovementType.Walk => Entity.Stats.SlowSpeed,
 		// 	MovementType.Run => Entity.Stats.BaseSpeed,
@@ -74,11 +71,10 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 		float newSpeed = Entity.AttributeModifiers.ApplyTo(Attributes.GenericMoveSpeed, Entity.Stats.BaseSpeed);
 
 		float speedDelta = _moveSpeed < newSpeed ? Entity.Stats.Acceleration : Entity.Stats.Deceleration;
-		_moveSpeed = Mathf.MoveToward(_moveSpeed, newSpeed, speedDelta * floatDelta);
+		_moveSpeed = _moveSpeed.MoveToward(newSpeed, speedDelta * floatDelta);
 
 
 		// ----- Rotation & Movement -----
-
 		float rotationSpeed = Entity.AttributeModifiers.ApplyTo(Attributes.GenericTurnSpeed, Entity.Stats.RotationSpeed);
 
 		// if (_movementType != MovementType.Idle) {
@@ -94,23 +90,25 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 		// }
 
 
-		Entity.Movement = _moveDirection * _moveSpeed;
+		Entity.Movement += _movement * _moveSpeed;
+		_movement = Vector3.Zero;
 
 		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection), (float)delta * rotationSpeed);
 
 
 		// ----- Floating at the Surface -----
-
 		if (isOnWaterSurface) {
 			float floatingSpeed = Mathf.IsZeroApprox(Entity.Movement.LengthSquared())
 				? (offsetToWaterSurface <= 0f ? 5f : 2.5f)
 				: 1f;
 
-			floatingDisplacement = Mathf.MoveToward(floatingDisplacement, offsetToWaterSurface, 2f * floatDelta);
-			Vector3 floatingDisplacementVector = Vector3.Up * 2f * floatingDisplacement * floatingSpeed / (Mathf.Abs(distanceToWaterSurface) + 1f);
+			_floatingDisplacement = _floatingDisplacement.MoveToward(offsetToWaterSurface, 2f * floatDelta);
+			Vector3 floatingDisplacementVector = Vector3.Up * 2f * _floatingDisplacement * floatingSpeed / (Mathf.Abs(distanceToWaterSurface) + 1f);
 
 			Entity.Inertia = Entity.Inertia.MoveToward(floatingDisplacementVector, 12f * floatDelta);
 		}
+
+		return Entity.Movement;
 	}
 
 
@@ -125,7 +123,7 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 
 	public override void _Process(double delta) {
 		if (!Engine.IsEditorHint() && Water is not null) {
-			bool isSubmerged = EntityCenterOfMass < WaterSurface;
+			bool isSubmerged = EntityCenterOfMass < _waterSurface;
 			bool hasFoothold = Entity.IsOnWall() && Entity.GetWallNormal().Dot(Entity.UpDirection) >= 0f;
 			if (IsActive && !isSubmerged && hasFoothold) {
 				ExitWater();
@@ -187,7 +185,6 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 	}
 
 	public virtual void DisavowPlayer() {
-		_moveDirection = Vector3.Zero;
 		_jumpInput = false;
 	}
 
