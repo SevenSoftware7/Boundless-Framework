@@ -19,12 +19,19 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 	public override bool IsInterruptable => _isInterruptable;
 	private bool _isInterruptable = false;
 
+	private Vector3 _movement = Vector3.Zero;
+	private MovementBehaviour.MovementType _movementType = MovementBehaviour.MovementType.Run;
+
 	private AnimationPlayer AnimPlayer = entity.AnimationPlayer is AnimationPlayer animPlayer
 		? animPlayer
 		: throw new InvalidOperationException($"Could not initialize AnimationAction, because no AnimationPlayer could be found");
 	protected readonly AnimationPath AnimationPath = path;
 
 
+	public void SetMovement(Vector3 direction, MovementBehaviour.MovementType movementType) {
+		_movement = direction;
+		_movementType = movementType;
+	}
 
 	/// <summary>
 	/// Method to add an Attribute Modifier.
@@ -140,6 +147,14 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 		foreach (AttributeModifier? modifier in modifiers) {
 			if (modifier is null) continue;
 			Entity.AttributeModifiers.Remove(modifier);
+		}
+	}
+
+	public override void _Process(double delta) {
+		base._Process(delta);
+
+		if (!_movement.IsZeroApprox() && Entity.CurrentBehaviour is GroundedBehaviour groundedBehaviour) {
+			groundedBehaviour.Move(Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection) * _movement, _movementType);
 		}
 	}
 }
