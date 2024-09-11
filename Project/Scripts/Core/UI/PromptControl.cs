@@ -5,7 +5,6 @@ using Godot;
 [GlobalClass]
 public abstract partial class PromptControl : Control {
 	[Export] public bool Enabled;
-	public bool QueuedForDestruction { get; private set; }
 
 
 	public void SetEnabled(bool enabled) {
@@ -43,8 +42,5 @@ public abstract partial class PromptControl : Control {
 		SetText(interactTarget.Interactable.InteractLabel);
 	}
 
-	public void Destroy() {
-		QueuedForDestruction = true;
-		Enabled = false;
-	}
+	public virtual void Destroy() { } // TODO: When CancelFree works (again), replace with the standard QueueFree pipeline
 }

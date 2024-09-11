@@ -1,6 +1,8 @@
 namespace LandlessSkies.Core;
 
 using Godot;
+using SevenDev.Utility;
+
 
 [Tool]
 [GlobalClass]
@@ -10,6 +12,11 @@ public partial class SliderPromptControl : PromptControl {
 	[Export] private TextureRect Key = null!;
 
 	private float velocity;
+	private bool _queuedForDestruction = false;
+
+	// Store the position and scale here because some precision is lost when modifying the Position and Scale properties
+	private float _positionX;
+	private float _scaleY;
 
 
 	public override void SetText(string text) {
@@ -25,38 +32,46 @@ public partial class SliderPromptControl : PromptControl {
 		Position = Position with { X = -Size.X };
 		Scale = new(1f, 0f);
 		Visible = false;
+
+		_positionX = Position.X;
+		_scaleY = Scale.Y;
+	}
+
+	public override void Destroy() {
+		base.Destroy();
+		if (Visible) {
+			_queuedForDestruction = true;
+		}
+		else {
+			QueueFree();
+		}
 	}
 
 	public override void _Process(double delta) {
 		base._Process(delta);
 
-		if (QueuedForDestruction && !Visible && IsQueuedForDeletion()) return;
+		if (_queuedForDestruction && !Visible) {
+			QueueFree();
+			return;
+		}
 
 		float floatDelta = (float)delta;
 
-		Vector2 targetPosition = Position with {
-			X = Enabled ? 0 : -Size.X
-		};
 
-		Vector2 targetScale = Scale with {
-			Y = !Enabled && (shrinkInView || Position.IsEqualApprox(targetPosition)) ? Mathf.Epsilon : 1f
-		};
-		Scale = Scale.Lerp(targetScale, 25f * floatDelta);
+		float targetPositionX = (Enabled && !_queuedForDestruction) ? 0 : -Size.X;
+		_positionX = _positionX.ClampedLerp(targetPositionX, 15f * floatDelta);
+		Position = Position with { X = _positionX };
+
+		float targetScaleY = !(Enabled && !_queuedForDestruction) && (shrinkInView || _positionX.IsEqualApprox(targetPositionX)) ? 0f : 1f;
+		_scaleY = _scaleY.ClampedLerp(targetScaleY, 25f * floatDelta);
+		Scale = Scale with { Y = _scaleY };
 
 
 		bool wasNotVisible = !Visible;
-		Visible = !Mathf.IsEqualApprox(Scale.Y, Mathf.Epsilon);
+		Visible = !_scaleY.IsZeroApprox();
 		if (Visible && wasNotVisible) {
 			GetParent()?.MoveChild(this, 0);
 		}
-
-		if (QueuedForDestruction && !Visible) {
-			QueueFree();
-		}
-
-		if (!Visible) return;
-
-		Position = Position.Lerp(targetPosition, 15f * floatDelta);
 
 		UpdateMinimumSize();
 	}
@@ -64,4 +79,16 @@ public partial class SliderPromptControl : PromptControl {
 	public override Vector2 _GetMinimumSize() {
 		return Size * Scale;
 	}
+
+	// public override void _Notification(int what) {
+	// 	base._Notification(what);
+	// 	switch((ulong)what) {
+	// 		case NotificationPredelete:
+	// 			if (Visible) {
+	// 				_queuedForDestruction = true;
+	// 				CancelFree();
+	// 			}
+	// 			break;
+	// 	}
+	// }
 }
