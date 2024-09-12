@@ -47,6 +47,7 @@ public abstract partial class AttributeModifier : Resource, IAttributeModifier {
 		return [
 			VariantUtility.GenerateProperty(
 				AttributeValue,
+				Variant.Type.StringName,
 				PropertyUsageFlags.Default & ~PropertyUsageFlags.Storage,
 				PropertyHint.Enum,
 				Attributes.JoinedGenericAttributes
