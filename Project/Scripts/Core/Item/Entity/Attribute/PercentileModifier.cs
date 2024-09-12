@@ -11,7 +11,7 @@ public sealed partial class PercentileModifier : AttributeModifier {
 		set {
 			_percentile = value;
 			UpdateName();
-			EmitChanged();
+			EmitValueModified();
 		}
 	}
 	private float _percentile;

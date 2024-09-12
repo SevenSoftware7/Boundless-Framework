@@ -248,7 +248,11 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 	private void UpdateHealth(bool keepRatio) {
 		_health?.SetMaximum(AttributeModifiers.ApplyTo(Attributes.GenericMaxHealth, Stats.MaxHealth), keepRatio);
 	}
-	private void OnHealthModifiersUpdate() => UpdateHealth(false);
+	private void OnHealthModifiersUpdate(EntityAttribute attribute) {
+		if (attribute == Attributes.GenericMaxHealth) {
+			UpdateHealth(false);
+		}
+	}
 
 	public override void _Ready() {
 		base._Ready();

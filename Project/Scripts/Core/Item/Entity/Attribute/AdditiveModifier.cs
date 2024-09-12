@@ -11,7 +11,7 @@ public sealed partial class AdditiveModifier : AttributeModifier {
 		set {
 			_adder = value;
 			UpdateName();
-			EmitChanged();
+			EmitValueModified();
 		}
 	}
 	private float _adder;

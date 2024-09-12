@@ -1,6 +1,8 @@
 namespace LandlessSkies.Core;
 
 using System.Collections.Generic;
+using Godot;
+
 
 public static class Attributes {
 	public static readonly EntityAttribute GenericGravity = "generic_gravity";
@@ -18,5 +20,7 @@ public static class Attributes {
 		GenericjumpHeight,
 		GenericGravity,
 	];
+
+	public static readonly StringName JoinedGenericAttributes = string.Join(',', GenericAttributes);
 
 }

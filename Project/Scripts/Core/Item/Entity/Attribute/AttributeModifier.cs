@@ -2,6 +2,8 @@ namespace LandlessSkies.Core;
 
 using Godot;
 using Godot.Collections;
+using SevenDev.Utility;
+
 
 [Tool]
 [GlobalClass]
@@ -11,13 +13,18 @@ public abstract partial class AttributeModifier : Resource, IAttributeModifier {
 	[Export]
 	public StringName Name {
 		get => Target.Name;
-		set {
+		private set {
 			Target = value;
 			EmitChanged();
 		}
 	}
 	public EntityAttribute Target { get; private set; } = Attributes.GenericAttributes[0];
 	public virtual bool IsStacking => false;
+
+	public event System.Action<EntityAttribute>? OnValueModified;
+	protected void EmitValueModified() {
+		OnValueModified?.Invoke(Target);
+	}
 
 
 
@@ -37,13 +44,14 @@ public abstract partial class AttributeModifier : Resource, IAttributeModifier {
 	protected abstract string GetResourceName();
 
 	public override Array<Dictionary> _GetPropertyList() {
-		return [new Dictionary() {
-			{ "name", AttributeValue },
-			{ "type", (int)Variant.Type.StringName },
-			{ "usage", (int)(PropertyUsageFlags.Default & ~PropertyUsageFlags.Storage) },
-			{ "hint", (int)PropertyHint.Enum },
-			{ "hint_string", string.Join(',', Attributes.GenericAttributes) },
-		}];
+		return [
+			VariantUtility.GenerateProperty(
+				AttributeValue,
+				PropertyUsageFlags.Default & ~PropertyUsageFlags.Storage,
+				PropertyHint.Enum,
+				Attributes.JoinedGenericAttributes
+			)
+		];
 	}
 
 	public override Variant _Get(StringName property) {

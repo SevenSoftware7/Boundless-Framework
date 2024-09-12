@@ -11,7 +11,7 @@ public sealed partial class MultiplicativeModifier : AttributeModifier {
 		set {
 			_multiplier = value;
 			UpdateName();
-			EmitChanged();
+			EmitValueModified();
 		}
 	}
 	private float _multiplier;

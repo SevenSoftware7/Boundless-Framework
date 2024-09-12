@@ -13,10 +13,7 @@ public sealed class AttributeModifierCollection : ICollection<AttributeModifier>
 	public int Count => _dictionary.Values.Sum(e => e.Count);
 	public bool IsReadOnly => false;
 
-	// Ideally, this would be of type Action<EntityAttribute>? so we can optimize when we refresh data,
-	// But Godot Signals don't play nice with Lambdas so we can't inject parameters in the event invocations.
-	// -----> https://github.com/godotengine/godot/issues/76690
-	public event System.Action? OnModifiersUpdated;
+	public event System.Action<EntityAttribute>? OnModifiersUpdated;
 
 
 	public float ApplyTo(EntityAttribute target, float baseValue) {
@@ -28,7 +25,7 @@ public sealed class AttributeModifierCollection : ICollection<AttributeModifier>
 
 	public void Add(AttributeModifier item) {
 		AddInternal(item);
-		OnModifiersUpdated?.Invoke();
+		OnModifiersUpdated?.Invoke(item.Target);
 	}
 
 	private void AddInternal(AttributeModifier item) {
@@ -41,23 +38,24 @@ public sealed class AttributeModifierCollection : ICollection<AttributeModifier>
 			entry.Add(item);
 		}
 
-		Callable changeCallable = Callable.From(OnModifiersUpdated!);
-
-		if (!item.IsConnected(Resource.SignalName.Changed, changeCallable)) {
-			item.Connect(Resource.SignalName.Changed, changeCallable);
-		}
+		item.OnValueModified += OnModifiersUpdated;
 	}
 
 	public void AddRange(IEnumerable<AttributeModifier> items) {
+		HashSet<EntityAttribute> attributes = [];
 		foreach (AttributeModifier item in items) {
 			AddInternal(item);
+			attributes.Add(item.Target);
 		}
-		OnModifiersUpdated?.Invoke();
+		foreach (EntityAttribute attribute in attributes) {
+			OnModifiersUpdated?.Invoke(attribute);
+		}
 	}
 
 	public bool Remove(AttributeModifier item) {
 		bool wasRemoved = RemoveInternal(item);
-		if (wasRemoved) OnModifiersUpdated?.Invoke();
+		if (wasRemoved) OnModifiersUpdated?.Invoke(item.Target);
+
 		return wasRemoved;
 	}
 
@@ -66,19 +64,20 @@ public sealed class AttributeModifierCollection : ICollection<AttributeModifier>
 		if (Unsafe.IsNullRef(ref entry) || !entry.Remove(item))
 			return false;
 
-		Callable changeCallable = Callable.From(OnModifiersUpdated!);
-
-		if (item.IsConnected(Resource.SignalName.Changed, changeCallable)) {
-			item.Disconnect(Resource.SignalName.Changed, changeCallable);
-		}
+		item.OnValueModified -= OnModifiersUpdated;
 		return true;
 	}
 
 	public void RemoveRange(IEnumerable<AttributeModifier> items) {
+		HashSet<EntityAttribute> attributes = [];
 		foreach (AttributeModifier item in items) {
 			RemoveInternal(item);
+			attributes.Add(item.Target);
 		}
-		OnModifiersUpdated?.Invoke();
+
+		foreach (EntityAttribute attribute in attributes) {
+			OnModifiersUpdated?.Invoke(attribute);
+		}
 	}
 
 	public void Set(IEnumerable<AttributeModifier> modifiers) {
