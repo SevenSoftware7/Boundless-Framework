@@ -2,29 +2,36 @@ namespace LandlessSkies.Core;
 
 using Godot;
 using Godot.Collections;
-using SevenDev.Utility;
-
 
 [Tool]
 [GlobalClass]
 public abstract partial class AttributeModifier : Resource, IAttributeModifier {
 	public static readonly StringName AttributeValue = "AttributeValue";
 
+	[Export] private bool UseAttributeDropdown {
+		get => _useAttributeDropdown;
+		set {
+			_useAttributeDropdown = value;
+			NotifyPropertyListChanged();
+		}
+	}
+	private bool _useAttributeDropdown = false;
+
 	[Export]
-	public StringName Name {
+	public StringName AttributeName {
 		get => Target.Name;
 		private set {
 			Target = value;
+			UpdateName();
 			EmitChanged();
 		}
 	}
+
 	public EntityAttribute Target { get; private set; } = Attributes.GenericAttributes[0];
 	public virtual bool IsStacking => false;
 
 	public event System.Action<EntityAttribute>? OnValueModified;
-	protected void EmitValueModified() {
-		OnValueModified?.Invoke(Target);
-	}
+	protected void EmitValueModified() => OnValueModified?.Invoke(Target);
 
 
 
@@ -36,6 +43,7 @@ public abstract partial class AttributeModifier : Resource, IAttributeModifier {
 
 
 	public abstract float ApplyTo(float baseValue);
+
 	public void UpdateName() {
 		if (!Engine.IsEditorHint()) return;
 
@@ -43,31 +51,18 @@ public abstract partial class AttributeModifier : Resource, IAttributeModifier {
 	}
 	protected abstract string GetResourceName();
 
-	public override Array<Dictionary> _GetPropertyList() {
-		return [
-			VariantUtility.GenerateProperty(
-				AttributeValue,
-				Variant.Type.StringName,
-				PropertyUsageFlags.Default & ~PropertyUsageFlags.Storage,
-				PropertyHint.Enum,
-				Attributes.JoinedGenericAttributes
-			)
-		];
-	}
 
-	public override Variant _Get(StringName property) {
-		if (property != AttributeValue)
-			return base._Get(property);
+	public override void _ValidateProperty(Dictionary property) {
+		base._ValidateProperty(property);
 
-		return Name;
-	}
+		StringName name = property["name"].AsStringName();
 
-	public override bool _Set(StringName property, Variant value) {
-		if (property != AttributeValue)
-			return base._Set(property, value);
-
-		Name = value.AsStringName();
-		UpdateName();
-		return true;
+		if (UseAttributeDropdown && name == PropertyName.AttributeName) {
+			property["hint"] = (int)PropertyHint.Enum;
+			property["hint_string"] = Attributes.JoinedGenericAttributes;
+		}
+		else if (name == PropertyName.UseAttributeDropdown) {
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
+		}
 	}
 }

@@ -30,6 +30,6 @@ public sealed partial class AdditiveModifier : AttributeModifier {
 	}
 
 	protected override string GetResourceName() {
-		return $"{(_adder >= 0 ? '+' : '-')} {Mathf.Abs(_adder)} {Name}";
+		return $"{(_adder >= 0 ? '+' : '-')} {Mathf.Abs(_adder)} {AttributeName}";
 	}
 }

@@ -34,6 +34,6 @@ public sealed partial class PercentileModifier : AttributeModifier {
 	}
 
 	protected override string GetResourceName() {
-		return $"{_percentile:+0.##%;-#.##%} {Name}";
+		return $"{_percentile:+0.##%;-#.##%} {AttributeName}";
 	}
 }

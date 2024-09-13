@@ -34,6 +34,6 @@ public sealed partial class MultiplicativeModifier : AttributeModifier {
 	}
 
 	protected override string GetResourceName() {
-		return $"{_multiplier:0.##%} {Name}";
+		return $"{_multiplier:0.##%} {AttributeName}";
 	}
 }
