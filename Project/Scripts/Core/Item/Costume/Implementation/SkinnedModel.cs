@@ -1,21 +1,20 @@
 namespace LandlessSkies.Core;
 
+using System.Linq;
 using Godot;
 
 [Tool]
 [GlobalClass]
-public partial class SkinnedModel : Model, IInjectable<Skeleton3D?>, IInjectable<Handedness> {
-	[Export] protected GeometryInstance3D Model { get; private set; } = null!;
+public partial class SkinnedModel : MeshModel, IInjectable<Skeleton3D?>, IInjectable<Handedness> {
 
 	[ExportGroup("Dependencies")]
 	public Skeleton3D? Skeleton { get; private set; }
 	public Handedness Handedness { get; private set; }
 
 
+	protected SkinnedModel(GeometryInstance3D[] meshes) : base(meshes) { }
 	protected SkinnedModel() : base() { }
 
-
-	public override Aabb GetAabb() => Model.GetAabb();
 
 	public void Inject(Handedness handedness) {
 		Handedness = handedness;
@@ -23,14 +22,12 @@ public partial class SkinnedModel : Model, IInjectable<Skeleton3D?>, IInjectable
 	public void Inject(Skeleton3D? skeleton) {
 		Skeleton = skeleton;
 
-		if (Model is null || Model is not MeshInstance3D meshInstance) return;
+		if (Skeleton is null) return;
 
-		if (Skeleton is null) {
-			meshInstance.Skeleton = "..";
-			return;
+		foreach (MeshInstance3D mesh in Meshes.OfType<MeshInstance3D>()) {
+			NodePath path = mesh.GetPathTo(Skeleton);
+			mesh.Skeleton = path;
 		}
-
-		meshInstance.Skeleton = meshInstance.GetPathTo(Skeleton);
 	}
 
 	public void RequestInjection() {
@@ -49,7 +46,7 @@ public partial class SkinnedModel : Model, IInjectable<Skeleton3D?>, IInjectable
 	public override void _Ready() {
 		base._Ready();
 
-		if (GetParent()?.IsNodeReady() ?? false) {
+		if (Meshes.Count != 0 && (GetParent()?.IsNodeReady() ?? false)) {
 			RequestInjection();
 		}
 	}

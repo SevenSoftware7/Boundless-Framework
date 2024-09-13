@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://chsj82irsedw6"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Model.cs" id="1_0xwor"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Implementation/MeshModel.cs" id="1_rpy7d"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g4lnn"]
 albedo_color = Color(0.2412, 0.362693, 0.67, 1)
@@ -21,8 +21,9 @@ size = Vector3(0.1, 1.5, 0.3)
 material = SubResource("StandardMaterial3D_g4lnn")
 size = Vector3(0.3, 1, 0.1)
 
-[node name="Model - Eleos (base)" type="Node3D"]
-script = ExtResource("1_0xwor")
+[node name="Model - Eleos (base)" type="Node3D" node_paths=PackedStringArray("Meshes")]
+script = ExtResource("1_rpy7d")
+Meshes = [NodePath("Handle"), NodePath("Guard"), NodePath("Guard/Blade"), NodePath("Guard/Blade/Tip")]
 
 [node name="Handle" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)

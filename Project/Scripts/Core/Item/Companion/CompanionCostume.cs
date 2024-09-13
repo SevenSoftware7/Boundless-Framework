@@ -9,6 +9,8 @@ public partial class CompanionCostume : Costume, IPortraitProvider {
 	[Export] private string _displayName = string.Empty;
 	public override string DisplayName => _displayName;
 
+
+	[ExportGroup("Portraits")]
 	[Export] private Texture2D? _displayPortrait = null;
 	public override Texture2D? DisplayPortrait => _displayPortrait;
 
