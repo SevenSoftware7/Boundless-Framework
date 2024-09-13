@@ -60,13 +60,6 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 		float distanceToWaterSurface = Mathf.Abs(offsetToWaterSurface);
 		bool isOnWaterSurface = distanceToWaterSurface <= SurfaceThreshold;
 
-		// ---- Speed Calculation ----
-		// float newSpeed = _movementType switch {
-		// 	MovementType.Walk => Entity.Stats.SlowSpeed,
-		// 	MovementType.Run => Entity.Stats.BaseSpeed,
-		// 	MovementType.Sprint => Entity.Stats.SprintSpeed,
-		// 	_ => 0f
-		// };
 
 		float newSpeed = Entity.AttributeModifiers.ApplyTo(Attributes.GenericMoveSpeed, Entity.Stats.BaseSpeed);
 
@@ -76,22 +69,6 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 
 		// ----- Rotation & Movement -----
 		float rotationSpeed = Entity.AttributeModifiers.ApplyTo(Attributes.GenericTurnSpeed, Entity.Stats.RotationSpeed);
-
-		// if (_movementType != MovementType.Idle) {
-		// 	Vector3 normalizedInput = _moveDirection.Normalized();
-
-		// 	_lastDirection = _lastDirection.Lerp(normalizedInput, rotationSpeed * floatDelta);
-		// 	Entity.GlobalForward = Entity.GlobalForward.SafeSlerp(normalizedInput, rotationSpeed * floatDelta);
-
-		// 	Entity.Movement = _lastDirection * _moveSpeed * Mathf.Clamp(_lastDirection.Dot(Entity.GlobalForward), 0f, 1f);
-		// }
-		// else {
-		// 	Entity.Movement = _lastDirection * _moveSpeed;
-		// }
-
-
-		Entity.Movement += _movement * _moveSpeed;
-		_movement = Vector3.Zero;
 
 		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection), (float)delta * rotationSpeed);
 
@@ -108,7 +85,7 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 			Entity.Inertia = Entity.Inertia.MoveToward(floatingDisplacementVector, 12f * floatDelta);
 		}
 
-		return Entity.Movement;
+		return _movement.Normalized() * _moveSpeed;
 	}
 
 

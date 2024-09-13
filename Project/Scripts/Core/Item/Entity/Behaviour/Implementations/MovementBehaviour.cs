@@ -42,7 +42,7 @@ public abstract partial class MovementBehaviour : EntityBehaviour {
 			Entity.Velocity = Entity.Inertia + Entity.Movement;
 			Entity.MoveAndSlide();
 
-			Entity.Movement = Vector3.Zero;
+			Entity.Movement = _movement = Vector3.Zero;
 		}
 	}
 
