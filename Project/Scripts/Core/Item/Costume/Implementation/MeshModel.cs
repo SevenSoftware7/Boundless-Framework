@@ -14,7 +14,7 @@ public partial class MeshModel : Model {
 			foreach (GeometryInstance3D model in Meshes) {
 				Material? materialOverride = model.MaterialOverride;
 
-				if (materialOverride == _materialOverride || materialOverride is null) {
+				if (materialOverride == _materialOverride || materialOverride is null || _materialOverride is null) {
 					model.MaterialOverride = value;
 				}
 			}
@@ -30,7 +30,7 @@ public partial class MeshModel : Model {
 			foreach (GeometryInstance3D model in Meshes) {
 				Material? materialOverlay = model.MaterialOverlay;
 
-				if (materialOverlay == _materialOverlay || materialOverlay is null) {
+				if (materialOverlay == _materialOverlay || materialOverlay is null || _materialOverlay is null) {
 					model.MaterialOverlay = value;
 				}
 			}
