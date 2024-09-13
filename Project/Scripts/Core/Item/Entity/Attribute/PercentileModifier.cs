@@ -10,7 +10,6 @@ public sealed partial class PercentileModifier : AttributeModifier {
 		get => _percentile;
 		set {
 			_percentile = value;
-			UpdateName();
 			EmitValueModified();
 		}
 	}

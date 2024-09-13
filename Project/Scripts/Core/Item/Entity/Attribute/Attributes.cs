@@ -3,7 +3,6 @@ namespace LandlessSkies.Core;
 using System.Collections.Generic;
 using Godot;
 
-
 public static class Attributes {
 	public static readonly EntityAttribute GenericGravity = "generic_gravity";
 	public static readonly EntityAttribute GenericMaxHealth = "generic_max_health";

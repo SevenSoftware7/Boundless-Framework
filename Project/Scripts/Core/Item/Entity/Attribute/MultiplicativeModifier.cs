@@ -10,7 +10,6 @@ public sealed partial class MultiplicativeModifier : AttributeModifier {
 		get => _multiplier;
 		set {
 			_multiplier = value;
-			UpdateName();
 			EmitValueModified();
 		}
 	}

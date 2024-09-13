@@ -10,7 +10,6 @@ public sealed partial class AdditiveModifier : AttributeModifier {
 		get => _adder;
 		set {
 			_adder = value;
-			UpdateName();
 			EmitValueModified();
 		}
 	}

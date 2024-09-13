@@ -31,7 +31,10 @@ public abstract partial class AttributeModifier : Resource, IAttributeModifier {
 	public virtual bool IsStacking => false;
 
 	public event System.Action<EntityAttribute>? OnValueModified;
-	protected void EmitValueModified() => OnValueModified?.Invoke(Target);
+	protected void EmitValueModified() {
+		OnValueModified?.Invoke(Target);
+		UpdateName();
+	}
 
 
 
@@ -44,7 +47,7 @@ public abstract partial class AttributeModifier : Resource, IAttributeModifier {
 
 	public abstract float ApplyTo(float baseValue);
 
-	public void UpdateName() {
+	private void UpdateName() {
 		if (!Engine.IsEditorHint()) return;
 
 		ResourceName = GetResourceName();
