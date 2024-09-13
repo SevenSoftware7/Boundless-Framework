@@ -26,8 +26,8 @@ OverrideRotation = true
 
 [node name="Rain" parent="CameraController3D/FX" instance=ExtResource("3_532s7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 30, 0)
-visible = false
 sorting_use_aabb_center = false
+lifetime = 0.6
 visibility_aabb = AABB(-20, -119, -20, 40, 120, 40)
 
 [node name="HUD" type="Control" parent="." node_paths=PackedStringArray("ProjectorCamera", "PointerContainer", "InfoContainer", "PromptContainer")]
