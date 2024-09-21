@@ -1,5 +1,6 @@
 namespace LandlessSkies.Core;
 
+using System;
 using System.Collections.Generic;
 using Godot;
 using SevenDev.Utility;
@@ -8,10 +9,22 @@ using SevenDev.Utility;
 public partial class DamageArea : Area3D {
 	private readonly List<IDamageable> hitBuffer = [];
 
-	public TimeDuration? LifeTime;
+	[Export] public ulong LifeTime {
+		get => _lifeTime?.DurationMsec ?? 0;
+		set {
+			if (_lifeTime is null) {
+				_lifeTime = new(true, value);
+			}
+			else {
+				_lifeTime.DurationMsec = value;
+			}
+		}
+	}
+	public TimeDuration? _lifeTime;
 
-	public IDamageDealer? DamageDealer { get; init; }
 	[Export] public float Damage = 1f;
+	[Export] public DamageType Type = DamageType.Physical;
+
 	[Export] public bool SelfDamage = false;
 
 	[Export] public bool CanParry = false;
@@ -20,30 +33,30 @@ public partial class DamageArea : Area3D {
 	[Signal] public delegate void OnDestroyEventHandler();
 
 
+	public IDamageDealer? DamageDealer { get; init; }
+
+
 
 	public DamageArea() : base() {
 		CollisionLayer = CollisionLayers.Damage;
 		CollisionMask = CollisionLayers.Damage | CollisionLayers.Entity | CollisionLayers.Prop;
 	}
-	public DamageArea(ulong lifeTime) : this() {
-		if (lifeTime != 0) {
-			LifeTime = new(true, lifeTime);
-		}
-	}
 
 
 
-	public void GetParriedBy(DamageArea other) {
-		if (!Parriable) return;
+	public void Parry(DamageArea other) {
+		if (!CanParry || !other.Parriable) return;
 
-		if (other.DamageDealer?.Damageable is IDamageable damageable) {
-			hitBuffer.Remove(damageable);
+		if (DamageDealer?.Damageable is IDamageable damageable) {
+			other.hitBuffer.Remove(damageable);
+			DamageDealer.AwardDamage(other.Damage, (IDamageDealer.DamageType)Type | IDamageDealer.DamageType.Parry, damageable);
 		}
 	}
 
 	private void ApplyBufferedDamage() {
 		foreach (IDamageable hit in hitBuffer) {
 			hit.Damage(Damage);
+			DamageDealer?.AwardDamage(Damage, (IDamageDealer.DamageType)Type, hit);
 		}
 		hitBuffer.Clear();
 	}
@@ -51,8 +64,8 @@ public partial class DamageArea : Area3D {
 
 
 	private void _BodyEntered(Node3D body) {
-		GD.Print($"Body {body.Name} collided with DamageArea {Name}");
-		if (body is IDamageable damageable && (damageable != DamageDealer || SelfDamage)) {
+		// GD.Print($"Body {body.Name} collided with DamageArea {Name} (from {DamageDealer?.GetType().Name})");
+		if (body is IDamageable damageable && (SelfDamage || damageable != DamageDealer?.Damageable)) {
 			if (hitBuffer.Count == 0) {
 				Callable.From(ApplyBufferedDamage).CallDeferred();
 			}
@@ -60,16 +73,16 @@ public partial class DamageArea : Area3D {
 		}
 	}
 	private void _AreaEntered(Node3D area) {
-		GD.Print($"Area {area.Name} collided with DamageArea {Name}");
+		// GD.Print($"Area {area.Name} collided with DamageArea {Name} (from {DamageDealer?.GetType().Name})");
 		if (area is DamageArea damageArea) {
-			if (CanParry) damageArea.GetParriedBy(this);
+			Parry(damageArea);
 		}
 	}
 
 
 	public override void _Process(double delta) {
 		base._Process(delta);
-		if (LifeTime is not null && LifeTime.HasPassed) {
+		if (_lifeTime is not null && _lifeTime.HasPassed) {
 			QueueFree();
 		}
 	}
@@ -88,5 +101,13 @@ public partial class DamageArea : Area3D {
 				EmitSignal(SignalName.OnDestroy);
 				break;
 		}
+	}
+
+
+
+	[Flags]
+	public enum DamageType {
+		Physical = IDamageDealer.DamageType.Physical,
+		Magical = IDamageDealer.DamageType.Magical,
 	}
 }

@@ -11,7 +11,7 @@ using SevenDev.Utility;
 /// </summary>
 [Tool]
 [GlobalClass]
-public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, IInjectable<Entity?>, IInjectable<Skeleton3D?>, IInjectable<Handedness>, IInjectable<WeaponHolsterState> {
+public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, IInjectable<Entity?>, IInjectable<Skeleton3D?>, IInjectable<Handedness>, IInjectable<WeaponHolsterState>, IDamageDealerProxy {
 	private static readonly StringName LeftWeapon = "LeftWeapon";
 	private static readonly StringName RightWeapon = "RightWeapon";
 	private static readonly StringName LeftHand = "LeftHand";
@@ -19,6 +19,7 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 
 	public static readonly Basis rightHandBoneBasis = Basis.FromEuler(new(Mathf.DegToRad(-90f), 0f, Mathf.DegToRad(-90f)));
 	public static readonly Basis leftHandBoneBasis = Basis.FromEuler(new(Mathf.DegToRad(-90f), 0f, Mathf.DegToRad(90f)));
+
 
 	public WeaponHolsterState HolsterState {
 		get => _holsterState;
@@ -44,6 +45,8 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 	public abstract WeaponUsage Usage { get; }
 	public abstract WeaponSize Size { get; }
 
+
+	public IDamageDealer? Sender => Entity;
 
 
 	[Export]
@@ -82,6 +85,7 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 	}
 	private int _style;
 	public virtual int StyleCount => 1;
+
 
 	[Signal] public delegate void CostumeChangedEventHandler(WeaponCostume? newCostume, WeaponCostume? oldCostume);
 
@@ -182,7 +186,6 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 			StickToSkeletonBone();
 		}
 	}
-
 
 	[Serializable]
 	public class WeaponSaveData<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] T>(T weapon) : CostumableSaveData<T, WeaponCostume>(weapon) where T : Weapon;

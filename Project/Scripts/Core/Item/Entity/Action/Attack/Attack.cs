@@ -11,13 +11,11 @@ using SevenDev.Utility;
 /// <param name="entity">Inherited from <see cref="Action"/>.</param>
 /// <param name="weapon">The Weapon which will be used in the Attack.</param>
 /// <param name="modifiers">Inherited from <see cref="Action"/>.</param>
-public abstract partial class Attack(Entity entity, Weapon weapon, AnimationPath path, IEnumerable<AttributeModifier>? modifiers = null) : AnimationAction(entity, path, modifiers), IDamageDealer {
+public abstract partial class Attack(Entity entity, Weapon weapon, AnimationPath path, IEnumerable<AttributeModifier>? modifiers = null) : AnimationAction(entity, path, modifiers), IDamageDealerProxy {
 	private readonly List<DamageArea?> damageAreas = [];
 
 	public Weapon Weapon { get; private set; } = weapon;
-
-
-	IDamageable IDamageDealer.Damageable => Entity;
+	public IDamageDealer? Sender => Weapon;
 
 
 	protected static StringName GetAnimationPath(StringName library, StringName attack) => library.IsEmpty ? attack : $"{library}/{attack}";
@@ -72,6 +70,10 @@ public abstract partial class Attack(Entity entity, Weapon weapon, AnimationPath
 	/// <param name="damageArea">The DamageArea which had its ability to Parry changed</param>
 	protected virtual void _SetCanParry(bool canParry, DamageArea damageArea) { }
 
+
+	public void AwardDamage(ref float damage, ref IDamageDealer.DamageType type) {
+
+	}
 
 	[Flags]
 	public enum AttackType : byte {

@@ -5,11 +5,15 @@ using SevenDev.Utility;
 
 [GlobalClass]
 public sealed partial class DamageAreaBuilder : Resource {
-	[Export] public float Damage = 1f;
 	[Export] public ulong LifeTime = 250;
 
-	[Export] public bool Parriable = false;
+	[Export] public float Damage = 1f;
+	[Export] public DamageArea.DamageType Type = DamageArea.DamageType.Physical;
+
+	[Export] public bool SelfDamage = false;
+
 	[Export] public bool CanParry = false;
+	[Export] public bool Parriable = false;
 
 	[Export] public bool Attached = false;
 	[Export] public HitBoxAttachment AttachmentTarget = HitBoxAttachment.Entity;
@@ -18,11 +22,14 @@ public sealed partial class DamageAreaBuilder : Resource {
 
 
 	public DamageArea Build(Attack attack) {
-		DamageArea damageArea = new(LifeTime) {
-			Damage = Damage,
+		DamageArea damageArea = new() {
 			DamageDealer = attack,
-			Parriable = Parriable,
+			LifeTime = LifeTime,
+			Damage = Damage,
+			Type = Type,
+			SelfDamage = SelfDamage,
 			CanParry = CanParry,
+			Parriable = Parriable,
 		};
 
 		Node3D parent = AttachmentTarget switch {

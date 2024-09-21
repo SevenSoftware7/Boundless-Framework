@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using KGySoft.CoreLibraries;
-using LandlessSkies.Vanilla;
 using SevenDev.Utility;
 
 /// <summary>
@@ -14,7 +13,7 @@ using SevenDev.Utility;
 /// </summary>
 [Tool]
 [GlobalClass]
-public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICostumable, ICustomizable, ISaveable<Entity>, IInjectionProvider<Entity?>, IInjectionProvider<Skeleton3D?>, IInjectionProvider<Handedness>, ISerializationListener {
+public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDamageDealer, ICostumable, ICustomizable, ISaveable<Entity>, IInjectionProvider<Entity?>, IInjectionProvider<Skeleton3D?>, IInjectionProvider<Handedness>, ISerializationListener {
 	public readonly List<Vector3> RecoverLocationBuffer = [];
 	public const int RECOVER_LOCATION_BUFFER_SIZE = 5;
 
@@ -23,6 +22,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 	[Export] public string DisplayName { get; private set; } = string.Empty;
 	public Texture2D? DisplayPortrait => CostumeHolder?.Costume?.DisplayPortrait;
 
+
+	public IDamageable? Damageable => this;
 
 	[Export] public EntityStats Stats { get; private set; } = new();
 	[Export] public HudPack HudPack { get; private set; } = new();
@@ -285,6 +286,14 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 		healthBar?.QueueFree();
 	}
 
+	public virtual void OnBeforeSerialize() { }
+	public virtual void OnAfterDeserialize() {
+		Callable.From(() => {
+			this.PropagateInject<Entity?>();
+			this.PropagateInject<Skeleton3D?>();
+			this.PropagateInject<Handedness>();
+		}).CallDeferred();
+	}
 
 
 	public ISaveData<Entity> Save() => new EntitySaveData<Entity>(this);
@@ -293,15 +302,10 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, ICos
 	Skeleton3D? IInjectionProvider<Skeleton3D?>.GetInjection() => Skeleton;
 	Handedness IInjectionProvider<Handedness>.GetInjection() => Handedness;
 
-	public virtual void OnBeforeSerialize() { }
-
-	public virtual void OnAfterDeserialize() {
-		Callable.From(() => {
-			this.PropagateInject<Entity?>();
-			this.PropagateInject<Skeleton3D?>();
-			this.PropagateInject<Handedness>();
-		}).CallDeferred();
+	public virtual void AwardDamage(float amount, IDamageDealer.DamageType type, IDamageable target) {
+		GD.Print($"{Name} hit {(target as Node)?.Name} for {amount} damage.");
 	}
+
 
 
 	[Serializable]
