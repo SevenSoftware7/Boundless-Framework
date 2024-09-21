@@ -18,7 +18,7 @@ public abstract partial class Attack(Entity entity, Weapon weapon, AnimationPath
 	public IDamageDealer? Sender => Weapon;
 
 
-	public void CreateHitBox(DamageAreaBuilder builder) {
+	public void CreateHitBox(AttackDamageAreaBuilder builder) {
 		DamageArea hitArea = builder.Build(this);
 
 		damageAreas.Add(hitArea);
