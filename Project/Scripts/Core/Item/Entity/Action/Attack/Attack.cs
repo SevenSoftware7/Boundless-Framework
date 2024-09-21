@@ -18,8 +18,6 @@ public abstract partial class Attack(Entity entity, Weapon weapon, AnimationPath
 	public IDamageDealer? Sender => Weapon;
 
 
-	protected static StringName GetAnimationPath(StringName library, StringName attack) => library.IsEmpty ? attack : $"{library}/{attack}";
-
 	public void CreateHitBox(DamageAreaBuilder builder) {
 		DamageArea hitArea = builder.Build(this);
 
