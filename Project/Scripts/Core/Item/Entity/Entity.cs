@@ -193,11 +193,13 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	public virtual List<ICustomization> GetCustomizations() => [];
 	public virtual List<ICustomizable> GetSubCustomizables() => [.. GetChildren().OfType<ICustomizable>()];
 
-	public void Damage(float amount) {
+	public void Damage(ref DamageData data) {
 		if (Health is null) return;
+
 		// TODO: damage reduction, absorption, etc...
-		Health.Value -= amount;
-		GD.Print($"Entity {Name} took {amount} Damage");
+
+		Health.Value -= data.Amount;
+		GD.Print($"Entity {Name} took {data.Amount} Damage");
 	}
 
 	public void Kill() {
@@ -302,8 +304,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	Skeleton3D? IInjectionProvider<Skeleton3D?>.GetInjection() => Skeleton;
 	Handedness IInjectionProvider<Handedness>.GetInjection() => Handedness;
 
-	public virtual void AwardDamage(float amount, IDamageDealer.DamageType type, IDamageable target) {
-		GD.Print($"{Name} hit {(target as Node)?.Name} for {amount} damage.");
+	public virtual void AwardDamage(in DamageData data, IDamageable? target) {
+		GD.Print($"{Name} hit {(target as Node)?.Name} for {data.Amount} damage.");
 	}
 
 

@@ -5,9 +5,9 @@ public interface IDamageDealerProxy : IDamageDealer {
 
 	IDamageable? IDamageDealer.Damageable => Sender?.Damageable;
 
-	void IDamageDealer.AwardDamage(float amount, DamageType type, IDamageable target) {
-		AwardDamage(ref amount, ref type, target);
-		Sender?.AwardDamage(amount, type, target);
+	void IDamageDealer.AwardDamage(in DamageData data, IDamageable? target) {
+		AwardDamage(in data, target);
+		Sender?.AwardDamage(in data, target);
 	}
-	public virtual void AwardDamage(ref float amount, ref DamageType type, IDamageable target) { }
+	public new void AwardDamage(in DamageData data, IDamageable? target) { }
 }

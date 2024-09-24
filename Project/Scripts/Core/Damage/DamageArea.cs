@@ -23,12 +23,7 @@ public partial class DamageArea : Area3D {
 	public TimeDuration? _lifeTime;
 
 	[Export] public float Damage = 1f;
-	[Export] public DamageType Type = DamageType.Physical;
-
-	[Export] public bool SelfDamage = false;
-
-	[Export] public bool CanParry = false;
-	[Export] public bool Parriable = false;
+	[Export] public IDamageDealer.DamageFlags Flags = IDamageDealer.DamageFlags.Physical;
 
 	[Signal] public delegate void OnDestroyEventHandler();
 
@@ -45,18 +40,21 @@ public partial class DamageArea : Area3D {
 
 
 	public void Parry(DamageArea other) {
-		if (!CanParry || !other.Parriable) return;
+		if (!Flags.HasFlag(IDamageDealer.DamageFlags.CanParry) || !other.Flags.HasFlag(IDamageDealer.DamageFlags.CanBeParried)) return;
 
-		if (DamageDealer?.Damageable is IDamageable damageable) {
-			other.hitBuffer.Remove(damageable);
-			DamageDealer.AwardDamage(other.Damage, (IDamageDealer.DamageType)Type | IDamageDealer.DamageType.Parry, damageable);
+		if (DamageDealer?.Damageable is IDamageable selfDamageable) {
+			other.hitBuffer.Remove(selfDamageable);
 		}
+
+		DamageData parryData = new(Damage, DamageData.DamageType.Parry);
+		parryData.Inflict(other.DamageDealer?.Damageable, DamageDealer);
 	}
 
 	private void ApplyBufferedDamage() {
-		foreach (IDamageable hit in hitBuffer) {
-			hit.Damage(Damage);
-			DamageDealer?.AwardDamage(Damage, (IDamageDealer.DamageType)Type, hit);
+		DamageData damageData = new(Damage, DamageData.DamageType.Standard);
+
+		foreach (IDamageable target in hitBuffer) {
+			damageData.Inflict(target, DamageDealer);
 		}
 		hitBuffer.Clear();
 	}
@@ -65,7 +63,7 @@ public partial class DamageArea : Area3D {
 
 	private void _BodyEntered(Node3D body) {
 		// GD.Print($"Body {body.Name} collided with DamageArea {Name} (from {DamageDealer?.GetType().Name})");
-		if (body is IDamageable damageable && (SelfDamage || damageable != DamageDealer?.Damageable)) {
+		if (body is IDamageable damageable && (Flags.HasFlag(IDamageDealer.DamageFlags.SelfDamage) || damageable != DamageDealer?.Damageable)) {
 			if (hitBuffer.Count == 0) {
 				Callable.From(ApplyBufferedDamage).CallDeferred();
 			}
@@ -101,13 +99,5 @@ public partial class DamageArea : Area3D {
 				EmitSignal(SignalName.OnDestroy);
 				break;
 		}
-	}
-
-
-
-	[Flags]
-	public enum DamageType {
-		Physical = IDamageDealer.DamageType.Physical,
-		Magical = IDamageDealer.DamageType.Magical,
 	}
 }

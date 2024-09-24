@@ -6,12 +6,12 @@ public abstract partial class DamageAreaBuilder<T> : Resource where T : IDamageD
 	[Export] public ulong LifeTime = 250;
 
 	[Export] public float Damage = 1f;
-	[Export] public DamageArea.DamageType Type = DamageArea.DamageType.Physical;
+	[Export] public IDamageDealer.DamageFlags DamageType = IDamageDealer.DamageFlags.Physical;
 
 	[Export] public bool SelfDamage = false;
-
 	[Export] public bool CanParry = false;
 	[Export] public bool Parriable = false;
+
 	[Export] public Godot.Collections.Array<DamageHitboxBuilder> HitboxBuilders = [];
 
 
@@ -20,10 +20,7 @@ public abstract partial class DamageAreaBuilder<T> : Resource where T : IDamageD
 			DamageDealer = damageDealer,
 			LifeTime = LifeTime,
 			Damage = Damage,
-			Type = Type,
-			SelfDamage = SelfDamage,
-			CanParry = CanParry,
-			Parriable = Parriable,
+			Flags = DamageType,
 		};
 
 		SetupDamageArea(damageDealer, damageArea);

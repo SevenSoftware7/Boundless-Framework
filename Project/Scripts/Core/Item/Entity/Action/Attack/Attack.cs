@@ -33,21 +33,27 @@ public abstract partial class Attack(Entity entity, Weapon weapon, AnimationPath
 	/// <summary>
 	/// Method to enable or disable an Attack hitbox's Parriability, mainly for Animations, but can be used via script too.
 	/// </summary>
-	/// <param name="parriable">Whether the Attack hitbox should be parriable</param>
-	public void SetParriable(bool parriable, int damageAreaIndex) {
+	/// <param name="canBeParried">Whether the Attack hitbox should be parriable</param>
+	public void SetCanBeParried(bool canBeParried, int damageAreaIndex) {
 		if (damageAreaIndex > damageAreas.Count) return;
 		DamageArea? damageArea = damageAreas[damageAreaIndex];
 		if (damageArea is null) return;
 
-		damageArea.Parriable = parriable;
-		_SetParriable(parriable, damageArea);
+		if (canBeParried) {
+			damageArea.Flags |= IDamageDealer.DamageFlags.CanBeParried;
+		}
+		else {
+			damageArea.Flags &= ~IDamageDealer.DamageFlags.CanBeParried;
+		}
+
+		_SetCanBeParried(canBeParried, damageArea);
 	}
 	/// <summary>
 	/// Callback method when updating the Parriability of an Attack hitbox
 	/// </summary>
-	/// <param name="parriable">Whether the attack hitbox was set to be parriable or not</param>
+	/// <param name="canBeParried">Whether the attack hitbox was set to be parriable or not</param>
 	/// <param name="damageArea">The DamageArea which had its parriability changed</param>
-	protected virtual void _SetParriable(bool parriable, DamageArea damageArea) { }
+	protected virtual void _SetCanBeParried(bool canBeParried, DamageArea damageArea) { }
 
 	/// <summary>
 	/// Method to enable or disable an Attack hitbox's ability to parry others, mainly for Animations, but can be used via script too.
@@ -58,7 +64,13 @@ public abstract partial class Attack(Entity entity, Weapon weapon, AnimationPath
 		DamageArea? damageArea = damageAreas[damageAreaIndex];
 		if (damageArea is null) return;
 
-		damageArea.CanParry = canParry;
+		if (canParry) {
+			damageArea.Flags |= IDamageDealer.DamageFlags.CanParry;
+		}
+		else {
+			damageArea.Flags &= ~IDamageDealer.DamageFlags.CanParry;
+		}
+
 		_SetCanParry(canParry, damageArea);
 	}
 	/// <summary>
@@ -68,10 +80,6 @@ public abstract partial class Attack(Entity entity, Weapon weapon, AnimationPath
 	/// <param name="damageArea">The DamageArea which had its ability to Parry changed</param>
 	protected virtual void _SetCanParry(bool canParry, DamageArea damageArea) { }
 
-
-	public void AwardDamage(ref float damage, ref IDamageDealer.DamageType type) {
-
-	}
 
 	[Flags]
 	public enum AttackType : byte {

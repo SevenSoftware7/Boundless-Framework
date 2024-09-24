@@ -5,13 +5,15 @@ namespace LandlessSkies.Core;
 public interface IDamageDealer {
 	public virtual IDamageable? Damageable => null;
 
-	public void AwardDamage(float amount, DamageType type, IDamageable target);
+	public void AwardDamage(in DamageData data, IDamageable? target);
 
 
 	[Flags]
-	public enum DamageType {
+	public enum DamageFlags {
 		Physical = 1 << 0,
 		Magical = 1 << 1,
-		Parry = 1 << 2,
+		CanParry = 1 << 2,
+		CanBeParried = 1 << 3,
+		SelfDamage = 1 << 4,
 	}
 }
