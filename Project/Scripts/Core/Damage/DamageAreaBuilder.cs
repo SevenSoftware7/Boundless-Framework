@@ -8,10 +8,6 @@ public abstract partial class DamageAreaBuilder<T> : Resource where T : IDamageD
 	[Export] public float Damage = 1f;
 	[Export] public IDamageDealer.DamageFlags DamageType = IDamageDealer.DamageFlags.Physical;
 
-	[Export] public bool SelfDamage = false;
-	[Export] public bool CanParry = false;
-	[Export] public bool Parriable = false;
-
 	[Export] public Godot.Collections.Array<DamageHitboxBuilder> HitboxBuilders = [];
 
 
