@@ -1,6 +1,9 @@
 # Godot 4+ specific ignores
 .godot/
 
-# Compiled DotNet files
+# Compiled .NET files
 bin/
 obj/
+
+[Bb]uild
+*.csproj.old*
