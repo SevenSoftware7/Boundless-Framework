@@ -30,8 +30,8 @@ public partial class SkinnedModel : MeshModel {
 	}
 
 	public void RequestInjection() {
-		this.RequestInjection<Skeleton3D?>();
-		this.RequestInjection<Handedness>();
+		if (this.RequestInjection<Skeleton3D>()) Skeleton = null;
+		if (this.RequestInjection<Handedness>()) Handedness = Handedness.Right;
 	}
 
 

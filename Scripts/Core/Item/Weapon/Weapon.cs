@@ -142,9 +142,10 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 		}
 	}
 	public virtual void RequestInjection() {
-		if (!this.RequestInjection<Entity?>()) {
-			this.RequestInjection<Skeleton3D?>();
-			this.RequestInjection<Handedness>();
+		if (!this.RequestInjection<Entity>()) {
+			Entity = null;
+			if (this.RequestInjection<Skeleton3D>()) Skeleton = null;
+			if (this.RequestInjection<Handedness>()) Handedness = Handedness.Right;
 		}
 	}
 

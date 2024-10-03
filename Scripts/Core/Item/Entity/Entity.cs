@@ -14,7 +14,8 @@ using KGySoft.CoreLibraries;
 /// </summary>
 [Tool]
 [GlobalClass]
-public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDamageDealer, ICostumable, ICustomizable, ISaveable<Entity>, IInjectionProvider<Entity?>, IInjectionProvider<Skeleton3D?>, IInjectionProvider<Handedness>, ISerializationListener {
+[Injector]
+public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDamageDealer, ICostumable, ICustomizable, ISaveable<Entity>, ISerializationListener {
 	public readonly List<Vector3> RecoverLocationBuffer = [];
 	public const int RECOVER_LOCATION_BUFFER_SIZE = 5;
 
@@ -30,6 +31,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	[Export] public HudPack HudPack { get; private set; } = new();
 
 	[Export]
+	[Injector]
 	public virtual Handedness Handedness {
 		get => _handedness;
 		protected set {
@@ -48,12 +50,13 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 	[ExportGroup("Dependencies")]
 	[Export]
+	[Injector]
 	public virtual Skeleton3D? Skeleton {
 		get => _skeleton;
 		protected set {
 			_skeleton = value;
 			if (IsNodeReady()) {
-				this.PropagateInject<Skeleton3D?>();
+				this.PropagateInject<Skeleton3D>();
 			}
 		}
 	}
@@ -261,8 +264,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	public override void _Ready() {
 		base._Ready();
 
-		this.PropagateInject<Entity?>();
-		this.PropagateInject<Skeleton3D?>();
+		this.PropagateInject<Entity>();
+		this.PropagateInject<Skeleton3D>();
 		this.PropagateInject<Handedness>();
 
 		UpdateHealth(true);
@@ -292,18 +295,14 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	public virtual void OnBeforeSerialize() { }
 	public virtual void OnAfterDeserialize() {
 		Callable.From(() => {
-			this.PropagateInject<Entity?>();
-			this.PropagateInject<Skeleton3D?>();
+			this.PropagateInject<Entity>();
+			this.PropagateInject<Skeleton3D>();
 			this.PropagateInject<Handedness>();
 		}).CallDeferred();
 	}
 
 
 	public ISaveData<Entity> Save() => new EntitySaveData<Entity>(this);
-
-	Entity? IInjectionProvider<Entity?>.GetInjection() => this;
-	Skeleton3D? IInjectionProvider<Skeleton3D?>.GetInjection() => Skeleton;
-	Handedness IInjectionProvider<Handedness>.GetInjection() => Handedness;
 
 	public virtual void AwardDamage(in DamageData data, IDamageable? target) {
 		GD.Print($"{Name} hit {(target as Node)?.Name} for {data.Amount} damage.");

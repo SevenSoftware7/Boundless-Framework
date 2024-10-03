@@ -8,11 +8,12 @@ using SevenDev.Boundless.Injection;
 
 [Tool]
 [GlobalClass]
-public partial class Companion : Node3D, IUIObject, ICustomizable, ICostumable, ISaveable<Companion>, IInjectionProvider<Skeleton3D?> {
+public partial class Companion : Node3D, IUIObject, ICustomizable, ICostumable, ISaveable<Companion> {
 	[Export] public string DisplayName { get; private set; } = string.Empty;
 	public Texture2D? DisplayPortrait => CostumeHolder?.Costume?.DisplayPortrait;
 
 	[Export]
+	[Injector]
 	public virtual Skeleton3D? Skeleton {
 		get => _skeleton;
 		protected set {
@@ -40,7 +41,7 @@ public partial class Companion : Node3D, IUIObject, ICustomizable, ICostumable, 
 	public virtual List<ICustomizable> GetSubCustomizables() => [];
 	public virtual List<ICustomization> GetCustomizations() => [];
 
-	public Skeleton3D? GetInjection() => _skeleton;
+	public Skeleton3D? GetInjectValue() => _skeleton;
 
 
 	public virtual ISaveData<Companion> Save() => new CompanionSaveData<Companion>(this);
