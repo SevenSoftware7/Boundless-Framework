@@ -10,9 +10,9 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 
 	protected Vector3 _jumpDirection;
 
-	protected readonly TimeDuration jumpBuffer = new(false, 125);
-	protected readonly TimeDuration coyoteTimer = new(false, 150);
-	protected readonly TimeDuration jumpCooldown = new(false, 500);
+	protected readonly TimeDuration jumpBuffer = new(125, false);
+	protected readonly TimeDuration coyoteTimer = new(150, false);
+	protected readonly TimeDuration jumpCooldown = new(500, false);
 
 
 	protected GroundedBehaviour() : this(null) { }
@@ -173,7 +173,7 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 
 		return horizontalInertia.MoveToward(
 			Vector3.Zero,
-			(Entity.IsOnFloor() && !coyoteTimer.HasPassed
+			(Entity.IsOnFloor() && !coyoteTimer.HasElapsed
 				? 25f
 				: 0.5f
 			) * (float)delta
@@ -213,7 +213,7 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 			coyoteTimer.Start();
 		}
 
-		if (!jumpBuffer.HasPassed && !coyoteTimer.HasPassed) {
+		if (!jumpBuffer.HasElapsed && !coyoteTimer.HasElapsed) {
 			ExecuteJump();
 		}
 	}
@@ -221,7 +221,7 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 	protected void ExecuteJump() {
 		if (JumpAction is null) return;
 
-		if (jumpCooldown.HasPassed && Entity.ExecuteAction(JumpAction) && Entity.CurrentAction is JumpAction jumpAction) {
+		if (jumpCooldown.HasElapsed && Entity.ExecuteAction(JumpAction) && Entity.CurrentAction is JumpAction jumpAction) {
 			jumpAction.Direction = _jumpDirection;
 			jumpBuffer.End();
 			jumpCooldown.Start();

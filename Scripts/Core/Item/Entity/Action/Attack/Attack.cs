@@ -22,7 +22,7 @@ public abstract partial class Attack(Entity entity, Weapon weapon, AnimationPath
 		DamageArea hitArea = builder.Build(this);
 
 		damageAreas.Add(hitArea);
-		hitArea.OnDestroy += () => {
+		hitArea.Destroyed += () => {
 			int index = damageAreas.IndexOf(hitArea);
 			if (index < 0) return;
 

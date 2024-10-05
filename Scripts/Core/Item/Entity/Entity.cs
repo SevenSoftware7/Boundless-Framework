@@ -213,7 +213,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 
 	private void OnKill(float fromHealth) {
-		EmitSignal(SignalName.Death, fromHealth);
+		OnDeath(fromHealth);
 	}
 
 	public void VoidOut() {

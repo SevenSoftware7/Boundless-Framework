@@ -17,7 +17,7 @@ warnings/check_invalid_track_paths=false
 config/name="Landless Skies"
 run/main_scene="res://Scenes/Main.tscn"
 config/use_custom_user_dir=true
-config/features=PackedStringArray("4.3", "C#", "Forward Plus")
+config/features=PackedStringArray("4.4", "C#", "Forward Plus")
 boot_splash/show_image=false
 config/icon="res://icon.svg"
 

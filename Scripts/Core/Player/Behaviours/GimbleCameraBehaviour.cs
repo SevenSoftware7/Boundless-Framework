@@ -16,7 +16,7 @@ public sealed partial class GimbleCameraBehaviour : EntityCameraBehaviour {
 	}
 	private Vector3 velocity = Vector3.Zero;
 
-	protected override bool IsOneTime => false;
+	protected override bool IsOneTime { get; } = false;
 
 
 	[Export] public float SmoothTime = 0.065f;

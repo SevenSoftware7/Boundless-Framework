@@ -16,13 +16,13 @@ public sealed partial class Water : Area3D {
 
 
 
-	private void OnBodyEntered(Node3D body) {
+	private void _OnBodyEntered(Node3D body) {
 		body.PropagateAction<IWaterCollisionNotifier>(c => {
 			c.OnEnterWater(this);
 		});
 	}
 
-	private void OnBodyExited(Node3D body) {
+	private void _OnBodyExited(Node3D body) {
 		body.PropagateAction<IWaterCollisionNotifier>(c => {
 			c.OnExitWater(this);
 		});
@@ -32,7 +32,8 @@ public sealed partial class Water : Area3D {
 	public override void _Ready() {
 		base._Ready();
 
-		BodyEntered += OnBodyEntered;
-		BodyExited += OnBodyExited;
+		BodyEntered += _OnBodyEntered;
+		BodyExited += _OnBodyExited;
 	}
+
 }

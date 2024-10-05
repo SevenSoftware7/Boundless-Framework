@@ -14,9 +14,9 @@ public abstract partial class EntityTrigger : DetectorArea3D<Entity> {
 	}
 
 	protected sealed override void OnTargetEntered(Entity target) {
-		EmitSignal(SignalName.EntityEntered, target);
 		OnEntityEntered(target);
+		_EntityEntered(target);
 	}
 
-	protected abstract void OnEntityEntered(Entity entity);
+	protected abstract void _EntityEntered(Entity entity);
 }

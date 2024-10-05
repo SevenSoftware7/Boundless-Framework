@@ -19,7 +19,7 @@ public sealed partial class GravitatedCameraBehaviour : EntityCameraBehaviour {
 		}
 	}
 
-	protected override bool IsOneTime => false;
+	protected override bool IsOneTime { get; } = false;
 
 
 	[Export] public float HorizontalSmoothTime = 0.065f;

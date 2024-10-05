@@ -7,7 +7,7 @@ public partial class AttributeModifierTrigger : EntityTrigger {
 	[Export] private Godot.Collections.Array<AttributeModifier> _attributeModifiers = [];
 
 
-	protected override void OnEntityEntered(Entity entity) {
+	protected override void _EntityEntered(Entity entity) {
 		entity.AttributeModifiers.AddRange(_attributeModifiers);
 	}
 }

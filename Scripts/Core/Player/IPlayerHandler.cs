@@ -1,8 +1,8 @@
 namespace LandlessSkies.Core;
 
 /// <summary>
-/// <para>Interface that is used to allow a class to Handle a Player.</para>
-/// <para>For example: react to the Player's Inputs or setup UI.</para>
+/// Interface that is used to allow a class to Handle a Player.<para/>
+/// For example: react to the Player's Inputs or setup UI.<para/>
 /// </summary>
 public interface IPlayerHandler {
 	/// <summary>
@@ -12,8 +12,8 @@ public interface IPlayerHandler {
 	public void HandlePlayer(Player player);
 
 	/// <summary>
-	/// <para>Stop Handling the Player.</para>
-	/// <para>Reset all the UI, and Inputs here.</para>
+	/// Stop Handling the Player.<para/>
+	/// Reset all the UI, and Inputs here.<para/>
 	/// </summary>
 	public void DisavowPlayer();
 }

@@ -5,5 +5,5 @@
 [resource]
 resource_name = "NemesisAnimations"
 _data = {
-"Slash": ExtResource("1_72eg2")
+&"Slash": ExtResource("1_72eg2")
 }

@@ -34,8 +34,8 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 	}
 
 	/// <summary>
-	/// Method to add an Attribute Modifier.
-	/// <para>Mainly for Animations, but can be used via script too.</para>
+	/// Method to add an Attribute Modifier.<para/>
+	/// Mainly for Animations, but can be used via script too.
 	/// </summary>
 	/// <param name="modifier">The Attribute Modifier to add</param>
 	public void AddAttributeModifier(AttributeModifier modifier) {
@@ -46,8 +46,8 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 	}
 
 	/// <summary>
-	/// Method to remove an already existing Attribute Modifier.
-	/// <para>Mainly for Animations, but can be used via script too.</para>
+	/// Method to remove an already existing Attribute Modifier.<para/>
+	/// Mainly for Animations, but can be used via script too.
 	/// </summary>
 	/// <param name="index">The Cache Index of the Attribute Modifier to remove</param>
 	public void RemoveAttributeModifier(int index) {
@@ -59,8 +59,8 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 		modifiers[index] = null;
 	}
 	/// <summary>
-	/// Method to remove an already existing Attribute Modifier.
-	/// <para>Mainly for Animations, but can be used via script too.</para>
+	/// Method to remove an already existing Attribute Modifier.<para/>
+	/// Mainly for Animations, but can be used via script too.
 	/// </summary>
 	/// <param name="modifier">The Attribute Modifier to remove</param>
 	public void RemoveAttributeModifier(AttributeModifier modifier) {
@@ -75,8 +75,8 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 	}
 
 	/// <summary>
-	/// Method to enable or disable the Attack Cancellability.
-	/// <para>mainly for Animations, but can be used via script too.</para>
+	/// Method to enable or disable the Attack Cancellability.<para/>
+	/// mainly for Animations, but can be used via script too.
 	/// </summary>
 	/// <param name="cancellable">Whether the Attack should be cancellable</param>
 	public void SetCancellable(bool cancellable) {
@@ -84,14 +84,14 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 		_SetCancellable(cancellable);
 	}
 	/// <summary>
-	/// Callback method when updating the Cancellability of the Attack.
+	/// Callback method for when the Cancellability of the Attack is updated.
 	/// </summary>
 	/// <param name="cancellable">Whether the attack was set to be cancellable or not</param>
 	protected virtual void _SetCancellable(bool cancellable) { }
 
 	/// <summary>
-	/// Method to enable or disable the Attack Interruptability.
-	/// <para>mainly for Animations, but can be used via script too.</para>
+	/// Method to enable or disable the Attack Interruptability.<para/>
+	/// mainly for Animations, but can be used via script too.
 	/// </summary>
 	/// <param name="interruptable">Whether the Attack should be interruptable</param>
 	public void SetInterruptable(bool interruptable) {
@@ -99,7 +99,7 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 		_SetInterruptable(interruptable);
 	}
 	/// <summary>
-	/// Callback method when updating the Interruptability of the Attack.
+	/// Callback method for when the Interruptability of the Attack is updated.
 	/// </summary>
 	/// <param name="interruptable">Whether the attack was set to be interruptable or not</param>
 	protected virtual void _SetInterruptable(bool interruptable) { }

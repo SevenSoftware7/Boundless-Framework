@@ -6,7 +6,7 @@ using SevenDev.Boundless.Utility;
 
 
 /// <summary>
-/// A Charge Attack is an attack that can be charged an indeterminate amount of time
+/// A Charge Attack is an attack that can be charged an indeterminate amount of time.
 /// </summary>
 /// <param name="entity">Inherited from <see cref="Action"/>.</param>
 /// <param name="weapon">Inherited from <see cref="Attack"/>.</param>

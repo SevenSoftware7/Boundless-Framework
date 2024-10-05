@@ -9,7 +9,7 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 	private PromptControl? dismountPrompt;
 
 	protected abstract Transform3D SittingPosition { get; }
-	protected sealed override bool IsOneTime => true;
+	protected override bool IsOneTime { get; } = true;
 
 
 	protected SittingBehaviour() : this(null) { }

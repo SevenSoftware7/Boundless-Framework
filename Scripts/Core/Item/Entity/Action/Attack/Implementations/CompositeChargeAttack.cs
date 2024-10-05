@@ -13,7 +13,7 @@ using SevenDev.Boundless.Utility;
 /// <param name="info">The Composite Charge Attack Parameters to use when setting up the Charge Attack</param>
 /// <param name="modifiers">Inherited from <see cref="Action"/>.</param>
 public partial class CompositeChargeAttack(Entity entity, Weapon weapon, AnimationPath animationPath, CompositeChargeAttack.Builder info, IEnumerable<AttributeModifier>? modifiers = null) : ChargeAttack(entity, weapon, animationPath, modifiers) {
-	private readonly TimeDuration chargeTime = new(true, info.ChargeDuration);
+	private readonly TimeDuration chargeTime = new(info.ChargeDuration, true);
 	private bool isDone;
 
 
@@ -51,7 +51,7 @@ public partial class CompositeChargeAttack(Entity entity, Weapon weapon, Animati
 	protected virtual void _UnchargedAttack() { }
 
 	public override void HandlePlayer(Player player) {
-		if (!isDone && chargeTime.HasPassed) {
+		if (!isDone && chargeTime.HasElapsed) {
 			isDone = true;
 			_ChargeDone();
 		}

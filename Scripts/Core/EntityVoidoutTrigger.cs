@@ -4,7 +4,7 @@ using Godot;
 
 [GlobalClass]
 public partial class EntityVoidoutTrigger : EntityTrigger {
-	protected override void OnEntityEntered(Entity entity) {
+	protected override void _EntityEntered(Entity entity) {
 		entity.VoidOut();
 	}
 }

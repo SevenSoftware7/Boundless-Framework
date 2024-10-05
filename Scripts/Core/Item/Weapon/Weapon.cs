@@ -120,7 +120,7 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 
 
 	[Injectable]
-	public virtual void InjectEntity(Entity? entity) {
+	public virtual void Inject(Entity? entity) {
 		if (AnimationLibrary is null || entity == Entity) {
 			Entity = entity;
 			return;
@@ -153,21 +153,17 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 	private void StickToSkeletonBone() {
 		if (Skeleton is null) return;
 
-
-		string boneName = Handedness switch {
-			Handedness.Left => LeftWeapon,
-			Handedness.Right or _ => RightWeapon,
+		(string boneName, string fallbackBoneName) = Handedness switch {
+			Handedness.Left => (LeftWeapon, LeftHand),
+			Handedness.Right or _ => (RightWeapon, RightHand),
 		};
+
 		if (Skeleton.TryGetBoneTransform(boneName, out Transform3D weaponBoneTransform)) {
 			GlobalTransform = weaponBoneTransform;
 			return;
 		}
 
-		boneName = Handedness switch {
-			Handedness.Left => LeftHand,
-			Handedness.Right or _ => RightHand,
-		};
-		if (Skeleton.TryGetBoneTransform(boneName, out Transform3D handBoneTransform)) {
+		if (Skeleton.TryGetBoneTransform(fallbackBoneName, out Transform3D handBoneTransform)) {
 			GlobalTransform = handBoneTransform with { Basis = handBoneTransform.Basis * (Handedness == Handedness.Right ? rightHandBoneBasis : leftHandBoneBasis) };
 			return;
 		}

@@ -5,5 +5,5 @@
 [resource]
 resource_name = "EleosAnimations"
 _data = {
-"Slash": ExtResource("1_603he")
+&"Slash": ExtResource("1_603he")
 }

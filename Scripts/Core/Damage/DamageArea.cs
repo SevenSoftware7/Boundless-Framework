@@ -12,7 +12,7 @@ public partial class DamageArea : Area3D {
 		get => _lifeTime?.DurationMsec ?? 0;
 		set {
 			if (_lifeTime is null) {
-				_lifeTime = new(true, value);
+				_lifeTime = new(value, true);
 			}
 			else {
 				_lifeTime.DurationMsec = value;
@@ -24,7 +24,7 @@ public partial class DamageArea : Area3D {
 	[Export] public float Damage = 1f;
 	[Export] public IDamageDealer.DamageFlags Flags = IDamageDealer.DamageFlags.Physical;
 
-	[Signal] public delegate void OnDestroyEventHandler();
+	[Signal] public delegate void DestroyedEventHandler();
 
 
 	public IDamageDealer? DamageDealer { get; init; }
@@ -79,7 +79,7 @@ public partial class DamageArea : Area3D {
 
 	public override void _Process(double delta) {
 		base._Process(delta);
-		if (_lifeTime is not null && _lifeTime.HasPassed) {
+		if (_lifeTime is not null && _lifeTime.HasElapsed) {
 			QueueFree();
 		}
 	}
@@ -95,7 +95,7 @@ public partial class DamageArea : Area3D {
 		switch((ulong)what) {
 			case NotificationPredelete:
 				ApplyBufferedDamage();
-				EmitSignal(SignalName.OnDestroy);
+				OnDestroyed();
 				break;
 		}
 	}
