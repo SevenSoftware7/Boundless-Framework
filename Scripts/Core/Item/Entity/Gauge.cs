@@ -69,10 +69,6 @@ public partial class Gauge : Node {
 		Value = 0f;
 	}
 
-	public override void _Ready() {
-		base._Ready();
-	}
-
 	public override void _ValidateProperty(Dictionary property) {
 		base._ValidateProperty(property);
 

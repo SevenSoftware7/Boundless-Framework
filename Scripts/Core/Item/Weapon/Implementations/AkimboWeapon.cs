@@ -14,18 +14,18 @@ public sealed partial class AkimboWeapon : WeaponCollection, IInjectionIntercept
 	public IWeapon? MainWeapon { get; private set; }
 	public IWeapon? SideWeapon { get; private set; }
 
-	public override int Style {
+	public override uint Style {
 		get => MainWeapon?.Style ?? 0;
 		set {
-			if (MainWeapon is not null && value < MainWeapon.StyleCount) {
+			if (MainWeapon is not null && value <= MainWeapon.MaxStyle) {
 				MainWeapon.Style = value;
 			}
-			else if (SideWeapon is not null && value == StyleCount - 1) {
+			else if (SideWeapon is not null && value == MaxStyle + 1) {
 				SideWeapon.Style++;
 			}
 		}
 	}
-	public override int StyleCount => (MainWeapon?.StyleCount ?? 1) + (SideWeapon is null ? 0 : 1);
+	public override uint MaxStyle => (MainWeapon?.MaxStyle ?? 0) + (uint)(SideWeapon is null ? 0 : 1);
 
 	protected override IWeapon? Weapon => MainWeapon;
 

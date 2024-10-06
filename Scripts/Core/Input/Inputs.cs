@@ -31,4 +31,17 @@ public static class Inputs {
 	public static readonly StringName SwitchWeaponOctonary = "switch_weapon_octonary";
 	public static readonly StringName SwitchWeaponNonary = "switch_weapon_nonary";
 	public static readonly StringName SwitchWeaponDenary = "switch_weapon_denary";
+
+	public static readonly StringName[] SwitchWeaponActions = [
+		SwitchWeaponPrimary,
+		SwitchWeaponSecondary,
+		SwitchWeaponTertiary,
+		SwitchWeaponQuaternary,
+		SwitchWeaponQuinary,
+		SwitchWeaponSenary,
+		SwitchWeaponSeptenary,
+		SwitchWeaponOctonary,
+		SwitchWeaponNonary,
+		SwitchWeaponDenary
+	];
 }

@@ -1,15 +1,15 @@
 namespace LandlessSkies.Core;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using SevenDev.Boundless.Utility;
 
-
 [Tool]
 [GlobalClass]
 public partial class ArmedEntity : Entity, IDamageDealer, ISerializationListener {
-	private readonly List<int> styleSwitchBuffer = [];
+	private readonly List<uint> styleSwitchBuffer = [];
 
 
 	public IWeapon? Weapon {
@@ -36,45 +36,22 @@ public partial class ArmedEntity : Entity, IDamageDealer, ISerializationListener
 
 		if (_weapon is null) return;
 
-
-		int bufferStyle = -1;
-		if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponPrimary)) {
-			bufferStyle = 0;
-		}
-		else if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponSecondary)) {
-			bufferStyle = 1;
-		}
-		else if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponTertiary)) {
-			bufferStyle = 2;
-		}
-		else if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponQuaternary)) {
-			bufferStyle = 3;
-		}
-		else if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponQuinary)) {
-			bufferStyle = 4;
-		}
-		else if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponSenary)) {
-			bufferStyle = 5;
-		}
-		else if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponSeptenary)) {
-			bufferStyle = 6;
-		}
-		else if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponOctonary)) {
-			bufferStyle = 7;
-		}
-		else if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponNonary)) {
-			bufferStyle = 8;
-		}
-		else if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponDenary)) {
-			bufferStyle = 9;
+		uint maxWeaponStyle = (uint)Math.Min((int)(Weapon?.MaxStyle ?? 0) + 1, Inputs.SwitchWeaponActions.Length);
+		uint? bufferStyle = null;
+		for (uint i = 0; i < maxWeaponStyle; i++) {
+			if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponActions[i])) {
+				GD.PrintS(i, Inputs.SwitchWeaponActions[i]);
+				bufferStyle = i;
+				break;
+			}
 		}
 
-		if (bufferStyle != -1) {
+		if (bufferStyle.HasValue) {
 			if (CurrentAction is Attack attack && !attack.CanCancel()) {
-				styleSwitchBuffer.Add(bufferStyle);
+				styleSwitchBuffer.Add(bufferStyle.Value);
 			}
 			else {
-				_weapon.Style = bufferStyle;
+				_weapon.Style = bufferStyle.Value;
 			}
 		}
 	}
@@ -85,7 +62,7 @@ public partial class ArmedEntity : Entity, IDamageDealer, ISerializationListener
 		if (_weapon is null) return;
 		if (CurrentAction is Attack attack && !attack.CanCancel()) return;
 
-		foreach (int bufferedStyle in styleSwitchBuffer) {
+		foreach (uint bufferedStyle in styleSwitchBuffer) {
 			_weapon.Style = bufferedStyle;
 		}
 

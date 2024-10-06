@@ -36,9 +36,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 		get => _handedness;
 		protected set {
 			_handedness = value;
-			if (IsNodeReady()) {
-				this.PropagateInject<Handedness>();
-			}
+			this.PropagateInjection<Handedness>();
 		}
 	}
 	private Handedness _handedness = Handedness.Right;
@@ -55,9 +53,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 		get => _skeleton;
 		protected set {
 			_skeleton = value;
-			if (IsNodeReady()) {
-				this.PropagateInject<Skeleton3D>();
-			}
+			this.PropagateInjection<Skeleton3D>();
 		}
 	}
 	private Skeleton3D? _skeleton;
@@ -264,9 +260,9 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	public override void _Ready() {
 		base._Ready();
 
-		this.PropagateInject<Entity>();
-		this.PropagateInject<Skeleton3D>();
-		this.PropagateInject<Handedness>();
+		this.PropagateInjection<Entity>();
+		this.PropagateInjection<Skeleton3D>();
+		this.PropagateInjection<Handedness>();
 
 		UpdateHealth(true);
 
@@ -295,9 +291,9 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	public virtual void OnBeforeSerialize() { }
 	public virtual void OnAfterDeserialize() {
 		Callable.From(() => {
-			this.PropagateInject<Entity>();
-			this.PropagateInject<Skeleton3D>();
-			this.PropagateInject<Handedness>();
+			this.PropagateInjection<Entity>();
+			this.PropagateInjection<Skeleton3D>();
+			this.PropagateInjection<Handedness>();
 		}).CallDeferred();
 	}
 

@@ -7,8 +7,8 @@ public interface IWeapon : ICustomizable, ISaveable<IWeapon> {
 	WeaponUsage Usage { get; }
 	WeaponSize Size { get; }
 
-	abstract int Style { get; set; }
-	virtual int StyleCount => 1;
+	abstract uint Style { get; set; }
+	virtual uint MaxStyle => 0;
 
 	IEnumerable<Action.Wrapper> GetAttacks(Entity target);
 }

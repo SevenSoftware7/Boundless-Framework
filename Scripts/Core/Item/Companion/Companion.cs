@@ -8,7 +8,7 @@ using SevenDev.Boundless.Injection;
 
 [Tool]
 [GlobalClass]
-public partial class Companion : Node3D, IUIObject, ICustomizable, ICostumable, ISaveable<Companion> {
+public partial class Companion : Node3D, IUIObject, ICustomizable, ICostumable, ISaveable<Companion>, ISerializationListener {
 	[Export] public string DisplayName { get; private set; } = string.Empty;
 	public Texture2D? DisplayPortrait => CostumeHolder?.Costume?.DisplayPortrait;
 
@@ -18,9 +18,7 @@ public partial class Companion : Node3D, IUIObject, ICustomizable, ICostumable, 
 		get => _skeleton;
 		protected set {
 			_skeleton = value;
-			if (IsNodeReady()) {
-				this.PropagateInject();
-			}
+			this.PropagateInjection();
 		}
 	}
 	private Skeleton3D? _skeleton;
@@ -38,24 +36,25 @@ public partial class Companion : Node3D, IUIObject, ICustomizable, ICostumable, 
 	}
 
 
+	public override void _Ready() {
+		base._Ready();
+		this.PropagateInjection<Skeleton3D>();
+	}
+
+
 	public virtual List<ICustomizable> GetSubCustomizables() => [];
 	public virtual List<ICustomization> GetCustomizations() => [];
-
-	public Skeleton3D? GetInjectValue() => _skeleton;
 
 
 	public virtual ISaveData<Companion> Save() => new CompanionSaveData<Companion>(this);
 
-	public override void _Ready() {
-		base._Ready();
-		if (IsNodeReady()) {
-			this.PropagateInject();
-		}
+	public void OnBeforeSerialize() { }
+	public void OnAfterDeserialize() {
+		Callable.From(() => {
+			this.PropagateInjection<Skeleton3D>();
+		});
 	}
-
 
 	[Serializable]
-	public class CompanionSaveData<T>(T companion) : CostumableSaveData<Companion, CompanionCostume>(companion) where T : Companion {
-
-	}
+	public class CompanionSaveData<T>(T companion) : CostumableSaveData<Companion, CompanionCostume>(companion) where T : Companion;
 }

@@ -5,8 +5,8 @@
     <RootNamespace>LandlessSkies</RootNamespace>
     <Nullable>enable</Nullable>
     <PublishAot>true</PublishAot>
-    <!-- <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles> -->
-    <!-- <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\Generated</CompilerGeneratedFilesOutputPath> -->
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\Generated</CompilerGeneratedFilesOutputPath>
     <!-- <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild> -->
   </PropertyGroup>
   <ItemGroup>
@@ -18,8 +18,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="SevenDev.Boundless.Utility" Version="1.0.0" />
-    <PackageReference Include="SevenDev.Boundless.Injection" Version="1.0.0" />
-    <PackageReference Include="SevenDev.Boundless.Injection.Generators" Version="1.0.0" PrivateAssets="all" IncludeAssets="all" />
+    <PackageReference Include="SevenDev.Boundless.Injection" Version="1.1.0" />
+    <PackageReference Include="SevenDev.Boundless.Injection.Generators" Version="1.1.0" PrivateAssets="all" IncludeAssets="all" />
     <!-- <ProjectReference Include="..\Boundless.Utility\SevenDev.Boundless.Utility\SevenDev.Boundless.Utility.csproj" />
     <ProjectReference Include="..\Boundless.Injection\SevenDev.Boundless.Injection\SevenDev.Boundless.Injection.csproj" />
     <ProjectReference Include="..\Boundless.Injection\SevenDev.Boundless.Injection.Generators\SevenDev.Boundless.Injection.Generators.csproj" PrivateAssets="all" OutputItemType="analyzer" /> -->

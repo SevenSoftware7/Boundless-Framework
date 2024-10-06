@@ -14,26 +14,23 @@ using SevenDev.Boundless.Injection;
 public sealed partial class MultiWeapon : WeaponCollection, IInjectionInterceptor<WeaponHolsterState> {
 	private List<IWeapon> _weapons = [];
 	public IWeapon? CurrentWeapon {
-		get => IndexInBounds(_currentIndex) ? _weapons[_currentIndex] : null;
-		private set {
-			if (value is not null) {
-				_currentIndex = _weapons.IndexOf(value);
-				UpdateCurrent();
-			}
-		}
+		get => _currentIndex < _weapons.Count ? _weapons[(int)_currentIndex] : null;
+		private set => SwitchTo(value);
 	}
 
+	[Injector]
+	[Injectable]
 	private WeaponHolsterState HolsterState;
 
-	public override int StyleCount => Mathf.Max(_weapons.Count, 1);
+	public override uint MaxStyle => (uint)(_weapons.Count != 0 ? _weapons.Count - 1 : 0);
 
 	[ExportGroup("Current Weapon")]
 	[Export]
-	public override int Style {
+	public override uint Style {
 		get => _currentIndex;
 		set => SwitchTo(value);
 	}
-	private int _currentIndex;
+	private uint _currentIndex;
 
 	protected override IWeapon? Weapon => CurrentWeapon;
 
@@ -48,23 +45,21 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 
 
 
-
-	private bool IndexInBounds(int index) => index < _weapons.Count && index >= 0;
 	private void UpdateCurrent() {
-		if (!IndexInBounds(_currentIndex)) {
+		if (_currentIndex >= _weapons.Count) {
 			_currentIndex = 0;
 		}
 
-		this.PropagateInject(HolsterState);
+		this.PropagateInjection<WeaponHolsterState>();
 	}
 
 	public void SwitchTo(IWeapon? weapon) {
 		if (weapon is null) return;
-		SwitchTo(_weapons.IndexOf(weapon));
+		SwitchTo((uint)_weapons.IndexOf(weapon));
 	}
 
-	public void SwitchTo(int index) {
-		int newIndex = index % StyleCount;
+	public void SwitchTo(uint index) {
+		uint newIndex = index % (MaxStyle + 1);
 		if (newIndex == _currentIndex && CurrentWeapon is IWeapon currentWeapon) {
 			currentWeapon.Style++;
 			return;
@@ -98,8 +93,7 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 	}
 
 
-	public WeaponHolsterState Intercept(Node child, WeaponHolsterState value) {
-		HolsterState = value;
+	WeaponHolsterState IInjectionInterceptor<WeaponHolsterState>.Intercept(Node child, WeaponHolsterState value) {
 		return child == CurrentWeapon ? value : WeaponHolsterState.Holstered;
 	}
 
@@ -117,21 +111,6 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 	protected override void UpdateWeapons() {
 		_weapons = [.. GetChildren().OfType<IWeapon>()];
 		UpdateCurrent();
-	}
-
-	public override void _Ready() {
-		base._Ready();
-		UpdateWeapons();
-	}
-	public override void _Notification(int what) {
-		base._Notification(what);
-		switch ((ulong)what) {
-			case NotificationChildOrderChanged:
-				if (IsNodeReady()) {
-					UpdateWeapons();
-				}
-				break;
-		}
 	}
 
 

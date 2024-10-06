@@ -88,12 +88,12 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 	[Injectable] public virtual Skeleton3D? Skeleton { get; protected set; }
 	[Injectable] public virtual Handedness Handedness { get; protected set; }
 
-	public int Style {
+	public uint Style {
 		get => _style;
-		set => _style = value % (StyleCount + 1);
+		set => _style = value % (MaxStyle + 1);
 	}
-	private int _style;
-	public virtual int StyleCount => 1;
+	private uint _style;
+	public virtual uint MaxStyle { get; } = 0;
 
 
 	[Signal] public delegate void CostumeChangedEventHandler(WeaponCostume? newCostume, WeaponCostume? oldCostume);
@@ -143,7 +143,8 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 	}
 	public virtual void RequestInjection() {
 		if (!this.RequestInjection<Entity>()) {
-			Entity = null;
+			_entity = null;
+
 			if (this.RequestInjection<Skeleton3D>()) Skeleton = null;
 			if (this.RequestInjection<Handedness>()) Handedness = Handedness.Right;
 		}

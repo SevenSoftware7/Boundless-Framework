@@ -10,8 +10,8 @@ public abstract partial class WeaponCollection : Node, IWeapon, ISerializationLi
 	public virtual WeaponUsage Usage => Weapon?.Usage ?? 0;
 	public virtual WeaponSize Size => Weapon?.Size ?? 0;
 
-	public abstract int Style { get; set; }
-	public abstract int StyleCount { get; }
+	public abstract uint Style { get; set; }
+	public abstract uint MaxStyle { get; }
 
 	public virtual string DisplayName => Weapon?.DisplayName ?? string.Empty;
 	public virtual Texture2D? DisplayPortrait => Weapon?.DisplayPortrait;
