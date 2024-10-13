@@ -1,25 +1,19 @@
-[gd_scene load_steps=8 format=3 uid="uid://bp1e6thwkkcrr"]
+[gd_scene load_steps=7 format=3 uid="uid://bp1e6thwkkcrr"]
 
 [ext_resource type="Script" path="res://Scripts/Vanilla/Weapon/Eleos/EleosWeapon.cs" id="1_pwvbn"]
 [ext_resource type="AnimationLibrary" uid="uid://dvww6dpnwphxd" path="res://Resources/Weapons/Eleos/EleosAnimations.tres" id="2_7ftow"]
-[ext_resource type="Script" path="csharp://Scripts/Core/InterfaceResource.cs:LandlessSkies.Core.InterfaceResource`1[LandlessSkies.Core.IItemData`1[LandlessSkies.Core.Weapon]].cs" id="2_8af86"]
+[ext_resource type="Resource" uid="uid://cvuwijf5xqma6" path="res://Resources/Weapons/Eleos/Eleos_ui.tres" id="2_ersgj"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="2_n5f5j"]
-[ext_resource type="Script" path="csharp://Scripts/Core/InterfaceResource.cs:LandlessSkies.Core.InterfaceResource`1[LandlessSkies.Core.IItemData`1[LandlessSkies.Core.Costume]].cs" id="6_p203t"]
-
-[sub_resource type="Resource" id="Resource_8be55"]
-script = ExtResource("2_8af86")
-Resource = &"res://Resources/Weapons/Eleos/Eleos_data.tres"
-
-[sub_resource type="Resource" id="Resource_tgwyx"]
-script = ExtResource("6_p203t")
-Resource = &"res://Resources/Weapons/Eleos/Costumes/Eleos-base_data.tres"
+[ext_resource type="Resource" uid="uid://r7mx5ymlfh3l" path="res://Resources/Weapons/Eleos/Eleos_key.tres" id="2_uj7so"]
+[ext_resource type="Resource" uid="uid://dw0tbdkonwsel" path="res://Resources/Weapons/Eleos/Costumes/Eleos-base_key.tres" id="6_cu83a"]
 
 [node name="Eleos" type="Node3D" node_paths=PackedStringArray("CostumeHolder")]
 script = ExtResource("1_pwvbn")
-Data = SubResource("Resource_8be55")
+Key = ExtResource("2_uj7so")
+UI = ExtResource("2_ersgj")
 AnimationLibrary = ExtResource("2_7ftow")
 CostumeHolder = NodePath("CostumeHolder")
 
 [node name="CostumeHolder" type="Node3D" parent="."]
 script = ExtResource("2_n5f5j")
-CostumeData = SubResource("Resource_tgwyx")
+CostumeKey = ExtResource("6_cu83a")

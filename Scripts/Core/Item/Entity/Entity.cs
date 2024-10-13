@@ -7,6 +7,8 @@ using Godot;
 using SevenDev.Boundless.Utility;
 using SevenDev.Boundless.Injection;
 using KGySoft.CoreLibraries;
+using LandlessSkies.Vanilla;
+
 
 /// <summary>
 /// The Entity is the Main part of the Framework and corresponds to any thing a Player is able to Control partially or entirely.
@@ -24,11 +26,10 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	public readonly List<Vector3> RecoverLocationBuffer = new(RECOVER_LOCATION_BUFFER_SIZE);
 
 
-	IItemData<Entity>? IItem<Entity>.Data => Data.Value;
-
-	[Export] public InterfaceResource<IItemData<Entity>> Data = new();
-	public string DisplayName => Data.Value?.DisplayName ?? string.Empty;
-	public Texture2D? DisplayPortrait => Data.Value?.DisplayPortrait;
+	[Export] public DataKey Key { get; private set; } = new();
+	[Export] public ItemUIData? UI { get; private set; }
+	public string DisplayName => UI?.DisplayName ?? string.Empty;
+	public Texture2D? DisplayPortrait => UI?.DisplayPortrait;
 
 
 	public IDamageable? Damageable => this;
@@ -375,11 +376,6 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 	public virtual void OnBeforeSerialize() { }
 	public virtual void OnAfterDeserialize() {
-		Callable.From(() => {
-			this.PropagateInjection<Entity>();
-			this.PropagateInjection<Skeleton3D>();
-			this.PropagateInjection<Handedness>();
-		}).CallDeferred();
 		GetWeapon();
 	}
 

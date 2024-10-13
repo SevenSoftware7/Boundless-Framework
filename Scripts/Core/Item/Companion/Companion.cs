@@ -8,12 +8,11 @@ using SevenDev.Boundless.Injection;
 
 [Tool]
 [GlobalClass]
-public partial class Companion : Node3D, ICustomizable, ICostumable, IPersistent<Companion>, IItem<Companion>, IInjectionBlocker<Skeleton3D>, ISerializationListener {
-	IItemData<Companion>? IItem<Companion>.Data => Data.Value;
-
-	[Export] public InterfaceResource<IItemData<Companion>> Data = new();
-	public string DisplayName => Data.Value?.DisplayName ?? string.Empty;
-	public Texture2D? DisplayPortrait => Data.Value?.DisplayPortrait;
+public partial class Companion : Node3D, ICustomizable, ICostumable, IPersistent<Companion>, IItem<Companion>, IInjectionBlocker<Skeleton3D> {
+	[Export] public DataKey Key { get; private set; } = new();
+	[Export] public ItemUIData? UI { get; private set; }
+	public string DisplayName => UI?.DisplayName ?? string.Empty;
+	public Texture2D? DisplayPortrait => UI?.DisplayPortrait;
 
 
 	[Export]
@@ -22,7 +21,7 @@ public partial class Companion : Node3D, ICustomizable, ICostumable, IPersistent
 		get => _skeleton;
 		protected set {
 			_skeleton = value;
-			this.PropagateInjection();
+			this.PropagateInjection<Skeleton3D>();
 		}
 	}
 	private Skeleton3D? _skeleton;
@@ -53,13 +52,6 @@ public partial class Companion : Node3D, ICustomizable, ICostumable, IPersistent
 
 
 	public virtual IPersistenceData<Companion> Save() => new CompanionSaveData<Companion>(this);
-
-	public void OnBeforeSerialize() { }
-	public void OnAfterDeserialize() {
-		Callable.From(() => {
-			this.PropagateInjection<Skeleton3D>();
-		});
-	}
 
 	[Serializable]
 	public class CompanionSaveData<T>(T companion) : ItemPersistenceData<Companion>(companion) where T : Companion;

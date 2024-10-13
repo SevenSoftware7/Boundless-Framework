@@ -1,15 +1,12 @@
 [gd_resource type="Resource" script_class="SceneWeaponData" load_steps=5 format=3 uid="uid://dwoudcgmk0aae"]
 
+[ext_resource type="Resource" uid="uid://r7mx5ymlfh3l" path="res://Resources/Weapons/Eleos/Eleos_key.tres" id="1_a63nq"]
 [ext_resource type="PackedScene" uid="uid://bp1e6thwkkcrr" path="res://Resources/Weapons/Eleos/Eleos.tscn" id="1_rklg0"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/ItemUIData.cs" id="1_wkrgx"]
+[ext_resource type="Resource" uid="uid://cvuwijf5xqma6" path="res://Resources/Weapons/Eleos/Eleos_ui.tres" id="2_jxk8r"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/SceneWeaponData.cs" id="2_w44ts"]
-
-[sub_resource type="Resource" id="Resource_b7841"]
-script = ExtResource("1_wkrgx")
-DisplayName = "Eleos"
 
 [resource]
 script = ExtResource("2_w44ts")
-Key = "eleos"
-UIData = SubResource("Resource_b7841")
+Key = ExtResource("1_a63nq")
+UIData = ExtResource("2_jxk8r")
 Scene = ExtResource("1_rklg0")

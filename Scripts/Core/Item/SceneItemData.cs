@@ -4,11 +4,11 @@ using Godot;
 
 [Tool]
 public partial class SceneItemData<T> : Resource, IItemData<T> where T : Node, IItem<T> {
-	[Export] public string Key { get; private set; } = string.Empty;
-
+	[Export] public DataKey Key { get; private set; } = new();
 	[Export] public ItemUIData? UIData { get; private set; } = new();
 	public string DisplayName => UIData?.DisplayName ?? string.Empty;
 	public Texture2D? DisplayPortrait => UIData?.DisplayPortrait;
+
 
 	[Export] public PackedScene? Scene {
 		get => _scene;

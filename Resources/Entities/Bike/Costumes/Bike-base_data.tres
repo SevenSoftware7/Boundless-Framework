@@ -1,15 +1,12 @@
 [gd_resource type="Resource" script_class="SceneEntityCostumeData" load_steps=5 format=3 uid="uid://bb3xo4pwx7g3y"]
 
+[ext_resource type="Resource" uid="uid://djkxop4aum535" path="res://Resources/Entities/Bike/Costumes/Bike-base_key.tres" id="1_japl1"]
 [ext_resource type="PackedScene" uid="uid://burrwvhjdl2u3" path="res://Resources/Entities/Bike/Costumes/Bike-base.tscn" id="1_ts1se"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/ItemUIData.cs" id="2_hru7t"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/SceneEntityCostumeData.cs" id="2_tplhr"]
-
-[sub_resource type="Resource" id="Resource_ijl32"]
-script = ExtResource("2_hru7t")
-DisplayName = "Bike (base)"
+[ext_resource type="Resource" uid="uid://dpxmaply7ike1" path="res://Resources/Entities/Bike/Costumes/Bike-base_ui.tres" id="3_dejvl"]
 
 [resource]
 script = ExtResource("2_tplhr")
-Key = "bike_base"
-UIData = SubResource("Resource_ijl32")
+Key = ExtResource("1_japl1")
+UIData = ExtResource("3_dejvl")
 Scene = ExtResource("1_ts1se")

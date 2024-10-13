@@ -30,8 +30,8 @@ public partial class SkinnedCostume : MeshCostume {
 	}
 
 	public void RequestInjection() {
-		if (this.RequestInjection<Skeleton3D>()) Skeleton = null;
-		if (this.RequestInjection<Handedness>()) Handedness = Handedness.Right;
+		if (!this.RequestInjection<Skeleton3D>()) Skeleton = null;
+		if (!this.RequestInjection<Handedness>()) Handedness = Handedness.Right;
 	}
 
 

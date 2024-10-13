@@ -1,25 +1,19 @@
-[gd_scene load_steps=8 format=3 uid="uid://b7b17ebmgtrfy"]
+[gd_scene load_steps=7 format=3 uid="uid://b7b17ebmgtrfy"]
 
 [ext_resource type="Script" path="res://Scripts/Vanilla/Weapon/Nemesis/NemesisWeapon.cs" id="1_vy2ad"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="2_cm0hb"]
+[ext_resource type="Resource" uid="uid://4x2qnwvdg3se" path="res://Resources/Weapons/Nemesis/Nemesis_key.tres" id="2_illkl"]
 [ext_resource type="AnimationLibrary" uid="uid://caafq3ok75ukn" path="res://Resources/Weapons/Nemesis/NemesisAnimations.tres" id="2_l4rjo"]
-[ext_resource type="Script" path="csharp://Scripts/Core/InterfaceResource.cs:LandlessSkies.Core.InterfaceResource`1[LandlessSkies.Core.IItemData`1[LandlessSkies.Core.Weapon]].cs" id="2_vltgc"]
-[ext_resource type="Script" path="csharp://Scripts/Core/InterfaceResource.cs:LandlessSkies.Core.InterfaceResource`1[LandlessSkies.Core.IItemData`1[LandlessSkies.Core.Costume]].cs" id="6_kyl7e"]
-
-[sub_resource type="Resource" id="Resource_x38lm"]
-script = ExtResource("2_vltgc")
-Resource = &"res://Resources/Weapons/Nemesis/Nemesis_data.tres"
-
-[sub_resource type="Resource" id="Resource_bdda0"]
-script = ExtResource("6_kyl7e")
-Resource = &"res://Resources/Weapons/Nemesis/Costumes/Nemesis-base_data.tres"
+[ext_resource type="Resource" uid="uid://c8q8b6jgvn4vo" path="res://Resources/Weapons/Nemesis/Nemesis_ui.tres" id="2_na6b6"]
+[ext_resource type="Resource" uid="uid://nv3cruo4dqdt" path="res://Resources/Weapons/Nemesis/Costumes/Nemesis-base_key.tres" id="6_sdxrf"]
 
 [node name="Nemesis" type="Node3D" node_paths=PackedStringArray("CostumeHolder")]
 script = ExtResource("1_vy2ad")
-Data = SubResource("Resource_x38lm")
+Key = ExtResource("2_illkl")
+UI = ExtResource("2_na6b6")
 AnimationLibrary = ExtResource("2_l4rjo")
 CostumeHolder = NodePath("CostumeHolder")
 
 [node name="CostumeHolder" type="Node3D" parent="."]
 script = ExtResource("2_cm0hb")
-CostumeData = SubResource("Resource_bdda0")
+CostumeKey = ExtResource("6_sdxrf")

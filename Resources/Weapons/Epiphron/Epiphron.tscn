@@ -1,25 +1,19 @@
-[gd_scene load_steps=8 format=3 uid="uid://fbs6dr24ss3g"]
+[gd_scene load_steps=7 format=3 uid="uid://fbs6dr24ss3g"]
 
 [ext_resource type="Script" path="res://Scripts/Vanilla/Weapon/Epiphron/EpiphronWeapon.cs" id="1_wltox"]
+[ext_resource type="Resource" uid="uid://dvuweom50h6eu" path="res://Resources/Weapons/Epiphron/Epiphron_key.tres" id="2_4xhx5"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="2_b3qyv"]
-[ext_resource type="Script" path="csharp://Scripts/Core/InterfaceResource.cs:LandlessSkies.Core.InterfaceResource`1[LandlessSkies.Core.IItemData`1[LandlessSkies.Core.Weapon]].cs" id="2_jdg84"]
+[ext_resource type="Resource" uid="uid://bcqvwsqa5w2ei" path="res://Resources/Weapons/Epiphron/Epiphron_ui.tres" id="2_ey7pk"]
 [ext_resource type="AnimationLibrary" uid="uid://b0gic15n8ccgn" path="res://Resources/Weapons/Epiphron/EpiphronAnimations.tres" id="2_v8v6b"]
-[ext_resource type="Script" path="csharp://Scripts/Core/InterfaceResource.cs:LandlessSkies.Core.InterfaceResource`1[LandlessSkies.Core.IItemData`1[LandlessSkies.Core.Costume]].cs" id="6_vvfah"]
-
-[sub_resource type="Resource" id="Resource_ahoej"]
-script = ExtResource("2_jdg84")
-Resource = &"res://Resources/Weapons/Epiphron/Epiphron_data.tres"
-
-[sub_resource type="Resource" id="Resource_4i2ar"]
-script = ExtResource("6_vvfah")
-Resource = &"res://Resources/Weapons/Epiphron/Costumes/Epiphron-base_data.tres"
+[ext_resource type="Resource" uid="uid://b5vpfmo67yl6e" path="res://Resources/Weapons/Epiphron/Costumes/Epiphron-base_key.tres" id="6_pw5vt"]
 
 [node name="Epiphron" type="Node3D" node_paths=PackedStringArray("CostumeHolder")]
 script = ExtResource("1_wltox")
-Data = SubResource("Resource_ahoej")
+Key = ExtResource("2_4xhx5")
+UI = ExtResource("2_ey7pk")
 AnimationLibrary = ExtResource("2_v8v6b")
 CostumeHolder = NodePath("CostumeHolder")
 
 [node name="CostumeHolder" type="Node3D" parent="."]
 script = ExtResource("2_b3qyv")
-CostumeData = SubResource("Resource_4i2ar")
+CostumeKey = ExtResource("6_pw5vt")

@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="DataKey" load_steps=2 format=3 uid="uid://dyvavvfne7go"]
+
+[ext_resource type="Script" path="res://Scripts/Core/Item/DataKey.cs" id="1_q6yem"]
+
+[resource]
+script = ExtResource("1_q6yem")
+String = &"bike"

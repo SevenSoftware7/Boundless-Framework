@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="DataKey" load_steps=2 format=3 uid="uid://dvuweom50h6eu"]
+
+[ext_resource type="Script" path="res://Scripts/Core/Item/DataKey.cs" id="1_twtgn"]
+
+[resource]
+script = ExtResource("1_twtgn")
+String = &"epiphron"

@@ -34,9 +34,8 @@ public abstract class PersistenceData<T>(T item) : IPersistenceData<T> where T :
 }
 
 public class ItemPersistenceData<T>(T item) : PersistenceData<T>(item) where T : class, IItem<T> {
-	private readonly string DataKey = item.Data?.Key ?? string.Empty;
-	public IItemData<T>? Data => IItemData<T>.GetData(DataKey);
+	private readonly DataKey DataKey = item.Key;
+	public IItemData<T> Data => IItemData<T>.GetData(DataKey) ?? throw new System.InvalidOperationException();
 
-	protected sealed override T Instantiate() => Data?.Instantiate() ?? throw new System.NotImplementedException();
-
+	protected sealed override T Instantiate() => Data.Instantiate();
 }

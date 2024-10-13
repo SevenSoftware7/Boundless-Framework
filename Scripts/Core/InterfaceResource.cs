@@ -14,24 +14,14 @@ public partial class InterfaceResource<T> : Resource where T : class {
 	}
 	private T? _value;
 
-	[Export] public StringName? Resource {
-		get => _resourcePath ?? string.Empty;
+	[Export] public Resource? Resource {
+		get => Value as Resource;
 		private set {
-			_resourcePath = value;
-
-			try {
-				T? resource = ResourceLoader.Load<T>(_resourcePath);
-				if (resource is T interfaceValue) {
-					Value = interfaceValue;
-					GD.Print($"Found Resource Value : {interfaceValue}. Resource Path : {_resourcePath}");
-				}
-			}
-			catch (Exception e) {
-				GD.PushError($"Error loading resource: {e.Message}. Resource Path : {_resourcePath}");
+			if (value is T interfaceValue) {
+				Value = interfaceValue;
 			}
 		}
 	}
-	private StringName? _resourcePath;
 
 
 	public InterfaceResource() : this(null, null) { }

@@ -1,8 +1,9 @@
-[gd_scene load_steps=22 format=3 uid="uid://b7rhbgw2dujty"]
+[gd_scene load_steps=21 format=3 uid="uid://b7rhbgw2dujty"]
 
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Entity.cs" id="1_44rt4"]
+[ext_resource type="Resource" uid="uid://b56txqwbw36sk" path="res://Resources/Entities/Eos/Eos_key.tres" id="2_ctdcn"]
+[ext_resource type="Resource" uid="uid://hpsfrfhvt5ll" path="res://Resources/Entities/Eos/Eos_ui.tres" id="2_hamhv"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/EntityStats.cs" id="2_lubr1"]
-[ext_resource type="Script" path="csharp://Scripts/Core/InterfaceResource.cs:LandlessSkies.Core.InterfaceResource`1[LandlessSkies.Core.IItemData`1[LandlessSkies.Core.Entity]].cs" id="2_sasyd"]
 [ext_resource type="PackedScene" uid="uid://dr77fv5m8yjck" path="res://Scenes/UI/Pointer.tscn" id="3_qcq8b"]
 [ext_resource type="PackedScene" uid="uid://cck2wboppochk" path="res://Scenes/UI/Gauge.tscn" id="3_uuynt"]
 [ext_resource type="PackedScene" uid="uid://br8bdv51nxt4p" path="res://Scenes/UI/Prompt.tscn" id="4_qonq2"]
@@ -13,11 +14,7 @@
 [ext_resource type="Script" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="9_8kq40"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Behaviour/Implementations/BipedBehaviour.cs" id="12_0ikht"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Behaviour/Implementations/SwimmingBehaviour.cs" id="13_ecggl"]
-[ext_resource type="Script" path="csharp://Scripts/Core/InterfaceResource.cs:LandlessSkies.Core.InterfaceResource`1[LandlessSkies.Core.IItemData`1[LandlessSkies.Core.Costume]].cs" id="15_doykv"]
-
-[sub_resource type="Resource" id="Resource_1taxk"]
-script = ExtResource("2_sasyd")
-Resource = &"res://Resources/Entities/Eos/Eos_data.tres"
+[ext_resource type="Resource" uid="uid://bi8pp11ga45x3" path="res://Resources/Entities/Eos/Costumes/Eos-base_key.tres" id="15_ppfic"]
 
 [sub_resource type="Resource" id="Resource_v01j0"]
 script = ExtResource("2_lubr1")
@@ -49,17 +46,14 @@ _data = {
 [sub_resource type="BoxShape3D" id="BoxShape3D_iqmmo"]
 size = Vector3(0.3, 3.1, 0.3)
 
-[sub_resource type="Resource" id="Resource_wq4kp"]
-script = ExtResource("15_doykv")
-Resource = &"res://Resources/Entities/Eos/Costumes/Eos-base_data.tres"
-
 [node name="Eos" type="CharacterBody3D" node_paths=PackedStringArray("CostumeHolder", "Skeleton", "AnimationPlayer", "CurrentBehaviour", "Health", "CenterOfMass")]
 collision_layer = 256
 floor_constant_speed = true
 platform_floor_layers = 4294963965
 platform_wall_layers = 4294963965
 script = ExtResource("1_44rt4")
-Data = SubResource("Resource_1taxk")
+Key = ExtResource("2_ctdcn")
+UI = ExtResource("2_hamhv")
 Stats = SubResource("Resource_v01j0")
 HudPack = SubResource("Resource_qwv27")
 CostumeHolder = NodePath("CostumeHolder")
@@ -101,4 +95,4 @@ Entity = NodePath("..")
 
 [node name="CostumeHolder" type="Node3D" parent="."]
 script = ExtResource("9_8kq40")
-CostumeData = SubResource("Resource_wq4kp")
+CostumeKey = ExtResource("15_ppfic")
