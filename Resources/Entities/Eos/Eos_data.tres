@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SceneEntityData" load_steps=5 format=3 uid="uid://djyqyaq7lwdkr"]
+
+[ext_resource type="PackedScene" uid="uid://b7rhbgw2dujty" path="res://Resources/Entities/Eos/Eos.tscn" id="1_dapd7"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/ItemUIData.cs" id="2_nh6fk"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/SceneEntityData.cs" id="3_jssrc"]
+
+[sub_resource type="Resource" id="Resource_l6k4y"]
+script = ExtResource("2_nh6fk")
+DisplayName = "Eos"
+
+[resource]
+script = ExtResource("3_jssrc")
+Key = "Eos"
+UIData = SubResource("Resource_l6k4y")
+Scene = ExtResource("1_dapd7")

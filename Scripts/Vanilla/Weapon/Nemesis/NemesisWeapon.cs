@@ -14,7 +14,7 @@ public sealed partial class NemesisWeapon : Weapon, IPlayerHandler {
 
 
 	private NemesisWeapon() : this(null) { }
-	public NemesisWeapon(WeaponCostume? costume = null) : base(costume) {
+	public NemesisWeapon(IItemData<Costume>? costume = null) : base(costume) {
 		slashAttack = new(this);
 	}
 

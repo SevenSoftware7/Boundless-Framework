@@ -16,7 +16,7 @@ public sealed partial class EleosWeapon : Weapon, IPlayerHandler {
 
 
 	private EleosWeapon() : this(null) { }
-	public EleosWeapon(WeaponCostume? costume = null) : base(costume) {
+	public EleosWeapon(IItemData<Costume>? costume = null) : base(costume) {
 		slashAttack = new(this);
 		chargeAttack = new(
 			this,

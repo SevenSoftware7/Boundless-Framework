@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SceneEntityData" load_steps=5 format=3 uid="uid://q4arq6wxs6ho"]
+
+[ext_resource type="PackedScene" uid="uid://bxcpbr13uyeh1" path="res://Resources/Entities/Bike/Bike.tscn" id="1_1dwal"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/ItemUIData.cs" id="1_3phb5"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/SceneEntityData.cs" id="2_g1571"]
+
+[sub_resource type="Resource" id="Resource_d0vqu"]
+script = ExtResource("1_3phb5")
+DisplayName = "Bike"
+
+[resource]
+script = ExtResource("2_g1571")
+Key = "bike"
+UIData = SubResource("Resource_d0vqu")
+Scene = ExtResource("1_1dwal")

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SceneCompanionData" load_steps=5 format=3 uid="uid://7o3ch4vnd7ux"]
+
+[ext_resource type="PackedScene" uid="uid://b7hcoc81x5g0i" path="res://Resources/Companions/Erebos/Erebos.tscn" id="1_pbcm2"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/ItemUIData.cs" id="1_xl4be"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Companion/SceneCompanionData.cs" id="2_svujt"]
+
+[sub_resource type="Resource" id="Resource_j6s43"]
+script = ExtResource("1_xl4be")
+DisplayName = "Erebos"
+
+[resource]
+script = ExtResource("2_svujt")
+Key = "erebos"
+UIData = SubResource("Resource_j6s43")
+Scene = ExtResource("1_pbcm2")

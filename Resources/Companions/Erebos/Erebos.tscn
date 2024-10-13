@@ -1,0 +1,36 @@
+[gd_scene load_steps=8 format=3 uid="uid://b7hcoc81x5g0i"]
+
+[ext_resource type="Script" path="res://Scripts/Vanilla/Companion/FloatingCompanion.cs" id="1_1r20i"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="2_iwojg"]
+[ext_resource type="Script" path="csharp://Scripts/Core/InterfaceResource.cs:LandlessSkies.Core.InterfaceResource`1[LandlessSkies.Core.IItemData`1[LandlessSkies.Core.Companion]].cs" id="2_uk8q6"]
+[ext_resource type="Script" path="csharp://Scripts/Core/InterfaceResource.cs:LandlessSkies.Core.InterfaceResource`1[LandlessSkies.Core.IItemData`1[LandlessSkies.Core.Costume]].cs" id="5_juf7e"]
+
+[sub_resource type="Curve3D" id="Curve3D_11sy3"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+up_vector_enabled = false
+
+[sub_resource type="Resource" id="Resource_gyact"]
+script = ExtResource("2_uk8q6")
+Resource = &"res://Resources/Companions/Erebos/Erebos_data.tres"
+
+[sub_resource type="Resource" id="Resource_lfl84"]
+script = ExtResource("5_juf7e")
+Resource = &"res://Resources/Companions/Erebos/Costumes/Erebos-base_data.tres"
+
+[node name="Erebos" type="Node3D" node_paths=PackedStringArray("Skeleton", "CostumeHolder")]
+script = ExtResource("1_1r20i")
+Curve = SubResource("Curve3D_11sy3")
+Data = SubResource("Resource_gyact")
+Skeleton = NodePath("Skeleton")
+CostumeHolder = NodePath("CostumeHolder")
+
+[node name="Skeleton" type="Skeleton3D" parent="."]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+
+[node name="CostumeHolder" type="Node3D" parent="."]
+script = ExtResource("2_iwojg")
+CostumeData = SubResource("Resource_lfl84")

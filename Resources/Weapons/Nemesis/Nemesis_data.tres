@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SceneWeaponData" load_steps=5 format=3 uid="uid://ci6ahybitat4f"]
+
+[ext_resource type="Script" path="res://Scripts/Core/Item/ItemUIData.cs" id="1_0houu"]
+[ext_resource type="PackedScene" uid="uid://b7b17ebmgtrfy" path="res://Resources/Weapons/Nemesis/Nemesis.tscn" id="1_clv3l"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/SceneWeaponData.cs" id="2_u0qmf"]
+
+[sub_resource type="Resource" id="Resource_ginwc"]
+script = ExtResource("1_0houu")
+DisplayName = "Nemesis"
+
+[resource]
+script = ExtResource("2_u0qmf")
+Key = "nemesis"
+UIData = SubResource("Resource_ginwc")
+Scene = ExtResource("1_clv3l")

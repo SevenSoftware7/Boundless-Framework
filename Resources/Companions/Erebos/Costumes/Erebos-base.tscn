@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://r6yqclqm3ubp"]
+
+[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Implementation/SkinnedCostume.cs" id="1_om25c"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_aafmt"]
+radius = 0.15
+height = 0.12
+is_hemisphere = true
+
+[node name="Model - Erebos (base)" type="Node3D" node_paths=PackedStringArray("Meshes")]
+script = ExtResource("1_om25c")
+Meshes = [NodePath("Model")]
+
+[node name="Model" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1.5, 0, 1, -6.55671e-08, 0, 0, 0)
+mesh = SubResource("SphereMesh_aafmt")

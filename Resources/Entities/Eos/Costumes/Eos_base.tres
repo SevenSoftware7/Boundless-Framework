@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="EntityCostume" load_steps=3 format=3 uid="uid://dvcjw3gon7rak"]
-
-[ext_resource type="PackedScene" uid="uid://hje36y5wrdyu" path="res://Resources/Entities/Eos/Costumes/Eos_base.tscn" id="1_hwbj6"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/EntityCostume.cs" id="2_tibbh"]
-
-[resource]
-script = ExtResource("2_tibbh")
-_displayName = "Eos (base)"
-ModelScene = ExtResource("1_hwbj6")

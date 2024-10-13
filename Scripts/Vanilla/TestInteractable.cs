@@ -21,7 +21,7 @@ public partial class TestInteractable : Interactable {
 	}
 
 	private async void CloneEntity(Entity entity) {
-		ISaveData<Entity>? savedEntity = entity.Save();
+		IPersistenceData<Entity>? savedEntity = entity.Save();
 
 		await Task.Run(() => {
 			string path = @$"{OS.GetUserDataDir()}/SaveData1.dat";
@@ -31,7 +31,7 @@ public partial class TestInteractable : Interactable {
 				formatter.SerializeToStream(stream, savedEntity);
 			}
 			using (FileStream stream = new(path, FileMode.Open)) {
-				savedEntity = formatter.DeserializeFromStream<ISaveData<Entity>?>(stream);
+				savedEntity = formatter.DeserializeFromStream<IPersistenceData<Entity>?>(stream);
 			}
 		});
 

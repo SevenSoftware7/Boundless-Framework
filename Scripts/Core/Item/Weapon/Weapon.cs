@@ -2,7 +2,6 @@ namespace LandlessSkies.Core;
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using Godot;
 using SevenDev.Boundless.Utility;
 using SevenDev.Boundless.Injection;
@@ -12,7 +11,7 @@ using SevenDev.Boundless.Injection;
 /// </summary>
 [Tool]
 [GlobalClass]
-public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, IDamageDealerProxy {
+public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject, ICostumable, IDamageDealerProxy {
 	private static readonly StringName LeftWeapon = "LeftWeapon";
 	private static readonly StringName RightWeapon = "RightWeapon";
 	private static readonly StringName LeftHand = "LeftHand";
@@ -20,6 +19,14 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 
 	public static readonly Basis rightHandBoneBasis = Basis.FromEuler(new(Mathf.DegToRad(-90f), 0f, Mathf.DegToRad(-90f)));
 	public static readonly Basis leftHandBoneBasis = Basis.FromEuler(new(Mathf.DegToRad(-90f), 0f, Mathf.DegToRad(90f)));
+
+
+	IItemData<Weapon>? IItem<Weapon>.Data => Data.Value;
+
+	[Export] public InterfaceResource<IItemData<Weapon>> Data = new();
+	public string DisplayName => Data.Value?.DisplayName ?? string.Empty;
+	public Texture2D? DisplayPortrait => Data.Value?.DisplayPortrait;
+
 
 	[Injectable]
 	public WeaponHolsterState HolsterState {
@@ -64,12 +71,6 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 
 
 
-	[Export] private string _displayName = string.Empty;
-	public string DisplayName => _displayName;
-
-	public Texture2D? DisplayPortrait => CostumeHolder?.Costume?.DisplayPortrait;
-
-
 	[ExportGroup("Costume")]
 	[Export] public CostumeHolder? CostumeHolder { get; set; }
 
@@ -96,12 +97,14 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 	public virtual uint MaxStyle { get; } = 0;
 
 
-	[Signal] public delegate void CostumeChangedEventHandler(WeaponCostume? newCostume, WeaponCostume? oldCostume);
-
-
 	protected Weapon() : this(null) { }
-	public Weapon(WeaponCostume? costume = null) : base() {
-		CostumeHolder = new CostumeHolder(costume).ParentTo(this);
+	public Weapon(IItemData<Costume>? costume = null) : base() {
+		if (CostumeHolder is null) {
+			CostumeHolder = new CostumeHolder(costume).ParentTo(this);
+		}
+		else {
+			CostumeHolder.SetCostume(costume);
+		}
 	}
 
 	public abstract Vector3 GetTipPosition();
@@ -110,13 +113,13 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 	public virtual List<ICustomization> GetCustomizations() => [];
 	public List<ICustomizable> GetSubCustomizables() {
 		List<ICustomizable> list = [];
-		if (CostumeHolder?.Model is not null) list.Add(CostumeHolder.Model);
+		if (CostumeHolder?.Costume is not null) list.Add(CostumeHolder.Costume);
 		return list;
 	}
 
 	public abstract IEnumerable<Action.Wrapper> GetAttacks(Entity target);
 
-	public ISaveData<IWeapon> Save() => new WeaponSaveData<Weapon>(this);
+	public IPersistenceData<IWeapon> Save() => new WeaponSaveData<Weapon>(this);
 
 
 	[Injectable]
@@ -190,5 +193,5 @@ public abstract partial class Weapon : Node3D, IWeapon, IUIObject, ICostumable, 
 	}
 
 	[Serializable]
-	public class WeaponSaveData<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] T>(T weapon) : CostumableSaveData<T, WeaponCostume>(weapon) where T : Weapon;
+	public class WeaponSaveData<T>(T weapon) : ItemPersistenceData<T>(weapon) where T : Weapon, IItem<T>;
 }

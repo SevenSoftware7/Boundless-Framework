@@ -1,12 +1,17 @@
-[gd_scene load_steps=12 format=3 uid="uid://bxcpbr13uyeh1"]
+[gd_scene load_steps=15 format=3 uid="uid://bxcpbr13uyeh1"]
 
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Entity.cs" id="1_46ioo"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/EntityStats.cs" id="2_4vcxx"]
+[ext_resource type="Script" path="csharp://Scripts/Core/InterfaceResource.cs:LandlessSkies.Core.InterfaceResource`1[LandlessSkies.Core.IItemData`1[LandlessSkies.Core.Entity]].cs" id="2_n32ok"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/HudPack.cs" id="3_aosnt"]
-[ext_resource type="Resource" uid="uid://bb3xo4pwx7g3y" path="res://Resources/Entities/Bike/Costumes/Bike_base.tres" id="4_yfh4w"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="5_5toi3"]
 [ext_resource type="Script" path="res://Scripts/Vanilla/Entities/VehicleBehaviour.cs" id="5_6pb3w"]
 [ext_resource type="Script" path="res://Scripts/Vanilla/VehicleSeatInteractable.cs" id="5_kaq40"]
+[ext_resource type="Script" path="csharp://Scripts/Core/InterfaceResource.cs:LandlessSkies.Core.InterfaceResource`1[LandlessSkies.Core.IItemData`1[LandlessSkies.Core.Costume]].cs" id="8_prptn"]
+
+[sub_resource type="Resource" id="Resource_pdm4g"]
+script = ExtResource("2_n32ok")
+Resource = &"res://Resources/Entities/Bike/Bike_data.tres"
 
 [sub_resource type="Resource" id="Resource_jjk82"]
 script = ExtResource("2_4vcxx")
@@ -27,6 +32,10 @@ script = ExtResource("3_aosnt")
 [sub_resource type="BoxShape3D" id="BoxShape3D_3bott"]
 size = Vector3(1, 1.6, 1.25)
 
+[sub_resource type="Resource" id="Resource_ywnfi"]
+script = ExtResource("8_prptn")
+Resource = &"res://Resources/Entities/Bike/Costumes/Bike-base_data.tres"
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_vd6cg"]
 size = Vector3(1, 1, 3)
 
@@ -35,7 +44,7 @@ collision_layer = 256
 platform_floor_layers = 4294963965
 platform_wall_layers = 4294963965
 script = ExtResource("1_46ioo")
-DisplayName = "Bike"
+Data = SubResource("Resource_pdm4g")
 Stats = SubResource("Resource_jjk82")
 HudPack = SubResource("Resource_bd6gb")
 CostumeHolder = NodePath("CostumeHolder")
@@ -53,10 +62,9 @@ shape = SubResource("BoxShape3D_3bott")
 
 [node name="CenterOfMass" type="Node3D" parent="CollisionShape3D"]
 
-[node name="CostumeHolder" type="Node3D" parent="." node_paths=PackedStringArray("Model")]
+[node name="CostumeHolder" type="Node3D" parent="."]
 script = ExtResource("5_5toi3")
-Costume = ExtResource("4_yfh4w")
-Model = NodePath("Model")
+CostumeData = SubResource("Resource_ywnfi")
 
 [node name="Seat" type="Area3D" parent="." node_paths=PackedStringArray("Vehicle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1.2)

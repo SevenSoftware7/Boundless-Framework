@@ -47,7 +47,7 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 		Vector3 normal = Entity.GetFloorNormal();
 		float groundFlatness = normal.Dot(Entity.UpDirection);
 
-		if (Entity.CostumeHolder?.Model is Model model) {
+		if (Entity.CostumeHolder?.Costume is Costume model) {
 			Vector3 groundUp = groundFlatness > 0.5f ? normal : Entity.UpDirection;
 			Vector3 rightDir = Entity.GlobalForward.Cross(groundUp).Normalized();
 

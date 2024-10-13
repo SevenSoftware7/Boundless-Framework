@@ -1,17 +1,25 @@
-[gd_scene load_steps=5 format=3 uid="uid://b7b17ebmgtrfy"]
+[gd_scene load_steps=8 format=3 uid="uid://b7b17ebmgtrfy"]
 
 [ext_resource type="Script" path="res://Scripts/Vanilla/Weapon/Nemesis/NemesisWeapon.cs" id="1_vy2ad"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="2_cm0hb"]
 [ext_resource type="AnimationLibrary" uid="uid://caafq3ok75ukn" path="res://Resources/Weapons/Nemesis/NemesisAnimations.tres" id="2_l4rjo"]
-[ext_resource type="Resource" uid="uid://ctyrw08y4svjk" path="res://Resources/Weapons/Nemesis/Costumes/Nemesis_Base.tres" id="2_snlmi"]
+[ext_resource type="Script" path="csharp://Scripts/Core/InterfaceResource.cs:LandlessSkies.Core.InterfaceResource`1[LandlessSkies.Core.IItemData`1[LandlessSkies.Core.Weapon]].cs" id="2_vltgc"]
+[ext_resource type="Script" path="csharp://Scripts/Core/InterfaceResource.cs:LandlessSkies.Core.InterfaceResource`1[LandlessSkies.Core.IItemData`1[LandlessSkies.Core.Costume]].cs" id="6_kyl7e"]
+
+[sub_resource type="Resource" id="Resource_x38lm"]
+script = ExtResource("2_vltgc")
+Resource = &"res://Resources/Weapons/Nemesis/Nemesis_data.tres"
+
+[sub_resource type="Resource" id="Resource_bdda0"]
+script = ExtResource("6_kyl7e")
+Resource = &"res://Resources/Weapons/Nemesis/Costumes/Nemesis-base_data.tres"
 
 [node name="Nemesis" type="Node3D" node_paths=PackedStringArray("CostumeHolder")]
 script = ExtResource("1_vy2ad")
+Data = SubResource("Resource_x38lm")
 AnimationLibrary = ExtResource("2_l4rjo")
-_displayName = "Nemesis"
 CostumeHolder = NodePath("CostumeHolder")
 
-[node name="CostumeHolder" type="Node3D" parent="." node_paths=PackedStringArray("Model")]
+[node name="CostumeHolder" type="Node3D" parent="."]
 script = ExtResource("2_cm0hb")
-Costume = ExtResource("2_snlmi")
-Model = NodePath("Model - Nemesis (base)")
+CostumeData = SubResource("Resource_bdda0")

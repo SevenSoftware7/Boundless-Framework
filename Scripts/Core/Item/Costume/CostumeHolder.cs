@@ -5,42 +5,51 @@ using SevenDev.Boundless.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class CostumeHolder : Node3D, ISerializationListener {
-	public Model? Model { get; private set; }
+public sealed partial class CostumeHolder : Node3D, ISerializationListener {
+	public Costume? Costume { get; private set; }
 
-	[Export]
-	public Costume? Costume {
-		get => _costume;
-		set => SetCostume(value);
+	[Export] public InterfaceResource<IItemData<Costume>> CostumeData = new();
+
+
+	public CostumeHolder() {
+		CostumeData.OnSet += SetCostume;
 	}
-	private Costume? _costume;
-
-
-	public CostumeHolder() { }
-	public CostumeHolder(Costume? costume) : this() {
+	public CostumeHolder(IItemData<Costume>? costume) : this() {
 		SetCostume(costume);
 	}
 
-
-	public void SetCostume(Costume? newCostume) {
-		Costume? oldCostume = _costume;
+	private void SetCostume(IItemData<Costume>? oldCostume, IItemData<Costume>? newCostume) {
 		if (newCostume == oldCostume) return;
-
-		_costume = newCostume;
-
 		Load(true);
+	}
+	public void SetCostume(IItemData<Costume>? newCostume) {
+		SetCostume(CostumeData.Value, newCostume);
+	}
+
+	public void SetCostume(IPersistenceData<Costume> costumeData) {
+		Unload();
+
+		Costume? instance = costumeData.Load();
+		CostumeData.Value = instance?.Data?.Value;
+
+		Costume = instance?.ParentTo(this);
 	}
 
 	public void Load(bool forceReload = false) {
-		if (Model is not null && !forceReload) return;
+		if (Costume is not null && !forceReload) return;
 
 		Unload();
 
-		Model = Costume?.Instantiate()?.ParentTo(this);
+		Costume = CostumeData?.Value?.Instantiate()?.ParentTo(this);
 	}
 	public void Unload() {
-		Model?.QueueFree();
-		Model = null;
+		Costume?.QueueFree();
+		Costume = null;
+	}
+
+	public override void _Ready() {
+		base._Ready();
+		Load();
 	}
 
 	public void OnBeforeSerialize() {

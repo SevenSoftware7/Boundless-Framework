@@ -8,15 +8,12 @@ using Godot;
 using SevenDev.Boundless.Utility;
 using SevenDev.Boundless.Injection;
 
-
 [Tool]
 [GlobalClass]
 public sealed partial class MultiWeapon : WeaponCollection, IInjectionInterceptor<WeaponHolsterState> {
 	private List<IWeapon> _weapons = [];
-	public IWeapon? CurrentWeapon {
-		get => _currentIndex < _weapons.Count ? _weapons[(int)_currentIndex] : null;
-		private set => SwitchTo(value);
-	}
+
+	public override IWeapon? CurrentWeapon => _currentIndex < _weapons.Count ? _weapons[(int)_currentIndex] : null;
 
 	[Injector]
 	[Injectable]
@@ -24,15 +21,14 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 
 	public override uint MaxStyle => (uint)(_weapons.Count != 0 ? _weapons.Count - 1 : 0);
 
-	[ExportGroup("Current Weapon")]
 	[Export]
 	public override uint Style {
 		get => _currentIndex;
 		set => SwitchTo(value);
 	}
-	private uint _currentIndex;
 
-	protected override IWeapon? Weapon => CurrentWeapon;
+
+	private uint _currentIndex;
 
 
 	private MultiWeapon() : base() { }
@@ -41,7 +37,7 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 			weaponNode.SetOwnerAndParent(this);
 		}
 	}
-	public MultiWeapon(ImmutableArray<ISaveData<IWeapon>> weaponSaves) : this(weaponSaves.Select(save => save.Load())) { }
+	public MultiWeapon(ImmutableArray<IPersistenceData<IWeapon>> weaponSaves) : this(weaponSaves.Select(save => save.Load())) { }
 
 
 
@@ -52,6 +48,43 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 
 		this.PropagateInjection<WeaponHolsterState>();
 	}
+
+	public void AddWeapon(IWeapon weapon) {
+		if (weapon is not Node weaponNode) {
+			_weapons.Add(weapon);
+			return;
+		}
+
+		_lockBackingList = true;
+		weaponNode.SetOwnerAndParent(this);
+		_weapons.Add(weapon);
+		_lockBackingList = false;
+	}
+	public void AddWeapons(IEnumerable<IWeapon> weapons) {
+		foreach (IWeapon weapon in weapons) {
+			AddWeapon(weapon);
+		}
+	}
+
+	public void RemoveWeapon(IWeapon weapon) {
+		if (weapon is not Node weaponNode) {
+			_weapons.Remove(weapon);
+			return;
+		}
+
+		_lockBackingList = true;
+		if (weaponNode.GetParent() == this) {
+			RemoveChild(weaponNode);
+			_weapons.Remove(weapon);
+		}
+		_lockBackingList = false;
+	}
+	public void RemoveWeapons(IEnumerable<IWeapon> weapons) {
+		foreach (IWeapon weapon in weapons) {
+			RemoveWeapon(weapon);
+		}
+	}
+
 
 	public void SwitchTo(IWeapon? weapon) {
 		if (weapon is null) return;
@@ -82,14 +115,14 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 		IWeapon? currentWeapon = CurrentWeapon;
 		return _weapons
 			.SelectMany((w) => w?.GetAttacks(target) ?? [])
+			.Concat(base.GetAttacks(target))
 			.Select(a => {
 				if (a.Builder is Attack.Builder attack && attack.Weapon != currentWeapon) {
 					a.BeforeExecute += () => SwitchTo(attack.Weapon);
 					a.AfterExecute += () => SwitchTo(currentWeapon);
 				}
 				return a;
-			})
-			.Concat(base.GetAttacks(target));
+			});
 	}
 
 
@@ -98,31 +131,32 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 	}
 
 
-	public override List<ICustomization> GetCustomizations() => base.GetCustomizations();
-	public override List<ICustomizable> GetSubCustomizables() {
-		List<ICustomizable> list = base.GetSubCustomizables();
-		return [.. list.Concat(_weapons)];
+	// public override Dictionary<StringName, ICustomization> GetCustomizations() => base.GetCustomizations();
+	public override IEnumerable<IUIObject> GetSubObjects() {
+		IEnumerable<IUIObject>? subObjects = base.GetSubObjects();
+
+		subObjects = subObjects.Concat(_weapons);
+
+		return subObjects;
 	}
-	public override ISaveData<IWeapon> Save() {
-		return new MultiWeaponSaveData([.. _weapons]);
-	}
+
 
 
 	protected override void UpdateWeapons() {
-		_weapons = [.. GetChildren().OfType<IWeapon>()];
+		IEnumerable<IWeapon> nonNodeWeapons = _weapons.Where(w => w is not Node);
+		_weapons = [.. GetChildren().OfType<IWeapon>().Concat(nonNodeWeapons)];
 		UpdateCurrent();
 	}
 
+	public override IPersistenceData<MultiWeapon> Save() => new MultiWeaponSaveData(this);
+
 
 	[Serializable]
-	public class MultiWeaponSaveData(IEnumerable<IWeapon> weapons) : ISaveData<MultiWeapon> {
-		private readonly ISaveData<IWeapon>[] WeaponSaves = weapons
-			.Select(w => w.Save())
-			.ToArray();
+	public class MultiWeaponSaveData(MultiWeapon multiWeapon) : PersistenceData<MultiWeapon>(multiWeapon) {
+		private readonly ImmutableArray<IPersistenceData<IWeapon>> WeaponSaves = [.. multiWeapon._weapons
+			.OfType<IPersistent<IWeapon>>()
+			.Select(w => w.Save()) ];
 
-
-		public MultiWeapon Load() {
-			return new MultiWeapon([.. WeaponSaves]);
-		}
+		protected override MultiWeapon Instantiate() => new(WeaponSaves);
 	}
 }

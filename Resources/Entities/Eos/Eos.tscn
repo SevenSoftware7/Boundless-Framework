@@ -1,7 +1,8 @@
-[gd_scene load_steps=19 format=3 uid="uid://b7rhbgw2dujty"]
+[gd_scene load_steps=22 format=3 uid="uid://b7rhbgw2dujty"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Implementations/ArmedEntity.cs" id="1_44rt4"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Entity.cs" id="1_44rt4"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/EntityStats.cs" id="2_lubr1"]
+[ext_resource type="Script" path="csharp://Scripts/Core/InterfaceResource.cs:LandlessSkies.Core.InterfaceResource`1[LandlessSkies.Core.IItemData`1[LandlessSkies.Core.Entity]].cs" id="2_sasyd"]
 [ext_resource type="PackedScene" uid="uid://dr77fv5m8yjck" path="res://Scenes/UI/Pointer.tscn" id="3_qcq8b"]
 [ext_resource type="PackedScene" uid="uid://cck2wboppochk" path="res://Scenes/UI/Gauge.tscn" id="3_uuynt"]
 [ext_resource type="PackedScene" uid="uid://br8bdv51nxt4p" path="res://Scenes/UI/Prompt.tscn" id="4_qonq2"]
@@ -10,9 +11,13 @@
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Gauge.cs" id="8_emu8a"]
 [ext_resource type="AnimationLibrary" uid="uid://caafq3ok75ukn" path="res://Resources/Weapons/Nemesis/NemesisAnimations.tres" id="8_uaax8"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="9_8kq40"]
-[ext_resource type="Resource" uid="uid://dvcjw3gon7rak" path="res://Resources/Entities/Eos/Costumes/Eos_base.tres" id="10_lfyyx"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Behaviour/Implementations/BipedBehaviour.cs" id="12_0ikht"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Behaviour/Implementations/SwimmingBehaviour.cs" id="13_ecggl"]
+[ext_resource type="Script" path="csharp://Scripts/Core/InterfaceResource.cs:LandlessSkies.Core.InterfaceResource`1[LandlessSkies.Core.IItemData`1[LandlessSkies.Core.Costume]].cs" id="15_doykv"]
+
+[sub_resource type="Resource" id="Resource_1taxk"]
+script = ExtResource("2_sasyd")
+Resource = &"res://Resources/Entities/Eos/Eos_data.tres"
 
 [sub_resource type="Resource" id="Resource_v01j0"]
 script = ExtResource("2_lubr1")
@@ -38,26 +43,30 @@ length = 0.001
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_y2wqj"]
 _data = {
-"RESET": SubResource("Animation_2ppbj")
+&"RESET": SubResource("Animation_2ppbj")
 }
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_iqmmo"]
 size = Vector3(0.3, 3.1, 0.3)
 
-[node name="Eos" type="CharacterBody3D" node_paths=PackedStringArray("CostumeHolder", "Skeleton", "AnimationPlayer", "Health", "CurrentBehaviour", "CenterOfMass")]
+[sub_resource type="Resource" id="Resource_wq4kp"]
+script = ExtResource("15_doykv")
+Resource = &"res://Resources/Entities/Eos/Costumes/Eos-base_data.tres"
+
+[node name="Eos" type="CharacterBody3D" node_paths=PackedStringArray("CostumeHolder", "Skeleton", "AnimationPlayer", "CurrentBehaviour", "Health", "CenterOfMass")]
 collision_layer = 256
 floor_constant_speed = true
 platform_floor_layers = 4294963965
 platform_wall_layers = 4294963965
 script = ExtResource("1_44rt4")
-DisplayName = "Eos"
+Data = SubResource("Resource_1taxk")
 Stats = SubResource("Resource_v01j0")
 HudPack = SubResource("Resource_qwv27")
 CostumeHolder = NodePath("CostumeHolder")
 Skeleton = NodePath("Skeleton3D")
 AnimationPlayer = NodePath("AnimationPlayer")
-Health = NodePath("Health")
 CurrentBehaviour = NodePath("BipedBehaviour")
+Health = NodePath("Health")
 _attributeModifiers = [null]
 CenterOfMass = NodePath("Collisions/CenterOfMass")
 
@@ -69,8 +78,8 @@ Ratio = 1.0
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_y2wqj"),
-"NemesisAnimations": ExtResource("8_uaax8")
+&"": SubResource("AnimationLibrary_y2wqj"),
+&"NemesisAnimations": ExtResource("8_uaax8")
 }
 
 [node name="Skeleton3D" parent="." instance=ExtResource("5_j1koo")]
@@ -92,4 +101,4 @@ Entity = NodePath("..")
 
 [node name="CostumeHolder" type="Node3D" parent="."]
 script = ExtResource("9_8kq40")
-Costume = ExtResource("10_lfyyx")
+CostumeData = SubResource("Resource_wq4kp")

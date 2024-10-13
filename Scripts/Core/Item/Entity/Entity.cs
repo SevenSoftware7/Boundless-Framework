@@ -15,17 +15,24 @@ using KGySoft.CoreLibraries;
 [Tool]
 [GlobalClass]
 [Injector]
-public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDamageDealer, ICostumable, ICustomizable, ISaveable<Entity>, ISerializationListener {
-	public readonly List<Vector3> RecoverLocationBuffer = [];
+public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDamageDealer, ICostumable, IUIObject, IPersistent<Entity>, IItem<Entity>, ISerializationListener {
 	public const int RECOVER_LOCATION_BUFFER_SIZE = 5;
 
-	private GaugeControl? healthBar;
 
-	[Export] public string DisplayName { get; private set; } = string.Empty;
-	public Texture2D? DisplayPortrait => CostumeHolder?.Costume?.DisplayPortrait;
+	public uint? StyleSwitchBuffer;
+
+	public readonly List<Vector3> RecoverLocationBuffer = new(RECOVER_LOCATION_BUFFER_SIZE);
+
+
+	IItemData<Entity>? IItem<Entity>.Data => Data.Value;
+
+	[Export] public InterfaceResource<IItemData<Entity>> Data = new();
+	public string DisplayName => Data.Value?.DisplayName ?? string.Empty;
+	public Texture2D? DisplayPortrait => Data.Value?.DisplayPortrait;
 
 
 	public IDamageable? Damageable => this;
+
 
 	[Export] public EntityStats Stats { get; private set; } = new();
 	[Export] public HudPack HudPack { get; private set; } = new();
@@ -71,6 +78,13 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	}
 	private AnimationPlayer? _animationPlayer;
 
+
+	[ExportGroup("State")]
+	[Export] public Action? CurrentAction { get; private set; }
+	[Export] public EntityBehaviour? CurrentBehaviour { get; private set; }
+	protected virtual Func<EntityBehaviour> DefaultBehaviour => () => new BipedBehaviour(this);
+
+
 	[Export]
 	public Gauge? Health {
 		get => _health;
@@ -83,10 +97,21 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	}
 	private Gauge? _health;
 
+	private GaugeControl? healthBar;
 
-	[ExportGroup("State")]
-	[Export] public Action? CurrentAction { get; private set; }
-	[Export] public EntityBehaviour? CurrentBehaviour { get; private set; }
+
+	public IWeapon? Weapon {
+		get => _weapon;
+		set {
+			_weapon = value;
+			if (_weapon is Node nodeWeapon) {
+				nodeWeapon.SafeRename("Weapon");
+			}
+		}
+	}
+	private IWeapon? _weapon;
+
+
 	[Export]
 	private Godot.Collections.Array<AttributeModifier> _attributeModifiers {
 		get => [.. AttributeModifiers, null];
@@ -128,7 +153,6 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	[Export]
 	public Node3D? CenterOfMass { get; private set; }
 
-	protected virtual Func<EntityBehaviour> DefaultBehaviour => () => new BipedBehaviour(this);
 
 
 	[Signal] public delegate void DeathEventHandler(float fromHealth);
@@ -144,8 +168,13 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 		Forward = Vector3.Forward;
 	}
-	public Entity(EntityCostume? costume = null) : this() {
-		CostumeHolder = new CostumeHolder(costume).ParentTo(this);
+	public Entity(IItemData<Costume>? costume = null) : this() {
+		if (CostumeHolder is null) {
+			CostumeHolder = new CostumeHolder(costume).ParentTo(this);
+		}
+		else {
+			CostumeHolder.SetCostume(costume);
+		}
 	}
 
 
@@ -190,8 +219,10 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	}
 
 
-	public virtual List<ICustomization> GetCustomizations() => [];
-	public virtual List<ICustomizable> GetSubCustomizables() => [.. GetChildren().OfType<ICustomizable>()];
+	public virtual Dictionary<string, ICustomization> GetCustomizations() => [];
+	public virtual IEnumerable<IUIObject> GetSubObjects() => GetChildren().OfType<IUIObject>();
+
+	private void GetWeapon() => Weapon = GetChildren().OfType<IWeapon>().FirstOrDefault();
 
 	public void Damage(ref DamageData data) {
 		if (Health is null) return;
@@ -233,12 +264,42 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	}
 
 	public virtual void HandlePlayer(Player player) {
-		if (healthBar is null && Health is not null) {
-			healthBar = player.HudManager.AddInfo(HudPack.HealthBar);
+		HandleHealthBar(player);
+		HandleWeaponInput(player);
 
-			if (healthBar is not null) {
-				healthBar.Value = Health;
+
+		void HandleHealthBar(Player player) {
+			if (healthBar is null && Health is not null) {
+				healthBar = player.HudManager.AddInfo(HudPack.HealthBar);
+
+				if (healthBar is not null) {
+					healthBar.Value = Health;
+				}
 			}
+		}
+
+		void HandleWeaponInput(Player player) {
+			if (_weapon is null) return;
+
+			uint maxWeaponStyle = (uint)Math.Min((int)(Weapon?.MaxStyle ?? 0) + 1, Inputs.SwitchWeaponActions.Length);
+			uint? bufferStyle = null;
+			for (uint i = 0; i < maxWeaponStyle; i++) {
+				if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponActions[i])) {
+					GD.PrintS(i, Inputs.SwitchWeaponActions[i]);
+					bufferStyle = i;
+					break;
+				}
+			}
+
+			if (bufferStyle.HasValue) {
+				if (CurrentAction is Attack attack && !attack.CanCancel()) {
+					StyleSwitchBuffer = bufferStyle.Value;
+				}
+				else {
+					_weapon.Style = bufferStyle.Value;
+				}
+			}
+
 		}
 	}
 
@@ -288,6 +349,30 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 		healthBar?.QueueFree();
 	}
 
+	public override void _Process(double delta) {
+		base._Process(delta);
+		HandleWeapon();
+
+
+		void HandleWeapon() {
+			if (_weapon is null) return;
+			if (CurrentAction is Attack attack && !attack.CanCancel()) return;
+
+			if (StyleSwitchBuffer is uint bufferedStyle) {
+				_weapon.Style = bufferedStyle;
+			}
+		}
+	}
+
+	public override void _Notification(int what) {
+		base._Notification(what);
+		switch ((ulong)what) {
+			case NotificationChildOrderChanged:
+				GetWeapon();
+				break;
+		}
+	}
+
 	public virtual void OnBeforeSerialize() { }
 	public virtual void OnAfterDeserialize() {
 		Callable.From(() => {
@@ -295,10 +380,11 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 			this.PropagateInjection<Skeleton3D>();
 			this.PropagateInjection<Handedness>();
 		}).CallDeferred();
+		GetWeapon();
 	}
 
 
-	public ISaveData<Entity> Save() => new EntitySaveData<Entity>(this);
+	public IPersistenceData<Entity> Save() => new EntitySaveData<Entity>(this);
 
 	public virtual void AwardDamage(in DamageData data, IDamageable? target) {
 		GD.Print($"{Name} hit {(target as Node)?.Name} for {data.Amount} damage.");
@@ -307,15 +393,11 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 
 	[Serializable]
-	public class EntitySaveData<T>(T entity) : CostumableSaveData<Entity, EntityCostume>(entity) where T : Entity {
-		public ISaveData[] MiscData = [.. entity.GetChildren().OfType<ISaveable>().Select(d => d.Save())];
+	public class EntitySaveData<T>(T entity) : ItemPersistenceData<Entity>(entity) where T : Entity {
+		public IPersistenceData[] MiscData = [.. entity.GetChildren().OfType<IPersistent>().Select(d => d.Save())];
 
-		public override T? Load() {
-			if (base.Load() is not T entity) return null;
-
-			MiscData.ForEach(d => (d.Load() as Node)?.ParentTo(entity));
-
-			return entity;
+		protected override void LoadInternal(Entity item) {
+			MiscData.ForEach(d => (d.Load() as Node)?.ParentTo(item));
 		}
 	}
 }

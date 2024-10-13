@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SceneEntityCostumeData" load_steps=5 format=3 uid="uid://dvcjw3gon7rak"]
+
+[ext_resource type="Script" path="res://Scripts/Core/Item/ItemUIData.cs" id="1_1pcdw"]
+[ext_resource type="PackedScene" uid="uid://hje36y5wrdyu" path="res://Resources/Entities/Eos/Costumes/Eos-base.tscn" id="1_ogmpo"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/SceneEntityCostumeData.cs" id="2_tibbh"]
+
+[sub_resource type="Resource" id="Resource_3ra7s"]
+script = ExtResource("1_1pcdw")
+DisplayName = "Eos (base)"
+
+[resource]
+script = ExtResource("2_tibbh")
+Key = "eos_base"
+UIData = SubResource("Resource_3ra7s")
+Scene = ExtResource("1_ogmpo")

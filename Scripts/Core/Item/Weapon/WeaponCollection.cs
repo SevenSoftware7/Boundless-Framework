@@ -6,28 +6,27 @@ using Godot;
 [Tool]
 [GlobalClass]
 public abstract partial class WeaponCollection : Node, IWeapon, ISerializationListener {
-	public virtual WeaponType Type => Weapon?.Type ?? 0;
-	public virtual WeaponUsage Usage => Weapon?.Usage ?? 0;
-	public virtual WeaponSize Size => Weapon?.Size ?? 0;
+	public virtual string DisplayName => CurrentWeapon?.DisplayName ?? "";
+	public virtual Texture2D? DisplayPortrait => CurrentWeapon?.DisplayPortrait;
+
+	protected bool _lockBackingList = false;
+
+	public virtual WeaponType Type => CurrentWeapon?.Type ?? 0;
+	public virtual WeaponUsage Usage => CurrentWeapon?.Usage ?? 0;
+	public virtual WeaponSize Size => CurrentWeapon?.Size ?? 0;
 
 	public abstract uint Style { get; set; }
 	public abstract uint MaxStyle { get; }
 
-	public virtual string DisplayName => Weapon?.DisplayName ?? string.Empty;
-	public virtual Texture2D? DisplayPortrait => Weapon?.DisplayPortrait;
-
-	protected abstract IWeapon? Weapon { get; }
-
+	public abstract IWeapon? CurrentWeapon { get; }
 
 	protected abstract void UpdateWeapons();
 
 
 	public virtual IEnumerable<Action.Wrapper> GetAttacks(Entity target) => [];
 
-	public virtual List<ICustomization> GetCustomizations() => [];
-	public virtual List<ICustomizable> GetSubCustomizables() => [];
-
-	public abstract ISaveData<IWeapon> Save();
+	public virtual Dictionary<string, ICustomization> GetCustomizations() => [];
+	public virtual IEnumerable<IUIObject> GetSubObjects() => [];
 
 
 	public override void _Ready() {
@@ -40,7 +39,9 @@ public abstract partial class WeaponCollection : Node, IWeapon, ISerializationLi
 
 		switch ((ulong)what) {
 			case NotificationChildOrderChanged:
-				UpdateWeapons();
+				if (!_lockBackingList) {
+					UpdateWeapons();
+				}
 				break;
 		}
 	}
@@ -49,4 +50,6 @@ public abstract partial class WeaponCollection : Node, IWeapon, ISerializationLi
 	public void OnAfterDeserialize() {
 		UpdateWeapons();
 	}
+
+	public abstract IPersistenceData<WeaponCollection> Save();
 }

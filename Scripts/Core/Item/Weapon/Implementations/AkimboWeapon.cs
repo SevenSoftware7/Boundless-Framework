@@ -11,8 +11,24 @@ using SevenDev.Boundless.Injection;
 [Tool]
 [GlobalClass]
 public sealed partial class AkimboWeapon : WeaponCollection, IInjectionInterceptor<Handedness> {
-	public IWeapon? MainWeapon { get; private set; }
-	public IWeapon? SideWeapon { get; private set; }
+	public IWeapon? MainWeapon {
+		get => _mainWeapon;
+		private set {
+			_mainWeapon = value;
+			if (value is Node mainWeaponNode) mainWeaponNode.SafeReparentTo(this);
+		}
+	}
+	private IWeapon? _mainWeapon;
+
+	public IWeapon? SideWeapon {
+		get => _sideWeapon;
+		private set {
+			_sideWeapon = value;
+			if (value is Node sideWeaponNode) sideWeaponNode.SafeReparentTo(this);
+		}
+	}
+	private IWeapon? _sideWeapon;
+
 
 	public override uint Style {
 		get => MainWeapon?.Style ?? 0;
@@ -27,30 +43,27 @@ public sealed partial class AkimboWeapon : WeaponCollection, IInjectionIntercept
 	}
 	public override uint MaxStyle => (MainWeapon?.MaxStyle ?? 0) + (uint)(SideWeapon is null ? 0 : 1);
 
-	protected override IWeapon? Weapon => MainWeapon;
+	public override IWeapon? CurrentWeapon => MainWeapon;
 
 
 	private AkimboWeapon() : base() { }
 	public AkimboWeapon(IWeapon? mainWeapon, IWeapon? sideWeapon) : this() {
 		MainWeapon = mainWeapon;
-		if (MainWeapon is Node mainWeaponNode) mainWeaponNode.ParentTo(this);
-
 		SideWeapon = sideWeapon;
-		if (SideWeapon is Node sideWeaponNode) sideWeaponNode.ParentTo(this);
 	}
-	public AkimboWeapon(ISaveData<IWeapon>? mainWeaponSave, ISaveData<IWeapon>? sideWeaponSave) : this(mainWeaponSave?.Load(), sideWeaponSave?.Load()) { }
+	public AkimboWeapon(IPersistenceData<IWeapon>? mainWeaponSave, IPersistenceData<IWeapon>? sideWeaponSave) : this(mainWeaponSave?.Load(), sideWeaponSave?.Load()) { }
 
 
 
-	public override List<ICustomization> GetCustomizations() => base.GetCustomizations();
-	public override List<ICustomizable> GetSubCustomizables() {
-		List<ICustomizable> list = base.GetSubCustomizables();
-		if (MainWeapon is not null) list.Add(MainWeapon);
-		if (SideWeapon is not null) list.Add(SideWeapon);
-		return list;
+	public override Dictionary<string, ICustomization> GetCustomizations() => base.GetCustomizations();
+	public override IEnumerable<IUIObject> GetSubObjects() {
+		IEnumerable<IUIObject> subObjects = base.GetSubObjects();
+		if (MainWeapon is not null) subObjects = subObjects.Append(MainWeapon);
+		if (SideWeapon is not null) subObjects = subObjects.Append(SideWeapon);
+		return subObjects;
 	}
 
-	public override IEnumerable<Attack.Wrapper> GetAttacks(Entity target) {
+	public override IEnumerable<Action.Wrapper> GetAttacks(Entity target) {
 		IWeapon? currentWeapon = MainWeapon;
 		return new IWeapon?[] { MainWeapon, SideWeapon }
 			.OfType<IWeapon>()
@@ -62,10 +75,6 @@ public sealed partial class AkimboWeapon : WeaponCollection, IInjectionIntercept
 	public Handedness Intercept(Node child, Handedness value) {
 		if (child == SideWeapon) return value.Reverse();
 		return value;
-	}
-
-	public override ISaveData<IWeapon> Save() {
-		return new AkimboWeaponSaveData(this);
 	}
 
 
@@ -82,14 +91,15 @@ public sealed partial class AkimboWeapon : WeaponCollection, IInjectionIntercept
 		}
 	}
 
+	public override IPersistenceData<AkimboWeapon> Save() => new AkimboWeaponSaveData(this);
+
+
 
 	[Serializable]
-	public class AkimboWeaponSaveData(AkimboWeapon akimbo) : ISaveData<AkimboWeapon> {
-		private readonly ISaveData<IWeapon>? MainWeaponSave = akimbo.MainWeapon?.Save();
-		private readonly ISaveData<IWeapon>? SideWeaponSave = akimbo.SideWeapon?.Save();
+	public class AkimboWeaponSaveData(AkimboWeapon akimbo) : PersistenceData<AkimboWeapon>(akimbo) {
+		private readonly IPersistenceData<IWeapon>? MainWeaponSave = (akimbo.MainWeapon as IPersistent<IWeapon>)?.Save();
+		private readonly IPersistenceData<IWeapon>? SideWeaponSave = (akimbo.SideWeapon as IPersistent<IWeapon>)?.Save();
 
-		public AkimboWeapon Load() {
-			return new AkimboWeapon(MainWeaponSave, SideWeaponSave);
-		}
+		protected override AkimboWeapon Instantiate() => new(MainWeaponSave, SideWeaponSave);
 	}
 }
