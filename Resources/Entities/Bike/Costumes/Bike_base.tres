@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="EntityCostume" load_steps=3 format=3 uid="uid://bb3xo4pwx7g3y"]
-
-[ext_resource type="PackedScene" uid="uid://burrwvhjdl2u3" path="res://Resources/Entities/Bike/Costumes/Bike_base.tscn" id="1_ts1se"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/EntityCostume.cs" id="2_tplhr"]
-
-[resource]
-script = ExtResource("2_tplhr")
-_displayName = "Bike (base)"
-ModelScene = ExtResource("1_ts1se")

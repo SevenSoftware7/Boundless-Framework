@@ -1,52 +1,72 @@
 namespace LandlessSkies.Core;
 
 using Godot;
+using Godot.Collections;
 using SevenDev.Boundless.Utility;
 
 [Tool]
 [GlobalClass]
-public partial class CostumeHolder : Node3D, ISerializationListener {
-	public Model? Model { get; private set; }
+public sealed partial class CostumeHolder : Node3D/* , ISerializationListener */ {
+	[Export] public Costume? Costume { get; private set; }
 
-	[Export]
-	public Costume? Costume {
-		get => _costume;
+	[Export] public DataKey? CostumeKey {
+		get => _costumeKey;
 		set => SetCostume(value);
 	}
-	private Costume? _costume;
+	private DataKey? _costumeKey;
 
 
 	public CostumeHolder() { }
-	public CostumeHolder(Costume? costume) : this() {
+	public CostumeHolder(IItemData<Costume>? costume) : this() {
 		SetCostume(costume);
 	}
 
+	public void SetCostume(DataKey? newCostumeKey) {
+		DataKey? oldKey = Costume?.Key;
+		if (newCostumeKey is not null && newCostumeKey == oldKey) return;
 
-	public void SetCostume(Costume? newCostume) {
-		Costume? oldCostume = _costume;
-		if (newCostume == oldCostume) return;
-
-		_costume = newCostume;
+		_costumeKey = newCostumeKey;
 
 		Load(true);
 	}
+	public void SetCostume(IItemData<Costume>? newCostume) => SetCostume(newCostume?.Key);
 
-	public void Load(bool forceReload = false) {
-		if (Model is not null && !forceReload) return;
+	public void SetCostume(IPersistenceData<Costume> costumeData) {
+		Unload();
+
+		Costume? instance = costumeData.Load();
+		_costumeKey = instance?.Key;
+		Costume = instance?.SetOwnerAndParent(this);
+	}
+
+
+	public void Load() => Load(false);
+	private void Load(bool forceReload = false) {
+		if (Costume is not null && !forceReload) return;
 
 		Unload();
 
-		Model = Costume?.Instantiate()?.ParentTo(this);
+		Costume = IItemData<Costume>.GetData(CostumeKey)?.Instantiate()?.SetOwnerAndParent(this);
 	}
 	public void Unload() {
-		Model?.QueueFree();
-		Model = null;
+		Costume?.QueueFree();
+		Costume = null;
 	}
 
-	public void OnBeforeSerialize() {
-		Unload();
+
+	public override void _Ready() {
+		base._Ready();
+		Load();
 	}
-	public void OnAfterDeserialize() {
-		Callable.From(() => Load()).CallDeferred();
+
+	public override void _ValidateProperty(Dictionary property) {
+		base._ValidateProperty(property);
+
+		StringName name = property["name"].AsStringName();
+
+
+		if (name == PropertyName.Costume) {
+			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Editor);
+		}
 	}
 }

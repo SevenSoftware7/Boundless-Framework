@@ -2,7 +2,7 @@ namespace LandlessSkies.Core;
 
 using System.Collections.Generic;
 
-public interface IWeapon : ICustomizable, ISaveable<IWeapon> {
+public interface IWeapon : IUIObject {
 	WeaponType Type { get; }
 	WeaponUsage Usage { get; }
 	WeaponSize Size { get; }

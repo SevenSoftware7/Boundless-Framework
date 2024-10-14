@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="DataKey" load_steps=2 format=3 uid="uid://dw0tbdkonwsel"]
+
+[ext_resource type="Script" path="res://Scripts/Core/Item/DataKey.cs" id="1_i8302"]
+
+[resource]
+script = ExtResource("1_i8302")
+String = &"eleos_base"

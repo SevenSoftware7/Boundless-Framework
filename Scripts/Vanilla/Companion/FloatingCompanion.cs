@@ -42,7 +42,7 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 
 	private bool PositionBlocked(Vector3 position) {
 		SphereShape3D sphere = new() {
-			Radius = (CostumeHolder?.Model?.GetAabb().GetLongestAxisSize() ?? 1f) + 0.5f,
+			Radius = (CostumeHolder?.Costume?.GetAabb().GetLongestAxisSize() ?? 1f) + 0.5f,
 		};
 
 		return GetWorld3D().CollideShape3D(Transform3D.Identity.Translated(position), out _, sphere, CollisionMask, maxResults: 1, collideWithAreas: false);

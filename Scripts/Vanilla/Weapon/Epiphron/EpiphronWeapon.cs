@@ -14,7 +14,7 @@ public sealed partial class EpiphronWeapon : Weapon, IPlayerHandler {
 
 
 	private EpiphronWeapon() : this(null) { }
-	public EpiphronWeapon(WeaponCostume? costume = null) : base(costume) {
+	public EpiphronWeapon(IItemData<Costume>? costume = null) : base(costume) {
 		slashAttack = new(this);
 	}
 

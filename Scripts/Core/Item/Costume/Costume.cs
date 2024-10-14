@@ -1,22 +1,27 @@
 namespace LandlessSkies.Core;
 
+using System.Collections.Generic;
 using Godot;
 
 [Tool]
 [GlobalClass]
-public abstract partial class Costume : Resource, IUIObject {
-	[Export] public PackedScene? ModelScene { get; private set; }
+public abstract partial class Costume : Node3D, IPersistent<Costume>, IItem<Costume>, ICustomizable {
+	[Export] public DataKey Key { get; private set; } = new();
+	[Export] public ItemUIData? UI { get; private set; }
+	public string DisplayName => UI?.DisplayName ?? string.Empty;
+	public Texture2D? DisplayPortrait => UI?.DisplayPortrait;
 
-	public abstract string DisplayName { get; }
-	public abstract Texture2D? DisplayPortrait { get; }
+	public abstract Material? MaterialOverride { get; protected set; }
+	public abstract Material? MaterialOverlay { get; protected set; }
+	public abstract float Transparency { get; protected set; }
+
+	protected Costume() : base() { }
 
 
-	public virtual Model? Instantiate() {
-		Model? model = ModelScene?.Instantiate<Model>();
-		if (model is not null) {
-			model.Costume = this;
-		}
+	public virtual Dictionary<string, ICustomization> GetCustomizations() => [];
 
-		return model;
-	}
+	public virtual Aabb GetAabb() => default;
+
+	public IPersistenceData<Costume> Save() => new ItemPersistenceData<Costume>(this);
+
 }

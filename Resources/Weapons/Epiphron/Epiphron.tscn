@@ -1,17 +1,19 @@
-[gd_scene load_steps=5 format=3 uid="uid://fbs6dr24ss3g"]
+[gd_scene load_steps=7 format=3 uid="uid://fbs6dr24ss3g"]
 
 [ext_resource type="Script" path="res://Scripts/Vanilla/Weapon/Epiphron/EpiphronWeapon.cs" id="1_wltox"]
+[ext_resource type="Resource" uid="uid://dvuweom50h6eu" path="res://Resources/Weapons/Epiphron/Epiphron_key.tres" id="2_4xhx5"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="2_b3qyv"]
-[ext_resource type="Resource" uid="uid://c376t1le83xwr" path="res://Resources/Weapons/Epiphron/Costumes/Epiphron_base.tres" id="2_g21pk"]
+[ext_resource type="Resource" uid="uid://bcqvwsqa5w2ei" path="res://Resources/Weapons/Epiphron/Epiphron_ui.tres" id="2_ey7pk"]
 [ext_resource type="AnimationLibrary" uid="uid://b0gic15n8ccgn" path="res://Resources/Weapons/Epiphron/EpiphronAnimations.tres" id="2_v8v6b"]
+[ext_resource type="Resource" uid="uid://b5vpfmo67yl6e" path="res://Resources/Weapons/Epiphron/Costumes/Epiphron-base_key.tres" id="6_pw5vt"]
 
 [node name="Epiphron" type="Node3D" node_paths=PackedStringArray("CostumeHolder")]
 script = ExtResource("1_wltox")
+Key = ExtResource("2_4xhx5")
+UI = ExtResource("2_ey7pk")
 AnimationLibrary = ExtResource("2_v8v6b")
-_displayName = "Epiphron"
 CostumeHolder = NodePath("CostumeHolder")
 
-[node name="CostumeHolder" type="Node3D" parent="." node_paths=PackedStringArray("Model")]
+[node name="CostumeHolder" type="Node3D" parent="."]
 script = ExtResource("2_b3qyv")
-Costume = ExtResource("2_g21pk")
-Model = NodePath("Model - Epiphron (base)")
+CostumeKey = ExtResource("6_pw5vt")

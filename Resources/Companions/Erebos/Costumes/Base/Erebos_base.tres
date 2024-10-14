@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="CompanionCostume" load_steps=3 format=3 uid="uid://caqyvip0olism"]
-
-[ext_resource type="Script" path="res://Scripts/Core/Item/Companion/CompanionCostume.cs" id="1_u5ko6"]
-[ext_resource type="PackedScene" uid="uid://r6yqclqm3ubp" path="res://Resources/Companions/Erebos/Costumes/Base/Erebos_base.tscn" id="1_uykhd"]
-
-[resource]
-script = ExtResource("1_u5ko6")
-_displayName = "Erebos (base)"
-ModelScene = ExtResource("1_uykhd")

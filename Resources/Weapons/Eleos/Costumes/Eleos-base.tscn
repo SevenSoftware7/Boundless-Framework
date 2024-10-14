@@ -1,0 +1,51 @@
+[gd_scene load_steps=9 format=3 uid="uid://chsj82irsedw6"]
+
+[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Implementation/MeshCostume.cs" id="1_rpy7d"]
+[ext_resource type="Resource" uid="uid://dw0tbdkonwsel" path="res://Resources/Weapons/Eleos/Costumes/Eleos-base_key.tres" id="2_2xexw"]
+[ext_resource type="Resource" uid="uid://xtp020wlwyfq" path="res://Resources/Weapons/Eleos/Costumes/Eleos-base_ui.tres" id="3_df4kq"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g4lnn"]
+albedo_color = Color(0.2412, 0.362693, 0.67, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2kvh4"]
+material = SubResource("StandardMaterial3D_g4lnn")
+size = Vector3(0.15, 4, 0.15)
+
+[sub_resource type="BoxMesh" id="BoxMesh_45lma"]
+material = SubResource("StandardMaterial3D_g4lnn")
+size = Vector3(0.15, 0.15, 0.55)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cwqqc"]
+material = SubResource("StandardMaterial3D_g4lnn")
+size = Vector3(0.1, 1.5, 0.3)
+
+[sub_resource type="PrismMesh" id="PrismMesh_b4to5"]
+material = SubResource("StandardMaterial3D_g4lnn")
+size = Vector3(0.3, 1, 0.1)
+
+[node name="Model - Eleos (base)" type="Node3D" node_paths=PackedStringArray("Meshes")]
+script = ExtResource("1_rpy7d")
+Meshes = [NodePath("Handle"), NodePath("Guard"), NodePath("Guard/Blade"), NodePath("Guard/Blade/Tip")]
+Key = ExtResource("2_2xexw")
+UI = ExtResource("3_df4kq")
+
+[node name="Handle" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+layers = 2
+mesh = SubResource("BoxMesh_2kvh4")
+skeleton = NodePath("../..")
+
+[node name="Guard" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.75, 0)
+mesh = SubResource("BoxMesh_45lma")
+skeleton = NodePath("Blade")
+
+[node name="Blade" type="MeshInstance3D" parent="Guard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("BoxMesh_cwqqc")
+skeleton = NodePath("../..")
+
+[node name="Tip" type="MeshInstance3D" parent="Guard/Blade"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 1.25, 0)
+mesh = SubResource("PrismMesh_b4to5")
+skeleton = NodePath("../..")

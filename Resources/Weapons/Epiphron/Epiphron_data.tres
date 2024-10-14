@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SceneWeaponData" load_steps=5 format=3 uid="uid://7vx1dn4qvh34"]
+
+[ext_resource type="Resource" uid="uid://dvuweom50h6eu" path="res://Resources/Weapons/Epiphron/Epiphron_key.tres" id="1_axtv4"]
+[ext_resource type="PackedScene" uid="uid://fbs6dr24ss3g" path="res://Resources/Weapons/Epiphron/Epiphron.tscn" id="1_uexkc"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/SceneWeaponData.cs" id="2_hbhyg"]
+[ext_resource type="Resource" uid="uid://bcqvwsqa5w2ei" path="res://Resources/Weapons/Epiphron/Epiphron_ui.tres" id="2_mniaj"]
+
+[resource]
+script = ExtResource("2_hbhyg")
+Key = ExtResource("1_axtv4")
+UIData = ExtResource("2_mniaj")
+Scene = ExtResource("1_uexkc")

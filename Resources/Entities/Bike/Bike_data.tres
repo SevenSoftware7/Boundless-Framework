@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SceneEntityData" load_steps=5 format=3 uid="uid://q4arq6wxs6ho"]
+
+[ext_resource type="PackedScene" uid="uid://bxcpbr13uyeh1" path="res://Resources/Entities/Bike/Bike.tscn" id="1_1dwal"]
+[ext_resource type="Resource" uid="uid://dyvavvfne7go" path="res://Resources/Entities/Bike/Bike_key.tres" id="1_gb7ed"]
+[ext_resource type="Resource" uid="uid://boxbx8vssbjgn" path="res://Resources/Entities/Bike/Bike_ui.tres" id="2_c3o8l"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/SceneEntityData.cs" id="2_g1571"]
+
+[resource]
+script = ExtResource("2_g1571")
+Key = ExtResource("1_gb7ed")
+UIData = ExtResource("2_c3o8l")
+Scene = ExtResource("1_1dwal")

@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="WeaponCostume" load_steps=3 format=3 uid="uid://ctyrw08y4svjk"]
-
-[ext_resource type="PackedScene" uid="uid://cbkv4cstjgb7i" path="res://Resources/Weapons/Nemesis/Costumes/Nemesis_Base.tscn" id="1_opthf"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/WeaponCostume.cs" id="2_gwqkm"]
-
-[resource]
-script = ExtResource("2_gwqkm")
-_displayName = "Nemesis (base)"
-ModelScene = ExtResource("1_opthf")

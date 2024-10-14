@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ItemUIData" load_steps=2 format=3 uid="uid://bcqvwsqa5w2ei"]
+
+[ext_resource type="Script" path="res://Scripts/Core/Item/ItemUIData.cs" id="1_nr41x"]
+
+[resource]
+script = ExtResource("1_nr41x")
+DisplayName = "Epiphron"

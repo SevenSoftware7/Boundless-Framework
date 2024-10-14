@@ -10,7 +10,7 @@ public partial class DrivingBehaviour : SittingBehaviour {
 
 	private EntityBehaviour? previousBehaviour;
 
-	protected override Transform3D SittingPosition => Vehicle?.Entity.CostumeHolder?.Model?.GlobalTransform ?? Vehicle?.Entity.GlobalTransform ?? Transform3D.Identity;
+	protected override Transform3D SittingPosition => Vehicle?.Entity.CostumeHolder?.Costume?.GlobalTransform ?? Vehicle?.Entity.GlobalTransform ?? Transform3D.Identity;
 
 
 	protected DrivingBehaviour() : this(null!, null!) { }

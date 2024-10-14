@@ -8,9 +8,12 @@ using SevenDev.Boundless.Injection;
 
 [Tool]
 [GlobalClass]
-public partial class Companion : Node3D, IUIObject, ICustomizable, ICostumable, ISaveable<Companion>, ISerializationListener {
-	[Export] public string DisplayName { get; private set; } = string.Empty;
-	public Texture2D? DisplayPortrait => CostumeHolder?.Costume?.DisplayPortrait;
+public partial class Companion : Node3D, ICustomizable, ICostumable, IPersistent<Companion>, IItem<Companion>, IInjectionBlocker<Skeleton3D> {
+	[Export] public DataKey Key { get; private set; } = new();
+	[Export] public ItemUIData? UI { get; private set; }
+	public string DisplayName => UI?.DisplayName ?? string.Empty;
+	public Texture2D? DisplayPortrait => UI?.DisplayPortrait;
+
 
 	[Export]
 	[Injector]
@@ -18,7 +21,7 @@ public partial class Companion : Node3D, IUIObject, ICustomizable, ICostumable, 
 		get => _skeleton;
 		protected set {
 			_skeleton = value;
-			this.PropagateInjection();
+			this.PropagateInjection<Skeleton3D>();
 		}
 	}
 	private Skeleton3D? _skeleton;
@@ -27,12 +30,14 @@ public partial class Companion : Node3D, IUIObject, ICustomizable, ICostumable, 
 	[Export] public CostumeHolder? CostumeHolder { get; set; }
 
 
-	[Signal] public delegate void CostumeChangedEventHandler(CompanionCostume? newCostume, CompanionCostume? oldCostume);
-
-
 	protected Companion() : base() { }
-	public Companion(CompanionCostume? costume = null) {
-		CostumeHolder = new CostumeHolder(costume).ParentTo(this);
+	public Companion(IItemData<Costume>? costume = null) {
+		if (CostumeHolder is null) {
+			CostumeHolder = new CostumeHolder(costume).ParentTo(this);
+		}
+		else {
+			CostumeHolder.SetCostume(costume);
+		}
 	}
 
 
@@ -46,15 +51,8 @@ public partial class Companion : Node3D, IUIObject, ICustomizable, ICostumable, 
 	public virtual List<ICustomization> GetCustomizations() => [];
 
 
-	public virtual ISaveData<Companion> Save() => new CompanionSaveData<Companion>(this);
-
-	public void OnBeforeSerialize() { }
-	public void OnAfterDeserialize() {
-		Callable.From(() => {
-			this.PropagateInjection<Skeleton3D>();
-		});
-	}
+	public virtual IPersistenceData<Companion> Save() => new CompanionSaveData<Companion>(this);
 
 	[Serializable]
-	public class CompanionSaveData<T>(T companion) : CostumableSaveData<Companion, CompanionCostume>(companion) where T : Companion;
+	public class CompanionSaveData<T>(T companion) : ItemPersistenceData<Companion>(companion) where T : Companion;
 }
