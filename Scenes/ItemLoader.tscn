@@ -1,6 +1,6 @@
 [gd_scene load_steps=14 format=3 uid="uid://b7opdy1wr1go2"]
 
-[ext_resource type="Script" path="res://Scripts/Vanilla/ItemRegistry.cs" id="1_fx5va"]
+[ext_resource type="Script" path="res://Scripts/Core/ItemRegistry.cs" id="1_fx5va"]
 [ext_resource type="Resource" uid="uid://djyqyaq7lwdkr" path="res://Resources/Entities/Eos/Eos_data.tres" id="2_ghesn"]
 [ext_resource type="Resource" uid="uid://dvcjw3gon7rak" path="res://Resources/Entities/Eos/Costumes/Eos-base_data.tres" id="2_r31ok"]
 [ext_resource type="Resource" uid="uid://q4arq6wxs6ho" path="res://Resources/Entities/Bike/Bike_data.tres" id="3_m2ch7"]
