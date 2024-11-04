@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="DataKey" load_steps=2 format=3 uid="uid://r7mx5ymlfh3l"]
+[gd_resource type="Resource" script_class="WeaponResourceDataKey" load_steps=2 format=3 uid="uid://r7mx5ymlfh3l"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Item/DataKey.cs" id="1_fd4vf"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/WeaponResourceDataKey.cs" id="1_78nsy"]
 
 [resource]
-script = ExtResource("1_fd4vf")
-String = &"eleos"
+script = ExtResource("1_78nsy")
+Key = "eleos"

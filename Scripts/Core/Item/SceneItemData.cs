@@ -3,8 +3,9 @@ namespace LandlessSkies.Core;
 using Godot;
 
 [Tool]
-public partial class SceneItemData<T> : Resource, IItemData<T> where T : Node, IItem<T> {
-	[Export] public DataKey Key { get; private set; } = new();
+public abstract partial class SceneItemData<T> : Resource, IItemData<T> where T : Node, IItem<T> {
+	public abstract IDataKeyProvider<T> KeyProvider { get; }
+
 	[Export] public ItemUIData? UIData { get; private set; } = new();
 	public string DisplayName => UIData?.DisplayName ?? string.Empty;
 	public Texture2D? DisplayPortrait => UIData?.DisplayPortrait;

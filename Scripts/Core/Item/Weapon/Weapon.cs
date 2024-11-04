@@ -21,7 +21,9 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject
 	public static readonly Basis leftHandBoneBasis = Basis.FromEuler(new(Mathf.DegToRad(-90f), 0f, Mathf.DegToRad(90f)));
 
 
-	[Export] public DataKey Key { get; private set; } = new();
+	[Export] public WeaponResourceDataKey ResourceKeyProvider { get; private set; } = new();
+	IDataKeyProvider<Weapon> IItem<Weapon>.KeyProvider => ResourceKeyProvider;
+
 	[Export] public ItemUIData? UI { get; private set; }
 	public string DisplayName => UI?.DisplayName ?? string.Empty;
 	public Texture2D? DisplayPortrait => UI?.DisplayPortrait;

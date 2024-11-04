@@ -5,15 +5,16 @@
 [ext_resource type="Resource" uid="uid://cvuwijf5xqma6" path="res://Resources/Weapons/Eleos/Eleos_ui.tres" id="2_ersgj"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="2_n5f5j"]
 [ext_resource type="Resource" uid="uid://r7mx5ymlfh3l" path="res://Resources/Weapons/Eleos/Eleos_key.tres" id="2_uj7so"]
-[ext_resource type="Resource" uid="uid://dw0tbdkonwsel" path="res://Resources/Weapons/Eleos/Costumes/Eleos-base_key.tres" id="6_cu83a"]
+[ext_resource type="Resource" uid="uid://dw0tbdkonwsel" path="res://Resources/Weapons/Eleos/Costumes/Eleos-base_key.tres" id="6_nud0r"]
 
 [node name="Eleos" type="Node3D" node_paths=PackedStringArray("CostumeHolder")]
 script = ExtResource("1_pwvbn")
-Key = ExtResource("2_uj7so")
+ResourceKeyProvider = ExtResource("2_uj7so")
 UI = ExtResource("2_ersgj")
 AnimationLibrary = ExtResource("2_7ftow")
 CostumeHolder = NodePath("CostumeHolder")
 
-[node name="CostumeHolder" type="Node3D" parent="."]
+[node name="CostumeHolder" type="Node3D" parent="." node_paths=PackedStringArray("Costume")]
 script = ExtResource("2_n5f5j")
-CostumeKey = ExtResource("6_cu83a")
+Costume = NodePath("Model - Eleos (base)")
+CostumeKeyProvider = ExtResource("6_nud0r")

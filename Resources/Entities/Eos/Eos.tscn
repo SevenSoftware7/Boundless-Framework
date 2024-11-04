@@ -14,7 +14,7 @@
 [ext_resource type="Script" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="9_8kq40"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Behaviour/Implementations/BipedBehaviour.cs" id="12_0ikht"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Behaviour/Implementations/SwimmingBehaviour.cs" id="13_ecggl"]
-[ext_resource type="Resource" uid="uid://bi8pp11ga45x3" path="res://Resources/Entities/Eos/Costumes/Eos-base_key.tres" id="15_ppfic"]
+[ext_resource type="Resource" uid="uid://bi8pp11ga45x3" path="res://Resources/Entities/Eos/Costumes/Eos-base_key.tres" id="15_cn8qi"]
 
 [sub_resource type="Resource" id="Resource_v01j0"]
 script = ExtResource("2_lubr1")
@@ -52,7 +52,7 @@ floor_constant_speed = true
 platform_floor_layers = 4294963965
 platform_wall_layers = 4294963965
 script = ExtResource("1_44rt4")
-Key = ExtResource("2_ctdcn")
+ResourceKeyProvider = ExtResource("2_ctdcn")
 UI = ExtResource("2_hamhv")
 Stats = SubResource("Resource_v01j0")
 HudPack = SubResource("Resource_qwv27")
@@ -95,4 +95,4 @@ Entity = NodePath("..")
 
 [node name="CostumeHolder" type="Node3D" parent="."]
 script = ExtResource("9_8kq40")
-CostumeKey = ExtResource("15_ppfic")
+CostumeKeyProvider = ExtResource("15_cn8qi")

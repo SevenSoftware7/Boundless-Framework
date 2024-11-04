@@ -1,4 +1,4 @@
-[gd_scene load_steps=123 format=3 uid="uid://b505xodur2iff"]
+[gd_scene load_steps=111 format=3 uid="uid://b505xodur2iff"]
 
 [ext_resource type="RDShaderFile" uid="uid://br3hg0ejs6wif" path="res://Resources/Rendering/Shaders/FetchWaterData.glsl" id="2_5l7vn"]
 [ext_resource type="RDShaderFile" uid="uid://dabjxhg50sdto" path="res://Resources/Rendering/Shaders/WaterDisplacementCompute.glsl" id="4_tdgd3"]
@@ -21,7 +21,6 @@
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Attribute/AdditiveModifier.cs" id="15_y8l2d"]
 [ext_resource type="PackedScene" uid="uid://bp1e6thwkkcrr" path="res://Resources/Weapons/Eleos/Eleos.tscn" id="17_jhoyp"]
 [ext_resource type="Script" path="res://Scripts/Core/Damage/DamageArea.cs" id="18_pbwgl"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/DataKey.cs" id="20_j6j28"]
 [ext_resource type="PackedScene" uid="uid://bxcpbr13uyeh1" path="res://Resources/Entities/Bike/Bike.tscn" id="20_pcyav"]
 [ext_resource type="PackedScene" uid="uid://b7hcoc81x5g0i" path="res://Resources/Companions/Erebos/Erebos.tscn" id="26_ds8t8"]
 [ext_resource type="PackedScene" uid="uid://7ic4jncm8p1a" path="res://Scenes/Player.tscn" id="26_rkn04"]
@@ -1478,50 +1477,6 @@ albedo_color = Color(0.025, 0, 0.75, 0.498039)
 [sub_resource type="SphereMesh" id="SphereMesh_nkuww"]
 material = SubResource("StandardMaterial3D_k6yo1")
 
-[sub_resource type="Resource" id="Resource_4kafa"]
-script = ExtResource("20_j6j28")
-String = &""
-
-[sub_resource type="Resource" id="Resource_puwlv"]
-script = ExtResource("20_j6j28")
-String = &""
-
-[sub_resource type="Resource" id="Resource_xj30w"]
-script = ExtResource("20_j6j28")
-String = &""
-
-[sub_resource type="Resource" id="Resource_4y877"]
-script = ExtResource("20_j6j28")
-String = &""
-
-[sub_resource type="Resource" id="Resource_vurbj"]
-script = ExtResource("20_j6j28")
-String = &""
-
-[sub_resource type="Resource" id="Resource_iy1cl"]
-script = ExtResource("20_j6j28")
-String = &""
-
-[sub_resource type="Resource" id="Resource_w674o"]
-script = ExtResource("20_j6j28")
-String = &""
-
-[sub_resource type="Resource" id="Resource_d6whr"]
-script = ExtResource("20_j6j28")
-String = &""
-
-[sub_resource type="Resource" id="Resource_o8wkt"]
-script = ExtResource("20_j6j28")
-String = &""
-
-[sub_resource type="Resource" id="Resource_i43ew"]
-script = ExtResource("20_j6j28")
-String = &""
-
-[sub_resource type="Resource" id="Resource_a1cme"]
-script = ExtResource("20_j6j28")
-String = &""
-
 [sub_resource type="SphereMesh" id="SphereMesh_0tosi"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_d6mbx"]
@@ -1893,7 +1848,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30201, -4.81285)
 curve = SubResource("Curve3D_1g2j1")
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Environment/Path3D"]
-transform = Transform3D(-0.0922569, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97164e-07, 0.995733, 8.27696e-08, -0.0922569, -1.98959, 0, 2.30373)
+transform = Transform3D(-0.0922568, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97163e-07, 0.995733, 8.27696e-08, -0.0922568, -1.98959, 0, 2.30373)
 script = ExtResource("36_x7xeh")
 
 [node name="AnimatableBody3D" type="AnimatableBody3D" parent="Environment/Path3D/PathFollow3D"]
@@ -1978,12 +1933,10 @@ Entity = NodePath("../Eos")
 
 [node name="Bike" parent="." instance=ExtResource("20_pcyav")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.10534, 2, 32.9924)
-Key = SubResource("Resource_4kafa")
 
 [node name="Eos" parent="." instance=ExtResource("9_0jt21")]
 process_priority = -10
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.873384, 2, 34.141)
-Key = SubResource("Resource_puwlv")
 
 [node name="Weapon" type="Node" parent="Eos"]
 script = ExtResource("11_uqmxm")
@@ -1996,16 +1949,13 @@ script = ExtResource("13_d6cna")
 
 [node name="Epiphron" parent="Eos/Weapon/Main/First" instance=ExtResource("12_1jl3t")]
 transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
-Key = SubResource("Resource_xj30w")
 
 [node name="Nemesis" parent="Eos/Weapon/Main/First" instance=ExtResource("15_x4bcq")]
 transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
-Key = SubResource("Resource_4y877")
 IsHolstered = true
 
 [node name="Eleos" parent="Eos/Weapon/Main/First" instance=ExtResource("17_jhoyp")]
 transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
-Key = SubResource("Resource_vurbj")
 IsHolstered = true
 
 [node name="Second" type="Node" parent="Eos/Weapon/Main"]
@@ -2013,17 +1963,14 @@ script = ExtResource("13_d6cna")
 
 [node name="Epiphron" parent="Eos/Weapon/Main/Second" instance=ExtResource("12_1jl3t")]
 transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
-Key = SubResource("Resource_iy1cl")
 IsHolstered = true
 
 [node name="Nemesis" parent="Eos/Weapon/Main/Second" instance=ExtResource("15_x4bcq")]
 transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
-Key = SubResource("Resource_w674o")
 IsHolstered = true
 
 [node name="Eleos" parent="Eos/Weapon/Main/Second" instance=ExtResource("17_jhoyp")]
 transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
-Key = SubResource("Resource_d6whr")
 IsHolstered = true
 
 [node name="Third" type="Node" parent="Eos/Weapon/Main"]
@@ -2031,17 +1978,14 @@ script = ExtResource("13_d6cna")
 
 [node name="Epiphron" parent="Eos/Weapon/Main/Third" instance=ExtResource("12_1jl3t")]
 transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
-Key = SubResource("Resource_o8wkt")
 IsHolstered = true
 
 [node name="Nemesis" parent="Eos/Weapon/Main/Third" instance=ExtResource("15_x4bcq")]
 transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
-Key = SubResource("Resource_i43ew")
 IsHolstered = true
 
 [node name="Eleos" parent="Eos/Weapon/Main/Third" instance=ExtResource("17_jhoyp")]
 transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
-Key = SubResource("Resource_a1cme")
 IsHolstered = true
 
 [node name="Erebos" parent="Eos" instance=ExtResource("26_ds8t8")]

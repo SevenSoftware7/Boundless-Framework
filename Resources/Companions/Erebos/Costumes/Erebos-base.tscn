@@ -12,7 +12,7 @@ is_hemisphere = true
 [node name="Model - Erebos (base)" type="Node3D" node_paths=PackedStringArray("Meshes")]
 script = ExtResource("1_om25c")
 Meshes = [NodePath("Model")]
-Key = ExtResource("2_pfvub")
+ResourceKey = ExtResource("2_pfvub")
 UI = ExtResource("3_twnj4")
 
 [node name="Model" type="MeshInstance3D" parent="."]

@@ -26,7 +26,9 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	public readonly List<Vector3> RecoverLocationBuffer = new(RECOVER_LOCATION_BUFFER_SIZE);
 
 
-	[Export] public DataKey Key { get; private set; } = new();
+	[Export] public EntityResourceDataKey ResourceKeyProvider { get; private set; } = new();
+	IDataKeyProvider<Entity> IItem<Entity>.KeyProvider => ResourceKeyProvider;
+
 	[Export] public ItemUIData? UI { get; private set; }
 	public string DisplayName => UI?.DisplayName ?? string.Empty;
 	public Texture2D? DisplayPortrait => UI?.DisplayPortrait;

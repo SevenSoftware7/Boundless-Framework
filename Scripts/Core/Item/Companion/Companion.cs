@@ -9,7 +9,9 @@ using SevenDev.Boundless.Injection;
 [Tool]
 [GlobalClass]
 public partial class Companion : Node3D, ICustomizable, ICostumable, IPersistent<Companion>, IItem<Companion>, IInjectionBlocker<Skeleton3D> {
-	[Export] public DataKey Key { get; private set; } = new();
+	[Export] public CompanionResourceDataKey ResourceKeyProvider { get; private set; } = new();
+	IDataKeyProvider<Companion> IItem<Companion>.KeyProvider => ResourceKeyProvider;
+
 	[Export] public ItemUIData? UI { get; private set; }
 	public string DisplayName => UI?.DisplayName ?? string.Empty;
 	public Texture2D? DisplayPortrait => UI?.DisplayPortrait;

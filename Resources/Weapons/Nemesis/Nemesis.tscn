@@ -5,15 +5,16 @@
 [ext_resource type="Resource" uid="uid://4x2qnwvdg3se" path="res://Resources/Weapons/Nemesis/Nemesis_key.tres" id="2_illkl"]
 [ext_resource type="AnimationLibrary" uid="uid://caafq3ok75ukn" path="res://Resources/Weapons/Nemesis/NemesisAnimations.tres" id="2_l4rjo"]
 [ext_resource type="Resource" uid="uid://c8q8b6jgvn4vo" path="res://Resources/Weapons/Nemesis/Nemesis_ui.tres" id="2_na6b6"]
-[ext_resource type="Resource" uid="uid://nv3cruo4dqdt" path="res://Resources/Weapons/Nemesis/Costumes/Nemesis-base_key.tres" id="6_sdxrf"]
+[ext_resource type="Resource" uid="uid://nv3cruo4dqdt" path="res://Resources/Weapons/Nemesis/Costumes/Nemesis-base_key.tres" id="6_x50f5"]
 
 [node name="Nemesis" type="Node3D" node_paths=PackedStringArray("CostumeHolder")]
 script = ExtResource("1_vy2ad")
-Key = ExtResource("2_illkl")
+ResourceKeyProvider = ExtResource("2_illkl")
 UI = ExtResource("2_na6b6")
 AnimationLibrary = ExtResource("2_l4rjo")
 CostumeHolder = NodePath("CostumeHolder")
 
-[node name="CostumeHolder" type="Node3D" parent="."]
+[node name="CostumeHolder" type="Node3D" parent="." node_paths=PackedStringArray("Costume")]
 script = ExtResource("2_cm0hb")
-CostumeKey = ExtResource("6_sdxrf")
+Costume = NodePath("Model - Nemesis (base)")
+CostumeKeyProvider = ExtResource("6_x50f5")

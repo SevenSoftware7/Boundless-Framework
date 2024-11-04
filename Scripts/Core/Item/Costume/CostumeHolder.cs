@@ -9,11 +9,11 @@ using SevenDev.Boundless.Utility;
 public sealed partial class CostumeHolder : Node3D/* , ISerializationListener */ {
 	[Export] public Costume? Costume { get; private set; }
 
-	[Export] public DataKey? CostumeKey {
-		get => _costumeKey;
+	[Export] public CostumeResourceDataKey? CostumeKeyProvider {
+		get => _costumeKeyProvider as CostumeResourceDataKey;
 		set => SetCostume(value);
 	}
-	private DataKey? _costumeKey;
+	private IDataKeyProvider<Costume>? _costumeKeyProvider;
 
 
 	public CostumeHolder() { }
@@ -21,21 +21,21 @@ public sealed partial class CostumeHolder : Node3D/* , ISerializationListener */
 		SetCostume(costume);
 	}
 
-	public void SetCostume(DataKey? newCostumeKey) {
-		DataKey? oldKey = Costume?.Key;
-		if (newCostumeKey is not null && newCostumeKey == oldKey) return;
+	public void SetCostume(IDataKeyProvider<Costume>? newCostumeKey) {
+		CostumeResourceDataKey? oldKey = Costume?.ResourceKey;
+		if (newCostumeKey is not null && newCostumeKey.Key == oldKey?.Key) return;
 
-		_costumeKey = newCostumeKey;
+		_costumeKeyProvider = newCostumeKey;
 
 		Load(true);
 	}
-	public void SetCostume(IItemData<Costume>? newCostume) => SetCostume(newCostume?.Key);
+	public void SetCostume(IItemData<Costume>? newCostume) => SetCostume(newCostume?.KeyProvider);
 
 	public void SetCostume(IPersistenceData<Costume> costumeData) {
 		Unload();
 
 		Costume? instance = costumeData.Load();
-		_costumeKey = instance?.Key;
+		_costumeKeyProvider = instance?.ResourceKey;
 		Costume = instance?.SetOwnerAndParent(this);
 	}
 
@@ -46,7 +46,7 @@ public sealed partial class CostumeHolder : Node3D/* , ISerializationListener */
 
 		Unload();
 
-		Costume = IItemData<Costume>.GetData(CostumeKey)?.Instantiate()?.SetOwnerAndParent(this);
+		Costume = _costumeKeyProvider?.GetData()?.Instantiate()?.SetOwnerAndParent(this);
 	}
 	public void Unload() {
 		Costume?.QueueFree();

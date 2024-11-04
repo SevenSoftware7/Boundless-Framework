@@ -5,15 +5,16 @@
 [ext_resource type="Script" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="2_b3qyv"]
 [ext_resource type="Resource" uid="uid://bcqvwsqa5w2ei" path="res://Resources/Weapons/Epiphron/Epiphron_ui.tres" id="2_ey7pk"]
 [ext_resource type="AnimationLibrary" uid="uid://b0gic15n8ccgn" path="res://Resources/Weapons/Epiphron/EpiphronAnimations.tres" id="2_v8v6b"]
-[ext_resource type="Resource" uid="uid://b5vpfmo67yl6e" path="res://Resources/Weapons/Epiphron/Costumes/Epiphron-base_key.tres" id="6_pw5vt"]
+[ext_resource type="Resource" uid="uid://b5vpfmo67yl6e" path="res://Resources/Weapons/Epiphron/Costumes/Epiphron-base_key.tres" id="6_7myka"]
 
 [node name="Epiphron" type="Node3D" node_paths=PackedStringArray("CostumeHolder")]
 script = ExtResource("1_wltox")
-Key = ExtResource("2_4xhx5")
+ResourceKeyProvider = ExtResource("2_4xhx5")
 UI = ExtResource("2_ey7pk")
 AnimationLibrary = ExtResource("2_v8v6b")
 CostumeHolder = NodePath("CostumeHolder")
 
-[node name="CostumeHolder" type="Node3D" parent="."]
+[node name="CostumeHolder" type="Node3D" parent="." node_paths=PackedStringArray("Costume")]
 script = ExtResource("2_b3qyv")
-CostumeKey = ExtResource("6_pw5vt")
+Costume = NodePath("Model - Epiphron (base)")
+CostumeKeyProvider = ExtResource("6_7myka")
