@@ -4,10 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using KGySoft.CoreLibraries;
 using SevenDev.Boundless.Utility;
 using SevenDev.Boundless.Injection;
-using KGySoft.CoreLibraries;
-using LandlessSkies.Vanilla;
+using SevenDev.Boundless.Persistence;
 
 
 /// <summary>
@@ -53,7 +53,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 
 	[ExportGroup("Costume")]
-	[Export] public CostumeHolder? CostumeHolder { get; set; }
+	public CostumeHolder CostumeHolder => _costumeHolder ??= new CostumeHolder().SafeReparentAndSetOwner(this).SafeRename(nameof(CostumeHolder));
+	[Export] private CostumeHolder? _costumeHolder;
 
 
 	[ExportGroup("Dependencies")]
@@ -161,7 +162,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	[Signal] public delegate void DeathEventHandler(float fromHealth);
 
 
-	protected Entity() : base() {
+	public Entity() : base() {
 		CollisionLayer = CollisionLayers.Entity;
 		CollisionMask = CollisionLayers.Terrain;
 
@@ -170,14 +171,6 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 		PlatformWallLayers = movingPlatformLayers;
 
 		Forward = Vector3.Forward;
-	}
-	public Entity(IItemData<Costume>? costume = null) : this() {
-		if (CostumeHolder is null) {
-			CostumeHolder = new CostumeHolder(costume).ParentTo(this);
-		}
-		else {
-			CostumeHolder.SetCostume(costume);
-		}
 	}
 
 
@@ -222,8 +215,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	}
 
 
-	public virtual Dictionary<string, ICustomization> GetCustomizations() => [];
 	public virtual IEnumerable<IUIObject> GetSubObjects() => GetChildren().OfType<IUIObject>();
+	public virtual Dictionary<string, ICustomization> GetCustomizations() => [];
 
 	private void GetWeapon() => Weapon = GetChildren().OfType<IWeapon>().FirstOrDefault();
 
@@ -243,7 +236,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 
 	private void OnKill(float fromHealth) {
-		OnDeath(fromHealth);
+		EmitSignalDeath(fromHealth);
 	}
 
 	public void VoidOut() {
@@ -382,14 +375,13 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	}
 
 
-	public IPersistenceData<Entity> Save() => new EntitySaveData<Entity>(this);
-
 	public virtual void AwardDamage(in DamageData data, IDamageable? target) {
 		GD.Print($"{Name} hit {(target as Node)?.Name} for {data.Amount} damage.");
 	}
 
 
 
+	public virtual IPersistenceData<Entity> Save() => new EntitySaveData<Entity>(this);
 	[Serializable]
 	public class EntitySaveData<T>(T entity) : ItemPersistenceData<Entity>(entity) where T : Entity {
 		public IPersistenceData[] MiscData = [.. entity.GetChildren().OfType<IPersistent>().Select(d => d.Save())];

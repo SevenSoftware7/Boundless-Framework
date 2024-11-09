@@ -1,6 +1,7 @@
 namespace LandlessSkies.Core;
 
 using System.Collections.Generic;
+using SevenDev.Boundless.Persistence;
 
 public interface IWeapon : IUIObject {
 	WeaponType Type { get; }

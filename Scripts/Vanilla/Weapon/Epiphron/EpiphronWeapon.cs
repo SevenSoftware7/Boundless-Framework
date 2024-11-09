@@ -1,8 +1,8 @@
 namespace LandlessSkies.Vanilla;
 
-using LandlessSkies.Core;
 using System.Collections.Generic;
 using Godot;
+using LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
@@ -13,8 +13,7 @@ public sealed partial class EpiphronWeapon : Weapon, IPlayerHandler {
 	public override WeaponSize Size => WeaponSize.OneHanded;
 
 
-	private EpiphronWeapon() : this(null) { }
-	public EpiphronWeapon(IItemData<Costume>? costume = null) : base(costume) {
+	public EpiphronWeapon() : base() {
 		slashAttack = new(this);
 	}
 

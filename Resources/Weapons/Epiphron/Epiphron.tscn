@@ -7,14 +7,13 @@
 [ext_resource type="AnimationLibrary" uid="uid://b0gic15n8ccgn" path="res://Resources/Weapons/Epiphron/EpiphronAnimations.tres" id="2_v8v6b"]
 [ext_resource type="Resource" uid="uid://b5vpfmo67yl6e" path="res://Resources/Weapons/Epiphron/Costumes/Epiphron-base_key.tres" id="6_7myka"]
 
-[node name="Epiphron" type="Node3D" node_paths=PackedStringArray("CostumeHolder")]
+[node name="Epiphron" type="Node3D" node_paths=PackedStringArray("_costumeHolder")]
 script = ExtResource("1_wltox")
 ResourceKeyProvider = ExtResource("2_4xhx5")
 UI = ExtResource("2_ey7pk")
 AnimationLibrary = ExtResource("2_v8v6b")
-CostumeHolder = NodePath("CostumeHolder")
+_costumeHolder = NodePath("CostumeHolder")
 
-[node name="CostumeHolder" type="Node3D" parent="." node_paths=PackedStringArray("Costume")]
+[node name="CostumeHolder" type="Node3D" parent="."]
 script = ExtResource("2_b3qyv")
-Costume = NodePath("Model - Epiphron (base)")
 CostumeKeyProvider = ExtResource("6_7myka")

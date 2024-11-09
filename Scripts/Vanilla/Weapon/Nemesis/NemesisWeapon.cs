@@ -1,8 +1,8 @@
 namespace LandlessSkies.Vanilla;
 
-using LandlessSkies.Core;
 using System.Collections.Generic;
 using Godot;
+using LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
@@ -13,8 +13,7 @@ public sealed partial class NemesisWeapon : Weapon, IPlayerHandler {
 	public override WeaponSize Size => WeaponSize.TwoHanded;
 
 
-	private NemesisWeapon() : this(null) { }
-	public NemesisWeapon(IItemData<Costume>? costume = null) : base(costume) {
+	public NemesisWeapon() : base() {
 		slashAttack = new(this);
 	}
 

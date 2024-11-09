@@ -12,9 +12,9 @@
 [ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Gauge.cs" id="8_emu8a"]
 [ext_resource type="AnimationLibrary" uid="uid://caafq3ok75ukn" path="res://Resources/Weapons/Nemesis/NemesisAnimations.tres" id="8_uaax8"]
 [ext_resource type="Script" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="9_8kq40"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Behaviour/Implementations/BipedBehaviour.cs" id="12_0ikht"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Behaviour/Implementations/SwimmingBehaviour.cs" id="13_ecggl"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Behaviour/Implementations/BipedBehaviour.cs" id="14_5nb4q"]
 [ext_resource type="Resource" uid="uid://bi8pp11ga45x3" path="res://Resources/Entities/Eos/Costumes/Eos-base_key.tres" id="15_cn8qi"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Behaviour/Implementations/SwimmingBehaviour.cs" id="15_sat4e"]
 
 [sub_resource type="Resource" id="Resource_v01j0"]
 script = ExtResource("2_lubr1")
@@ -35,6 +35,9 @@ HealthBar = ExtResource("3_uuynt")
 InteractPrompt = ExtResource("4_qonq2")
 InteractPointer = ExtResource("3_qcq8b")
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_iqmmo"]
+size = Vector3(0.3, 3.1, 0.3)
+
 [sub_resource type="Animation" id="Animation_2ppbj"]
 length = 0.001
 
@@ -43,10 +46,7 @@ _data = {
 &"RESET": SubResource("Animation_2ppbj")
 }
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_iqmmo"]
-size = Vector3(0.3, 3.1, 0.3)
-
-[node name="Eos" type="CharacterBody3D" node_paths=PackedStringArray("CostumeHolder", "Skeleton", "AnimationPlayer", "CurrentBehaviour", "Health", "CenterOfMass")]
+[node name="Eos" type="CharacterBody3D" node_paths=PackedStringArray("Skeleton", "AnimationPlayer", "CurrentBehaviour", "Health", "CenterOfMass")]
 collision_layer = 256
 floor_constant_speed = true
 platform_floor_layers = 4294963965
@@ -56,13 +56,26 @@ ResourceKeyProvider = ExtResource("2_ctdcn")
 UI = ExtResource("2_hamhv")
 Stats = SubResource("Resource_v01j0")
 HudPack = SubResource("Resource_qwv27")
-CostumeHolder = NodePath("CostumeHolder")
 Skeleton = NodePath("Skeleton3D")
 AnimationPlayer = NodePath("AnimationPlayer")
 CurrentBehaviour = NodePath("BipedBehaviour")
 Health = NodePath("Health")
 _attributeModifiers = [null]
 CenterOfMass = NodePath("Collisions/CenterOfMass")
+
+[node name="Skeleton3D" parent="." instance=ExtResource("5_j1koo")]
+transform = Transform3D(-1, 0, -1.50996e-07, 0, 1, 0, 1.50996e-07, 0, -1, 0, 0, -0.1)
+
+[node name="CostumeHolder" type="Node3D" parent="." node_paths=PackedStringArray("Costume")]
+script = ExtResource("9_8kq40")
+Costume = NodePath("Model - Eos (base)")
+CostumeKeyProvider = ExtResource("15_cn8qi")
+
+[node name="Collisions" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
+shape = SubResource("BoxShape3D_iqmmo")
+
+[node name="CenterOfMass" type="Node3D" parent="Collisions"]
 
 [node name="Health" type="Node" parent="."]
 script = ExtResource("8_emu8a")
@@ -76,23 +89,12 @@ libraries = {
 &"NemesisAnimations": ExtResource("8_uaax8")
 }
 
-[node name="Skeleton3D" parent="." instance=ExtResource("5_j1koo")]
-transform = Transform3D(-1, 0, -1.50996e-07, 0, 1, 0, 1.50996e-07, 0, -1, 0, 0, -0.1)
-
-[node name="Collisions" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
-shape = SubResource("BoxShape3D_iqmmo")
-
-[node name="CenterOfMass" type="Node3D" parent="Collisions"]
-
 [node name="BipedBehaviour" type="Node" parent="." node_paths=PackedStringArray("Entity")]
-script = ExtResource("12_0ikht")
+script = ExtResource("14_5nb4q")
 Entity = NodePath("..")
+metadata/_custom_type_script = ExtResource("14_5nb4q")
 
 [node name="SwimmingBehaviour" type="Node" parent="." node_paths=PackedStringArray("Entity")]
-script = ExtResource("13_ecggl")
+script = ExtResource("15_sat4e")
 Entity = NodePath("..")
-
-[node name="CostumeHolder" type="Node3D" parent="."]
-script = ExtResource("9_8kq40")
-CostumeKeyProvider = ExtResource("15_cn8qi")
+metadata/_custom_type_script = ExtResource("15_sat4e")

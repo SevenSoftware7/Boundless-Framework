@@ -1,6 +1,7 @@
 namespace LandlessSkies.Core;
 
 using Godot;
+using SevenDev.Boundless.Persistence;
 
 [Tool]
 [GlobalClass]

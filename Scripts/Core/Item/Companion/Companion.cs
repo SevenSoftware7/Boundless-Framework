@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Godot;
 using SevenDev.Boundless.Utility;
 using SevenDev.Boundless.Injection;
+using SevenDev.Boundless.Persistence;
 
 [Tool]
 [GlobalClass]
@@ -29,18 +30,11 @@ public partial class Companion : Node3D, ICustomizable, ICostumable, IPersistent
 	private Skeleton3D? _skeleton;
 
 	[ExportGroup("Costume")]
-	[Export] public CostumeHolder? CostumeHolder { get; set; }
+	public CostumeHolder CostumeHolder => _costumeHolder ??= new CostumeHolder().SafeReparentAndSetOwner(this).SafeRename(nameof(CostumeHolder));
+	[Export] private CostumeHolder? _costumeHolder;
 
 
-	protected Companion() : base() { }
-	public Companion(IItemData<Costume>? costume = null) {
-		if (CostumeHolder is null) {
-			CostumeHolder = new CostumeHolder(costume).ParentTo(this);
-		}
-		else {
-			CostumeHolder.SetCostume(costume);
-		}
-	}
+	public Companion() : base() { }
 
 
 	public override void _Ready() {
@@ -49,8 +43,8 @@ public partial class Companion : Node3D, ICustomizable, ICostumable, IPersistent
 	}
 
 
-	public virtual List<ICustomizable> GetSubCustomizables() => [];
-	public virtual List<ICustomization> GetCustomizations() => [];
+	public virtual IEnumerable<IUIObject> GetSubObjects() => [CostumeHolder];
+	public virtual Dictionary<string, ICustomization> GetCustomizations() => [];
 
 
 	public virtual IPersistenceData<Companion> Save() => new CompanionSaveData<Companion>(this);

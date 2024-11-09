@@ -7,10 +7,11 @@ using System.Linq;
 using Godot;
 using SevenDev.Boundless.Utility;
 using SevenDev.Boundless.Injection;
+using SevenDev.Boundless.Persistence;
 
 [Tool]
 [GlobalClass]
-public sealed partial class MultiWeapon : WeaponCollection, IInjectionInterceptor<WeaponHolsterState> {
+public sealed partial class MultiWeapon : WeaponCollection, IInjectionInterceptor<WeaponHolsterState>, IPersistent<MultiWeapon> {
 	private List<IWeapon> _weapons = [];
 
 	public override IWeapon? CurrentWeapon => _currentIndex < _weapons.Count ? _weapons[(int)_currentIndex] : null;
@@ -148,9 +149,8 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 		UpdateCurrent();
 	}
 
+
 	public override IPersistenceData<MultiWeapon> Save() => new MultiWeaponSaveData(this);
-
-
 	[Serializable]
 	public class MultiWeaponSaveData(MultiWeapon multiWeapon) : PersistenceData<MultiWeapon>(multiWeapon) {
 		private readonly ImmutableArray<IPersistenceData<IWeapon>> WeaponSaves = [.. multiWeapon._weapons

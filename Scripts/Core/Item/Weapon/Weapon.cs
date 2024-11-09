@@ -5,13 +5,14 @@ using System.Collections.Generic;
 using Godot;
 using SevenDev.Boundless.Utility;
 using SevenDev.Boundless.Injection;
+using SevenDev.Boundless.Persistence;
 
 /// <summary>
 /// A Weapon is needed to initiate an Attack as an Entity.
 /// </summary>
 [Tool]
 [GlobalClass]
-public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject, ICostumable, IDamageDealerProxy {
+public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject, ICostumable, IDamageDealerProxy, IPersistent<Weapon> {
 	private static readonly StringName LeftWeapon = "LeftWeapon";
 	private static readonly StringName RightWeapon = "RightWeapon";
 	private static readonly StringName LeftHand = "LeftHand";
@@ -35,10 +36,10 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject
 		set {
 			_holsterState = value;
 			if (_holsterState.IsHolstered) {
-				CostumeHolder?.Disable();
+				_costumeHolder?.Disable();
 			}
 			else {
-				CostumeHolder?.Enable();
+				_costumeHolder?.Enable();
 			}
 		}
 	}
@@ -73,7 +74,8 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject
 
 
 	[ExportGroup("Costume")]
-	[Export] public CostumeHolder? CostumeHolder { get; set; }
+	public CostumeHolder CostumeHolder => _costumeHolder ??= new CostumeHolder().SafeReparentAndSetOwner(this).SafeRename(nameof(CostumeHolder));
+	[Export] private CostumeHolder? _costumeHolder;
 
 
 	[ExportGroup("Dependencies")]
@@ -98,29 +100,16 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject
 	public virtual uint MaxStyle { get; } = 0;
 
 
-	protected Weapon() : this(null) { }
-	public Weapon(IItemData<Costume>? costume = null) : base() {
-		if (CostumeHolder is null) {
-			CostumeHolder = new CostumeHolder(costume).ParentTo(this);
-		}
-		else {
-			CostumeHolder.SetCostume(costume);
-		}
-	}
+	public Weapon() : base() { }
+
 
 	public abstract Vector3 GetTipPosition();
 
 
-	public virtual List<ICustomization> GetCustomizations() => [];
-	public List<ICustomizable> GetSubCustomizables() {
-		List<ICustomizable> list = [];
-		if (CostumeHolder?.Costume is not null) list.Add(CostumeHolder.Costume);
-		return list;
-	}
+	public virtual IEnumerable<IUIObject> GetSubObjects() => [CostumeHolder];
+	public virtual Dictionary<string, ICustomization> GetCustomizations() => [];
 
 	public abstract IEnumerable<Action.Wrapper> GetAttacks(Entity target);
-
-	public IPersistenceData<IWeapon> Save() => new WeaponSaveData<Weapon>(this);
 
 
 	[Injectable]
@@ -193,6 +182,7 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject
 		}
 	}
 
+	public virtual IPersistenceData<Weapon> Save() => new WeaponSaveData<Weapon>(this);
 	[Serializable]
 	public class WeaponSaveData<T>(T weapon) : ItemPersistenceData<T>(weapon) where T : Weapon, IItem<T>;
 }

@@ -95,7 +95,7 @@ public partial class DamageArea : Area3D {
 		switch((ulong)what) {
 			case NotificationPredelete:
 				ApplyBufferedDamage();
-				OnDestroyed();
+				EmitSignalDestroyed();
 				break;
 		}
 	}

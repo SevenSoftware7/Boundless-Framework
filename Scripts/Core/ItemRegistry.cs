@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Godot.Collections;
+using SevenDev.Boundless.Persistence;
 
 [Tool]
 [GlobalClass]
@@ -13,7 +14,10 @@ public partial class ItemRegistry : Node {
 		set {
 			IEnumerable<IItemData> nonResourceData = value.OfType<IItemData>().Where(data => data is not Resource);
 			_itemData = value.OfType<IItemData>().Concat(nonResourceData).ToList();
-			Callable.From(RegisterData).CallDeferred();
+
+			if (IsNodeReady()) {
+				Callable.From(RegisterData).CallDeferred();
+			}
 		}
 	}
 	private List<IItemData> _itemData = [];
@@ -22,5 +26,10 @@ public partial class ItemRegistry : Node {
 		foreach (IItemData data in _itemData) {
 			data.Register();
 		}
+	}
+
+	public override void _Ready() {
+		base._Ready();
+		RegisterData();
 	}
 }

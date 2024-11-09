@@ -7,14 +7,13 @@
 [ext_resource type="Resource" uid="uid://c8q8b6jgvn4vo" path="res://Resources/Weapons/Nemesis/Nemesis_ui.tres" id="2_na6b6"]
 [ext_resource type="Resource" uid="uid://nv3cruo4dqdt" path="res://Resources/Weapons/Nemesis/Costumes/Nemesis-base_key.tres" id="6_x50f5"]
 
-[node name="Nemesis" type="Node3D" node_paths=PackedStringArray("CostumeHolder")]
+[node name="Nemesis" type="Node3D" node_paths=PackedStringArray("_costumeHolder")]
 script = ExtResource("1_vy2ad")
 ResourceKeyProvider = ExtResource("2_illkl")
 UI = ExtResource("2_na6b6")
 AnimationLibrary = ExtResource("2_l4rjo")
-CostumeHolder = NodePath("CostumeHolder")
+_costumeHolder = NodePath("CostumeHolder")
 
-[node name="CostumeHolder" type="Node3D" parent="." node_paths=PackedStringArray("Costume")]
+[node name="CostumeHolder" type="Node3D" parent="."]
 script = ExtResource("2_cm0hb")
-Costume = NodePath("Model - Nemesis (base)")
 CostumeKeyProvider = ExtResource("6_x50f5")

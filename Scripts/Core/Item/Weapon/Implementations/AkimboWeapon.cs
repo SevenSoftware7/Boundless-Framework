@@ -6,11 +6,12 @@ using System.Linq;
 using Godot;
 using SevenDev.Boundless.Utility;
 using SevenDev.Boundless.Injection;
+using SevenDev.Boundless.Persistence;
 
 
 [Tool]
 [GlobalClass]
-public sealed partial class AkimboWeapon : WeaponCollection, IInjectionInterceptor<Handedness> {
+public sealed partial class AkimboWeapon : WeaponCollection, IInjectionInterceptor<Handedness>, IPersistent<AkimboWeapon> {
 	public IWeapon? MainWeapon {
 		get => _mainWeapon;
 		private set {
@@ -91,10 +92,8 @@ public sealed partial class AkimboWeapon : WeaponCollection, IInjectionIntercept
 		}
 	}
 
+
 	public override IPersistenceData<AkimboWeapon> Save() => new AkimboWeaponSaveData(this);
-
-
-
 	[Serializable]
 	public class AkimboWeaponSaveData(AkimboWeapon akimbo) : PersistenceData<AkimboWeapon>(akimbo) {
 		private readonly IPersistenceData<IWeapon>? MainWeaponSave = (akimbo.MainWeapon as IPersistent<IWeapon>)?.Save();

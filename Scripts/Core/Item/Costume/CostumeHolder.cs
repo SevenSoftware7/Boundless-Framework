@@ -1,18 +1,42 @@
 namespace LandlessSkies.Core;
 
+using System.Collections.Generic;
 using Godot;
-using Godot.Collections;
 using SevenDev.Boundless.Utility;
+using SevenDev.Boundless.Persistence;
 
 [Tool]
 [GlobalClass]
-public sealed partial class CostumeHolder : Node3D/* , ISerializationListener */ {
+public sealed partial class CostumeHolder : Node3D, ICustomizable {
 	[Export] public Costume? Costume { get; private set; }
 
 	[Export] public CostumeResourceDataKey? CostumeKeyProvider {
 		get => _costumeKeyProvider as CostumeResourceDataKey;
-		set => SetCostume(value);
+		set {
+			_costumeKeyProvider = value;
+			if (IsNodeReady()) {
+				Callable.From(Reload).CallDeferred();
+			}
+		}
 	}
+
+	public string DisplayName => Costume?.DisplayName ?? string.Empty;
+	public Texture2D? DisplayPortrait => Costume?.DisplayPortrait;
+
+	public Dictionary<string, ICustomization> GetCustomizations() {
+		Dictionary<string, ICustomization> customizations = [];
+		// TODO: Add Costume picker here
+
+		if (Costume?.GetCustomizations() is Dictionary<string, ICustomization> costumeCustomizations) {
+			foreach (var customization in costumeCustomizations) {
+				customizations[customization.Key] = customization.Value;
+			}
+		}
+
+		return customizations;
+	}
+
+
 	private IDataKeyProvider<Costume>? _costumeKeyProvider;
 
 
@@ -22,9 +46,6 @@ public sealed partial class CostumeHolder : Node3D/* , ISerializationListener */
 	}
 
 	public void SetCostume(IDataKeyProvider<Costume>? newCostumeKey) {
-		CostumeResourceDataKey? oldKey = Costume?.ResourceKey;
-		if (newCostumeKey is not null && newCostumeKey.Key == oldKey?.Key) return;
-
 		_costumeKeyProvider = newCostumeKey;
 
 		Load(true);
@@ -34,9 +55,8 @@ public sealed partial class CostumeHolder : Node3D/* , ISerializationListener */
 	public void SetCostume(IPersistenceData<Costume> costumeData) {
 		Unload();
 
-		Costume? instance = costumeData.Load();
-		_costumeKeyProvider = instance?.ResourceKey;
-		Costume = instance?.SetOwnerAndParent(this);
+		Costume = costumeData.Load()?.ParentTo(this);
+		_costumeKeyProvider = Costume?.ResourceKey;
 	}
 
 
@@ -46,12 +66,13 @@ public sealed partial class CostumeHolder : Node3D/* , ISerializationListener */
 
 		Unload();
 
-		Costume = _costumeKeyProvider?.GetData()?.Instantiate()?.SetOwnerAndParent(this);
+		Costume = _costumeKeyProvider?.GetData()?.Instantiate()?.ParentTo(this);
 	}
 	public void Unload() {
 		Costume?.QueueFree();
 		Costume = null;
 	}
+	public void Reload() => Load(true);
 
 
 	public override void _Ready() {
@@ -59,7 +80,7 @@ public sealed partial class CostumeHolder : Node3D/* , ISerializationListener */
 		Load();
 	}
 
-	public override void _ValidateProperty(Dictionary property) {
+	public override void _ValidateProperty(Godot.Collections.Dictionary property) {
 		base._ValidateProperty(property);
 
 		StringName name = property["name"].AsStringName();

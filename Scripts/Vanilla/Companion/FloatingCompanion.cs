@@ -30,7 +30,7 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 	[Export] public Curve3D Curve { get; private set; }
 
 
-	private FloatingCompanion() : base() {
+	public FloatingCompanion() : base() {
 		Curve = new() {
 			UpVectorEnabled = false
 		};

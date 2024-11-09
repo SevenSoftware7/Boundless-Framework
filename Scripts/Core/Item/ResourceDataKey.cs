@@ -1,6 +1,7 @@
 namespace LandlessSkies.Core;
 
 using Godot;
+using SevenDev.Boundless.Persistence;
 
 [Tool]
 public sealed partial class ResourceDataKey<T> : Resource, IDataKeyProvider<T> where T : IItem<T> {

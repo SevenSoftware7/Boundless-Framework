@@ -1,6 +1,7 @@
 namespace LandlessSkies.Core;
 
 using Godot;
+using SevenDev.Boundless.Persistence;
 
 [Tool]
 public abstract partial class SceneItemData<T> : Resource, IItemData<T> where T : Node, IItem<T> {

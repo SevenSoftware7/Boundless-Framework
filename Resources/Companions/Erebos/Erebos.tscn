@@ -20,7 +20,7 @@ Curve = SubResource("Curve3D_11sy3")
 ResourceKeyProvider = ExtResource("2_xa4iv")
 UI = ExtResource("2_n7qo5")
 Skeleton = NodePath("Skeleton")
-CostumeHolder = NodePath("CostumeHolder")
+_costumeHolder = NodePath("CostumeHolder")
 
 [node name="Skeleton" type="Skeleton3D" parent="."]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)

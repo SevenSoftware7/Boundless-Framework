@@ -23,10 +23,10 @@ public partial class Gauge : Node {
 			if (_value == oldValue) return;
 
 			if (_value == 0f) {
-				OnEmptied(oldValue);
+				EmitSignalEmptied(oldValue);
 			}
 
-			OnValueChanged(_value);
+			EmitSignalValueChanged(_value);
 		}
 	}
 	private float _value;
@@ -62,7 +62,7 @@ public partial class Gauge : Node {
 			? Mathf.Clamp(_value / oldMaximum, 0f, 1f) * _maximum
 			: Mathf.Min(Value, _maximum);
 
-		OnMaximumChanged(_maximum);
+		EmitSignalMaximumChanged(_maximum);
 	}
 
 	public void Kill() {
