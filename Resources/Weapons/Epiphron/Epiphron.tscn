@@ -9,7 +9,7 @@
 
 [node name="Epiphron" type="Node3D" node_paths=PackedStringArray("_costumeHolder")]
 script = ExtResource("1_wltox")
-ResourceKeyProvider = ExtResource("2_4xhx5")
+KeyProvider = ExtResource("2_4xhx5")
 UI = ExtResource("2_ey7pk")
 AnimationLibrary = ExtResource("2_v8v6b")
 _costumeHolder = NodePath("CostumeHolder")

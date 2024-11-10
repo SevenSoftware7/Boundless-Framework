@@ -7,6 +7,6 @@
 
 [resource]
 script = ExtResource("2_hbhyg")
-_keyProvider = ExtResource("1_axtv4")
+KeyProvider = ExtResource("1_axtv4")
 UIData = ExtResource("2_mniaj")
 Scene = ExtResource("1_uexkc")

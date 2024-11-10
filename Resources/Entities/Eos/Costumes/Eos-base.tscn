@@ -272,7 +272,7 @@ bind/72/pose = Transform3D(1, 1.11293e-07, 8.20728e-07, 5.54894e-07, -6.85453e-0
 [node name="Model - Eos (base)" type="Node3D" node_paths=PackedStringArray("Meshes")]
 script = ExtResource("1_ut7ww")
 Meshes = [NodePath("Costume - Eos (base)")]
-Key = ExtResource("2_ul7je")
+ResourceKey = ExtResource("2_ul7je")
 UI = ExtResource("3_7u2op")
 
 [node name="Costume - Eos (base)" type="MeshInstance3D" parent="."]

@@ -37,7 +37,7 @@ collision_layer = 256
 platform_floor_layers = 4294963965
 platform_wall_layers = 4294963965
 script = ExtResource("1_46ioo")
-ResourceKeyProvider = ExtResource("2_gl27x")
+KeyProvider = ExtResource("2_gl27x")
 UI = ExtResource("2_icn6q")
 Stats = SubResource("Resource_jjk82")
 HudPack = SubResource("Resource_bd6gb")
@@ -46,9 +46,8 @@ CurrentBehaviour = NodePath("VehicleBehaviour")
 _attributeModifiers = [null]
 CenterOfMass = NodePath("CollisionShape3D/CenterOfMass")
 
-[node name="CostumeHolder" type="Node3D" parent="." node_paths=PackedStringArray("Costume")]
+[node name="CostumeHolder" type="Node3D" parent="."]
 script = ExtResource("5_5toi3")
-Costume = NodePath("Model")
 CostumeKeyProvider = ExtResource("8_5fcav")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]

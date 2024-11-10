@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="CostumeResourceDataKey" load_steps=2 format=3 uid="uid://bi8pp11ga45x3"]
+[gd_resource type="Resource" script_class="EntityCostumeResourceDataKey" load_steps=2 format=3 uid="uid://bi8pp11ga45x3"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/CostumeResourceDataKey.cs" id="1_plwr5"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/EntityCostumeResourceDataKey.cs" id="1_iuqsy"]
 
 [resource]
-script = ExtResource("1_plwr5")
+script = ExtResource("1_iuqsy")
 Key = "eos_base"

@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="CostumeResourceDataKey" load_steps=2 format=3 uid="uid://nv3cruo4dqdt"]
+[gd_resource type="Resource" script_class="WeaponCostumeResourceDataKey" load_steps=2 format=3 uid="uid://nv3cruo4dqdt"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/CostumeResourceDataKey.cs" id="1_ohfvu"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/WeaponCostumeResourceDataKey.cs" id="1_g5ysc"]
 
 [resource]
-script = ExtResource("1_ohfvu")
+script = ExtResource("1_g5ysc")
 Key = "nemesis_base"

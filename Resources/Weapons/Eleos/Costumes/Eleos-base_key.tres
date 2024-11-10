@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="CostumeResourceDataKey" load_steps=2 format=3 uid="uid://dw0tbdkonwsel"]
+[gd_resource type="Resource" script_class="WeaponCostumeResourceDataKey" load_steps=2 format=3 uid="uid://dw0tbdkonwsel"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/CostumeResourceDataKey.cs" id="1_ygrlk"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/WeaponCostumeResourceDataKey.cs" id="1_nqu2a"]
 
 [resource]
-script = ExtResource("1_ygrlk")
+script = ExtResource("1_nqu2a")
 Key = "eleos_base"

@@ -7,8 +7,9 @@ using SevenDev.Boundless.Persistence;
 [Tool]
 [GlobalClass]
 public abstract partial class Costume : Node3D, IPersistent<Costume>, IItem<Costume>, ICustomizable {
-	[Export] public CostumeResourceDataKey ResourceKey { get; private set; } = new();
 	IDataKeyProvider<Costume> IItem<Costume>.KeyProvider => ResourceKey;
+	[Export] public CostumeResourceDataKey ResourceKey { get; private set; } = new();
+
 	[Export] public ItemUIData? UI { get; private set; }
 	public string DisplayName => UI?.DisplayName ?? string.Empty;
 	public Texture2D? DisplayPortrait => UI?.DisplayPortrait;

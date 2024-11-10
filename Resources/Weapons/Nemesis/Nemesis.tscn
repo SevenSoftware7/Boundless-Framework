@@ -9,7 +9,7 @@
 
 [node name="Nemesis" type="Node3D" node_paths=PackedStringArray("_costumeHolder")]
 script = ExtResource("1_vy2ad")
-ResourceKeyProvider = ExtResource("2_illkl")
+KeyProvider = ExtResource("2_illkl")
 UI = ExtResource("2_na6b6")
 AnimationLibrary = ExtResource("2_l4rjo")
 _costumeHolder = NodePath("CostumeHolder")

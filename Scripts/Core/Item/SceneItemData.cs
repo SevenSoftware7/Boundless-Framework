@@ -4,8 +4,16 @@ using Godot;
 using SevenDev.Boundless.Persistence;
 
 [Tool]
-public abstract partial class SceneItemData<T> : Resource, IItemData<T> where T : Node, IItem<T> {
-	public abstract IDataKeyProvider<T> KeyProvider { get; }
+public abstract partial class SceneItemData<[MustBeVariant] T> : Resource, IItemData<T> where T : Node, IItem<T> {
+	IDataKeyProvider<T> IItemData<T>.KeyProvider => KeyProvider;
+	[Export] private GenericResourceDataKey<T> KeyProvider {
+		get => _keyProvider;
+		set {
+			if (value is null) return;
+			_keyProvider = value;
+		}
+	}
+	private GenericResourceDataKey<T> _keyProvider = new();
 
 	[Export] public ItemUIData? UIData { get; private set; } = new();
 	public string DisplayName => UIData?.DisplayName ?? string.Empty;

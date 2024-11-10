@@ -1,14 +1,10 @@
 namespace LandlessSkies.Core;
 
 using Godot;
-using SevenDev.Boundless.Persistence;
 
 [Tool]
 [GlobalClass]
-public sealed partial class CompanionResourceDataKey : Resource, IDataKeyProvider<Companion> {
-	[Export] public string Key {
-		get => key;
-		private set => key = value.ToSnakeCase();
-	}
-	private string key = string.Empty;
+public sealed partial class CompanionResourceDataKey : GenericResourceDataKey<Companion> {
+	public CompanionResourceDataKey() : base() {}
+	public CompanionResourceDataKey(string? key) : base(key) {}
 }

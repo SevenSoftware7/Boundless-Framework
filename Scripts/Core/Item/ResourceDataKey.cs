@@ -4,7 +4,8 @@ using Godot;
 using SevenDev.Boundless.Persistence;
 
 [Tool]
-public sealed partial class ResourceDataKey<T> : Resource, IDataKeyProvider<T> where T : IItem<T> {
+[GlobalClass]
+public partial class ResourceDataKey : Resource, IDataKeyProvider {
 	[Export] public string Key {
 		get => key;
 		private set => key = value.ToSnakeCase();

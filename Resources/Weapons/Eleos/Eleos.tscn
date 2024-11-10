@@ -9,7 +9,7 @@
 
 [node name="Eleos" type="Node3D" node_paths=PackedStringArray("_costumeHolder")]
 script = ExtResource("1_pwvbn")
-ResourceKeyProvider = ExtResource("2_uj7so")
+KeyProvider = ExtResource("2_uj7so")
 UI = ExtResource("2_ersgj")
 AnimationLibrary = ExtResource("2_7ftow")
 _costumeHolder = NodePath("CostumeHolder")

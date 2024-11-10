@@ -10,6 +10,7 @@ using SevenDev.Boundless.Persistence;
 public sealed partial class CostumeHolder : Node3D, ICustomizable {
 	[Export] public Costume? Costume { get; private set; }
 
+	private IDataKeyProvider<Costume>? _costumeKeyProvider;
 	[Export] public CostumeResourceDataKey? CostumeKeyProvider {
 		get => _costumeKeyProvider as CostumeResourceDataKey;
 		set {
@@ -35,9 +36,6 @@ public sealed partial class CostumeHolder : Node3D, ICustomizable {
 
 		return customizations;
 	}
-
-
-	private IDataKeyProvider<Costume>? _costumeKeyProvider;
 
 
 	public CostumeHolder() { }
