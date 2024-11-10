@@ -3,7 +3,7 @@
 [ext_resource type="Resource" uid="uid://r7mx5ymlfh3l" path="res://Resources/Weapons/Eleos/Eleos_key.tres" id="1_a63nq"]
 [ext_resource type="PackedScene" uid="uid://bp1e6thwkkcrr" path="res://Resources/Weapons/Eleos/Eleos.tscn" id="1_rklg0"]
 [ext_resource type="Resource" uid="uid://cvuwijf5xqma6" path="res://Resources/Weapons/Eleos/Eleos_ui.tres" id="2_jxk8r"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/SceneWeaponData.cs" id="2_w44ts"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/WeaponSceneData.cs" id="2_w44ts"]
 
 [resource]
 script = ExtResource("2_w44ts")

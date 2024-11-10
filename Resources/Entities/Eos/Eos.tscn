@@ -66,9 +66,8 @@ CenterOfMass = NodePath("Collisions/CenterOfMass")
 [node name="Skeleton3D" parent="." instance=ExtResource("5_j1koo")]
 transform = Transform3D(-1, 0, -1.50996e-07, 0, 1, 0, 1.50996e-07, 0, -1, 0, 0, -0.1)
 
-[node name="CostumeHolder" type="Node3D" parent="." node_paths=PackedStringArray("Costume")]
+[node name="CostumeHolder" type="Node3D" parent="."]
 script = ExtResource("9_8kq40")
-Costume = NodePath("Model - Eos (base)")
 CostumeKeyProvider = ExtResource("15_cn8qi")
 
 [node name="Collisions" type="CollisionShape3D" parent="."]

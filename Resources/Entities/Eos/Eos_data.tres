@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="SceneEntityData" load_steps=5 format=3 uid="uid://djyqyaq7lwdkr"]
+[gd_resource type="Resource" script_class="EntitySceneData" load_steps=5 format=3 uid="uid://djyqyaq7lwdkr"]
 
 [ext_resource type="PackedScene" uid="uid://b7rhbgw2dujty" path="res://Resources/Entities/Eos/Eos.tscn" id="1_dapd7"]
 [ext_resource type="Resource" uid="uid://b56txqwbw36sk" path="res://Resources/Entities/Eos/Eos_key.tres" id="1_g205y"]
 [ext_resource type="Resource" uid="uid://hpsfrfhvt5ll" path="res://Resources/Entities/Eos/Eos_ui.tres" id="2_32aii"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/SceneEntityData.cs" id="3_jssrc"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/EntitySceneData.cs" id="3_jssrc"]
 
 [resource]
 script = ExtResource("3_jssrc")

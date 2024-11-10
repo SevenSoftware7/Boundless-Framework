@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="SceneWeaponCostumeData" load_steps=5 format=3 uid="uid://c376t1le83xwr"]
+[gd_resource type="Resource" script_class="WeaponCostumeSceneData" load_steps=5 format=3 uid="uid://c376t1le83xwr"]
 
 [ext_resource type="PackedScene" uid="uid://ceqxywrq7p5l3" path="res://Resources/Weapons/Epiphron/Costumes/Epiphron-base.tscn" id="1_1afxg"]
 [ext_resource type="Resource" uid="uid://b5vpfmo67yl6e" path="res://Resources/Weapons/Epiphron/Costumes/Epiphron-base_key.tres" id="1_mid7c"]
 [ext_resource type="Resource" uid="uid://cofdps2evpaco" path="res://Resources/Weapons/Epiphron/Costumes/Epiphron-base_ui.tres" id="2_578hx"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/SceneWeaponCostumeData.cs" id="3_qpj6o"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/Costume/WeaponCostumeSceneData.cs" id="3_qpj6o"]
 
 [resource]
 script = ExtResource("3_qpj6o")

@@ -4,4 +4,4 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public partial class SceneEntityData : SceneItemData<Entity>;
+public partial class EntitySceneData : SceneItemData<Entity>;

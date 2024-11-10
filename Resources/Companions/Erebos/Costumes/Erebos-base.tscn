@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://r6yqclqm3ubp"]
 
 [ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Implementation/SkinnedCostume.cs" id="1_om25c"]
-[ext_resource type="Resource" uid="uid://cqg5mixm7j8g" path="res://Resources/Companions/Erebos/Costumes/Erebos-base_key.tres" id="2_pfvub"]
+[ext_resource type="Resource" uid="uid://dld7ow8og42nk" path="res://Resources/Companions/Erebos/Costumes/Erebos-base_key.tres" id="2_pfvub"]
 [ext_resource type="Resource" uid="uid://cywx36nmhnlrf" path="res://Resources/Companions/Erebos/Costumes/Erebos-base_ui.tres" id="3_twnj4"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_aafmt"]

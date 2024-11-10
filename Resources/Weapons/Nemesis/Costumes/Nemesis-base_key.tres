@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="WeaponCostumeResourceDataKey" load_steps=2 format=3 uid="uid://nv3cruo4dqdt"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/WeaponCostumeResourceDataKey.cs" id="1_g5ysc"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/Costume/WeaponCostumeResourceDataKey.cs" id="1_g5ysc"]
 
 [resource]
 script = ExtResource("1_g5ysc")

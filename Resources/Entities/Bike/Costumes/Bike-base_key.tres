@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="EntityCostumeResourceDataKey" load_steps=2 format=3 uid="uid://djkxop4aum535"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/EntityCostumeResourceDataKey.cs" id="1_uixj8"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Costume/EntityCostumeResourceDataKey.cs" id="1_uixj8"]
 
 [resource]
 script = ExtResource("1_uixj8")

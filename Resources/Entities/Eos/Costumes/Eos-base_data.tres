@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="SceneEntityCostumeData" load_steps=5 format=3 uid="uid://dvcjw3gon7rak"]
+[gd_resource type="Resource" script_class="EntityCostumeSceneData" load_steps=5 format=3 uid="uid://dvcjw3gon7rak"]
 
 [ext_resource type="PackedScene" uid="uid://hje36y5wrdyu" path="res://Resources/Entities/Eos/Costumes/Eos-base.tscn" id="1_ogmpo"]
 [ext_resource type="Resource" uid="uid://bi8pp11ga45x3" path="res://Resources/Entities/Eos/Costumes/Eos-base_key.tres" id="1_v1q1j"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/SceneEntityCostumeData.cs" id="2_tibbh"]
+[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Costume/EntityCostumeSceneData.cs" id="2_tibbh"]
 [ext_resource type="Resource" uid="uid://djr6ag7agl07c" path="res://Resources/Entities/Eos/Costumes/Eos-base_ui.tres" id="3_qoj6f"]
 
 [resource]
