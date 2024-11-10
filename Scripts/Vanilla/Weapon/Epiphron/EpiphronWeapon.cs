@@ -8,9 +8,9 @@ using LandlessSkies.Core;
 [GlobalClass]
 public sealed partial class EpiphronWeapon : Weapon, IPlayerHandler {
 	private readonly SlashAttack.Builder slashAttack;
-	public override WeaponType Type => WeaponType.Sword;
-	public override WeaponUsage Usage => WeaponUsage.Slash | WeaponUsage.Thrust;
-	public override WeaponSize Size => WeaponSize.OneHanded;
+	public override IWeapon.WeaponKind Kind => IWeapon.WeaponKind.Sword;
+	public override IWeapon.WeaponUsage Usage => IWeapon.WeaponUsage.Slash | IWeapon.WeaponUsage.Thrust;
+	public override IWeapon.WeaponSize Size => IWeapon.WeaponSize.OneHanded;
 
 
 	public EpiphronWeapon() : base() {

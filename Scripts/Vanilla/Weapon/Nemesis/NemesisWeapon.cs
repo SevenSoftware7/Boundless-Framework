@@ -8,9 +8,9 @@ using LandlessSkies.Core;
 [GlobalClass]
 public sealed partial class NemesisWeapon : Weapon, IPlayerHandler {
 	private readonly SlashAttack.Builder slashAttack;
-	public override WeaponType Type => WeaponType.Sword;
-	public override WeaponUsage Usage => WeaponUsage.Slash | WeaponUsage.Strike;
-	public override WeaponSize Size => WeaponSize.TwoHanded;
+	public override IWeapon.WeaponKind Kind => IWeapon.WeaponKind.Sword;
+	public override IWeapon.WeaponUsage Usage => IWeapon.WeaponUsage.Slash | IWeapon.WeaponUsage.Strike;
+	public override IWeapon.WeaponSize Size => IWeapon.WeaponSize.TwoHanded;
 
 
 	public NemesisWeapon() : base() {

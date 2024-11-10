@@ -51,9 +51,9 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject
 		private set => HolsterState = value;
 	}
 
-	public abstract WeaponType Type { get; }
-	public abstract WeaponUsage Usage { get; }
-	public abstract WeaponSize Size { get; }
+	public abstract IWeapon.WeaponKind Kind { get; }
+	public abstract IWeapon.WeaponUsage Usage { get; }
+	public abstract IWeapon.WeaponSize Size { get; }
 
 
 	public IDamageDealer? Sender => Entity;
