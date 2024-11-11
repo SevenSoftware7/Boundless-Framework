@@ -29,10 +29,19 @@ public sealed partial class MultiplicativeModifier : AttributeModifier {
 
 
 	public override float ApplyTo(float baseValue) {
-		return baseValue * _multiplier;
+		return baseValue * Mathf.Lerp(1f, _multiplier, Efficiency);
 	}
 
 	protected override string GetResourceName() {
 		return $"{_multiplier:0.##%} {AttributeName}";
+	}
+
+	protected override bool EqualsInternal(AttributeModifier other) {
+		return other is MultiplicativeModifier multiplicativeModifier && multiplicativeModifier._multiplier == _multiplier;
+	}
+	public override int GetHashCode() {
+		unchecked {
+			return (base.GetHashCode() * 397) ^ (_multiplier.GetHashCode() * 397);
+		}
 	}
 }

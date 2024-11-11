@@ -2,6 +2,7 @@ namespace LandlessSkies.Core;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using SevenDev.Boundless.Utility;
 
@@ -39,10 +40,24 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 	/// </summary>
 	/// <param name="modifier">The Attribute Modifier to add</param>
 	public void AddAttributeModifier(AttributeModifier modifier) {
+		modifier = (AttributeModifier)modifier.Duplicate();
 		if (modifier is null) return;
 
-		Entity.AttributeModifiers.Add(modifier);
 		modifiers.Add(modifier);
+		Entity.AttributeModifiers.Add(modifier);
+	}
+	/// <summary>
+	/// Method to add an Attribute Modifier.<para/>
+	/// Mainly for Animations, but can be used via script too.
+	/// </summary>
+	/// <param name="modifier">The Attribute Modifier to add</param>
+	/// <param name="timeMilliseconds">The time in milliseconds the AttributeModifier will take to "fade in"</param>
+	public async void AddAttributeModifier(AttributeModifier modifier, uint timeMilliseconds = 0) {
+		modifier = (AttributeModifier)modifier.Duplicate();
+		if (modifier is null) return;
+
+		modifiers.Add(modifier);
+		await Entity.AttributeModifiers.Add(modifier, timeMilliseconds);
 	}
 
 	/// <summary>
@@ -51,27 +66,57 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 	/// </summary>
 	/// <param name="index">The Cache Index of the Attribute Modifier to remove</param>
 	public void RemoveAttributeModifier(int index) {
-		if (modifiers.Count <= index) return;
+		if (index < 0 || modifiers.Count <= index) return;
+
 		AttributeModifier? modifier = modifiers[index];
 		if (modifier is null) return;
 
-		Entity.AttributeModifiers.Remove(modifier);
 		modifiers[index] = null;
+		Entity.AttributeModifiers.Remove(modifier);
+	}
+	/// <summary>
+	/// Method to remove an already existing Attribute Modifier.<para/>
+	/// Mainly for Animations, but can be used via script too.
+	/// </summary>
+	/// <param name="index">The Cache Index of the Attribute Modifier to remove</param>
+	/// <param name="timeMilliseconds">The time in milliseconds the AttributeModifier will take to "fade out"</param>
+	public async void RemoveAttributeModifier(int index, uint timeMilliseconds = 0) {
+		if (index < 0 || modifiers.Count <= index) return;
+
+		AttributeModifier? modifier = modifiers[index];
+		if (modifier is null) return;
+
+		modifiers[index] = null;
+		await Entity.AttributeModifiers.Remove(modifier, timeMilliseconds);
 	}
 	/// <summary>
 	/// Method to remove an already existing Attribute Modifier.<para/>
 	/// Mainly for Animations, but can be used via script too.
 	/// </summary>
 	/// <param name="modifier">The Attribute Modifier to remove</param>
+	/// <param name="timeMilliseconds">The time in milliseconds the AttributeModifier will take to "fade out"</param>
 	public void RemoveAttributeModifier(AttributeModifier modifier) {
 		if (modifier is null) return;
-
-		Entity.AttributeModifiers.Remove(modifier);
 
 		int index = modifiers.IndexOf(modifier);
 		if (index < 0) return;
 
 		modifiers[index] = null;
+		Entity.AttributeModifiers.Remove(modifier);
+	}
+	/// <summary>
+	/// Method to remove an already existing Attribute Modifier.<para/>
+	/// Mainly for Animations, but can be used via script too.
+	/// </summary>
+	/// <param name="modifier">The Attribute Modifier to remove</param>
+	public async void RemoveAttributeModifier(AttributeModifier modifier, uint timeMilliseconds = 0) {
+		if (modifier is null) return;
+
+		int index = modifiers.IndexOf(modifier);
+		if (index < 0) return;
+
+		modifiers[index] = null;
+		await Entity.AttributeModifiers.Remove(modifier, timeMilliseconds);
 	}
 
 	/// <summary>
@@ -110,16 +155,20 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 	}
 	private void OnAnimationChanged(StringName oldName, StringName newName) {
 		if (oldName == AnimationPath) {
-			_AnimationChanged(newName);
-			Stop();
+			Callable.From(() => {
+				_AnimationChanged(newName);
+				Stop();
+			}).CallDeferred();
 		}
 	}
 	protected virtual void _AnimationChanged(StringName newName) { }
 
 	private void OnAnimationFinished(StringName name) {
 		if (name == AnimationPath) {
-			_AnimationFinished();
-			Stop();
+			Callable.From(() => {
+				_AnimationFinished();
+				Stop();
+			}).CallDeferred();
 		}
 	}
 	protected virtual void _AnimationFinished() { }
@@ -144,10 +193,11 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 			AnimPlayer.Stop();
 		}
 
-		foreach (AttributeModifier? modifier in modifiers) {
-			if (modifier is null) continue;
-			Entity.AttributeModifiers.Remove(modifier);
-		}
+		AnimPlayer.AnimationStarted -= OnAnimationStarted;
+		AnimPlayer.AnimationChanged -= OnAnimationChanged;
+		AnimPlayer.AnimationFinished -= OnAnimationFinished;
+
+		Entity.AttributeModifiers.RemoveRange(modifiers.OfType<AttributeModifier>());
 	}
 
 	public override void _Process(double delta) {

@@ -1,10 +1,12 @@
 namespace LandlessSkies.Core;
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Godot;
 
 public sealed class AttributeModifierCollection : ICollection<AttributeModifier> {
@@ -13,7 +15,7 @@ public sealed class AttributeModifierCollection : ICollection<AttributeModifier>
 	public int Count => _dictionary.Values.Sum(e => e.Count);
 	public bool IsReadOnly => false;
 
-	public event System.Action<EntityAttribute>? OnModifiersUpdated;
+	public event Action<EntityAttribute>? OnModifiersUpdated;
 
 
 	public float ApplyTo(EntityAttribute target, float baseValue) {
@@ -27,7 +29,25 @@ public sealed class AttributeModifierCollection : ICollection<AttributeModifier>
 		AddInternal(item);
 		OnModifiersUpdated?.Invoke(item.Target);
 	}
+	public async Task Add(AttributeModifier item, uint timeMilliseconds = 0, Func<float, float, float, float>? function = null) {
+		await AddSlowlyInternal(item, timeMilliseconds, function);
+		if (timeMilliseconds == 0) OnModifiersUpdated?.Invoke(item.Target);
+	}
 
+	private async Task AddSlowlyInternal(AttributeModifier item, uint timeMilliseconds, Func<float, float, float, float>? function) {
+		AddInternal(item);
+
+		if (timeMilliseconds > 0) {
+			function ??= Mathf.Lerp;
+
+			float start = 0f;
+			float end = item.Efficiency;
+
+			await AsyncUtils.WaitAndCall(timeMilliseconds, (elapsed) => {
+				item.Efficiency = function(start, end, (float)elapsed / timeMilliseconds);
+			});
+		}
+	}
 	private void AddInternal(AttributeModifier item) {
 		ref AttributeModifierEntry entry = ref CollectionsMarshal.GetValueRefOrAddDefault(_dictionary, item.Target, out bool existed);
 
@@ -58,7 +78,36 @@ public sealed class AttributeModifierCollection : ICollection<AttributeModifier>
 
 		return wasRemoved;
 	}
+	public async Task<bool> Remove(AttributeModifier item, uint timeMilliseconds = 0, Func<float, float, float, float>? function = null) {
+		bool wasRemoved = await RemoveSlowlyInternal(item, timeMilliseconds, function);
+		if (wasRemoved && timeMilliseconds == 0) OnModifiersUpdated?.Invoke(item.Target);
 
+		return wasRemoved;
+	}
+
+	private async Task<bool> RemoveSlowlyInternal(AttributeModifier item, uint timeMilliseconds = 0, Func<float, float, float, float>? function = null) {
+		ref var entryRef = ref CollectionsMarshal.GetValueRefOrNullRef(_dictionary, item.Target);
+		if (Unsafe.IsNullRef(ref entryRef)) return false;
+		if (!entryRef.Contains(item)) return false;
+
+		AttributeModifierEntry entry = entryRef;
+
+		if (timeMilliseconds > 0) {
+			function ??= Mathf.Lerp;
+
+			float start = item.Efficiency;
+			float end = 0f;
+
+			await AsyncUtils.WaitAndCall(timeMilliseconds, (elapsed) => {
+				item.Efficiency = function(start, end, (float)elapsed / timeMilliseconds);
+			});
+		}
+
+		if (!entry.Remove(item)) return false;
+
+		item.OnValueModified -= OnModifiersUpdated;
+		return true;
+	}
 	private bool RemoveInternal(AttributeModifier item) {
 		ref var entry = ref CollectionsMarshal.GetValueRefOrNullRef(_dictionary, item.Target);
 		if (Unsafe.IsNullRef(ref entry) || !entry.Remove(item))

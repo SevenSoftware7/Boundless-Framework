@@ -27,10 +27,19 @@ public partial class SetModifier : AttributeModifier {
 
 
 	public override float ApplyTo(float baseValue) {
-		return _value;
+		return Mathf.Lerp(baseValue, _value, Efficiency);
 	}
 
 	protected override string GetResourceName() {
 		return $"{AttributeName} = {_value}";
+	}
+
+	protected override bool EqualsInternal(AttributeModifier other) {
+		return other is SetModifier setModifier && setModifier._value == _value;
+	}
+	public override int GetHashCode() {
+		unchecked {
+			return (base.GetHashCode() * 397) ^ (_value.GetHashCode() * 397);
+		}
 	}
 }
