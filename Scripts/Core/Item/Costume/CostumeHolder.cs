@@ -8,7 +8,7 @@ using SevenDev.Boundless.Persistence;
 [Tool]
 [GlobalClass]
 public sealed partial class CostumeHolder : Node3D, ICustomizable {
-	[Export] public Costume? Costume { get; private set; }
+	public Costume? Costume { get; private set; }
 
 	private IDataKeyProvider<Costume>? _costumeKeyProvider;
 	[Export] public CostumeResourceDataKey? CostumeKeyProvider {
@@ -76,16 +76,5 @@ public sealed partial class CostumeHolder : Node3D, ICustomizable {
 	public override void _Ready() {
 		base._Ready();
 		Load();
-	}
-
-	public override void _ValidateProperty(Godot.Collections.Dictionary property) {
-		base._ValidateProperty(property);
-
-		StringName name = property["name"].AsStringName();
-
-
-		if (name == PropertyName.Costume) {
-			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Editor);
-		}
 	}
 }

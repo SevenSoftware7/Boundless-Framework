@@ -1963,9 +1963,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.10534, 2, 32.9924)
 process_priority = -10
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.873384, 2, 34.141)
 
-[node name="CostumeHolder" parent="Eos" index="1" node_paths=PackedStringArray("Costume")]
-Costume = NodePath("@Node3D@22763")
-
 [node name="AnimationPlayer" parent="Eos" index="4"]
 libraries = {
 &"": SubResource("AnimationLibrary_y2wqj"),
