@@ -57,7 +57,7 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 		if (modifier is null) return;
 
 		modifiers.Add(modifier);
-		await Entity.AttributeModifiers.Add(modifier, timeMilliseconds);
+		await Entity.AttributeModifiers.AddProgressively(modifier, timeMilliseconds);
 	}
 
 	/// <summary>
@@ -87,7 +87,7 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 		if (modifier is null) return;
 
 		modifiers[index] = null;
-		await Entity.AttributeModifiers.Remove(modifier, timeMilliseconds);
+		await Entity.AttributeModifiers.RemoveProgressively(modifier, timeMilliseconds);
 	}
 	/// <summary>
 	/// Method to remove an already existing Attribute Modifier.<para/>
@@ -116,7 +116,7 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 		if (index < 0) return;
 
 		modifiers[index] = null;
-		await Entity.AttributeModifiers.Remove(modifier, timeMilliseconds);
+		await Entity.AttributeModifiers.RemoveProgressively(modifier, timeMilliseconds);
 	}
 
 	/// <summary>

@@ -29,12 +29,12 @@ public sealed class AttributeModifierCollection : ICollection<AttributeModifier>
 		AddInternal(item);
 		OnModifiersUpdated?.Invoke(item.Target);
 	}
-	public async Task Add(AttributeModifier item, uint timeMilliseconds = 0, Func<float, float, float, float>? function = null) {
-		await AddSlowlyInternal(item, timeMilliseconds, function);
+	public async Task AddProgressively(AttributeModifier item, uint timeMilliseconds = 0, Func<float, float, float, float>? function = null) {
+		await AddProgressivelyInternal(item, timeMilliseconds, function);
 		if (timeMilliseconds == 0) OnModifiersUpdated?.Invoke(item.Target);
 	}
 
-	private async Task AddSlowlyInternal(AttributeModifier item, uint timeMilliseconds, Func<float, float, float, float>? function) {
+	private async Task AddProgressivelyInternal(AttributeModifier item, uint timeMilliseconds, Func<float, float, float, float>? function) {
 		AddInternal(item);
 
 		if (timeMilliseconds > 0) {
@@ -78,14 +78,14 @@ public sealed class AttributeModifierCollection : ICollection<AttributeModifier>
 
 		return wasRemoved;
 	}
-	public async Task<bool> Remove(AttributeModifier item, uint timeMilliseconds = 0, Func<float, float, float, float>? function = null) {
-		bool wasRemoved = await RemoveSlowlyInternal(item, timeMilliseconds, function);
+	public async Task<bool> RemoveProgressively(AttributeModifier item, uint timeMilliseconds = 0, Func<float, float, float, float>? function = null) {
+		bool wasRemoved = await RemoveProgressivelyInternal(item, timeMilliseconds, function);
 		if (wasRemoved && timeMilliseconds == 0) OnModifiersUpdated?.Invoke(item.Target);
 
 		return wasRemoved;
 	}
 
-	private async Task<bool> RemoveSlowlyInternal(AttributeModifier item, uint timeMilliseconds = 0, Func<float, float, float, float>? function = null) {
+	private async Task<bool> RemoveProgressivelyInternal(AttributeModifier item, uint timeMilliseconds = 0, Func<float, float, float, float>? function = null) {
 		ref var entryRef = ref CollectionsMarshal.GetValueRefOrNullRef(_dictionary, item.Target);
 		if (Unsafe.IsNullRef(ref entryRef)) return false;
 		if (!entryRef.Contains(item)) return false;
