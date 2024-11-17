@@ -29,7 +29,7 @@ public sealed partial class NemesisWeapon : Weapon, IPlayerHandler {
 
 	public void HandlePlayer(Player player) {
 		if (player.Entity is null) return;
-		if (IsHolstered) return;
+		if (HolsterState) return;
 
 		switch (player.Entity.CurrentBehaviour) {
 			case GroundedBehaviour grounded:

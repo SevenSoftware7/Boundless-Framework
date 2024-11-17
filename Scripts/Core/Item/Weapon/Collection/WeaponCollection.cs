@@ -16,8 +16,8 @@ public abstract partial class WeaponCollection : Node, IWeapon, ISerializationLi
 	public virtual IWeapon.WeaponUsage Usage => CurrentWeapon?.Usage ?? 0;
 	public virtual IWeapon.WeaponSize Size => CurrentWeapon?.Size ?? 0;
 
-	public abstract uint Style { get; set; }
-	public abstract uint MaxStyle { get; }
+	public abstract StyleState Style { get; }
+	public abstract StyleState MaxStyle { get; }
 
 	public abstract IWeapon? CurrentWeapon { get; }
 

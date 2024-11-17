@@ -46,9 +46,9 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject
 	private WeaponHolsterState _holsterState = WeaponHolsterState.Unholstered;
 
 	[Export]
-	protected bool IsHolstered {
+	private bool IsHolstered {
 		get => HolsterState.IsHolstered;
-		private set => HolsterState = value;
+		set => HolsterState = value;
 	}
 
 	public abstract IWeapon.WeaponKind Kind { get; }
@@ -92,12 +92,13 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject
 	[Injectable] public virtual Skeleton3D? Skeleton { get; protected set; }
 	[Injectable] public virtual Handedness Handedness { get; protected set; }
 
-	public uint Style {
+	[Injectable]
+	public StyleState Style {
 		get => _style;
-		set => _style = value % (MaxStyle + 1);
+		set => _style = value.WrappedWith(MaxStyle);
 	}
-	private uint _style;
-	public virtual uint MaxStyle { get; } = 0;
+	private StyleState _style;
+	public virtual StyleState MaxStyle { get; } = StyleState.Primary;
 
 
 	public Weapon() : base() { }

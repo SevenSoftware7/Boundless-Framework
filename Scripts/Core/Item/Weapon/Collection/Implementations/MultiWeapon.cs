@@ -11,8 +11,9 @@ using SevenDev.Boundless.Persistence;
 
 [Tool]
 [GlobalClass]
-public sealed partial class MultiWeapon : WeaponCollection, IInjectionInterceptor<WeaponHolsterState>, IPersistent<MultiWeapon> {
+public sealed partial class MultiWeapon : WeaponCollection, IInjectionInterceptor<WeaponHolsterState>, IInjectionBlocker<StyleState>, IInjectionInterceptor<StyleState>, IPersistent<MultiWeapon> {
 	private List<IWeapon> _weapons = [];
+	private uint _currentIndex;
 
 	public override IWeapon? CurrentWeapon => _currentIndex < _weapons.Count ? _weapons[(int)_currentIndex] : null;
 
@@ -20,16 +21,10 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 	[Injectable]
 	private WeaponHolsterState HolsterState;
 
-	public override uint MaxStyle => (uint)(_weapons.Count != 0 ? _weapons.Count - 1 : 0);
-
-	[Export]
-	public override uint Style {
-		get => _currentIndex;
-		set => SwitchTo(value);
-	}
+	public override StyleState Style => _currentIndex;
+	public override StyleState MaxStyle => _weapons.Count != 0 ? _weapons.Count - 1 : 0;
 
 
-	private uint _currentIndex;
 
 
 	private MultiWeapon() : base() { }
@@ -91,25 +86,25 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 		if (weapon is null) return;
 		SwitchTo((uint)_weapons.IndexOf(weapon));
 	}
-
 	public void SwitchTo(uint index) {
-		uint newIndex = index % (MaxStyle + 1);
-		if (newIndex == _currentIndex && CurrentWeapon is IWeapon currentWeapon) {
-			currentWeapon.Style++;
-			return;
+		_currentIndex = index % ((uint)MaxStyle + 1);
+		UpdateCurrent();
+	}
+	[Injectable] public void SwitchTo(StyleState style) => SwitchTo((uint)style);
+
+	StyleState IInjectionInterceptor<StyleState>.Intercept(Node child, StyleState value) {
+		if (value == _currentIndex && child is IWeapon weapon && _weapons.Contains(weapon)) {
+			return weapon.Style + 1;
 		}
 
-		_currentIndex = newIndex;
+		_currentIndex = (uint)value;
 
 		// Reset style on Weapon to be equipped
 		// TODO: if the Entity is a player, check for the preference setting
 		// to get the corresponding switch-to-weapon behaviour.
-		if (CurrentWeapon is IWeapon newWeapon) {
-			newWeapon.Style = 0;
-		}
-
-		UpdateCurrent();
+		return StyleState.Primary;
 	}
+	bool IInjectionBlocker<StyleState>.ShouldBlock(Node child, StyleState value) => child is IWeapon weapon && _weapons.IndexOf(weapon) != value;
 
 
 	public override IEnumerable<Action.Wrapper> GetAttacks(Entity target) {
@@ -151,6 +146,8 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 
 
 	public override IPersistenceData<MultiWeapon> Save() => new MultiWeaponSaveData(this);
+
+
 	[Serializable]
 	public class MultiWeaponSaveData(MultiWeapon multiWeapon) : PersistenceData<MultiWeapon>(multiWeapon) {
 		private readonly ImmutableArray<IPersistenceData<IWeapon>> WeaponSaves = [.. multiWeapon._weapons

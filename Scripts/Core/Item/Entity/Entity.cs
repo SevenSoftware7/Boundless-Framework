@@ -17,11 +17,11 @@ using SevenDev.Boundless.Persistence;
 [Tool]
 [GlobalClass]
 [Injector]
-public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDamageDealer, ICostumable, IUIObject, IPersistent<Entity>, IItem<Entity>, ISerializationListener {
+public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDamageDealer, ICostumable, IUIObject, IPersistent<Entity>, IItem<Entity> {
 	public const int RECOVER_LOCATION_BUFFER_SIZE = 5;
 
 
-	public uint? StyleSwitchBuffer;
+	public StyleState? StyleSwitchBuffer;
 
 	public readonly List<Vector3> RecoverLocationBuffer = new(RECOVER_LOCATION_BUFFER_SIZE);
 
@@ -102,18 +102,6 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	private Gauge? _health;
 
 	private GaugeControl? healthBar;
-
-
-	public IWeapon? Weapon {
-		get => _weapon;
-		set {
-			_weapon = value;
-			if (_weapon is Node nodeWeapon) {
-				nodeWeapon.SafeRename("Weapon");
-			}
-		}
-	}
-	private IWeapon? _weapon;
 
 
 	[Export]
@@ -218,8 +206,6 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	public virtual IEnumerable<IUIObject> GetSubObjects() => GetChildren().OfType<IUIObject>();
 	public virtual Dictionary<string, ICustomization> GetCustomizations() => [];
 
-	private void GetWeapon() => Weapon = GetChildren().OfType<IWeapon>().FirstOrDefault();
-
 	public void Damage(ref DamageData data) {
 		if (Health is null) return;
 
@@ -261,7 +247,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 	public virtual void HandlePlayer(Player player) {
 		HandleHealthBar(player);
-		HandleWeaponInput(player);
+		HandleStyleInput(player);
 
 
 		void HandleHealthBar(Player player) {
@@ -274,25 +260,22 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 			}
 		}
 
-		void HandleWeaponInput(Player player) {
-			if (_weapon is null) return;
-
-			uint maxWeaponStyle = (uint)Math.Min((int)(Weapon?.MaxStyle ?? 0) + 1, Inputs.SwitchWeaponActions.Length);
-			uint? bufferStyle = null;
-			for (uint i = 0; i < maxWeaponStyle; i++) {
-				if (player.InputDevice.IsActionJustPressed(Inputs.SwitchWeaponActions[i])) {
-					GD.PrintS(i, Inputs.SwitchWeaponActions[i]);
+		void HandleStyleInput(Player player) {
+			StyleState? bufferStyle = null;
+			for (uint i = 0; i < Inputs.SwitchStyleActions.Length; i++) {
+				if (player.InputDevice.IsActionJustPressed(Inputs.SwitchStyleActions[i])) {
+					GD.PrintS(i, Inputs.SwitchStyleActions[i]);
 					bufferStyle = i;
 					break;
 				}
 			}
 
 			if (bufferStyle.HasValue) {
-				if (CurrentAction is Attack attack && !attack.CanCancel()) {
+				if (!CurrentAction.CanCancel()) {
 					StyleSwitchBuffer = bufferStyle.Value;
 				}
 				else {
-					_weapon.Style = bufferStyle.Value;
+					this.PropagateInjection(bufferStyle.Value);
 				}
 			}
 
@@ -351,27 +334,12 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 
 		void HandleWeapon() {
-			if (_weapon is null) return;
-			if (CurrentAction is Attack attack && !attack.CanCancel()) return;
+			if (!CurrentAction.CanCancel()) return;
 
-			if (StyleSwitchBuffer is uint bufferedStyle) {
-				_weapon.Style = bufferedStyle;
+			if (StyleSwitchBuffer is StyleState bufferedStyle) {
+				this.PropagateInjection(bufferedStyle);
 			}
 		}
-	}
-
-	public override void _Notification(int what) {
-		base._Notification(what);
-		switch ((ulong)what) {
-			case NotificationChildOrderChanged:
-				GetWeapon();
-				break;
-		}
-	}
-
-	public virtual void OnBeforeSerialize() { }
-	public virtual void OnAfterDeserialize() {
-		GetWeapon();
 	}
 
 

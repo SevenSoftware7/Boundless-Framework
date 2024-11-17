@@ -9,8 +9,8 @@ public interface IWeapon : IUIObject {
 	WeaponUsage Usage { get; }
 	WeaponSize Size { get; }
 
-	abstract uint Style { get; set; }
-	virtual uint MaxStyle => 0;
+	abstract StyleState Style { get; }
+	virtual StyleState MaxStyle => 0;
 
 	IEnumerable<Action.Wrapper> GetAttacks(Entity target);
 

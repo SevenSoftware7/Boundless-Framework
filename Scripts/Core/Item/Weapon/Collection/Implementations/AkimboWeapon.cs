@@ -11,7 +11,7 @@ using SevenDev.Boundless.Persistence;
 
 [Tool]
 [GlobalClass]
-public sealed partial class AkimboWeapon : WeaponCollection, IInjectionInterceptor<Handedness>, IPersistent<AkimboWeapon> {
+public sealed partial class AkimboWeapon : WeaponCollection, IInjectionInterceptor<Handedness>, IInjectionBlocker<StyleState>, IInjectionInterceptor<StyleState>, IPersistent<AkimboWeapon> {
 	public IWeapon? MainWeapon {
 		get => _mainWeapon;
 		private set {
@@ -31,18 +31,18 @@ public sealed partial class AkimboWeapon : WeaponCollection, IInjectionIntercept
 	private IWeapon? _sideWeapon;
 
 
-	public override uint Style {
-		get => MainWeapon?.Style ?? 0;
-		set {
-			if (MainWeapon is not null && value <= MainWeapon.MaxStyle) {
-				MainWeapon.Style = value;
-			}
-			else if (SideWeapon is not null && value == MaxStyle + 1) {
-				SideWeapon.Style++;
-			}
-		}
+	public override StyleState Style => MainWeapon?.Style ?? 0;
+	bool IInjectionBlocker<StyleState>.ShouldBlock(Node child, StyleState value) {
+		if (child == MainWeapon && value > MainWeapon!.MaxStyle) return true;
+		if (child == SideWeapon && value < MaxStyle) return true;
+		return false;
 	}
-	public override uint MaxStyle => (MainWeapon?.MaxStyle ?? 0) + (uint)(SideWeapon is null ? 0 : 1);
+	StyleState IInjectionInterceptor<StyleState>.Intercept(Node child, StyleState value) {
+		if (child == MainWeapon) return value;
+		if (child == SideWeapon) return SideWeapon?.Style + 1 ?? 0;
+		return value;
+	}
+	public override StyleState MaxStyle => (MainWeapon?.MaxStyle ?? 0) + (SideWeapon is null ? 0 : 1);
 
 	public override IWeapon? CurrentWeapon => MainWeapon;
 
@@ -94,6 +94,8 @@ public sealed partial class AkimboWeapon : WeaponCollection, IInjectionIntercept
 
 
 	public override IPersistenceData<AkimboWeapon> Save() => new AkimboWeaponSaveData(this);
+
+
 	[Serializable]
 	public class AkimboWeaponSaveData(AkimboWeapon akimbo) : PersistenceData<AkimboWeapon>(akimbo) {
 		private readonly IPersistenceData<IWeapon>? MainWeaponSave = (akimbo.MainWeapon as IPersistent<IWeapon>)?.Save();
