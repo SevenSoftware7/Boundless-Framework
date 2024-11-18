@@ -46,7 +46,7 @@ _data = {
 &"RESET": SubResource("Animation_2ppbj")
 }
 
-[node name="Eos" type="CharacterBody3D" node_paths=PackedStringArray("Skeleton", "AnimationPlayer", "CurrentBehaviour", "Health", "CenterOfMass")]
+[node name="Eos" type="CharacterBody3D" node_paths=PackedStringArray("_costumeHolder", "Skeleton", "AnimationPlayer", "CurrentBehaviour", "Health", "CenterOfMass")]
 collision_layer = 256
 floor_constant_speed = true
 platform_floor_layers = 4294963965
@@ -56,6 +56,7 @@ KeyProvider = ExtResource("2_ctdcn")
 UI = ExtResource("2_hamhv")
 Stats = SubResource("Resource_v01j0")
 HudPack = SubResource("Resource_qwv27")
+_costumeHolder = NodePath("CostumeHolder")
 Skeleton = NodePath("Skeleton3D")
 AnimationPlayer = NodePath("AnimationPlayer")
 CurrentBehaviour = NodePath("BipedBehaviour")
