@@ -36,7 +36,6 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 	public MultiWeapon(ImmutableArray<IPersistenceData<IWeapon>> weaponSaves) : this(weaponSaves.Select(save => save.Load())) { }
 
 
-
 	private void UpdateCurrent() {
 		if (_currentIndex >= _weapons.Count) {
 			_currentIndex = 0;

@@ -55,7 +55,6 @@ public sealed partial class AkimboWeapon : WeaponCollection, IInjectionIntercept
 	public AkimboWeapon(IPersistenceData<IWeapon>? mainWeaponSave, IPersistenceData<IWeapon>? sideWeaponSave) : this(mainWeaponSave?.Load(), sideWeaponSave?.Load()) { }
 
 
-
 	public override Dictionary<string, ICustomization> GetCustomizations() => base.GetCustomizations();
 	public override IEnumerable<IUIObject> GetSubObjects() {
 		IEnumerable<IUIObject> subObjects = base.GetSubObjects();

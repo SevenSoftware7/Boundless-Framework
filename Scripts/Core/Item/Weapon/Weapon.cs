@@ -29,6 +29,8 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject
 	public string DisplayName => UI?.DisplayName ?? string.Empty;
 	public Texture2D? DisplayPortrait => UI?.DisplayPortrait;
 
+	public IDamageDealer? Sender => Entity;
+
 
 	[Injectable]
 	public WeaponHolsterState HolsterState {
@@ -51,12 +53,17 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject
 		set => HolsterState = value;
 	}
 
+	[Injectable]
+	public StyleState Style {
+		get => _style;
+		set => _style = value.WrappedWith(MaxStyle);
+	}
+	private StyleState _style;
+	public virtual StyleState MaxStyle { get; } = StyleState.Primary;
+
 	public abstract IWeapon.WeaponKind Kind { get; }
 	public abstract IWeapon.WeaponUsage Usage { get; }
 	public abstract IWeapon.WeaponSize Size { get; }
-
-
-	public IDamageDealer? Sender => Entity;
 
 
 	[Export]
@@ -79,7 +86,6 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject
 
 
 	[ExportGroup("Dependencies")]
-
 	public Entity? Entity {
 		get => _entity;
 		protected set {
@@ -91,14 +97,6 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject
 	private Entity? _entity;
 	[Injectable] public virtual Skeleton3D? Skeleton { get; protected set; }
 	[Injectable] public virtual Handedness Handedness { get; protected set; }
-
-	[Injectable]
-	public StyleState Style {
-		get => _style;
-		set => _style = value.WrappedWith(MaxStyle);
-	}
-	private StyleState _style;
-	public virtual StyleState MaxStyle { get; } = StyleState.Primary;
 
 
 	public Weapon() : base() { }

@@ -355,7 +355,9 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 		public IPersistenceData[] MiscData = [.. entity.GetChildren().OfType<IPersistent>().Select(d => d.Save())];
 
 		protected override void LoadInternal(Entity item) {
-			MiscData.ForEach(d => (d.Load() as Node)?.ParentTo(item));
+			foreach (IPersistenceData data in MiscData) {
+				(data.Load() as Node)?.ParentTo(item);
+			}
 		}
 	}
 }
