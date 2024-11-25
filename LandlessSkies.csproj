@@ -5,15 +5,15 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>LandlessSkies</RootNamespace>
     <Nullable>enable</Nullable>
-    <PublishAot>true</PublishAot>
+    <!-- <PublishAot>true</PublishAot> -->
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\Generated</CompilerGeneratedFilesOutputPath>
     <!-- <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild> -->
   </PropertyGroup>
-  <ItemGroup>
+  <!-- <ItemGroup>
     <TrimmerRootAssembly Include="GodotSharp" />
     <TrimmerRootAssembly Include="$(TargetName)" />
-  </ItemGroup>
+  </ItemGroup> -->
   <ItemGroup>
     <Using Include="SimdLinq" />
   </ItemGroup>
@@ -24,5 +24,6 @@
     <PackageReference Include="SevenDev.Boundless.Persistence" Version="1.0.1" />
     <PackageReference Include="KGySoft.CoreLibraries" Version="8.1.0" />
     <PackageReference Include="SimdLinq" Version="1.3.2" />
+    <PackageReference Include="YamlDotNet" Version="16.2.0" />
   </ItemGroup>
 </Project>
