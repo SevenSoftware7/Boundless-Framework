@@ -12,6 +12,8 @@ using SevenDev.Boundless.Persistence;
 [Tool]
 [GlobalClass]
 public sealed partial class MultiWeapon : WeaponCollection, IInjectionInterceptor<WeaponHolsterState>, IInjectionBlocker<StyleState>, IInjectionInterceptor<StyleState>, IPersistent<MultiWeapon> {
+	public IInjectionNode InjectionNode { get; }
+
 	private List<IWeapon> _weapons = [];
 	private uint _currentIndex;
 
@@ -21,13 +23,32 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 	[Injectable]
 	private WeaponHolsterState HolsterState;
 
+	WeaponHolsterState IInjectionInterceptor<WeaponHolsterState>.Intercept(IInjectionNode child, WeaponHolsterState value) {
+		return child.UnderlyingObject == CurrentWeapon ? value : WeaponHolsterState.Holstered;
+	}
+
+
 	public override StyleState Style => _currentIndex;
 	public override StyleState MaxStyle => _weapons.Count != 0 ? _weapons.Count - 1 : 0;
 
+	StyleState IInjectionInterceptor<StyleState>.Intercept(IInjectionNode child, StyleState value) {
+		if (value == _currentIndex && child.UnderlyingObject is IWeapon weapon && _weapons.Contains(weapon)) {
+			return weapon.Style + 1;
+		}
+
+		_currentIndex = (uint)value;
+
+		// Reset style on Weapon to be equipped
+		// TODO: if the Entity is a player, check for the preference setting
+		// to get the corresponding switch-to-weapon behaviour.
+		return StyleState.Primary;
+	}
+	bool IInjectionBlocker<StyleState>.ShouldBlock(IInjectionNode child, StyleState value) => child.UnderlyingObject is IWeapon weapon && _weapons.IndexOf(weapon) != value;
 
 
-
-	private MultiWeapon() : base() { }
+	private MultiWeapon() : base() {
+		InjectionNode = new GodotNodeInjectionNode(this);
+	}
 	public MultiWeapon(IEnumerable<IWeapon?> weapons) : this() {
 		foreach (Node weaponNode in weapons.OfType<Node>()) {
 			weaponNode.SetOwnerAndParent(this);
@@ -91,20 +112,6 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 	}
 	[Injectable] public void SwitchTo(StyleState style) => SwitchTo((uint)style);
 
-	StyleState IInjectionInterceptor<StyleState>.Intercept(Node child, StyleState value) {
-		if (value == _currentIndex && child is IWeapon weapon && _weapons.Contains(weapon)) {
-			return weapon.Style + 1;
-		}
-
-		_currentIndex = (uint)value;
-
-		// Reset style on Weapon to be equipped
-		// TODO: if the Entity is a player, check for the preference setting
-		// to get the corresponding switch-to-weapon behaviour.
-		return StyleState.Primary;
-	}
-	bool IInjectionBlocker<StyleState>.ShouldBlock(Node child, StyleState value) => child is IWeapon weapon && _weapons.IndexOf(weapon) != value;
-
 
 	public override IEnumerable<Action.Wrapper> GetAttacks(Entity target) {
 		IWeapon? currentWeapon = CurrentWeapon;
@@ -121,12 +128,6 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 	}
 
 
-	WeaponHolsterState IInjectionInterceptor<WeaponHolsterState>.Intercept(Node child, WeaponHolsterState value) {
-		return child == CurrentWeapon ? value : WeaponHolsterState.Holstered;
-	}
-
-
-	// public override Dictionary<StringName, ICustomization> GetCustomizations() => base.GetCustomizations();
 	public override IEnumerable<IUIObject> GetSubObjects() {
 		IEnumerable<IUIObject>? subObjects = base.GetSubObjects();
 

@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using KGySoft.CoreLibraries;
 using SevenDev.Boundless.Utility;
 using SevenDev.Boundless.Injection;
 using SevenDev.Boundless.Persistence;
@@ -25,6 +24,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 	public readonly List<Vector3> RecoverLocationBuffer = new(RECOVER_LOCATION_BUFFER_SIZE);
 
+
+	public IInjectionNode InjectionNode { get; }
 
 	IDataKeyProvider<Entity> IItem<Entity>.KeyProvider => KeyProvider;
 	[Export] private EntityResourceDataKey KeyProvider = new();
@@ -151,6 +152,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 
 	public Entity() : base() {
+		InjectionNode = new GodotNodeInjectionNode(this);
+
 		CollisionLayer = CollisionLayers.Entity;
 		CollisionMask = CollisionLayers.Terrain;
 
@@ -275,7 +278,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 					StyleSwitchBuffer = bufferStyle.Value;
 				}
 				else {
-					this.PropagateInjection(bufferStyle.Value);
+					InjectionNode.PropagateInjection(bufferStyle.Value);
 				}
 			}
 
@@ -337,7 +340,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 			if (!CurrentAction.CanCancel()) return;
 
 			if (StyleSwitchBuffer is StyleState bufferedStyle) {
-				this.PropagateInjection(bufferedStyle);
+				InjectionNode.PropagateInjection(bufferedStyle);
 			}
 		}
 	}

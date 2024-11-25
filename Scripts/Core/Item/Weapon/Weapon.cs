@@ -22,6 +22,8 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject
 	public static readonly Basis leftHandBoneBasis = Basis.FromEuler(new(Mathf.DegToRad(-90f), 0f, Mathf.DegToRad(90f)));
 
 
+	public IInjectionNode InjectionNode { get; }
+
 	IDataKeyProvider<Weapon> IItem<Weapon>.KeyProvider => KeyProvider;
 	[Export] private WeaponResourceDataKey KeyProvider = new();
 
@@ -99,7 +101,9 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject
 	[Injectable] public virtual Handedness Handedness { get; protected set; }
 
 
-	public Weapon() : base() { }
+	public Weapon() : base() {
+		InjectionNode = new GodotNodeInjectionNode(this);
+	}
 
 
 	public abstract Vector3 GetTipPosition();

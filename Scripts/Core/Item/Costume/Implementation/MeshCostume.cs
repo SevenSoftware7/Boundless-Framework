@@ -5,7 +5,7 @@ using Godot;
 [Tool]
 [GlobalClass]
 public partial class MeshCostume : Costume {
-	[Export] protected Godot.Collections.Array<GeometryInstance3D> Meshes = [];
+	[Export] protected Godot.Collections.Array<GeometryInstance3D> Meshes;
 
 
 	public override Material? MaterialOverride {
@@ -60,7 +60,7 @@ public partial class MeshCostume : Costume {
 	protected MeshCostume(GeometryInstance3D[] meshes) : base() {
 		Meshes = [.. meshes];
 	}
-	protected MeshCostume() : base() { }
+	protected MeshCostume() : this([]) { }
 
 
 	public override Aabb GetAabb() {

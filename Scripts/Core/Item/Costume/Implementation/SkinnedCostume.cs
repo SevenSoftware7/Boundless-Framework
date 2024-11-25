@@ -7,14 +7,17 @@ using SevenDev.Boundless.Injection;
 [Tool]
 [GlobalClass]
 public partial class SkinnedCostume : MeshCostume {
+	public IInjectionNode InjectionNode { get; }
 
 	[ExportGroup("Dependencies")]
 	[Injectable] public Handedness Handedness { get; private set; }
 	public Skeleton3D? Skeleton { get; private set; }
 
 
-	protected SkinnedCostume(GeometryInstance3D[] meshes) : base(meshes) { }
-	protected SkinnedCostume() : base() { }
+	protected SkinnedCostume(GeometryInstance3D[] meshes) : base(meshes) {
+		InjectionNode = new GodotNodeInjectionNode(this);
+	}
+	protected SkinnedCostume() : this([]) { }
 
 
 	[Injectable]

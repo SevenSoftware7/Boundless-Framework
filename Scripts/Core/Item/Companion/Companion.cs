@@ -10,6 +10,8 @@ using SevenDev.Boundless.Persistence;
 [Tool]
 [GlobalClass]
 public partial class Companion : Node3D, ICustomizable, ICostumable, IPersistent<Companion>, IItem<Companion>, IInjectionBlocker<Skeleton3D> {
+	public IInjectionNode InjectionNode { get; }
+
 	IDataKeyProvider<Companion> IItem<Companion>.KeyProvider => KeyProvider;
 	[Export] private CompanionResourceDataKey KeyProvider = new();
 
@@ -34,7 +36,9 @@ public partial class Companion : Node3D, ICustomizable, ICostumable, IPersistent
 	[Export] private CostumeHolder? _costumeHolder;
 
 
-	public Companion() : base() { }
+	public Companion() : base() {
+		InjectionNode = new GodotNodeInjectionNode(this);
+	}
 
 
 	public override void _Ready() {

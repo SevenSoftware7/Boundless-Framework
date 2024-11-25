@@ -12,6 +12,8 @@ using SevenDev.Boundless.Persistence;
 [Tool]
 [GlobalClass]
 public sealed partial class AkimboWeapon : WeaponCollection, IInjectionInterceptor<Handedness>, IInjectionBlocker<StyleState>, IInjectionInterceptor<StyleState>, IPersistent<AkimboWeapon> {
+	public IInjectionNode InjectionNode { get; }
+
 	public IWeapon? MainWeapon {
 		get => _mainWeapon;
 		private set {
@@ -32,14 +34,16 @@ public sealed partial class AkimboWeapon : WeaponCollection, IInjectionIntercept
 
 
 	public override StyleState Style => MainWeapon?.Style ?? 0;
-	bool IInjectionBlocker<StyleState>.ShouldBlock(Node child, StyleState value) {
-		if (child == MainWeapon && value > MainWeapon!.MaxStyle) return true;
-		if (child == SideWeapon && value < MaxStyle) return true;
+	bool IInjectionBlocker<StyleState>.ShouldBlock(IInjectionNode child, StyleState value) {
+		object childObject = child.UnderlyingObject;
+		if (childObject == MainWeapon && value > MainWeapon!.MaxStyle) return true;
+		if (childObject == SideWeapon && value < MaxStyle) return true;
 		return false;
 	}
-	StyleState IInjectionInterceptor<StyleState>.Intercept(Node child, StyleState value) {
-		if (child == MainWeapon) return value;
-		if (child == SideWeapon) return SideWeapon?.Style + 1 ?? 0;
+	StyleState IInjectionInterceptor<StyleState>.Intercept(IInjectionNode child, StyleState value) {
+		object childObject = child.UnderlyingObject;
+		if (childObject == MainWeapon) return value;
+		if (childObject == SideWeapon) return SideWeapon?.Style + 1 ?? 0;
 		return value;
 	}
 	public override StyleState MaxStyle => (MainWeapon?.MaxStyle ?? 0) + (SideWeapon is null ? 0 : 1);
@@ -47,7 +51,9 @@ public sealed partial class AkimboWeapon : WeaponCollection, IInjectionIntercept
 	public override IWeapon? CurrentWeapon => MainWeapon;
 
 
-	private AkimboWeapon() : base() { }
+	private AkimboWeapon() : base() {
+		InjectionNode = new GodotNodeInjectionNode(this);
+	}
 	public AkimboWeapon(IWeapon? mainWeapon, IWeapon? sideWeapon) : this() {
 		MainWeapon = mainWeapon;
 		SideWeapon = sideWeapon;
@@ -72,8 +78,8 @@ public sealed partial class AkimboWeapon : WeaponCollection, IInjectionIntercept
 	}
 
 
-	public Handedness Intercept(Node child, Handedness value) {
-		if (child == SideWeapon) return value.Reverse();
+	Handedness IInjectionInterceptor<Handedness>.Intercept(IInjectionNode child, Handedness value) {
+		if (child.UnderlyingObject == SideWeapon) return value.Reverse();
 		return value;
 	}
 
