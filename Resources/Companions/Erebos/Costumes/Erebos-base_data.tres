@@ -2,7 +2,7 @@
 
 [ext_resource type="Resource" uid="uid://dld7ow8og42nk" path="res://Resources/Companions/Erebos/Costumes/Erebos-base_key.tres" id="1_2r0ae"]
 [ext_resource type="PackedScene" uid="uid://r6yqclqm3ubp" path="res://Resources/Companions/Erebos/Costumes/Erebos-base.tscn" id="1_3hm32"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Companion/Costume/CompanionCostumeSceneData.cs" id="3_lly3k"]
+[ext_resource type="Script" uid="uid://dndyn1l8j1xki" path="res://Scripts/Core/Item/Companion/Costume/CompanionCostumeSceneData.cs" id="3_lly3k"]
 [ext_resource type="Resource" uid="uid://cywx36nmhnlrf" path="res://Resources/Companions/Erebos/Costumes/Erebos-base_ui.tres" id="3_wairn"]
 
 [resource]
