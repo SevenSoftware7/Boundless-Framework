@@ -8,7 +8,7 @@ using Godot;
 public sealed class GodotResAssemblyLoadContext : AssemblyLoadContext {
 	private readonly string _assemblyDirectory;
 
-	public GodotResAssemblyLoadContext(string assemblyDirectory) {
+	public GodotResAssemblyLoadContext(string assemblyDirectory) : base(isCollectible: true) {
 		_assemblyDirectory = assemblyDirectory;
 	}
 

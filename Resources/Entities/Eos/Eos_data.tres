@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://b7rhbgw2dujty" path="res://Resources/Entities/Eos/Eos.tscn" id="1_dapd7"]
 [ext_resource type="Resource" uid="uid://b56txqwbw36sk" path="res://Resources/Entities/Eos/Eos_key.tres" id="1_g205y"]
 [ext_resource type="Resource" uid="uid://hpsfrfhvt5ll" path="res://Resources/Entities/Eos/Eos_ui.tres" id="2_32aii"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/EntitySceneData.cs" id="3_jssrc"]
+[ext_resource type="Script" uid="uid://b3kwj5my3j2ik" path="res://Scripts/Core/Item/Entity/EntitySceneData.cs" id="3_jssrc"]
 
 [resource]
 script = ExtResource("3_jssrc")

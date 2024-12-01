@@ -10,48 +10,54 @@ using Godot;
 public record class Mod : IDisposable {
 	private bool _disposed = false;
 
-	public required ModMetaData MetaData { get; init; }
-	public required Assembly[] Assemblies { get; init; }
+	public ModMetaData MetaData { get; init; }
+
+	public (Assembly, AssemblyLoadContext)[] Assemblies { get; init; }
+	public PckFile[] AssetPacks { get; init; }
 
 
+	public Mod(ModMetaData metaData) {
+		MetaData = metaData;
 
-	public static Mod Load(ModMetaData metaData) {
-		Assembly[] assemblies = metaData.AssemblyPaths
+		if (Engine.IsEditorHint()) {
+			throw new InvalidOperationException("Cannot load mods in the editor.");
+		}
+
+		Assemblies = metaData.AssemblyPaths
 			.Select(path => Path.Combine(metaData.Directory, path))
 			.Select(LoadAssembly)
-			.OfType<Assembly>()
+			.OfType<(Assembly, AssemblyLoadContext)>()
 			.ToArray();
 
-		return new Mod {
-			MetaData = metaData,
-			Assemblies = assemblies
-		};
-	}
-
-	public void Unload() {
-		foreach (Assembly assembly in Assemblies) {
-			AssemblyLoadContext.GetLoadContext(assembly)?.Unload();
-		}
-
-	}
+		AssetPacks = metaData.AssetPaths
+			.Select(path => Path.Combine(metaData.Directory, path))
+			.Select(PckLoader.Load)
+			.ToArray();
 
 
-	public void Start() {
-		foreach (Assembly assembly in Assemblies) {
-			assembly.GetTypes().SelectMany(type => type.GetMethods())
-				.Where(method => method.Name == "Main" && method.GetParameters().Length == 0)
-				.ToList().ForEach(method => method.Invoke(null, null));
+		string installPath = $"res://ModAssets/{metaData.Name}/";
+		foreach (PckFile assetPack in AssetPacks) {
+			// assetPack.Test();
+			assetPack.Install(installPath);
 		}
 	}
-	public void Stop() {
-		// foreach (Assembly assembly in Assemblies) {
-		// 	assembly.GetTypes().SelectMany(type => type.GetMethods())
-		// 		.Where(method => method.Name == "Stop" && method.GetParameters().Length == 0)
-		// 		.ToList().ForEach(method => method.Invoke(null, null));
-		// }
+
+	~Mod() {
+		Dispose(false);
+	}
+	public void Dispose() {
+		Dispose(true);
+		GC.SuppressFinalize(this);
+	}
+	private void Dispose(bool disposing) {
+		if (_disposed) return;
+		_disposed = true;
+
+		Stop();
+		Unload();
 	}
 
-	private static Assembly? LoadAssembly(string assemblyPath) {
+	private static (Assembly, AssemblyLoadContext)? LoadAssembly(string assemblyPath) {
 		string assemblyDirectory = Path.GetDirectoryName(assemblyPath.AsSpan()).ToString();
 		if (assemblyDirectory.Length == 0) return null;
 
@@ -63,17 +69,31 @@ public record class Mod : IDisposable {
 		MemoryStream stream = new(file);
 
 		AssemblyLoadContext assemblyLoadContext = new GodotResAssemblyLoadContext(assemblyDirectory);
-		return assemblyLoadContext.LoadFromStream(stream);
+		return (assemblyLoadContext.LoadFromStream(stream), assemblyLoadContext);
+	}
+
+	public void Unload() {
+		foreach (PckFile asset in AssetPacks) {
+			asset.Uninstall();
+		}
+		foreach ((_, AssemblyLoadContext context) in Assemblies) {
+			context?.Unload();
+		}
 	}
 
 
-	public void Dispose() {
-		if (_disposed) return;
-		_disposed = true;
-
-		Stop();
-		Unload();
-
-		GC.SuppressFinalize(this);
+	public void Start() {
+		foreach ((Assembly assembly, _) in Assemblies) {
+			assembly.GetTypes().SelectMany(type => type.GetMethods())
+				.Where(method => method.Name == "Main" && method.GetParameters().Length == 0)
+				.ToList().ForEach(method => method.Invoke(null, null));
+		}
+	}
+	public void Stop() {
+		// foreach (Assembly assembly in Assemblies) {
+		// 	assembly.GetTypes().SelectMany(type => type.GetMethods())
+		// 		.Where(method => method.Name == "Stop" && method.GetParameters().Length == 0)
+		// 		.ToList().ForEach(method => method.Invoke(null, null));
+		// }
 	}
 }

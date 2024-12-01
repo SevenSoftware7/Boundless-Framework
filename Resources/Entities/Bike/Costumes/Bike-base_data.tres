@@ -3,7 +3,7 @@
 [ext_resource type="Resource" uid="uid://djkxop4aum535" path="res://Resources/Entities/Bike/Costumes/Bike-base_key.tres" id="1_japl1"]
 [ext_resource type="PackedScene" uid="uid://burrwvhjdl2u3" path="res://Resources/Entities/Bike/Costumes/Bike-base.tscn" id="1_ts1se"]
 [ext_resource type="Resource" uid="uid://dpxmaply7ike1" path="res://Resources/Entities/Bike/Costumes/Bike-base_ui.tres" id="3_dejvl"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Entity/Costume/EntityCostumeSceneData.cs" id="4_j77cf"]
+[ext_resource type="Script" uid="uid://upq7u1vamnru" path="res://Scripts/Core/Item/Entity/Costume/EntityCostumeSceneData.cs" id="4_j77cf"]
 
 [resource]
 script = ExtResource("4_j77cf")

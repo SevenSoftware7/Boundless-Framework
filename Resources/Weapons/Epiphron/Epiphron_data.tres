@@ -2,7 +2,7 @@
 
 [ext_resource type="Resource" uid="uid://dvuweom50h6eu" path="res://Resources/Weapons/Epiphron/Epiphron_key.tres" id="1_axtv4"]
 [ext_resource type="PackedScene" uid="uid://fbs6dr24ss3g" path="res://Resources/Weapons/Epiphron/Epiphron.tscn" id="1_uexkc"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/WeaponSceneData.cs" id="2_hbhyg"]
+[ext_resource type="Script" uid="uid://cjb4jgm8obkbv" path="res://Scripts/Core/Item/Weapon/WeaponSceneData.cs" id="2_hbhyg"]
 [ext_resource type="Resource" uid="uid://bcqvwsqa5w2ei" path="res://Resources/Weapons/Epiphron/Epiphron_ui.tres" id="2_mniaj"]
 
 [resource]

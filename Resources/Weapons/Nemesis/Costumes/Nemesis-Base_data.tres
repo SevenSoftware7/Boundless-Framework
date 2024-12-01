@@ -3,7 +3,7 @@
 [ext_resource type="Resource" uid="uid://nv3cruo4dqdt" path="res://Resources/Weapons/Nemesis/Costumes/Nemesis-base_key.tres" id="1_got4r"]
 [ext_resource type="PackedScene" uid="uid://cbkv4cstjgb7i" path="res://Resources/Weapons/Nemesis/Costumes/Nemesis-base.tscn" id="1_opthf"]
 [ext_resource type="Resource" uid="uid://bcby6xfogpbuj" path="res://Resources/Weapons/Nemesis/Costumes/Nemesis-base_ui.tres" id="3_48f7y"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/Costume/WeaponCostumeSceneData.cs" id="3_jdnfj"]
+[ext_resource type="Script" uid="uid://2l2r58pjqet5" path="res://Scripts/Core/Item/Weapon/Costume/WeaponCostumeSceneData.cs" id="3_jdnfj"]
 
 [resource]
 script = ExtResource("3_jdnfj")

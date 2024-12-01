@@ -2,16 +2,16 @@
 
 [ext_resource type="RDShaderFile" uid="uid://br3hg0ejs6wif" path="res://Resources/Rendering/Shaders/FetchWaterData.glsl" id="2_5l7vn"]
 [ext_resource type="RDShaderFile" uid="uid://dabjxhg50sdto" path="res://Resources/Rendering/Shaders/WaterDisplacementCompute.glsl" id="4_tdgd3"]
-[ext_resource type="Script" uid="uid://bhq2puvtrgpq7" path="res://addons/cyclops_level_builder/nodes/cyclops_block.gd" id="4_xwxtm"]
+[ext_resource type="Script" path="res://addons/cyclops_level_builder/nodes/cyclops_block.gd" id="4_xwxtm"]
 [ext_resource type="Texture2D" uid="uid://dspqirrnynnb" path="res://Resources/Rendering/WaterDisplacement.tres" id="5_5pwvj"]
 [ext_resource type="Script" uid="uid://blwq8far4vs2g" path="res://Scripts/Core/EntityVoidoutTrigger.cs" id="5_aiymr"]
 [ext_resource type="RDShaderFile" uid="uid://b136gtyf7fy3b" path="res://Resources/Rendering/Shaders/WaterRender.glsl" id="5_gw1ln"]
-[ext_resource type="Script" uid="uid://rbmsljao684h" path="res://addons/cyclops_level_builder/resources/convex_block_data.gd" id="5_vmujk"]
+[ext_resource type="Script" path="res://addons/cyclops_level_builder/resources/convex_block_data.gd" id="5_vmujk"]
 [ext_resource type="RDShaderFile" uid="uid://caumal2txsxfx" path="res://Resources/Rendering/Shaders/UnderwaterEffect.glsl" id="5_xkj40"]
 [ext_resource type="Script" uid="uid://bonhtr480agp" path="res://Scripts/Core/Rendering/UnderwaterEffect.cs" id="6_7qu10"]
 [ext_resource type="Script" uid="uid://bxcge50p2j84b" path="res://Scripts/Core/Rendering/WaterDisplacementEffect.cs" id="6_cd6pn"]
 [ext_resource type="PackedScene" uid="uid://b7rhbgw2dujty" path="res://Resources/Entities/Eos/Eos.tscn" id="9_0jt21"]
-[ext_resource type="Shader" uid="uid://ceapbykjnn2sq" path="res://Resources/Rendering/Shaders/Water.gdshader" id="11_cp2h1"]
+[ext_resource type="Shader" path="res://Resources/Rendering/Shaders/Water.gdshader" id="11_cp2h1"]
 [ext_resource type="Script" uid="uid://dd7a781je5yhp" path="res://Scripts/Core/Item/Weapon/Collection/Implementations/AkimboWeapon.cs" id="11_uqmxm"]
 [ext_resource type="PackedScene" uid="uid://fbs6dr24ss3g" path="res://Resources/Weapons/Epiphron/Epiphron.tscn" id="12_1jl3t"]
 [ext_resource type="PackedScene" uid="uid://ckd33ejkd5cqi" path="res://Resources/FX/Water.tscn" id="12_xdv3s"]
@@ -1983,15 +1983,39 @@ script = ExtResource("13_d6cna")
 [node name="Epiphron" parent="Eos/Weapon/Main/First" instance=ExtResource("12_1jl3t")]
 transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
 
+[node name="Nemesis" parent="Eos/Weapon/Main/First" instance=ExtResource("15_x4bcq")]
+transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
+IsHolstered = true
+
+[node name="Eleos" parent="Eos/Weapon/Main/First" instance=ExtResource("17_jhoyp")]
+transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
+IsHolstered = true
+
 [node name="Second" type="Node" parent="Eos/Weapon/Main"]
 script = ExtResource("13_d6cna")
+
+[node name="Epiphron" parent="Eos/Weapon/Main/Second" instance=ExtResource("12_1jl3t")]
+transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
+IsHolstered = true
 
 [node name="Nemesis" parent="Eos/Weapon/Main/Second" instance=ExtResource("15_x4bcq")]
 transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
 IsHolstered = true
 
+[node name="Eleos" parent="Eos/Weapon/Main/Second" instance=ExtResource("17_jhoyp")]
+transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
+IsHolstered = true
+
 [node name="Third" type="Node" parent="Eos/Weapon/Main"]
 script = ExtResource("13_d6cna")
+
+[node name="Epiphron" parent="Eos/Weapon/Main/Third" instance=ExtResource("12_1jl3t")]
+transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
+IsHolstered = true
+
+[node name="Nemesis" parent="Eos/Weapon/Main/Third" instance=ExtResource("15_x4bcq")]
+transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
+IsHolstered = true
 
 [node name="Eleos" parent="Eos/Weapon/Main/Third" instance=ExtResource("17_jhoyp")]
 transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)

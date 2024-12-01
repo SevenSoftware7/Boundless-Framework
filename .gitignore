@@ -6,4 +6,5 @@ bin/
 obj/
 
 [Bb]uild
+[Mm]ods
 *.csproj.old*

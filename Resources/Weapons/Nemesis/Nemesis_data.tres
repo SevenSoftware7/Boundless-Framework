@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://b7b17ebmgtrfy" path="res://Resources/Weapons/Nemesis/Nemesis.tscn" id="1_clv3l"]
 [ext_resource type="Resource" uid="uid://4x2qnwvdg3se" path="res://Resources/Weapons/Nemesis/Nemesis_key.tres" id="1_kstfl"]
 [ext_resource type="Resource" uid="uid://c8q8b6jgvn4vo" path="res://Resources/Weapons/Nemesis/Nemesis_ui.tres" id="2_mmvg1"]
-[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/WeaponSceneData.cs" id="2_u0qmf"]
+[ext_resource type="Script" uid="uid://cjb4jgm8obkbv" path="res://Scripts/Core/Item/Weapon/WeaponSceneData.cs" id="2_u0qmf"]
 
 [resource]
 script = ExtResource("2_u0qmf")
