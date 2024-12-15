@@ -8,7 +8,9 @@ using System.Runtime.Loader;
 using Godot;
 
 public record class Mod : IDisposable {
+	private static readonly GodotPath ModAssetsPath = new("res://ModAssets/");
 	private bool _disposed = false;
+	private bool _started = false;
 
 	public ModMetaData MetaData { get; init; }
 
@@ -17,29 +19,22 @@ public record class Mod : IDisposable {
 
 
 	public Mod(ModMetaData metaData) {
-		MetaData = metaData;
-
 		if (Engine.IsEditorHint()) {
 			throw new InvalidOperationException("Cannot load mods in the editor.");
 		}
 
+		MetaData = metaData;
+
 		Assemblies = metaData.AssemblyPaths
-			.Select(path => Path.Combine(metaData.Directory, path))
+			.Select(path => metaData.Path.Combine(path))
 			.Select(LoadAssembly)
 			.OfType<(Assembly, AssemblyLoadContext)>()
 			.ToArray();
 
 		AssetPacks = metaData.AssetPaths
-			.Select(path => Path.Combine(metaData.Directory, path))
-			.Select(PckLoader.Load)
+			.Select(path => metaData.Path.Combine(path))
+			.Select(PckFile.Load)
 			.ToArray();
-
-
-		string installPath = $"res://ModAssets/{metaData.Name}/";
-		foreach (PckFile assetPack in AssetPacks) {
-			// assetPack.Test();
-			assetPack.Install(installPath);
-		}
 	}
 
 	~Mod() {
@@ -57,9 +52,8 @@ public record class Mod : IDisposable {
 		Unload();
 	}
 
-	private static (Assembly, AssemblyLoadContext)? LoadAssembly(string assemblyPath) {
-		string assemblyDirectory = Path.GetDirectoryName(assemblyPath.AsSpan()).ToString();
-		if (assemblyDirectory.Length == 0) return null;
+	private static (Assembly, AssemblyLoadContext)? LoadAssembly(GodotPath assemblyPath) {
+		if (string.IsNullOrEmpty(assemblyPath.Path)) return null;
 
 		byte[] file = Godot.FileAccess.GetFileAsBytes(assemblyPath);
 		if (file.Length == 0) {
@@ -68,7 +62,7 @@ public record class Mod : IDisposable {
 		}
 		MemoryStream stream = new(file);
 
-		AssemblyLoadContext assemblyLoadContext = new GodotResAssemblyLoadContext(assemblyDirectory);
+		AssemblyLoadContext assemblyLoadContext = new GodotResAssemblyLoadContext(assemblyPath);
 		return (assemblyLoadContext.LoadFromStream(stream), assemblyLoadContext);
 	}
 
@@ -77,12 +71,20 @@ public record class Mod : IDisposable {
 			asset.Uninstall();
 		}
 		foreach ((_, AssemblyLoadContext context) in Assemblies) {
-			context?.Unload();
+			context.Unload();
 		}
 	}
 
 
 	public void Start() {
+		if (_started) return;
+		_started = true;
+
+		GodotPath installPath = ModAssetsPath.Combine(MetaData.Name + '/');
+		foreach (PckFile assetPack in AssetPacks) {
+			assetPack.Install(installPath);
+		}
+
 		foreach ((Assembly assembly, _) in Assemblies) {
 			assembly.GetTypes().SelectMany(type => type.GetMethods())
 				.Where(method => method.Name == "Main" && method.GetParameters().Length == 0)
@@ -90,10 +92,16 @@ public record class Mod : IDisposable {
 		}
 	}
 	public void Stop() {
-		// foreach (Assembly assembly in Assemblies) {
-		// 	assembly.GetTypes().SelectMany(type => type.GetMethods())
-		// 		.Where(method => method.Name == "Stop" && method.GetParameters().Length == 0)
-		// 		.ToList().ForEach(method => method.Invoke(null, null));
-		// }
+		if (!_started) return;
+		_started = false;
+
+		foreach ((Assembly assembly, _) in Assemblies) {
+			assembly.GetTypes().SelectMany(type => type.GetMethods())
+				.Where(method => method.Name == "Stop" && method.GetParameters().Length == 0)
+				.ToList().ForEach(method => method.Invoke(null, null));
+		}
+		foreach (PckFile assetPack in AssetPacks) {
+			assetPack.Uninstall();
+		}
 	}
 }

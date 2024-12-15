@@ -2,10 +2,6 @@ namespace LandlessSkies.Core;
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.Loader;
 using Godot;
 using YamlDotNet.Serialization;
 
@@ -15,16 +11,16 @@ public record class ModMetaData {
 	public required string Author { get; set; }
 	public string Description { get; set; } = "";
 
-	public string Directory {
-		get => _directory;
+	private GodotPath _path;
+	public GodotPath Path {
+		get => _path;
 		set {
-			if (!value.StartsWith("res://") && !value.StartsWith("user://")) {
+			if (value.Protocol is not "res" or "user") {
 				throw new ArgumentException("Directory must be a valid Godot path.");
 			}
-			_directory = value;
+			_path = value;
 		}
 	}
-	private string _directory = "";
 
 	public IEnumerable<string> AssetPaths { get; set; } = [];
 	public IEnumerable<string> AssemblyPaths { get; set; } = [];

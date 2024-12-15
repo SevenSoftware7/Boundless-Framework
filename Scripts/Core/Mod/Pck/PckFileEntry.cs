@@ -7,7 +7,7 @@ using System.Security.Cryptography;
 
 public struct PckFileEntry {
 	public readonly required FileAccess File { get; init; }
-	public readonly required string Path { get; init; }
+	public readonly required GodotPath Path { get; init; }
 	public readonly required ulong Offset { get; init; }
 	public readonly required ulong Size { get; init; }
 	public readonly required byte[] Md5 { get; init; }
@@ -43,16 +43,14 @@ public struct PckFileEntry {
 
 	public bool Test() => StructuralComparisons.StructuralEqualityComparer.Equals(Digest, Md5);
 
-	public bool Extract(string path) {
+	public bool Extract(GodotPath path) {
 		if (!Test()) {
 			return false;
 		}
-		byte[] data = Data;
 
-		DirAccess.MakeDirRecursiveAbsolute(System.IO.Path.GetDirectoryName(path.AsSpan()).ToString());
-		using FileAccess file = FileAccess.Open(path, FileAccess.ModeFlags.Write);
-		file.StoreBuffer(data);
+		using FileAccess file = FileAccess.Open(path.FullPath, FileAccess.ModeFlags.Write);
 
-		return true;
+		file?.StoreBuffer(Data);
+		return file is not null;
 	}
 }

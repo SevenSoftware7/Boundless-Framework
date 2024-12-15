@@ -6,10 +6,10 @@ using System.IO;
 using Godot;
 
 public sealed class GodotResAssemblyLoadContext : AssemblyLoadContext {
-	private readonly string _assemblyDirectory;
+	private readonly GodotPath _assemblyPath;
 
-	public GodotResAssemblyLoadContext(string assemblyDirectory) : base(isCollectible: true) {
-		_assemblyDirectory = assemblyDirectory;
+	public GodotResAssemblyLoadContext(GodotPath assemblyPath) : base(isCollectible: true) {
+		_assemblyPath = assemblyPath;
 	}
 
 	protected override Assembly? Load(AssemblyName assemblyName) {
@@ -18,7 +18,7 @@ public sealed class GodotResAssemblyLoadContext : AssemblyLoadContext {
 			return defaultAssembly;
 		}
 		catch {
-			string? assemblyPath = Path.Combine(_assemblyDirectory, $"{assemblyName.Name}.dll");
+			string? assemblyPath = _assemblyPath.Combine($"{assemblyName.Name}.dll");
 			byte[]? file = Godot.FileAccess.GetFileAsBytes(assemblyPath);
 			if (file.Length == 0) {
 				GD.PrintErr(Godot.FileAccess.GetOpenError());
@@ -30,7 +30,7 @@ public sealed class GodotResAssemblyLoadContext : AssemblyLoadContext {
 	}
 
 	protected override nint LoadUnmanagedDll(string unmanagedDllName) {
-		string? libraryPath = Path.Combine(_assemblyDirectory, $"{unmanagedDllName}.dll");
+		string? libraryPath = Path.Combine(_assemblyPath, $"{unmanagedDllName}.dll");
 		byte[]? file = Godot.FileAccess.GetFileAsBytes(libraryPath);
 		if (file.Length == 0) {
 			GD.PrintErr(Godot.FileAccess.GetOpenError());
