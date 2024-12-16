@@ -9,8 +9,6 @@ using SevenDev.Boundless.Persistence;
 [Tool]
 [GlobalClass]
 public partial class ItemRegistry : Node {
-	private Mod? _mod;
-
 	[Export] public Array<Resource> ItemData {
 		get => [.. _itemData.OfType<Resource>(), null];
 		set {
