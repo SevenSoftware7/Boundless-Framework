@@ -2,7 +2,7 @@ using System;
 
 namespace LandlessSkies.Core;
 
-public partial struct FilePath {
+public partial struct FilePath : IEquatable<FilePath> {
 	public DirectoryPath Directory { get; init; }
 
 	private string _fileName = string.Empty;
@@ -71,6 +71,21 @@ public partial struct FilePath {
 	public FilePath Combine(ReadOnlySpan<char> path) {
 		return Combine(new DirectoryPath(path));
 	}
+
+
+	public readonly bool Equals(FilePath other) {
+		return Directory == other.Directory && FileName == other.FileName && Extension == other.Extension;
+	}
+	public override readonly bool Equals(object? obj) {
+		return obj is DirectoryPath other && Equals(other);
+	}
+	public override readonly int GetHashCode() {
+		return HashCode.Combine(Directory, FileName, Extension);
+	}
+
+
+	public static bool operator ==(FilePath left, FilePath right) => left.Equals(right);
+	public static bool operator !=(FilePath left, FilePath right) => !left.Equals(right);
 
 
 	public override string ToString() => Url;

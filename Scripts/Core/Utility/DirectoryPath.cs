@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace LandlessSkies.Core;
 
-public partial struct DirectoryPath {
+public partial struct DirectoryPath : IEquatable<DirectoryPath> {
 	[GeneratedRegex(@"^/*(.*?)/*$")]
 	private static partial Regex CleanSlashes();
 
@@ -61,6 +61,21 @@ public partial struct DirectoryPath {
 	public FilePath CombineFile(ReadOnlySpan<char> path) {
 		return Combine(new FilePath(path));
 	}
+
+	public readonly bool Equals(DirectoryPath other) {
+		return Protocol == other.Protocol && Path == other.Path;
+	}
+	public override readonly bool Equals(object? obj) {
+		return obj is DirectoryPath other && Equals(other);
+	}
+	public override readonly int GetHashCode() {
+		return HashCode.Combine(Protocol, Path);
+	}
+
+
+	public static bool operator ==(DirectoryPath left, DirectoryPath right) => left.Equals(right);
+	public static bool operator !=(DirectoryPath left, DirectoryPath right) => !left.Equals(right);
+
 
 	public override string ToString() => Url;
 
