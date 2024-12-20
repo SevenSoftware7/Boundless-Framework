@@ -38,7 +38,7 @@ public record class PckFile : IDisposable {
 			uint pathSize = archive.Get32();
 			string path = Encoding.UTF8.GetString(archive.GetBuffer(pathSize));
 			path = path.Replace("\0", string.Empty);
-			GodotPath entryPath = new(path);
+			FilePath entryPath = new(path);
 
 			ulong offset = archive.Get64() + format.FilesBaseOffset;
 
@@ -73,14 +73,16 @@ public record class PckFile : IDisposable {
 		Entries = [.. files];
 	}
 
-	private static GodotPath GetExtractPath(GodotPath path, PckFileEntry fileEntry) {
-		if (fileEntry.Path.Path.StartsWith(".godot")) {
-			return fileEntry.Path with { Protocol = "res" };
+	private static FilePath GetExtractPath(DirectoryPath path, PckFileEntry fileEntry) {
+		if (fileEntry.Path.Directory.Path.StartsWith(".godot")) {
+			return fileEntry.Path with {Directory = fileEntry.Path.Directory with {
+				Protocol = "res"
+			}};
 		}
 		return path.Combine(fileEntry.Path);
 	}
 
-	public static PckFile Load(GodotPath path) {
+	public static PckFile Load(FilePath path) {
 		FileAccess archive = FileAccess.Open(path, FileAccess.ModeFlags.Read);
 
 		try {
@@ -92,21 +94,17 @@ public record class PckFile : IDisposable {
 		}
 	}
 
-	public bool Install(GodotPath path) {
-		if (_installed is not null) {
-			return false;
-		}
+	public bool Install(DirectoryPath path) {
+		if (_installed is not null) return false;
 
-		if (Entries.Any(entry => !entry.Test())) {
-			return false;
-		}
+		if (Entries.Any(entry => !entry.Test())) return false;
 
 
-		GodotPath[] extractedEntries = new GodotPath[Entries.Length];
+		FilePath[] extractedEntries = new FilePath[Entries.Length];
 		uint extractedCount = 0;
 		for (; extractedCount < Entries.Length; extractedCount++) {
 			PckFileEntry entry = Entries[extractedCount];
-			GodotPath extractPath = GetExtractPath(path, entry);
+			FilePath extractPath = GetExtractPath(path, entry);
 			extractedEntries[extractedCount] = extractPath;
 
 			entry.Extract(extractPath);

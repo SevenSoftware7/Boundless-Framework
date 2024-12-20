@@ -8,7 +8,7 @@ public record class InstalledPckFile : IDisposable {
 
 	public required string Path { get; init; }
 	public required PckFile File { get; init; }
-	public required GodotPath[] Entries { get; init; }
+	public required FilePath[] Entries { get; init; }
 
 
 	~InstalledPckFile() {
@@ -27,8 +27,8 @@ public record class InstalledPckFile : IDisposable {
 	}
 
 
-	private static void RemoveFile(GodotPath path) {
-		DirAccess? dir = DirAccess.Open(path.DirectoryPathWithProtocol);
+	private static void RemoveFile(FilePath path) {
+		DirAccess? dir = DirAccess.Open(path.Url);
 		if (dir is null) {
 			return;
 		}
@@ -36,7 +36,7 @@ public record class InstalledPckFile : IDisposable {
 	}
 
 	public void Clean() {
-		foreach (GodotPath entry in Entries) {
+		foreach (FilePath entry in Entries) {
 			RemoveFile(entry);
 			GD.Print($"Uninstalled: {entry}");
 		}

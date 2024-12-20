@@ -11,8 +11,8 @@ public record class ModMetaData {
 	public required string Author { get; set; }
 	public string Description { get; set; } = "";
 
-	private GodotPath _path;
-	public GodotPath Path {
+	private DirectoryPath _path;
+	public DirectoryPath Path {
 		get => _path;
 		set {
 			if (value.Protocol is not "res" or "user") {
@@ -22,13 +22,14 @@ public record class ModMetaData {
 		}
 	}
 
-	public IEnumerable<string> AssetPaths { get; set; } = [];
-	public IEnumerable<string> AssemblyPaths { get; set; } = [];
+	public IEnumerable<FilePath> AssetPaths { get; set; } = [];
+	public IEnumerable<FilePath> AssemblyPaths { get; set; } = [];
 
 
 	public static ModMetaData FromYaml(string yaml) {
 		IDeserializer deserializer = new DeserializerBuilder()
 			.WithNamingConvention(YamlDotNet.Serialization.NamingConventions.HyphenatedNamingConvention.Instance)
+			.WithTypeConverter(new FilePathConverter())
 			.WithEnforceRequiredMembers()
 			.IgnoreUnmatchedProperties()
 			.IgnoreFields()
@@ -39,6 +40,11 @@ public record class ModMetaData {
 
 
 	public Mod? Load() {
+		if (Engine.IsEditorHint()) {
+			GD.PrintErr("Cannot load mods in the editor.");
+			return null;
+		}
+
 		try {
 			return new Mod(this);
 		}

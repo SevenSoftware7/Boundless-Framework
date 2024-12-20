@@ -1,13 +1,12 @@
 namespace LandlessSkies.Core;
 
 using Godot;
-using System;
 using System.Collections;
 using System.Security.Cryptography;
 
 public struct PckFileEntry {
 	public readonly required FileAccess File { get; init; }
-	public readonly required GodotPath Path { get; init; }
+	public readonly required FilePath Path { get; init; }
 	public readonly required ulong Offset { get; init; }
 	public readonly required ulong Size { get; init; }
 	public readonly required byte[] Md5 { get; init; }
@@ -43,12 +42,10 @@ public struct PckFileEntry {
 
 	public bool Test() => StructuralComparisons.StructuralEqualityComparer.Equals(Digest, Md5);
 
-	public bool Extract(GodotPath path) {
-		if (!Test()) {
-			return false;
-		}
+	public bool Extract(FilePath path) {
+		if (!Test()) return false;
 
-		using FileAccess file = FileAccess.Open(path.FullPath, FileAccess.ModeFlags.Write);
+		using FileAccess file = FileAccess.Open(path.Url, FileAccess.ModeFlags.Write);
 
 		file?.StoreBuffer(Data);
 		return file is not null;

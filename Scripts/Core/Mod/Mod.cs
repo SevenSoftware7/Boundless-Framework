@@ -8,7 +8,7 @@ using System.Runtime.Loader;
 using Godot;
 
 public record class Mod : IDisposable {
-	private static readonly GodotPath ModAssetsPath = new("res://ModAssets/");
+	private static readonly DirectoryPath ModAssetsPath = new("res://ModAssets/");
 	private bool _disposed = false;
 	private bool _started = false;
 
@@ -26,13 +26,13 @@ public record class Mod : IDisposable {
 		MetaData = metaData;
 
 		Assemblies = metaData.AssemblyPaths
-			.Select(path => metaData.Path.Combine(path))
+			.Select(metaData.Path.Combine)
 			.Select(LoadAssembly)
 			.OfType<(Assembly, AssemblyLoadContext)>()
 			.ToArray();
 
 		AssetPacks = metaData.AssetPaths
-			.Select(path => metaData.Path.Combine(path))
+			.Select(metaData.Path.Combine)
 			.Select(PckFile.Load)
 			.ToArray();
 	}
@@ -52,7 +52,7 @@ public record class Mod : IDisposable {
 		Unload();
 	}
 
-	private static (Assembly, AssemblyLoadContext)? LoadAssembly(GodotPath assemblyPath) {
+	private static (Assembly, AssemblyLoadContext)? LoadAssembly(FilePath assemblyPath) {
 		if (string.IsNullOrEmpty(assemblyPath.Path)) return null;
 
 		byte[] file = Godot.FileAccess.GetFileAsBytes(assemblyPath);
@@ -62,7 +62,7 @@ public record class Mod : IDisposable {
 		}
 		MemoryStream stream = new(file);
 
-		AssemblyLoadContext assemblyLoadContext = new GodotResAssemblyLoadContext(assemblyPath);
+		AssemblyLoadContext assemblyLoadContext = new GodotResAssemblyLoadContext(assemblyPath.Directory);
 		return (assemblyLoadContext.LoadFromStream(stream), assemblyLoadContext);
 	}
 
@@ -77,10 +77,12 @@ public record class Mod : IDisposable {
 
 
 	public void Start() {
+		if (_disposed) return;
+
 		if (_started) return;
 		_started = true;
 
-		GodotPath installPath = ModAssetsPath.Combine(MetaData.Name + '/');
+		DirectoryPath installPath = ModAssetsPath.CombineDirectory(MetaData.Name);
 		foreach (PckFile assetPack in AssetPacks) {
 			assetPack.Install(installPath);
 		}

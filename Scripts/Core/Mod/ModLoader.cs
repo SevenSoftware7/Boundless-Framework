@@ -7,13 +7,13 @@ namespace LandlessSkies.Core;
 public static class ModLoader {
 	internal static readonly List<Mod> LoadedMods = [];
 
-	private static readonly GodotPath ModDirectoryName = new("mods/");
-	private static readonly GodotPath UserModsPath = new($"user://{ModDirectoryName}");
-	private static readonly GodotPath InternalModsPath = new($"res://{ModDirectoryName}");
+	private static readonly DirectoryPath ModDirectoryName = new("mods");
+	private static readonly DirectoryPath UserModsPath = ModDirectoryName with { Protocol = "user" };
+	private static readonly DirectoryPath InternalModsPath = ModDirectoryName with { Protocol = "res" };
 
 
-	private static ModMetaData? ParseModConfig(GodotPath modDirectory) {
-		GodotPath modConfigPath = modDirectory.Combine("mod.config.yml");
+	private static ModMetaData? ParseModConfig(DirectoryPath modDirectory) {
+		FilePath modConfigPath = modDirectory.CombineFile("mod.config.yml");
 
 		byte[]? file = Godot.FileAccess.GetFileAsBytes(modConfigPath);
 		if (file.Length == 0) {
@@ -30,12 +30,12 @@ public static class ModLoader {
 
 
 	public static ModMetaData? ReadUserMod(string modName) {
-		GodotPath modDirectory = UserModsPath.Combine(modName + '/');
+		DirectoryPath modDirectory = UserModsPath.CombineDirectory(modName);
 		return ParseModConfig(modDirectory);
 	}
 
 	public static ModMetaData? ReadInternalMod(string modName) {
-		GodotPath modDirectory = InternalModsPath.Combine(modName + '/');
+		DirectoryPath modDirectory = InternalModsPath.CombineDirectory(modName);
 		return ParseModConfig(modDirectory);
 	}
 

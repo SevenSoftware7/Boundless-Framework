@@ -6,9 +6,9 @@ using System.IO;
 using Godot;
 
 public sealed class GodotResAssemblyLoadContext : AssemblyLoadContext {
-	private readonly GodotPath _assemblyPath;
+	private readonly DirectoryPath _assemblyPath;
 
-	public GodotResAssemblyLoadContext(GodotPath assemblyPath) : base(isCollectible: true) {
+	public GodotResAssemblyLoadContext(DirectoryPath assemblyPath) : base(isCollectible: true) {
 		_assemblyPath = assemblyPath;
 	}
 
@@ -18,7 +18,7 @@ public sealed class GodotResAssemblyLoadContext : AssemblyLoadContext {
 			return defaultAssembly;
 		}
 		catch {
-			string? assemblyPath = _assemblyPath.Combine($"{assemblyName.Name}.dll");
+			string? assemblyPath = _assemblyPath.CombineDirectory($"{assemblyName.Name}.dll");
 			byte[]? file = Godot.FileAccess.GetFileAsBytes(assemblyPath);
 			if (file.Length == 0) {
 				GD.PrintErr(Godot.FileAccess.GetOpenError());
