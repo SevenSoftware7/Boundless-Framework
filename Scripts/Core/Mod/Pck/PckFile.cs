@@ -10,7 +10,6 @@ public record class PckFile : IDisposable {
 	private bool _disposed = false;
 	private InstalledPckFile? _installed;
 
-	public FileAccess File { get; init; }
 	public PckFormat Format { get; init; }
 	public PckFileEntry[] Entries { get; init; }
 
@@ -26,7 +25,6 @@ public record class PckFile : IDisposable {
 		if (_disposed) return;
 
 		_disposed = true;
-		File.Dispose();
 	}
 
 
@@ -58,9 +56,14 @@ public record class PckFile : IDisposable {
 					continue;
 			}
 
+			ulong currentOffset = archive.GetPosition();
+			archive.Seek(offset);
+			byte[] data = archive.GetBuffer((long)size);
+			archive.Seek(currentOffset);
+
 			files.Add(new PckFileEntry {
-				File = archive,
 				Path = entryPath,
+				Data = data,
 				Offset = offset,
 				Size = size,
 				Md5 = md5,
@@ -68,7 +71,6 @@ public record class PckFile : IDisposable {
 			});
 		}
 
-		File = archive;
 		Format = format;
 		Entries = [.. files];
 	}
@@ -83,15 +85,9 @@ public record class PckFile : IDisposable {
 	}
 
 	public static PckFile Load(FilePath path) {
-		FileAccess archive = FileAccess.Open(path, FileAccess.ModeFlags.Read);
+		using FileAccess archive = FileAccess.Open(path, FileAccess.ModeFlags.Read);
 
-		try {
-			return new(archive);
-		}
-		catch {
-			archive.Dispose();
-			throw;
-		}
+		return new(archive);
 	}
 
 	public bool Install(DirectoryPath path) {
