@@ -50,7 +50,7 @@ public record class InstalledPckFile : IDisposable {
 
 	public void Clean() {
 		foreach (FilePath entry in Paths) {
-			using DirAccess? dir = DirAccess.Open(entry.Url);
+			using DirAccess? dir = DirAccess.Open(entry.Directory.Url);
 			dir?.Remove(entry);
 
 			UidCache.AdditionalCache.Remove(entry);
