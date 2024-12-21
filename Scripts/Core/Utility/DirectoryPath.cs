@@ -20,7 +20,7 @@ public partial struct DirectoryPath : IEquatable<DirectoryPath> {
 	public string Path {
 		readonly get => _path;
 		init {
-			_path = value;
+			_path = CleanSlashes().Match(value).Groups[1].Value;
 			_url = null;
 		}
 	}
@@ -29,14 +29,14 @@ public partial struct DirectoryPath : IEquatable<DirectoryPath> {
 	public string Url => _url ??= string.IsNullOrEmpty(Protocol) ? Path : $"{Protocol}://{Path}";
 
 	public DirectoryPath(string path) {
-		Path = path;
-
-		int contextSeparator = Path.IndexOf("://");
+		int contextSeparator = path.IndexOf("://");
 		if (contextSeparator != -1) {
-			Protocol = Path[..contextSeparator];
-			Path = Path[(contextSeparator + 3)..];
+			Protocol = path[..contextSeparator];
+			Path = path[(contextSeparator + 3)..];
 		}
-		Path = CleanSlashes().Match(Path).Groups[1].Value;
+		else {
+			Path = path;
+		}
 	}
 
 	public DirectoryPath(ReadOnlySpan<char> path) : this(path.ToString()) { }
@@ -63,13 +63,13 @@ public partial struct DirectoryPath : IEquatable<DirectoryPath> {
 	}
 
 	public readonly bool Equals(DirectoryPath other) {
-		return Protocol == other.Protocol && Path == other.Path;
+		return Path == other.Path;
 	}
 	public override readonly bool Equals(object? obj) {
 		return obj is DirectoryPath other && Equals(other);
 	}
 	public override readonly int GetHashCode() {
-		return HashCode.Combine(Protocol, Path);
+		return Path.GetHashCode();
 	}
 
 
