@@ -8,8 +8,9 @@ using System.Text;
 using Godot;
 
 public record class UidCache {
-	public static readonly FilePath GlobalCachePath = new("res://.godot/uid_cache.bin");
-	private static readonly UidCache _globalCache = ParseFile(GlobalCachePath) ?? new UidCache();
+	private static readonly FilePath GlobalCacheBackupPath = new("res://.godot/uid_cache.backup.bin");
+	private static readonly FilePath GlobalCachePath = new("res://.godot/uid_cache.bin");
+	private static readonly UidCache _globalCache = OpenGlobalCache();
 	public static readonly UidCache AdditionalCache = new();
 
 
@@ -53,12 +54,25 @@ public record class UidCache {
 		}
 	}
 
+	private static UidCache OpenGlobalCache() {
+		if (Godot.FileAccess.FileExists(GlobalCacheBackupPath)) {
+			UidCache? backupCache = ParseFile(GlobalCacheBackupPath);
+			backupCache?.WriteToFile(GlobalCachePath);
+			return backupCache ?? new UidCache();
+		}
+
+		if (Godot.FileAccess.FileExists(GlobalCachePath)) {
+			UidCache? cache = ParseFile(GlobalCachePath);
+			cache?.WriteToFile(GlobalCacheBackupPath);
+			return cache ?? new UidCache();
+		}
+
+		return new UidCache();
+	}
+
 	public static UidCache? ParseFile(FilePath path) {
 		using Godot.FileAccess file = Godot.FileAccess.Open(path, Godot.FileAccess.ModeFlags.Read);
-		if (file is null) {
-			GD.PrintErr(Godot.FileAccess.GetOpenError());
-			return null;
-		}
+		if (file is null) return null;
 
 		return new UidCache(file);
 	}
