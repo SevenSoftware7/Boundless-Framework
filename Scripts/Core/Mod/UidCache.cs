@@ -3,12 +3,14 @@ namespace LandlessSkies.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Godot;
 
 public record class UidCache {
 	public static readonly FilePath GlobalCachePath = new("res://.godot/uid_cache.bin");
-	public static readonly UidCache GlobalCache = ParseFile(GlobalCachePath) ?? new UidCache();
+	private static readonly UidCache _globalCache = ParseFile(GlobalCachePath) ?? new UidCache();
+	public static readonly UidCache AdditionalCache = new();
 
 
 	private readonly Dictionary<long, FilePath> _uidToPath = [];
@@ -61,6 +63,28 @@ public record class UidCache {
 		return new UidCache(file);
 	}
 
+	private static void WriteToFile(Godot.FileAccess file, Dictionary<long, FilePath> uidToPath) {
+		file.Store32((uint)uidToPath.Count);
+		foreach (KeyValuePair<long, FilePath> pair in uidToPath) {
+			file.Store64((ulong)pair.Key);
+
+			byte[] pathBytes = Encoding.UTF8.GetBytes(pair.Value.Url);
+			file.Store32((uint)pathBytes.Length);
+			file.StoreBuffer(pathBytes);
+		}
+	}
+
+	public static void UpdateGlobalCache() {
+		Dictionary<long, FilePath> mergedDictionary = _globalCache._uidToPath
+			.Concat(AdditionalCache._uidToPath)
+			.GroupBy(kvp => kvp.Key)
+			.ToDictionary(group => group.Key, group => group.Last().Value);
+
+		using Godot.FileAccess file = Godot.FileAccess.Open(GlobalCachePath, Godot.FileAccess.ModeFlags.Write);
+
+		WriteToFile(file, mergedDictionary);
+	}
+
 	public void WriteToFile(FilePath path) {
 		using Godot.FileAccess file = Godot.FileAccess.Open(path, Godot.FileAccess.ModeFlags.Write);
 		if (file is null) {
@@ -68,14 +92,7 @@ public record class UidCache {
 			return;
 		}
 
-		file.Store32((uint)_uidToPath.Count);
-		foreach (KeyValuePair<long, FilePath> pair in _uidToPath) {
-			file.Store64((ulong)pair.Key);
-
-			byte[] pathBytes = Encoding.UTF8.GetBytes(pair.Value.Url);
-			file.Store32((uint)pathBytes.Length);
-			file.StoreBuffer(pathBytes);
-		}
+		WriteToFile(file, _uidToPath);
 	}
 
 

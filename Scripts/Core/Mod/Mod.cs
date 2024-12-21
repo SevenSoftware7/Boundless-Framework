@@ -92,6 +92,8 @@ public record class Mod : IDisposable {
 				.Where(method => method.Name == "Main" && method.GetParameters().Length == 0)
 				.ToList().ForEach(method => method.Invoke(null, null));
 		}
+
+		GD.Print($"Started mod {MetaData.Name}");
 	}
 	public void Stop() {
 		if (!_started) return;
@@ -105,5 +107,7 @@ public record class Mod : IDisposable {
 		foreach (PckFile assetPack in AssetPacks) {
 			assetPack.Uninstall();
 		}
+
+		GD.Print($"Stopped mod {MetaData.Name}");
 	}
 }

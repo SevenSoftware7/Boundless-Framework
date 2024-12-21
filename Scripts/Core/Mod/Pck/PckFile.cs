@@ -113,11 +113,11 @@ public record class PckFile : IDisposable {
 				!entry.Path.Directory.Path.StartsWith(".godot")
 				&& (_uidCache?.TryGetUid(entry.Path, out long uid) ?? false)
 			) {
-				UidCache.GlobalCache.Add(uid, extractPath);
+				UidCache.AdditionalCache.Add(uid, extractPath);
 			}
 		}
 
-		UidCache.GlobalCache.WriteToFile(UidCache.GlobalCachePath);
+		UidCache.UpdateGlobalCache();
 
 		_installed = new InstalledPckFile {
 			Path = path.ToString(),
@@ -133,7 +133,7 @@ public record class PckFile : IDisposable {
 		_installed?.Dispose();
 		_installed = null;
 
-		UidCache.GlobalCache.WriteToFile(UidCache.GlobalCachePath);
+		UidCache.UpdateGlobalCache();
 	}
 
 	public bool Test() {

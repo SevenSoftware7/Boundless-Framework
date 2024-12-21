@@ -6,6 +6,15 @@ using Godot;
 using YamlDotNet.Serialization;
 
 public record class ModMetaData {
+	public static readonly IDeserializer Deserializer = new DeserializerBuilder()
+		.WithNamingConvention(YamlDotNet.Serialization.NamingConventions.HyphenatedNamingConvention.Instance)
+		.WithTypeConverter(new FilePathConverter())
+		.WithEnforceRequiredMembers()
+		.IgnoreUnmatchedProperties()
+		.IgnoreFields()
+		.Build();
+
+
 	public required string Name { get; set; }
 	public required string Version { get; set; }
 	public required string Author { get; set; }
@@ -26,16 +35,8 @@ public record class ModMetaData {
 	public IEnumerable<FilePath> AssemblyPaths { get; set; } = [];
 
 
-	public static ModMetaData FromYaml(string yaml) {
-		IDeserializer deserializer = new DeserializerBuilder()
-			.WithNamingConvention(YamlDotNet.Serialization.NamingConventions.HyphenatedNamingConvention.Instance)
-			.WithTypeConverter(new FilePathConverter())
-			.WithEnforceRequiredMembers()
-			.IgnoreUnmatchedProperties()
-			.IgnoreFields()
-			.Build();
-
-		return deserializer.Deserialize<ModMetaData>(yaml);
+	public static ModMetaData FromYaml(in string yaml) {
+		return Deserializer.Deserialize<ModMetaData>(yaml);
 	}
 
 

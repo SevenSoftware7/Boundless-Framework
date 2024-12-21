@@ -32,7 +32,7 @@ public record class InstalledPckFile : IDisposable {
 			using DirAccess? dir = DirAccess.Open(entry.Url);
 			dir?.Remove(entry);
 
-			UidCache.GlobalCache.Remove(entry);
+			UidCache.AdditionalCache.Remove(entry);
 		}
 	}
 }
