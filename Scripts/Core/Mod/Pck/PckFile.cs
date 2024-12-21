@@ -88,22 +88,23 @@ public record class PckFile : IDisposable {
 
 	public bool Install(DirectoryPath path) {
 		if (_installed is not null) return false;
-
 		if (Entries.Any(entry => !entry.Test())) return false;
 
 		_installed = new InstalledPckFile(this, path);
 
 		UidCache.UpdateGlobalCache();
-
 		return true;
 	}
 
 
-	public void Uninstall() {
-		_installed?.Dispose();
+	public bool Uninstall() {
+		if (_installed is null) return false;
+
+		_installed.Dispose();
 		_installed = null;
 
 		UidCache.UpdateGlobalCache();
+		return true;
 	}
 
 	public bool Test() {
