@@ -27,18 +27,12 @@ public record class InstalledPckFile : IDisposable {
 	}
 
 
-	private static void RemoveFile(FilePath path) {
-		DirAccess? dir = DirAccess.Open(path.Url);
-		if (dir is null) {
-			return;
-		}
-		dir.Remove(path);
-	}
-
 	public void Clean() {
 		foreach (FilePath entry in Entries) {
-			RemoveFile(entry);
-			GD.Print($"Uninstalled: {entry}");
+			using DirAccess? dir = DirAccess.Open(entry.Url);
+			dir?.Remove(entry);
+
+			UidCache.GlobalCache.Remove(entry);
 		}
 	}
 }

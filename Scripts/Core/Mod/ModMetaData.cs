@@ -40,11 +40,6 @@ public record class ModMetaData {
 
 
 	public Mod? Load() {
-		if (Engine.IsEditorHint()) {
-			GD.PrintErr("Cannot load mods in the editor.");
-			return null;
-		}
-
 		try {
 			return new Mod(this);
 		}

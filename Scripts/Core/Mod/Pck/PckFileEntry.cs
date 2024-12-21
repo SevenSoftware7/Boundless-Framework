@@ -22,7 +22,8 @@ public record class PckFileEntry {
 	public bool Extract(FilePath path) {
 		if (!Test()) return false;
 
-		using FileAccess file = FileAccess.Open(path.Url, FileAccess.ModeFlags.Write);
+		DirAccess.MakeDirRecursiveAbsolute(path.Directory);
+		using FileAccess file = FileAccess.Open(path, FileAccess.ModeFlags.Write);
 
 		file?.StoreBuffer(Data);
 		return file is not null;
