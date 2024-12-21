@@ -11,7 +11,7 @@ public record class PckFile : IDisposable {
 	private InstalledPckFile? _installed;
 
 
-	private readonly UidCache? _uidCache;
+	public readonly UidCache? UidCache;
 	public readonly PckFormat Format;
 	public readonly PckFileEntry[] Entries;
 
@@ -59,7 +59,7 @@ public record class PckFile : IDisposable {
 			switch (entryPath.Path) {
 				case ".godot/uid_cache.bin": {
 					using System.IO.MemoryStream stream = new(data);
-					_uidCache = new(stream);
+					UidCache = new(stream);
 				} continue;
 				case ".godot/global_script_class_cache.cfg":
 				case "project.binary":
@@ -80,15 +80,6 @@ public record class PckFile : IDisposable {
 		Entries = [.. files];
 	}
 
-	public static FilePath GetExtractPath(DirectoryPath extractPath, PckFileEntry fileEntry) {
-		if (fileEntry.Path.Directory.Path.StartsWith(".godot")) {
-			return fileEntry.Path with {Directory = fileEntry.Path.Directory with {
-				Protocol = "res"
-			}};
-		}
-		return extractPath.Combine(fileEntry.Path);
-	}
-
 	public static PckFile Load(FilePath path) {
 		using FileAccess archive = FileAccess.Open(path, FileAccess.ModeFlags.Read);
 
@@ -100,30 +91,9 @@ public record class PckFile : IDisposable {
 
 		if (Entries.Any(entry => !entry.Test())) return false;
 
-
-		FilePath[] extractedEntries = new FilePath[Entries.Length];
-		for (uint i = 0; i < Entries.Length; i++) {
-			PckFileEntry entry = Entries[i];
-			FilePath extractPath = GetExtractPath(path, entry);
-			extractedEntries[i] = extractPath;
-
-			entry.Extract(extractPath);
-
-			if (
-				!entry.Path.Directory.Path.StartsWith(".godot")
-				&& (_uidCache?.TryGetUid(entry.Path, out long uid) ?? false)
-			) {
-				UidCache.AdditionalCache.Add(uid, extractPath);
-			}
-		}
+		_installed = new InstalledPckFile(this, path);
 
 		UidCache.UpdateGlobalCache();
-
-		_installed = new InstalledPckFile {
-			Path = path.ToString(),
-			File = this,
-			Entries = extractedEntries
-		};
 
 		return true;
 	}

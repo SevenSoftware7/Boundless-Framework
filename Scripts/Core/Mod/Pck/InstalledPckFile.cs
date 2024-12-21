@@ -6,9 +6,8 @@ namespace LandlessSkies.Core;
 public record class InstalledPckFile : IDisposable {
 	private bool _disposed = false;
 
-	public required string Path { get; init; }
-	public required PckFile File { get; init; }
-	public required FilePath[] Entries { get; init; }
+	public PckFile File { get; init; }
+	public FilePath[] Paths { get; init; }
 
 
 	~InstalledPckFile() {
@@ -27,8 +26,30 @@ public record class InstalledPckFile : IDisposable {
 	}
 
 
+	public InstalledPckFile(PckFile file, DirectoryPath path) {
+		File = file;
+		Paths = new FilePath[file.Entries.Length];
+
+		for (uint i = 0; i < file.Entries.Length; i++) {
+			PckFileEntry entry = file.Entries[i];
+
+			FilePath extractPath = PckFileEntry.GetExtractPath(path, entry);
+			Paths[i] = extractPath;
+
+			entry.Extract(extractPath);
+
+			if (
+				!entry.Path.Directory.Path.StartsWith(".godot")
+				&& (file.UidCache?.TryGetUid(entry.Path, out long uid) ?? false)
+			) {
+				UidCache.AdditionalCache.Add(uid, extractPath);
+			}
+		}
+	}
+
+
 	public void Clean() {
-		foreach (FilePath entry in Entries) {
+		foreach (FilePath entry in Paths) {
 			using DirAccess? dir = DirAccess.Open(entry.Url);
 			dir?.Remove(entry);
 

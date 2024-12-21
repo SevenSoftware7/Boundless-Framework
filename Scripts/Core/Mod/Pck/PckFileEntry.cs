@@ -19,6 +19,15 @@ public record class PckFileEntry {
 
 	public bool Test() => StructuralComparisons.StructuralEqualityComparer.Equals(Digest, Md5);
 
+	public static FilePath GetExtractPath(DirectoryPath extractPath, PckFileEntry fileEntry) {
+		if (fileEntry.Path.Directory.Path.StartsWith(".godot")) {
+			return fileEntry.Path with {Directory = fileEntry.Path.Directory with {
+				Protocol = "res"
+			}};
+		}
+		return extractPath.Combine(fileEntry.Path);
+	}
+
 	public bool Extract(FilePath path) {
 		if (!Test()) return false;
 
