@@ -13,6 +13,12 @@ public partial class PointerControl : CenterContainer {
 		Visible = Target is not null;
 		if (!Target.HasValue || ProjectorCamera is null) return;
 
+		Vector3 position = Target.Value.Origin;
+		if (ProjectorCamera.IsPositionBehind(position)) {
+			Visible = false;
+			return;
+		}
+
 		Position = ProjectorCamera.UnprojectPosition(Target.Value.Origin);
 	}
 }
