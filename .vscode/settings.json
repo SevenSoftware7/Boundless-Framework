@@ -1,5 +1,6 @@
 {
     "files.exclude": {
         "**/*.uid": true
-    }
+    },
+    "godot.path": "${env:GodotPath}/Godot_v4.4-dev5_mono_win64/Godot_v4.4-dev5_mono_win64.exe",
 }
