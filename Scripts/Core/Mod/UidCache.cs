@@ -118,7 +118,7 @@ public record class UidCache {
 	}
 
 	public void Add(long uid, FilePath path) {
-		path = path with { Directory = path.Directory with { Protocol = "res"} };
+		path = path with { Directory = path.Directory with { Protocol = "res" } };
 		_uidToPath[uid] = path;
 		_pathToUid[path] = uid;
 	}

@@ -6,7 +6,6 @@ using Godot;
 using SevenDev.Boundless.Utility;
 
 
-// [Tool]
 [GlobalClass]
 public partial class CameraController3D : Camera3D {
 	[Export] public CameraBehaviour? CurrentBehaviour { get; private set; }
