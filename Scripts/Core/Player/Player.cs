@@ -3,7 +3,6 @@ namespace LandlessSkies.Core;
 using Godot;
 using SevenDev.Boundless.Utility;
 
-// [Tool]
 [GlobalClass]
 public sealed partial class Player : Node {
 	public const byte MaxPlayers = 2;
@@ -19,12 +18,14 @@ public sealed partial class Player : Node {
 		set {
 			if (_entity == value) return;
 
+			Entity? oldEntity = _entity;
+			Callable.From(() => oldEntity?.PropagatePlayerDisavowing()).CallDeferred();
+
 			Callable onKill = Callable.From<float>(OnEntityDeath);
 			NodeExtensions.SwapSignalEmitter(ref _entity, value, Entity.SignalName.Death, onKill);
 		}
 	}
 	private Entity? _entity;
-	private Entity? _lastEntity;
 
 	public InputDevice InputDevice => InputManager.CurrentDevice; // TODO: actual Device Management
 
@@ -58,11 +59,6 @@ public sealed partial class Player : Node {
 
 	public override void _Process(double delta) {
 		base._Process(delta);
-
-		if (_lastEntity != _entity) {
-			_lastEntity?.PropagatePlayerDisavowing();
-			_lastEntity = _entity;
-		}
 
 		_entity?.PropagatePlayerHandling(this);
 	}
