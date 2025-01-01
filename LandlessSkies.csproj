@@ -21,7 +21,7 @@
     <PackageReference Include="SevenDev.Boundless.Utility" Version="1.0.1" />
     <PackageReference Include="SevenDev.Boundless.Injection" Version="1.1.3" />
     <PackageReference Include="SevenDev.Boundless.Injection.Generators" Version="1.1.3" PrivateAssets="all" IncludeAssets="analyzers" />
-    <PackageReference Include="SevenDev.Boundless.Persistence" Version="1.0.1" />
+    <PackageReference Include="SevenDev.Boundless.Persistence" Version="1.0.2" />
     <PackageReference Include="KGySoft.CoreLibraries" Version="8.1.0" />
     <PackageReference Include="SimdLinq" Version="1.3.2" />
     <PackageReference Include="YamlDotNet" Version="16.2.0" />

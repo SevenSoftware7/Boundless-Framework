@@ -13,20 +13,24 @@ public partial class TestInteractable : Interactable {
 	public override string InteractLabel => "Interact";
 	public override float? MinLookIncidence => 0f;
 
-	public override void Interact(Entity entity, Player? player = null, int shapeIndex = 0) {
+	public override async void Interact(Entity entity, Player? player = null, int shapeIndex = 0) {
 		GD.Print($"Entity {entity.Name} interacted with {Name}, shape {GetShape3D(shapeIndex)?.Name} (index {shapeIndex})");
 
 		if (player is null) return;
 
-		CloneEntity(entity);
+		Entity? clonedEntity = await CloneEntity(entity);
+
+		if (player is not null && clonedEntity is not null) {
+			player.Entity = clonedEntity;
+		}
 	}
 
-	private async void CloneEntity(Entity entity) {
+	private async Task<Entity?> CloneEntity(Entity entity) {
 		IPersistenceData<Entity>? savedEntity = entity.Save();
 
 		await Task.Run(() => {
 			string path = @$"{OS.GetUserDataDir()}/SaveData1.dat";
-			BinarySerializationFormatter formatter = new(BinarySerializationOptions.CompactSerializationOfStructures);
+			BinarySerializationFormatter formatter = new(BinarySerializationOptions.RecursiveSerializationAsFallback);
 
 			using (FileStream stream = new(path, FileMode.Create)) {
 				formatter.SerializeToStream(stream, savedEntity);
@@ -40,6 +44,8 @@ public partial class TestInteractable : Interactable {
 		if (clonedEntity is not null) {
 			clonedEntity.GlobalTransform = GlobalTransform;
 		}
+
+		return clonedEntity;
 	}
 
 

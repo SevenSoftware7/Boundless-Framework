@@ -7,14 +7,20 @@ using SevenDev.Boundless.Persistence;
 [GlobalClass]
 public partial class ResourceDataKey : Resource, IDataKeyProvider {
 	[Export] public string Key {
-		get => key;
-		private set => key = value.ToSnakeCase();
+		get => _key ?? ResourcePath;
+		private set {
+			if (string.IsNullOrEmpty(value)) {
+				if (_key is not null) GD.PrintErr($"Key cannot be null or empty: {ResourcePath}");
+				return;
+			}
+			_key = value.ToSnakeCase();
+		}
 	}
-	private string key = string.Empty;
+	private string? _key;
 
 
 	public ResourceDataKey() : this(null) { }
 	public ResourceDataKey(string? key = null) : base() {
-		Key = key ?? string.Empty;
+		_key = key?.ToSnakeCase();
 	}
 }
