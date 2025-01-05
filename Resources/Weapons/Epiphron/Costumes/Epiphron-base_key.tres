@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="WeaponCostumeResourceDataKey" load_steps=2 format=3 uid="uid://b5vpfmo67yl6e"]
+[gd_resource type="Resource" script_class="WeaponCostumeResourceItemKey" load_steps=2 format=3 uid="uid://b5vpfmo67yl6e"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/Costume/WeaponCostumeResourceDataKey.cs" id="1_xkt44"]
+[ext_resource type="Script" uid="uid://boajo5fn61w5h" path="res://Scripts/Core/Item/Weapon/Costume/WeaponCostumeResourceItemKey.cs" id="1_xkt44"]
 
 [resource]
 script = ExtResource("1_xkt44")
-Key = "epiphron_base"
+String = "epiphron_base=cos"

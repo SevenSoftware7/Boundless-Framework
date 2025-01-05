@@ -24,8 +24,8 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject
 
 	public IInjectionNode InjectionNode { get; }
 
-	IDataKeyProvider<Weapon> IItem<Weapon>.KeyProvider => KeyProvider;
-	[Export] private WeaponResourceDataKey KeyProvider = new();
+	IItemKeyProvider<Weapon> IItem<Weapon>.KeyProvider => KeyProvider;
+	[Export] private WeaponResourceItemKey KeyProvider = new();
 
 	[Export] public ItemUIData? UI { get; private set; }
 	public string DisplayName => UI?.DisplayName ?? string.Empty;

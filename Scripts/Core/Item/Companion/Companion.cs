@@ -12,8 +12,8 @@ using SevenDev.Boundless.Persistence;
 public partial class Companion : Node3D, ICustomizable, ICostumable, IPersistent<Companion>, IItem<Companion>, IInjectionBlocker<Skeleton3D> {
 	public IInjectionNode InjectionNode { get; }
 
-	IDataKeyProvider<Companion> IItem<Companion>.KeyProvider => KeyProvider;
-	[Export] private CompanionResourceDataKey KeyProvider = new();
+	IItemKeyProvider<Companion> IItem<Companion>.KeyProvider => KeyProvider;
+	[Export] private CompanionResourceItemKey KeyProvider = new();
 
 	[Export] public ItemUIData? UI { get; private set; }
 	public string DisplayName => UI?.DisplayName ?? string.Empty;

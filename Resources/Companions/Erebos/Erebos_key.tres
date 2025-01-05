@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="CompanionResourceDataKey" load_steps=2 format=3 uid="uid://ddocod3xa3gvp"]
+[gd_resource type="Resource" script_class="CompanionResourceItemKey" load_steps=2 format=3 uid="uid://ddocod3xa3gvp"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Item/Companion/CompanionResourceDataKey.cs" id="1_jkm0x"]
+[ext_resource type="Script" uid="uid://d2iam6ue6prdh" path="res://Scripts/Core/Item/Companion/CompanionResourceItemKey.cs" id="1_jkm0x"]
 
 [resource]
 script = ExtResource("1_jkm0x")
-Key = "erebos"
+String = "erebos=cmp"

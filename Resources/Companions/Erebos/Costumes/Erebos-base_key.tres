@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="CompanionCostumeResourceDataKey" load_steps=2 format=3 uid="uid://dld7ow8og42nk"]
+[gd_resource type="Resource" script_class="CompanionCostumeResourceItemKey" load_steps=2 format=3 uid="uid://dld7ow8og42nk"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Item/Companion/Costume/CompanionCostumeResourceDataKey.cs" id="1_e2dnd"]
+[ext_resource type="Script" uid="uid://cfb7yssa7k755" path="res://Scripts/Core/Item/Companion/Costume/CompanionCostumeResourceItemKey.cs" id="1_e2dnd"]
 
 [resource]
 script = ExtResource("1_e2dnd")
-Key = "erebos_base"
+String = "erebos_base=cos"

@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="WeaponResourceDataKey" load_steps=2 format=3 uid="uid://dvuweom50h6eu"]
+[gd_resource type="Resource" script_class="WeaponResourceItemKey" load_steps=2 format=3 uid="uid://dvuweom50h6eu"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Item/Weapon/WeaponResourceDataKey.cs" id="1_31yhr"]
+[ext_resource type="Script" uid="uid://y8s5hi1dd3lk" path="res://Scripts/Core/Item/Weapon/WeaponResourceItemKey.cs" id="1_31yhr"]
 
 [resource]
 script = ExtResource("1_31yhr")
-Key = "epiphron"
+String = "epiphron=arm"

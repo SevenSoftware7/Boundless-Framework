@@ -27,8 +27,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 	public IInjectionNode InjectionNode { get; }
 
-	IDataKeyProvider<Entity> IItem<Entity>.KeyProvider => KeyProvider;
-	[Export] private EntityResourceDataKey KeyProvider = new();
+	IItemKeyProvider<Entity> IItem<Entity>.KeyProvider => KeyProvider;
+	[Export] private EntityResourceItemKey KeyProvider = new();
 
 	[Export] public ItemUIData? UI { get; private set; }
 	public string DisplayName => UI?.DisplayName ?? string.Empty;

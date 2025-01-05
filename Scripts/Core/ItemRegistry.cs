@@ -31,5 +31,15 @@ public partial class ItemRegistry : Node {
 	public override void _Ready() {
 		base._Ready();
 		RegisterData();
+
+
+		// if (Engine.IsEditorHint()) return;
+
+
+		// Mod? mod = ModLoader.LoadInternalMod("TestMod");
+		// mod?.Start();
+
+
+		// mod?.Stop();
 	}
 }

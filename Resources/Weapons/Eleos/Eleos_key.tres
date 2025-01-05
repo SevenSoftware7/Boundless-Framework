@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="WeaponResourceDataKey" load_steps=2 format=3 uid="uid://r7mx5ymlfh3l"]
+[gd_resource type="Resource" script_class="WeaponResourceItemKey" load_steps=2 format=3 uid="uid://r7mx5ymlfh3l"]
 
-[ext_resource type="Script" uid="uid://bb5ln1q3cgsys" path="res://Scripts/Core/Item/Weapon/WeaponResourceDataKey.cs" id="1_78nsy"]
+[ext_resource type="Script" uid="uid://y8s5hi1dd3lk" path="res://Scripts/Core/Item/Weapon/WeaponResourceItemKey.cs" id="1_78nsy"]
 
 [resource]
 script = ExtResource("1_78nsy")
-Key = "eleos"
+String = "eleos=arm"
