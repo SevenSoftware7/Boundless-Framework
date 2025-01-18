@@ -20,7 +20,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	public const int RECOVER_LOCATION_BUFFER_SIZE = 5;
 
 
-	public StyleState? StyleSwitchBuffer;
+	public readonly Queue<StyleState> StyleSwitchBuffer = [];
 
 	public readonly List<Vector3> RecoverLocationBuffer = new(RECOVER_LOCATION_BUFFER_SIZE);
 
@@ -275,7 +275,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 			if (bufferStyle.HasValue) {
 				if (!CurrentAction.CanCancel()) {
-					StyleSwitchBuffer = bufferStyle.Value;
+					StyleSwitchBuffer.Enqueue(bufferStyle.Value);
 				}
 				else {
 					InjectionNode.PropagateInjection(bufferStyle.Value);
@@ -339,7 +339,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 		void HandleWeapon() {
 			if (!CurrentAction.CanCancel()) return;
 
-			if (StyleSwitchBuffer is StyleState bufferedStyle) {
+			while (StyleSwitchBuffer.Count > 0) {
+				StyleState bufferedStyle = StyleSwitchBuffer.Dequeue();
 				InjectionNode.PropagateInjection(bufferedStyle);
 			}
 		}
