@@ -54,7 +54,7 @@ public sealed partial class MultiWeapon : CompositeWeapon, IInjectionInterceptor
 			weaponNode.SetOwnerAndParent(this);
 		}
 	}
-	public MultiWeapon(ImmutableArray<IPersistenceData<IWeapon>> weaponSaves, IItemDataRegistry registry) : this(weaponSaves.Select(save => save.Load(registry))) { }
+	public MultiWeapon(ImmutableArray<IPersistenceData<IWeapon>> weaponSaves, IItemDataProvider registry) : this(weaponSaves.Select(save => save.Load(registry))) { }
 
 
 	private void UpdateCurrent() {
@@ -154,6 +154,6 @@ public sealed partial class MultiWeapon : CompositeWeapon, IInjectionInterceptor
 			.OfType<IPersistent<IWeapon>>()
 			.Select(w => w.Save()) ];
 
-		protected override MultiWeapon Instantiate(IItemDataRegistry registry) => new(WeaponSaves, registry);
+		protected override MultiWeapon Instantiate(IItemDataProvider registry) => new(WeaponSaves, registry);
 	}
 }

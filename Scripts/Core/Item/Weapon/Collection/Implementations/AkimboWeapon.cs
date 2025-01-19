@@ -58,7 +58,7 @@ public sealed partial class AkimboWeapon : CompositeWeapon, IInjectionIntercepto
 		MainWeapon = mainWeapon;
 		SideWeapon = sideWeapon;
 	}
-	public AkimboWeapon(IPersistenceData<IWeapon>? mainWeaponSave, IPersistenceData<IWeapon>? sideWeaponSave, IItemDataRegistry registry) : this(mainWeaponSave?.Load(registry), sideWeaponSave?.Load(registry)) { }
+	public AkimboWeapon(IPersistenceData<IWeapon>? mainWeaponSave, IPersistenceData<IWeapon>? sideWeaponSave, IItemDataProvider registry) : this(mainWeaponSave?.Load(registry), sideWeaponSave?.Load(registry)) { }
 
 
 	public override Dictionary<string, ICustomization> GetCustomizations() => base.GetCustomizations();
@@ -106,6 +106,6 @@ public sealed partial class AkimboWeapon : CompositeWeapon, IInjectionIntercepto
 		private readonly IPersistenceData<IWeapon>? MainWeaponSave = (akimbo.MainWeapon as IPersistent<IWeapon>)?.Save();
 		private readonly IPersistenceData<IWeapon>? SideWeaponSave = (akimbo.SideWeapon as IPersistent<IWeapon>)?.Save();
 
-		protected override AkimboWeapon Instantiate(IItemDataRegistry registry) => new(MainWeaponSave, SideWeaponSave, registry);
+		protected override AkimboWeapon Instantiate(IItemDataProvider registry) => new(MainWeaponSave, SideWeaponSave, registry);
 	}
 }

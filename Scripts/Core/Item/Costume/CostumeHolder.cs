@@ -53,7 +53,7 @@ public sealed partial class CostumeHolder : Node3D, ICustomizable {
 	public void SetCostume(IPersistenceData<Costume> costumeData) {
 		Unload();
 
-		Costume = costumeData.Load(ItemRegistry.Registry)?.ParentTo(this);
+		Costume = costumeData.Load(ItemRegistry.GlobalRegistry)?.ParentTo(this);
 		_costumeKeyProvider = Costume?.ResourceKey;
 	}
 
@@ -62,7 +62,9 @@ public sealed partial class CostumeHolder : Node3D, ICustomizable {
 		Unload();
 
 		if (_costumeKeyProvider?.ItemKey is null) return;
-		Costume = ItemRegistry.Registry.GetData<Costume>(_costumeKeyProvider.ItemKey)?.Instantiate()?.ParentTo(this);
+
+		IItemData<Costume>? costumeData = ItemRegistry.GlobalRegistry.GetData<Costume>(_costumeKeyProvider.ItemKey);
+		Costume = costumeData?.Instantiate()?.ParentTo(this);
 	}
 
 	public void Load() => Load(false);
