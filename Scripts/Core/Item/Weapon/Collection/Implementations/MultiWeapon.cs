@@ -11,7 +11,7 @@ using SevenDev.Boundless.Persistence;
 
 [Tool]
 [GlobalClass]
-public sealed partial class MultiWeapon : WeaponCollection, IInjectionInterceptor<WeaponHolsterState>, IInjectionBlocker<StyleState>, IInjectionInterceptor<StyleState>, IPersistent<MultiWeapon> {
+public sealed partial class MultiWeapon : CompositeWeapon, IInjectionInterceptor<WeaponHolsterState>, IInjectionBlocker<StyleState>, IInjectionInterceptor<StyleState>, IPersistent<MultiWeapon> {
 	public IInjectionNode InjectionNode { get; }
 
 	private List<IWeapon> _weapons = [];
@@ -54,7 +54,7 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 			weaponNode.SetOwnerAndParent(this);
 		}
 	}
-	public MultiWeapon(ImmutableArray<IPersistenceData<IWeapon>> weaponSaves) : this(weaponSaves.Select(save => save.Load())) { }
+	public MultiWeapon(ImmutableArray<IPersistenceData<IWeapon>> weaponSaves, IItemDataRegistry registry) : this(weaponSaves.Select(save => save.Load(registry))) { }
 
 
 	private void UpdateCurrent() {
@@ -154,6 +154,6 @@ public sealed partial class MultiWeapon : WeaponCollection, IInjectionIntercepto
 			.OfType<IPersistent<IWeapon>>()
 			.Select(w => w.Save()) ];
 
-		protected override MultiWeapon Instantiate() => new(WeaponSaves);
+		protected override MultiWeapon Instantiate(IItemDataRegistry registry) => new(WeaponSaves, registry);
 	}
 }

@@ -11,7 +11,7 @@ using SevenDev.Boundless.Persistence;
 
 [Tool]
 [GlobalClass]
-public sealed partial class AkimboWeapon : WeaponCollection, IInjectionInterceptor<Handedness>, IInjectionBlocker<StyleState>, IInjectionInterceptor<StyleState>, IPersistent<AkimboWeapon> {
+public sealed partial class AkimboWeapon : CompositeWeapon, IInjectionInterceptor<Handedness>, IInjectionBlocker<StyleState>, IInjectionInterceptor<StyleState>, IPersistent<AkimboWeapon> {
 	public IInjectionNode InjectionNode { get; }
 
 	public IWeapon? MainWeapon {
@@ -58,7 +58,7 @@ public sealed partial class AkimboWeapon : WeaponCollection, IInjectionIntercept
 		MainWeapon = mainWeapon;
 		SideWeapon = sideWeapon;
 	}
-	public AkimboWeapon(IPersistenceData<IWeapon>? mainWeaponSave, IPersistenceData<IWeapon>? sideWeaponSave) : this(mainWeaponSave?.Load(), sideWeaponSave?.Load()) { }
+	public AkimboWeapon(IPersistenceData<IWeapon>? mainWeaponSave, IPersistenceData<IWeapon>? sideWeaponSave, IItemDataRegistry registry) : this(mainWeaponSave?.Load(registry), sideWeaponSave?.Load(registry)) { }
 
 
 	public override Dictionary<string, ICustomization> GetCustomizations() => base.GetCustomizations();
@@ -106,6 +106,6 @@ public sealed partial class AkimboWeapon : WeaponCollection, IInjectionIntercept
 		private readonly IPersistenceData<IWeapon>? MainWeaponSave = (akimbo.MainWeapon as IPersistent<IWeapon>)?.Save();
 		private readonly IPersistenceData<IWeapon>? SideWeaponSave = (akimbo.SideWeapon as IPersistent<IWeapon>)?.Save();
 
-		protected override AkimboWeapon Instantiate() => new(MainWeaponSave, SideWeaponSave);
+		protected override AkimboWeapon Instantiate(IItemDataRegistry registry) => new(MainWeaponSave, SideWeaponSave, registry);
 	}
 }

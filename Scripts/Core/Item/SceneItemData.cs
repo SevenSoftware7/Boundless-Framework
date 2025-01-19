@@ -4,8 +4,8 @@ using Godot;
 using SevenDev.Boundless.Persistence;
 
 [Tool]
-public abstract partial class SceneItemData<[MustBeVariant] T> : Resource, IItemData<T> where T : Node, IItem<T> {
-	IItemKeyProvider<T> IItemData<T>.KeyProvider => KeyProvider;
+public abstract partial class SceneItemData<[MustBeVariant] T> : Resource, IItemData<T> where T : Node, IItem {
+	IItemKeyProvider IItemData.KeyProvider => KeyProvider;
 	[Export] private GenericResourceItemKey<T> KeyProvider {
 		get => _keyProvider;
 		set {

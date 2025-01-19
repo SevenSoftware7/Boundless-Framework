@@ -40,7 +40,7 @@ public partial class TestInteractable : Interactable {
 			}
 		});
 
-		Entity? clonedEntity = savedEntity?.Load()?.SetOwnerAndParent(this);
+		Entity? clonedEntity = savedEntity?.Load(ItemRegistry.Registry)?.SetOwnerAndParent(this);
 		if (clonedEntity is not null) {
 			clonedEntity.GlobalTransform = GlobalTransform;
 		}

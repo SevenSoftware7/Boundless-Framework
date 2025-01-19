@@ -10,7 +10,7 @@ using SevenDev.Boundless.Persistence;
 public sealed partial class CostumeHolder : Node3D, ICustomizable {
 	public Costume? Costume { get; private set; }
 
-	private IItemKeyProvider<Costume>? _costumeKeyProvider;
+	private IItemKeyProvider? _costumeKeyProvider;
 	[Export] public CostumeResourceItemKey? CostumeKeyProvider {
 		get => _costumeKeyProvider as CostumeResourceItemKey;
 		set {
@@ -43,7 +43,7 @@ public sealed partial class CostumeHolder : Node3D, ICustomizable {
 		SetCostume(costume);
 	}
 
-	public void SetCostume(IItemKeyProvider<Costume>? newCostumeKey) {
+	public void SetCostume(IItemKeyProvider? newCostumeKey) {
 		_costumeKeyProvider = newCostumeKey;
 
 		Load(true);
@@ -53,24 +53,29 @@ public sealed partial class CostumeHolder : Node3D, ICustomizable {
 	public void SetCostume(IPersistenceData<Costume> costumeData) {
 		Unload();
 
-		Costume = costumeData.Load()?.ParentTo(this);
+		Costume = costumeData.Load(ItemRegistry.Registry)?.ParentTo(this);
 		_costumeKeyProvider = Costume?.ResourceKey;
 	}
 
+
+	public void Reload() {
+		Unload();
+
+		if (_costumeKeyProvider?.ItemKey is null) return;
+		Costume = ItemRegistry.Registry.GetData<Costume>(_costumeKeyProvider.ItemKey)?.Instantiate()?.ParentTo(this);
+	}
 
 	public void Load() => Load(false);
 	private void Load(bool forceReload = false) {
 		if (Costume is not null && !forceReload) return;
 
-		Unload();
-
-		Costume = _costumeKeyProvider?.GetData()?.Instantiate()?.ParentTo(this);
+		Reload();
 	}
+
 	public void Unload() {
 		Costume?.QueueFree();
 		Costume = null;
 	}
-	public void Reload() => Load(true);
 
 
 	public override void _Ready() {

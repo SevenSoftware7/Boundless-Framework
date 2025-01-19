@@ -6,7 +6,7 @@ using SevenDev.Boundless.Persistence;
 
 [Tool]
 [GlobalClass]
-public abstract partial class WeaponCollection : Node, IWeapon, ISerializationListener {
+public abstract partial class CompositeWeapon : Node, IWeapon, ISerializationListener {
 	public virtual string DisplayName => CurrentWeapon?.DisplayName ?? "";
 	public virtual Texture2D? DisplayPortrait => CurrentWeapon?.DisplayPortrait;
 
@@ -52,5 +52,5 @@ public abstract partial class WeaponCollection : Node, IWeapon, ISerializationLi
 		UpdateWeapons();
 	}
 
-	public abstract IPersistenceData<WeaponCollection> Save();
+	public abstract IPersistenceData<CompositeWeapon> Save();
 }

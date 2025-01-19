@@ -9,11 +9,13 @@ using SevenDev.Boundless.Persistence;
 [Tool]
 [GlobalClass]
 public partial class ItemRegistry : Node {
+	public static readonly ItemDataRegistry Registry = new(GD.Print);
+
 	[Export] public Array<Resource> ItemData {
 		get => [.. _itemData.OfType<Resource>(), null];
 		set {
 			IEnumerable<IItemData> nonResourceData = value.OfType<IItemData>().Where(data => data is not Resource);
-			_itemData = value.OfType<IItemData>().Concat(nonResourceData).ToList();
+			_itemData = [.. value.OfType<IItemData>(), .. nonResourceData];
 
 			if (IsNodeReady()) {
 				Callable.From(RegisterData).CallDeferred();
@@ -24,7 +26,7 @@ public partial class ItemRegistry : Node {
 
 	private void RegisterData() {
 		foreach (IItemData data in _itemData) {
-			data.Register();
+			data.Register(Registry);
 		}
 	}
 
