@@ -200,7 +200,7 @@ public partial class DrawCompositorEffect : BaseCompositorEffect {
 
 		Color[] clear_colors = [new Color(0, 0, 0, 0)];
 
-		long drawList = RenderingDevice.DrawListBegin(frameBuffer, RenderingDevice.InitialAction.Clear, RenderingDevice.FinalAction.Store, RenderingDevice.InitialAction.Clear, RenderingDevice.FinalAction.Discard, clear_colors);
+		long drawList = RenderingDevice.DrawListBegin(frameBuffer, RenderingDevice.DrawFlags.ClearAll, clear_colors);
 		RenderingDevice.DrawListBindRenderPipeline(drawList, renderPipeline);
 		RenderingDevice.DrawListBindVertexArray(drawList, vertexArray);
 		RenderingDevice.DrawListBindIndexArray(drawList, indexArray);

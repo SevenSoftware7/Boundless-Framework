@@ -1,5 +1,5 @@
 {
-    "godot.path": "${env:GodotPath}/Godot_v4.4-dev5_mono_win64/Godot_v4.4-dev5_mono_win64.exe",
+    "godot.path": "${env:GodotPath}/Godot_v4.4-beta2_mono_win64/Godot_v4.4-beta2_mono_win64.exe",
     "explorer.fileNesting.patterns": {
         "*": "${capture}.uid, ${capture}.import",
     }

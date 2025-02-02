@@ -133,7 +133,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			byte[] renderPushConstantBytes = GetDrawPushConstant(sceneData, projection);
 
 			RenderingDevice.DrawCommandBeginLabel("Render Water Mask", new Color(1f, 1f, 1f));
-			long drawList = RenderingDevice.DrawListBegin(waterBuffer, RenderingDevice.InitialAction.Clear, RenderingDevice.FinalAction.Store, RenderingDevice.InitialAction.Clear, RenderingDevice.FinalAction.Discard, clearColors, clearDepth);
+			long drawList = RenderingDevice.DrawListBegin(waterBuffer, RenderingDevice.DrawFlags.ClearAll, clearColors, clearDepth);
 			RenderingDevice.DrawListBindRenderPipeline(drawList, renderPipeline);
 
 			RenderingDevice.DrawListBindVertexArray(drawList, vertexArray);
