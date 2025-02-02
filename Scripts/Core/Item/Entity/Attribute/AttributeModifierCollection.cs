@@ -130,7 +130,7 @@ public sealed class AttributeModifierCollection : ICollection<AttributeModifier>
 	}
 
 	public void Set(IEnumerable<AttributeModifier> modifiers) {
-		HashSet<AttributeModifier> newModifiersSet = new(modifiers);
+		HashSet<AttributeModifier> newModifiersSet = [.. modifiers];
 
 		// Iterate over the current modifiers and collect those that need to be removed
 		List<AttributeModifier> currentModifiers = _dictionary.Values.SelectMany(e => e.List).ToList();
