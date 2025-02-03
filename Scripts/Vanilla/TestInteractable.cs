@@ -7,12 +7,33 @@ using KGySoft.Serialization.Binary;
 using SevenDev.Boundless.Utility;
 using SevenDev.Boundless.Persistence;
 using LandlessSkies.Core;
+using SevenDev.Boundless.Injection;
 
 [GlobalClass]
 public partial class TestInteractable : Interactable {
+	public IInjectionNode InjectionNode { get; }
+
+	[Injectable] private IItemDataProvider? _registry;
 	public override string InteractLabel => "Interact";
 	public override float? MinLookIncidence => 0f;
 
+
+	public TestInteractable() : base() {
+		InjectionNode = new GodotNodeInjectionNode(this);
+	}
+
+
+	public void RequestInjection() {
+		this.RequestInjection<IItemDataProvider>();
+	}
+
+	public override void _Ready() {
+		base._Ready();
+
+		RequestInjection();
+	}
+
+	public override bool IsInteractable(Entity entity) => true;
 	public override async void Interact(Entity entity, Player? player = null, int shapeIndex = 0) {
 		GD.Print($"Entity {entity.Name} interacted with {Name}, shape {GetShape3D(shapeIndex)?.Name} (index {shapeIndex})");
 
@@ -26,10 +47,11 @@ public partial class TestInteractable : Interactable {
 	}
 
 	private async Task<Entity?> CloneEntity(Entity entity) {
+		if (_registry is null) return null;
 		IPersistenceData<Entity>? savedEntity = entity.Save();
 
 		await Task.Run(() => {
-			string path = @$"{OS.GetUserDataDir()}/SaveData1.dat";
+			FilePath path = new(@$"{OS.GetUserDataDir()}/SaveData1.dat");
 			BinarySerializationFormatter formatter = new(BinarySerializationOptions.RecursiveSerializationAsFallback);
 
 			using (FileStream stream = new(path, FileMode.Create)) {
@@ -40,16 +62,11 @@ public partial class TestInteractable : Interactable {
 			}
 		});
 
-		Entity? clonedEntity = savedEntity?.Load(ItemRegistry.GlobalRegistry)?.SetOwnerAndParent(this);
+		Entity? clonedEntity = savedEntity?.Load(_registry)?.SetOwnerAndParent(this);
 		if (clonedEntity is not null) {
 			clonedEntity.GlobalTransform = GlobalTransform;
 		}
 
 		return clonedEntity;
-	}
-
-
-	public override bool IsInteractable(Entity entity) {
-		return true;
 	}
 }

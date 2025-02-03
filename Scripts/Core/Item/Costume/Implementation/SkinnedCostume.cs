@@ -48,7 +48,7 @@ public partial class SkinnedCostume : MeshCostume {
 	public override void _Ready() {
 		base._Ready();
 
-		if (Meshes.Count != 0 && (GetParent()?.IsNodeReady() ?? false)) {
+		if (Meshes.Count != 0) {
 			RequestInjection();
 		}
 	}

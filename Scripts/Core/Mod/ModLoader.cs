@@ -1,12 +1,8 @@
-using System.Collections.Generic;
-using System.IO;
-using Godot;
-
 namespace LandlessSkies.Core;
 
-public static class ModLoader {
-	internal static readonly List<Mod> LoadedMods = [];
+using Godot;
 
+public static class ModLoader {
 	private static readonly DirectoryPath ModDirectoryName = new("mods");
 	private static readonly DirectoryPath UserModsPath = ModDirectoryName with { Protocol = "user" };
 	private static readonly DirectoryPath InternalModsPath = ModDirectoryName with { Protocol = "res" };

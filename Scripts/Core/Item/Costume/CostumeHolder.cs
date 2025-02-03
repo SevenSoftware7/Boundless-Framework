@@ -4,20 +4,31 @@ using System.Collections.Generic;
 using Godot;
 using SevenDev.Boundless.Utility;
 using SevenDev.Boundless.Persistence;
+using SevenDev.Boundless.Injection;
 
 [Tool]
 [GlobalClass]
 public sealed partial class CostumeHolder : Node3D, ICustomizable {
+	public IInjectionNode InjectionNode { get; }
+
 	public Costume? Costume { get; private set; }
+
+	private IItemDataProvider? _registry;
+	[Injectable]
+	private IItemDataProvider? Registry {
+		get => _registry;
+		set {
+			_registry = value;
+			Reload();
+		}
+	}
 
 	private IItemKeyProvider? _costumeKeyProvider;
 	[Export] public CostumeResourceItemKey? CostumeKeyProvider {
 		get => _costumeKeyProvider as CostumeResourceItemKey;
 		set {
 			_costumeKeyProvider = value;
-			if (IsNodeReady()) {
-				Callable.From(Reload).CallDeferred();
-			}
+			Reload();
 		}
 	}
 
@@ -38,7 +49,9 @@ public sealed partial class CostumeHolder : Node3D, ICustomizable {
 	}
 
 
-	public CostumeHolder() { }
+	public CostumeHolder() {
+		InjectionNode = new GodotNodeInjectionNode(this);
+	}
 	public CostumeHolder(IItemData<Costume>? costume) : this() {
 		SetCostume(costume);
 	}
@@ -52,8 +65,9 @@ public sealed partial class CostumeHolder : Node3D, ICustomizable {
 
 	public void SetCostume(IPersistenceData<Costume> costumeData) {
 		Unload();
+		if (Registry is null) return;
 
-		Costume = costumeData.Load(ItemRegistry.GlobalRegistry)?.ParentTo(this);
+		Costume = costumeData.Load(Registry)?.ParentTo(this);
 		_costumeKeyProvider = Costume?.ResourceKey;
 	}
 
@@ -61,9 +75,10 @@ public sealed partial class CostumeHolder : Node3D, ICustomizable {
 	public void Reload() {
 		Unload();
 
+		if (_registry is null) return;
 		if (_costumeKeyProvider?.ItemKey is null) return;
 
-		IItemData<Costume>? costumeData = ItemRegistry.GlobalRegistry.GetData<Costume>(_costumeKeyProvider.ItemKey);
+		IItemData<Costume>? costumeData = _registry.GetData<Costume>(_costumeKeyProvider.ItemKey);
 		Costume = costumeData?.Instantiate()?.ParentTo(this);
 	}
 
@@ -79,9 +94,14 @@ public sealed partial class CostumeHolder : Node3D, ICustomizable {
 		Costume = null;
 	}
 
+	public void RequestInjection() {
+		this.RequestInjection<IItemDataProvider>();
+	}
 
 	public override void _Ready() {
 		base._Ready();
-		Load();
+
+		RequestInjection();
 	}
+
 }

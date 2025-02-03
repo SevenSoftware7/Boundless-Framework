@@ -1,5 +1,6 @@
-[gd_scene load_steps=117 format=3 uid="uid://b505xodur2iff"]
+[gd_scene load_steps=119 format=3 uid="uid://b505xodur2iff"]
 
+[ext_resource type="Script" uid="uid://cvkvg45cwuu2" path="res://Scripts/Core/MainNode.cs" id="1_u7mjy"]
 [ext_resource type="RDShaderFile" uid="uid://br3hg0ejs6wif" path="res://Resources/Rendering/Shaders/FetchWaterData.glsl" id="2_5l7vn"]
 [ext_resource type="RDShaderFile" uid="uid://dabjxhg50sdto" path="res://Resources/Rendering/Shaders/WaterDisplacementCompute.glsl" id="4_tdgd3"]
 [ext_resource type="Script" uid="uid://bhq2puvtrgpq7" path="res://addons/cyclops_level_builder/nodes/cyclops_block.gd" id="4_xwxtm"]
@@ -19,6 +20,7 @@
 [ext_resource type="Script" uid="uid://demu2xbt0bpng" path="res://Scripts/Core/Item/Entity/Attribute/AttributeModifierTrigger.cs" id="14_w4log"]
 [ext_resource type="PackedScene" uid="uid://b7b17ebmgtrfy" path="res://Resources/Weapons/Nemesis/Nemesis.tscn" id="15_x4bcq"]
 [ext_resource type="Script" uid="uid://cp6ie0y0o2qd4" path="res://Scripts/Core/Item/Entity/Attribute/AdditiveModifier.cs" id="15_y8l2d"]
+[ext_resource type="Script" uid="uid://bycrdvgqioks7" path="res://Scripts/Core/Item/Entity/Attribute/AttributeModifier.cs" id="16_u7mjy"]
 [ext_resource type="PackedScene" uid="uid://bp1e6thwkkcrr" path="res://Resources/Weapons/Eleos/Eleos.tscn" id="17_jhoyp"]
 [ext_resource type="Script" uid="uid://cdkgbhb2txfvj" path="res://Scripts/Core/Damage/DamageArea.cs" id="18_pbwgl"]
 [ext_resource type="PackedScene" uid="uid://bxcpbr13uyeh1" path="res://Resources/Entities/Bike/Bike.tscn" id="20_pcyav"]
@@ -1512,6 +1514,7 @@ size = Vector3(3, 1, 5)
 size = Vector3(3, 1, 5)
 
 [node name="Node3D" type="Node3D"]
+script = ExtResource("1_u7mjy")
 
 [node name="Environment" type="Node3D" parent="."]
 
@@ -1886,7 +1889,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.4761, 1.30216, -12.7711)
 collision_layer = 2048
 collision_mask = 2304
 script = ExtResource("14_w4log")
-_attributeModifiers = [SubResource("Resource_tocgr")]
+_attributeModifiers = Array[ExtResource("16_u7mjy")]([SubResource("Resource_tocgr")])
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/WitherArea3D"]
 shape = SubResource("SphereShape3D_d0jor")

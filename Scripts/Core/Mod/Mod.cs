@@ -82,6 +82,8 @@ public record class Mod : IDisposable {
 		if (_started) return;
 		_started = true;
 
+		GD.Print($"[Boundless.Modding] : Starting mod {MetaData.Name}");
+
 		DirectoryPath installPath = ModAssetsPath.CombineDirectory(MetaData.Name);
 		foreach (PckFile assetPack in AssetPacks) {
 			assetPack.Install(installPath);
@@ -93,11 +95,13 @@ public record class Mod : IDisposable {
 				.ToList().ForEach(method => method.Invoke(null, null));
 		}
 
-		GD.Print($"Started mod {MetaData.Name}");
+		GD.Print($"[Boundless.Modding] : Started mod {MetaData.Name}");
 	}
 	public void Stop() {
 		if (!_started) return;
 		_started = false;
+
+		GD.Print($"[Boundless.Modding] : Stopping mod {MetaData.Name}");
 
 		foreach ((Assembly assembly, _) in Assemblies) {
 			assembly.GetTypes().SelectMany(type => type.GetMethods())
@@ -108,6 +112,6 @@ public record class Mod : IDisposable {
 			assetPack.Uninstall();
 		}
 
-		GD.Print($"Stopped mod {MetaData.Name}");
+		GD.Print($"[Boundless.Modding] : Stopped mod {MetaData.Name}");
 	}
 }

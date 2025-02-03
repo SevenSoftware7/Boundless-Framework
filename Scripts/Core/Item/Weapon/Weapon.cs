@@ -171,9 +171,7 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem, IUIObject, ICostu
 	public override void _Ready() {
 		base._Ready();
 
-		if (GetParent()?.IsNodeReady() ?? false) {
-			RequestInjection();
-		}
+		RequestInjection();
 	}
 
 	public override void _Process(double delta) {

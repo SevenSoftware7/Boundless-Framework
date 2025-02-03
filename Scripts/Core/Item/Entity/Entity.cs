@@ -8,7 +8,6 @@ using SevenDev.Boundless.Utility;
 using SevenDev.Boundless.Injection;
 using SevenDev.Boundless.Persistence;
 
-
 /// <summary>
 /// The Entity is the Main part of the Framework and corresponds to any thing a Player is able to Control partially or entirely.
 /// All Characters and Enemies are Entities.
@@ -278,7 +277,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 					StyleSwitchBuffer.Enqueue(bufferStyle.Value);
 				}
 				else {
-					InjectionNode.PropagateInjection(bufferStyle.Value);
+					InjectionNode.PropagateInjection<StyleState>(bufferStyle.Value);
 				}
 			}
 
@@ -341,7 +340,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 			while (StyleSwitchBuffer.Count > 0) {
 				StyleState bufferedStyle = StyleSwitchBuffer.Dequeue();
-				InjectionNode.PropagateInjection(bufferedStyle);
+				InjectionNode.PropagateInjection<StyleState>(bufferedStyle);
 			}
 		}
 	}

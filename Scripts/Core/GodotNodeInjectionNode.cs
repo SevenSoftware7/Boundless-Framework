@@ -38,7 +38,7 @@ public readonly struct GodotNodeInjectionNode : IInjectionNode {
 	}
 
 	/// <inheritdoc/>
-	public readonly bool IsReady => GodotNode.IsNodeReady();
+	public readonly bool IsReady => GodotNode.IsNodeReady() || (GodotNode.GetTree()?.CurrentScene?.IsNodeReady() ?? false);
 
 	/// <inheritdoc/>
 	public readonly string NodeName => GodotNode.Name;
