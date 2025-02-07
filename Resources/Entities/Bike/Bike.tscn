@@ -43,7 +43,7 @@ Stats = SubResource("Resource_jjk82")
 HudPack = SubResource("Resource_bd6gb")
 _costumeHolder = NodePath("CostumeHolder")
 CurrentBehaviour = NodePath("VehicleBehaviour")
-_attributeModifiers = [null]
+_traitModifiers = [null]
 CenterOfMass = NodePath("CollisionShape3D/CenterOfMass")
 
 [node name="CostumeHolder" type="Node3D" parent="."]

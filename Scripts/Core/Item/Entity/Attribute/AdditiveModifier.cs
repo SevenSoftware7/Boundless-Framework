@@ -4,7 +4,7 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public sealed partial class AdditiveModifier : AttributeModifier {
+public sealed partial class AdditiveModifier : TraitModifier {
 	[Export]
 	public float Adder {
 		get => _adder;
@@ -17,7 +17,7 @@ public sealed partial class AdditiveModifier : AttributeModifier {
 
 
 
-	public AdditiveModifier(EntityAttribute target, float adder) : base(target) {
+	public AdditiveModifier(Trait target, float adder) : base(target) {
 		_adder = adder;
 	}
 	private AdditiveModifier() : base() { }
@@ -29,10 +29,10 @@ public sealed partial class AdditiveModifier : AttributeModifier {
 	}
 
 	protected override string GetResourceName() {
-		return $"{(_adder >= 0 ? '+' : '-')} {Mathf.Abs(_adder)} {AttributeName}";
+		return $"{(_adder >= 0 ? '+' : '-')} {Mathf.Abs(_adder)} {TraitName}";
 	}
 
-	protected override bool EqualsInternal(AttributeModifier other) {
+	protected override bool EqualsInternal(TraitModifier other) {
 		return other is AdditiveModifier additiveModifier && additiveModifier._adder == _adder;
 	}
 	public override int GetHashCode() {

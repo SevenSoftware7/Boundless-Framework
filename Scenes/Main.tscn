@@ -17,10 +17,9 @@
 [ext_resource type="PackedScene" uid="uid://fbs6dr24ss3g" path="res://Resources/Weapons/Epiphron/Epiphron.tscn" id="12_1jl3t"]
 [ext_resource type="PackedScene" uid="uid://ckd33ejkd5cqi" path="res://Resources/FX/Water.tscn" id="12_xdv3s"]
 [ext_resource type="Script" uid="uid://d3j00f1kcv4c2" path="res://Scripts/Core/Item/Weapon/Collection/Implementations/MultiWeapon.cs" id="13_d6cna"]
-[ext_resource type="Script" uid="uid://demu2xbt0bpng" path="res://Scripts/Core/Item/Entity/Attribute/AttributeModifierTrigger.cs" id="14_w4log"]
+[ext_resource type="Script" uid="uid://demu2xbt0bpng" path="res://Scripts/Core/Item/Entity/Attribute/TraitModifierTrigger.cs" id="14_w4log"]
 [ext_resource type="PackedScene" uid="uid://b7b17ebmgtrfy" path="res://Resources/Weapons/Nemesis/Nemesis.tscn" id="15_x4bcq"]
 [ext_resource type="Script" uid="uid://cp6ie0y0o2qd4" path="res://Scripts/Core/Item/Entity/Attribute/AdditiveModifier.cs" id="15_y8l2d"]
-[ext_resource type="Script" uid="uid://bycrdvgqioks7" path="res://Scripts/Core/Item/Entity/Attribute/AttributeModifier.cs" id="16_u7mjy"]
 [ext_resource type="PackedScene" uid="uid://bp1e6thwkkcrr" path="res://Resources/Weapons/Eleos/Eleos.tscn" id="17_jhoyp"]
 [ext_resource type="Script" uid="uid://cdkgbhb2txfvj" path="res://Scripts/Core/Damage/DamageArea.cs" id="18_pbwgl"]
 [ext_resource type="PackedScene" uid="uid://bxcpbr13uyeh1" path="res://Resources/Entities/Bike/Bike.tscn" id="20_pcyav"]
@@ -1483,6 +1482,8 @@ albedo_color = Color(0.025, 0, 0.75, 0.498039)
 [sub_resource type="SphereMesh" id="SphereMesh_nkuww"]
 material = SubResource("StandardMaterial3D_k6yo1")
 
+[sub_resource type="CSharpScript" id="CSharpScript_xvtyr"]
+
 [sub_resource type="Animation" id="Animation_2ppbj"]
 length = 0.001
 
@@ -1889,7 +1890,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.4761, 1.30216, -12.7711)
 collision_layer = 2048
 collision_mask = 2304
 script = ExtResource("14_w4log")
-_attributeModifiers = Array[ExtResource("16_u7mjy")]([SubResource("Resource_tocgr")])
+_attributeModifiers = [SubResource("Resource_tocgr")]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/WitherArea3D"]
 shape = SubResource("SphereShape3D_d0jor")
@@ -1956,10 +1957,12 @@ Entity = NodePath("../Eos")
 
 [node name="Bike" parent="." instance=ExtResource("20_pcyav")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.10534, 2, 32.9924)
+_attributeModifiers = Array[SubResource("CSharpScript_xvtyr")]([null])
 
 [node name="Eos" parent="." instance=ExtResource("9_0jt21")]
 process_priority = -10
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.873384, 2, 34.141)
+_attributeModifiers = Array[SubResource("CSharpScript_xvtyr")]([null])
 
 [node name="AnimationPlayer" parent="Eos" index="4"]
 libraries = {

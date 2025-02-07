@@ -4,7 +4,7 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public sealed partial class PercentileModifier : AttributeModifier {
+public sealed partial class PercentileModifier : TraitModifier {
 	[Export]
 	public float Percentile {
 		get => _percentile;
@@ -20,7 +20,7 @@ public sealed partial class PercentileModifier : AttributeModifier {
 
 
 
-	public PercentileModifier(EntityAttribute target, float percentile, bool isStacking = false) : base(target) {
+	public PercentileModifier(Trait target, float percentile, bool isStacking = false) : base(target) {
 		_percentile = percentile;
 		_isStacking = isStacking;
 	}
@@ -33,10 +33,10 @@ public sealed partial class PercentileModifier : AttributeModifier {
 	}
 
 	protected override string GetResourceName() {
-		return $"{_percentile:+0.##%;-#.##%} {AttributeName}";
+		return $"{_percentile:+0.##%;-#.##%} {TraitName}";
 	}
 
-	protected override bool EqualsInternal(AttributeModifier other) {
+	protected override bool EqualsInternal(TraitModifier other) {
 		return other is PercentileModifier percentileModifier && percentileModifier._percentile == _percentile;
 	}
 	public override int GetHashCode() {

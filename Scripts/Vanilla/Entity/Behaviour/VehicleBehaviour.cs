@@ -36,7 +36,7 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 		if (!_movement.IsEqualApprox(Vector3.Zero)) {
 			direction = _movement.Normalized();
 
-			newSpeed = Entity.GlobalForward.Dot(direction) * Entity.AttributeModifiers.ApplyTo(Attributes.GenericMoveSpeed, Entity.Stats.BaseSpeed);
+			newSpeed = Entity.GlobalForward.Dot(direction) * Entity.TraitModifiers.ApplyTo(Traits.GenericMoveSpeed, Entity.Stats.BaseSpeed);
 			Entity.GlobalForward = Entity.GlobalForward.Slerp(direction, floatDelta * 3f);
 		}
 

@@ -60,14 +60,14 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 		bool isOnWaterSurface = distanceToWaterSurface <= SurfaceThreshold;
 
 
-		float newSpeed = Entity.AttributeModifiers.ApplyTo(Attributes.GenericMoveSpeed, Entity.Stats.BaseSpeed);
+		float newSpeed = Entity.TraitModifiers.ApplyTo(Traits.GenericMoveSpeed, Entity.Stats.BaseSpeed);
 
 		float speedDelta = _moveSpeed < newSpeed ? Entity.Stats.Acceleration : Entity.Stats.Deceleration;
 		_moveSpeed = _moveSpeed.MoveToward(newSpeed, speedDelta * floatDelta);
 
 
 		// ----- Rotation & Movement -----
-		float rotationSpeed = Entity.AttributeModifiers.ApplyTo(Attributes.GenericTurnSpeed, Entity.Stats.RotationSpeed);
+		float rotationSpeed = Entity.TraitModifiers.ApplyTo(Traits.GenericTurnSpeed, Entity.Stats.RotationSpeed);
 
 		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection), (float)delta * rotationSpeed);
 

@@ -6,20 +6,18 @@ using Godot.Collections;
 
 [Tool]
 [GlobalClass]
-public abstract partial class AttributeModifier : Resource, IEquatable<AttributeModifier>, IAttributeModifier {
-	public static readonly StringName AttributeValue = "AttributeValue";
-
-	[Export] private bool UseAttributeDropdown {
-		get => _useAttributeDropdown;
+public abstract partial class TraitModifier : Resource, IEquatable<TraitModifier>, ITraitModifier {
+	[Export] private bool UseTraitDropdown {
+		get => _useTraitDropdown;
 		set {
-			_useAttributeDropdown = value;
+			_useTraitDropdown = value;
 			NotifyPropertyListChanged();
 		}
 	}
-	private bool _useAttributeDropdown = false;
+	private bool _useTraitDropdown = false;
 
 	[Export]
-	public StringName AttributeName {
+	public StringName TraitName {
 		get => Target.Name;
 		private set {
 			Target = value;
@@ -38,10 +36,10 @@ public abstract partial class AttributeModifier : Resource, IEquatable<Attribute
 	}
 	private float _efficiency = 1f;
 
-	public EntityAttribute Target { get; private set; } = Attributes.GenericAttributes[0];
+	public Trait Target { get; private set; } = Traits.GenericTraits[0];
 	public virtual bool IsStacking => false;
 
-	public event Action<EntityAttribute>? OnValueModified;
+	public event Action<Trait>? OnValueModified;
 	protected void EmitValueModified() {
 		OnValueModified?.Invoke(Target);
 		UpdateName();
@@ -49,10 +47,10 @@ public abstract partial class AttributeModifier : Resource, IEquatable<Attribute
 
 
 
-	public AttributeModifier(EntityAttribute target) : base() {
+	public TraitModifier(Trait target) : base() {
 		Target = target;
 	}
-	protected AttributeModifier() : base() { }
+	protected TraitModifier() : base() { }
 
 
 
@@ -71,29 +69,29 @@ public abstract partial class AttributeModifier : Resource, IEquatable<Attribute
 
 		StringName name = property["name"].AsStringName();
 
-		if (UseAttributeDropdown && name == PropertyName.AttributeName) {
+		if (UseTraitDropdown && name == PropertyName.TraitName) {
 			property["hint"] = (int)PropertyHint.Enum;
-			property["hint_string"] = Attributes.JoinedGenericAttributes;
+			property["hint_string"] = Traits.JoinedGenericTraits;
 		}
-		else if (name == PropertyName.UseAttributeDropdown) {
+		else if (name == PropertyName.UseTraitDropdown) {
 			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
 		}
 	}
 
-	public bool Equals(AttributeModifier? other) {
+	public bool Equals(TraitModifier? other) {
 		if (other is null) return false;
 		if (!EqualsInternal(other)) return true;
 		return Target == other.Target;
 	}
-	protected abstract bool EqualsInternal(AttributeModifier other);
-	public override bool Equals(object? obj) => Equals(obj as AttributeModifier);
+	protected abstract bool EqualsInternal(TraitModifier other);
+	public override bool Equals(object? obj) => Equals(obj as TraitModifier);
 
 
-	public static bool operator ==(AttributeModifier? left, AttributeModifier? right) {
+	public static bool operator ==(TraitModifier? left, TraitModifier? right) {
 		if (left is null) return right is null;
 		return left.Equals(right);
 	}
-	public static bool operator !=(AttributeModifier? left, AttributeModifier? right) {
+	public static bool operator !=(TraitModifier? left, TraitModifier? right) {
 		return !(left == right);
 	}
 

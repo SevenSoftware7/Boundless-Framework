@@ -105,11 +105,11 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 
 	[Export]
-	private Godot.Collections.Array<AttributeModifier> _attributeModifiers {
-		get => [.. AttributeModifiers, null];
-		set => AttributeModifiers.Set([.. value.Where(a => a is not null)]);
+	private Godot.Collections.Array<TraitModifier> _traitModifiers {
+		get => [.. TraitModifiers, null];
+		set => TraitModifiers.Set([.. value.Where(a => a is not null)]);
 	}
-	public readonly AttributeModifierCollection AttributeModifiers = [];
+	public readonly TraitModifierCollection TraitModifiers = [];
 
 
 	[ExportGroup("Movement")]
@@ -291,10 +291,10 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 
 	private void UpdateHealth(bool keepRatio) {
-		_health?.SetMaximum(AttributeModifiers.ApplyTo(Attributes.GenericMaxHealth, Stats.MaxHealth), keepRatio);
+		_health?.SetMaximum(TraitModifiers.ApplyTo(Traits.GenericMaxHealth, Stats.MaxHealth), keepRatio);
 	}
-	private void OnHealthModifiersUpdate(EntityAttribute attribute) {
-		if (attribute == Attributes.GenericMaxHealth) {
+	private void OnHealthModifiersUpdate(Trait trait) {
+		if (trait == Traits.GenericMaxHealth) {
 			UpdateHealth(false);
 		}
 	}
@@ -308,7 +308,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 		UpdateHealth(true);
 
-		AttributeModifiers.OnModifiersUpdated += OnHealthModifiersUpdate;
+		TraitModifiers.OnModifiersUpdated += OnHealthModifiersUpdate;
 
 		if (_globalForward == Vector3.Zero) {
 			_globalForward = GlobalBasis.Forward();

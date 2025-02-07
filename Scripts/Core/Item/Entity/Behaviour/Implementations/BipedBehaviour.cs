@@ -90,8 +90,8 @@ public partial class BipedBehaviour : GroundedBehaviour {
 		_moveSpeed = _moveSpeed.MoveToward(newSpeed, speedDelta * floatDelta);
 
 		// ----- Rotation & Movement -----
-		float rotationSpeed = Entity.AttributeModifiers.ApplyTo(Attributes.GenericTurnSpeed, Entity.Stats.RotationSpeed);
-		float finalSpeed = Entity.AttributeModifiers.ApplyTo(Attributes.GenericMoveSpeed, _moveSpeed);
+		float rotationSpeed = Entity.TraitModifiers.ApplyTo(Traits.GenericTurnSpeed, Entity.Stats.RotationSpeed);
+		float finalSpeed = Entity.TraitModifiers.ApplyTo(Traits.GenericMoveSpeed, _moveSpeed);
 
 		if (!_movement.IsZeroApprox()) {
 			Vector3 normalizedInput = _movement.Normalized();

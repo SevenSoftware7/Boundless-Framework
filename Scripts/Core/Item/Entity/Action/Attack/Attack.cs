@@ -11,7 +11,7 @@ using SevenDev.Boundless.Utility;
 /// <param name="entity">Inherited from <see cref="Action"/>.</param>
 /// <param name="weapon">The Weapon which will be used in the Attack.</param>
 /// <param name="modifiers">Inherited from <see cref="Action"/>.</param>
-public abstract partial class Attack(Entity entity, Weapon weapon, AnimationPath path, IEnumerable<AttributeModifier>? modifiers = null) : AnimationAction(entity, path, modifiers), IDamageDealerProxy {
+public abstract partial class Attack(Entity entity, Weapon weapon, AnimationPath path, IEnumerable<TraitModifier>? modifiers = null) : AnimationAction(entity, path, modifiers), IDamageDealerProxy {
 	private readonly List<DamageArea?> damageAreas = [];
 
 	public Weapon Weapon { get; private set; } = weapon;

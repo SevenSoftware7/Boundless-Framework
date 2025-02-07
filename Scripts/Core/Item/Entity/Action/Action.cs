@@ -18,7 +18,7 @@ public abstract partial class Action : Node {
 	/// The Entity which is executing the Action
 	/// </summary>
 	[Export] public Entity Entity;
-	public IEnumerable<AttributeModifier> Modifiers;
+	public IEnumerable<TraitModifier> Modifiers;
 
 	public event System.Action? OnStart;
 	public event System.Action? OnStop;
@@ -28,7 +28,7 @@ public abstract partial class Action : Node {
 	/// The Modifiers intrisic to the Action,<para/>
 	/// they will be applied to the Entity when the Action is started and removed from the Entity when the Action is stopped.
 	/// </param>
-	public Action(Entity entity, IEnumerable<AttributeModifier>? modifiers = null) {
+	public Action(Entity entity, IEnumerable<TraitModifier>? modifiers = null) {
 		Entity = entity;
 		Modifiers = modifiers ?? [];
 	}
@@ -56,7 +56,7 @@ public abstract partial class Action : Node {
 		Lifetime.Start();
 		OnStart?.Invoke();
 
-		Entity.AttributeModifiers.AddRange(Modifiers);
+		Entity.TraitModifiers.AddRange(Modifiers);
 		_Start();
 	}
 
@@ -66,7 +66,7 @@ public abstract partial class Action : Node {
 	public void Stop() {
 		OnStop?.Invoke();
 
-		Entity.AttributeModifiers.RemoveRange(Modifiers);
+		Entity.TraitModifiers.RemoveRange(Modifiers);
 		_Stop();
 
 		this.UnparentAndQueueFree();

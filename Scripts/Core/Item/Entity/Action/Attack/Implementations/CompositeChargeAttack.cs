@@ -12,7 +12,7 @@ using SevenDev.Boundless.Utility;
 /// <param name="library">The Animation Library of the attacks</param>
 /// <param name="info">The Composite Charge Attack Parameters to use when setting up the Charge Attack</param>
 /// <param name="modifiers">Inherited from <see cref="Action"/>.</param>
-public partial class CompositeChargeAttack(Entity entity, Weapon weapon, AnimationPath animationPath, CompositeChargeAttack.Builder info, IEnumerable<AttributeModifier>? modifiers = null) : ChargeAttack(entity, weapon, animationPath, modifiers) {
+public partial class CompositeChargeAttack(Entity entity, Weapon weapon, AnimationPath animationPath, CompositeChargeAttack.Builder info, IEnumerable<TraitModifier>? modifiers = null) : ChargeAttack(entity, weapon, animationPath, modifiers) {
 	private readonly TimeDuration chargeTime = new(info.ChargeDuration, true);
 	private bool isDone;
 
@@ -61,7 +61,7 @@ public partial class CompositeChargeAttack(Entity entity, Weapon weapon, Animati
 
 
 
-	public new sealed class Builder(Weapon weapon, Attack.Builder unchargedAttack, Attack.Builder chargedAttack, StringName AnimationName, StringName? actionKey = null, ulong? chargeDuration = null, IEnumerable<AttributeModifier>? modifiers = null) : ChargeAttack.Builder(weapon) {
+	public new sealed class Builder(Weapon weapon, Attack.Builder unchargedAttack, Attack.Builder chargedAttack, StringName AnimationName, StringName? actionKey = null, ulong? chargeDuration = null, IEnumerable<TraitModifier>? modifiers = null) : ChargeAttack.Builder(weapon) {
 		public Attack.Builder UnchargedAttack { get; init; } = unchargedAttack;
 		public Attack.Builder ChargedAttack { get; init; } = chargedAttack;
 

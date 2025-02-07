@@ -61,7 +61,7 @@ Skeleton = NodePath("Skeleton3D")
 AnimationPlayer = NodePath("AnimationPlayer")
 CurrentBehaviour = NodePath("BipedBehaviour")
 Health = NodePath("Health")
-_attributeModifiers = [null]
+_traitModifiers = [null]
 CenterOfMass = NodePath("Collisions/CenterOfMass")
 
 [node name="Skeleton3D" parent="." instance=ExtResource("5_j1koo")]

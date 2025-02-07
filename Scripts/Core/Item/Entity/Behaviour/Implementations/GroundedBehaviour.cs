@@ -189,7 +189,7 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 			return verticalInertia;
 		}
 
-		float fallSpeed = Entity.AttributeModifiers.ApplyTo(Attributes.GenericGravity, 32f);
+		float fallSpeed = Entity.TraitModifiers.ApplyTo(Traits.GenericGravity, 32f);
 
 		float fallInertia = verticalInertia.Dot(-Entity.UpDirection);
 		Vector3 targetInertia = -Entity.UpDirection * fallSpeed;

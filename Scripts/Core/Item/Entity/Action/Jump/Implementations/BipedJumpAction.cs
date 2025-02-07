@@ -42,7 +42,7 @@ public partial class BipedJumpAction : JumpAction, IPlayerHandler {
 	public void DisavowPlayer() { }
 
 	protected override void _Start() {
-		float jumpHeight = Entity.AttributeModifiers.ApplyTo(Attributes.GenericjumpHeight, Entity.Stats.JumpHeight);
+		float jumpHeight = Entity.TraitModifiers.ApplyTo(Traits.GenericjumpHeight, Entity.Stats.JumpHeight);
 
 		float initialJumpHeight = jumpHeight * INITIAL_JUMP_HEIGHT_FRACTION;
 		Entity.Inertia = Entity.Inertia.SlideOnFace(Direction) + Direction * initialJumpHeight;

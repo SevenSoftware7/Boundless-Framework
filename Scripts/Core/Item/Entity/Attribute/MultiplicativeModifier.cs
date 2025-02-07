@@ -4,7 +4,7 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public sealed partial class MultiplicativeModifier : AttributeModifier {
+public sealed partial class MultiplicativeModifier : TraitModifier {
 	[Export]
 	public float Multiplier {
 		get => _multiplier;
@@ -20,7 +20,7 @@ public sealed partial class MultiplicativeModifier : AttributeModifier {
 
 
 
-	public MultiplicativeModifier(EntityAttribute target, float multiplier, bool isStacking = false) : base(target) {
+	public MultiplicativeModifier(Trait target, float multiplier, bool isStacking = false) : base(target) {
 		_multiplier = multiplier;
 		_isStacking = isStacking;
 	}
@@ -33,10 +33,10 @@ public sealed partial class MultiplicativeModifier : AttributeModifier {
 	}
 
 	protected override string GetResourceName() {
-		return $"{_multiplier:0.##%} {AttributeName}";
+		return $"{_multiplier:0.##%} {TraitName}";
 	}
 
-	protected override bool EqualsInternal(AttributeModifier other) {
+	protected override bool EqualsInternal(TraitModifier other) {
 		return other is MultiplicativeModifier multiplicativeModifier && multiplicativeModifier._multiplier == _multiplier;
 	}
 	public override int GetHashCode() {

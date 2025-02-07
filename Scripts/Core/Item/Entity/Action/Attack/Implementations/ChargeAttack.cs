@@ -11,7 +11,7 @@ using SevenDev.Boundless.Utility;
 /// <param name="entity">Inherited from <see cref="Action"/>.</param>
 /// <param name="weapon">Inherited from <see cref="Attack"/>.</param>
 /// <param name="modifiers">Inherited from <see cref="Action"/>.</param>
-public abstract partial class ChargeAttack(Entity entity, Weapon weapon, AnimationPath path, IEnumerable<AttributeModifier>? modifiers = null) : Attack(entity, weapon, path, modifiers), IPlayerHandler {
+public abstract partial class ChargeAttack(Entity entity, Weapon weapon, AnimationPath path, IEnumerable<TraitModifier>? modifiers = null) : Attack(entity, weapon, path, modifiers), IPlayerHandler {
 	public override bool IsCancellable => true;
 	public override bool IsInterruptable => true;
 
