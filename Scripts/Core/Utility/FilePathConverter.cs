@@ -4,6 +4,7 @@ using System;
 using YamlDotNet.Serialization;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
+using SevenDev.Boundless.Utility;
 
 public class FilePathConverter : IYamlTypeConverter {
 	private static readonly Type FilePathType = typeof(FilePath);

@@ -1,6 +1,7 @@
 namespace LandlessSkies.Core;
 
 using Godot;
+using SevenDev.Boundless.Utility;
 
 public static class ModLoader {
 	private static readonly DirectoryPath ModDirectoryName = new("mods");

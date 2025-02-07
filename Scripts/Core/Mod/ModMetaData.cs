@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using YamlDotNet.Serialization;
+using SevenDev.Boundless.Utility;
 
 public record class ModMetaData {
 	public static readonly IDeserializer Deserializer = new DeserializerBuilder()

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Godot;
+using SevenDev.Boundless.Utility;
 
 public record class UidCache {
 	private static readonly FilePath GlobalCacheBackupPath = new("res://.godot/uid_cache.backup.bin");

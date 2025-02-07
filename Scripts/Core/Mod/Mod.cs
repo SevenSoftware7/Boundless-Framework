@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using Godot;
+using SevenDev.Boundless.Utility;
 
 public record class Mod : IDisposable {
 	private static readonly DirectoryPath ModAssetsPath = new("res://ModAssets/");
