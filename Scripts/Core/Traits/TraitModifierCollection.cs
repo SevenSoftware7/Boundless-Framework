@@ -27,11 +27,11 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 
 	public void Add(TraitModifier item) {
 		AddInternal(item);
-		OnModifiersUpdated?.Invoke(item.Target);
+		OnModifiersUpdated?.Invoke(item.Trait);
 	}
 	public async Task AddProgressively(TraitModifier item, uint timeMilliseconds = 0, Func<float, float, float, float>? function = null) {
 		await AddProgressivelyInternal(item, timeMilliseconds, function);
-		if (timeMilliseconds == 0) OnModifiersUpdated?.Invoke(item.Target);
+		if (timeMilliseconds == 0) OnModifiersUpdated?.Invoke(item.Trait);
 	}
 
 	private async Task AddProgressivelyInternal(TraitModifier item, uint timeMilliseconds, Func<float, float, float, float>? function) {
@@ -49,7 +49,7 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 		}
 	}
 	private void AddInternal(TraitModifier item) {
-		ref TraitModifierEntry entry = ref CollectionsMarshal.GetValueRefOrAddDefault(_dictionary, item.Target, out bool existed);
+		ref TraitModifierEntry entry = ref CollectionsMarshal.GetValueRefOrAddDefault(_dictionary, item.Trait, out bool existed);
 
 		if (!existed) {
 			entry = new(item);
@@ -65,7 +65,7 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 		HashSet<Trait> traits = [];
 		foreach (TraitModifier item in items) {
 			AddInternal(item);
-			traits.Add(item.Target);
+			traits.Add(item.Trait);
 		}
 		foreach (Trait trait in traits) {
 			OnModifiersUpdated?.Invoke(trait);
@@ -74,19 +74,19 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 
 	public bool Remove(TraitModifier item) {
 		bool wasRemoved = RemoveInternal(item);
-		if (wasRemoved) OnModifiersUpdated?.Invoke(item.Target);
+		if (wasRemoved) OnModifiersUpdated?.Invoke(item.Trait);
 
 		return wasRemoved;
 	}
 	public async Task<bool> RemoveProgressively(TraitModifier item, uint timeMilliseconds = 0, Func<float, float, float, float>? function = null) {
 		bool wasRemoved = await RemoveProgressivelyInternal(item, timeMilliseconds, function);
-		if (wasRemoved && timeMilliseconds == 0) OnModifiersUpdated?.Invoke(item.Target);
+		if (wasRemoved && timeMilliseconds == 0) OnModifiersUpdated?.Invoke(item.Trait);
 
 		return wasRemoved;
 	}
 
 	private async Task<bool> RemoveProgressivelyInternal(TraitModifier item, uint timeMilliseconds = 0, Func<float, float, float, float>? function = null) {
-		ref var entryRef = ref CollectionsMarshal.GetValueRefOrNullRef(_dictionary, item.Target);
+		ref var entryRef = ref CollectionsMarshal.GetValueRefOrNullRef(_dictionary, item.Trait);
 		if (Unsafe.IsNullRef(ref entryRef)) return false;
 		if (!entryRef.Contains(item)) return false;
 
@@ -109,7 +109,7 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 		return true;
 	}
 	private bool RemoveInternal(TraitModifier item) {
-		ref var entry = ref CollectionsMarshal.GetValueRefOrNullRef(_dictionary, item.Target);
+		ref var entry = ref CollectionsMarshal.GetValueRefOrNullRef(_dictionary, item.Trait);
 		if (Unsafe.IsNullRef(ref entry) || !entry.Remove(item))
 			return false;
 
@@ -121,7 +121,7 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 		HashSet<Trait> traits = [];
 		foreach (TraitModifier item in items) {
 			RemoveInternal(item);
-			traits.Add(item.Target);
+			traits.Add(item.Trait);
 		}
 
 		foreach (Trait trait in traits) {
@@ -159,7 +159,7 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 	}
 
 	public bool Contains(TraitModifier item) =>
-		_dictionary.TryGetValue(item.Target, out TraitModifierEntry entry) &&
+		_dictionary.TryGetValue(item.Trait, out TraitModifierEntry entry) &&
 		entry.Contains(item);
 
 	public void CopyTo(TraitModifier[] array, int arrayIndex) =>

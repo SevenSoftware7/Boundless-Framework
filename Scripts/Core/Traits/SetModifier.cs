@@ -31,7 +31,7 @@ public partial class SetModifier : TraitModifier {
 	}
 
 	protected override string GetResourceName() {
-		return $"{TraitName} = {_value}";
+		return $"{Trait.Name} = {_value}";
 	}
 
 	protected override bool EqualsInternal(TraitModifier other) {

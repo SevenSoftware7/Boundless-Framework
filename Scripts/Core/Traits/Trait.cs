@@ -21,6 +21,9 @@ public readonly struct Trait {
 		_ => false
 	};
 
+
+	public bool Equals(Trait? other) => Name == other?.Name;
+
 	public static bool operator ==(Trait? left, Trait? right) {
 		return left?.Equals(right) ?? right is null;
 	}
@@ -28,8 +31,8 @@ public readonly struct Trait {
 		return !(left == right);
 	}
 
-	public bool Equals(Trait? other) => Name == other?.Name;
 
+	public bool Equals(StringName? other) => Name == other;
 
 	public static bool operator ==(Trait? left, StringName? right) {
 		return left?.Equals(right) ?? right is null;
@@ -45,8 +48,8 @@ public readonly struct Trait {
 		return !(left == right);
 	}
 
-	public bool Equals(StringName? other) => Name == other;
 
+	public bool Equals(string? other) => other is not null && Name == other;
 
 	public static bool operator ==(Trait? left, string? right) {
 		return left?.Equals(right) ?? right == null;
@@ -61,8 +64,6 @@ public readonly struct Trait {
 	public static bool operator !=(string? left, Trait? right) {
 		return !(left == right);
 	}
-
-	public bool Equals(string? other) => other is not null && Name == other;
 
 
 	public override int GetHashCode() => Name.GetHashCode();

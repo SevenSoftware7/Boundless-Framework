@@ -37,7 +37,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	public IDamageable? Damageable => this;
 
 
-	[Export] public EntityStats Stats { get; private set; } = new();
+	[Export] public TraitsCollection EntityTraits { get; private set; } = [];
 	[Export] public HudPack HudPack { get; private set; } = new();
 
 	[Export]
@@ -163,6 +163,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 		Forward = Vector3.Forward;
 	}
 
+	public float GetTraitValue(Trait trait) => TraitModifiers.ApplyTo(trait, EntityTraits.GetOrDefault(trait));
+	public float GetTraitValue(Trait trait, float @default) => TraitModifiers.ApplyTo(trait, EntityTraits.GetOrDefault(trait, @default));
 
 	public bool ExecuteAction(Action.Builder builder, bool forceExecute = false) => ExecuteAction(new Action.Wrapper(builder), forceExecute);
 	public bool ExecuteAction(Action.Wrapper action, bool forceExecute = false) {
@@ -291,7 +293,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 
 	private void UpdateHealth(bool keepRatio) {
-		_health?.SetMaximum(TraitModifiers.ApplyTo(Traits.GenericMaxHealth, Stats.MaxHealth), keepRatio);
+		_health?.SetMaximum(GetTraitValue(Traits.GenericMaxHealth), keepRatio);
 	}
 	private void OnHealthModifiersUpdate(Trait trait) {
 		if (trait == Traits.GenericMaxHealth) {

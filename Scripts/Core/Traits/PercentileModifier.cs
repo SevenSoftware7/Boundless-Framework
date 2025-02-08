@@ -29,11 +29,11 @@ public sealed partial class PercentileModifier : TraitModifier {
 
 
 	public override float ApplyTo(float baseValue) {
-		return baseValue * (1f + Mathf.Lerp(0, _percentile, Efficiency));
+		return baseValue * Mathf.Lerp(0, _percentile / 100f, Efficiency);
 	}
 
 	protected override string GetResourceName() {
-		return $"{_percentile:+0.##%;-#.##%} {TraitName}";
+		return $"{_percentile/100f:0.##%;-#.##%} {Trait.Name}";
 	}
 
 	protected override bool EqualsInternal(TraitModifier other) {

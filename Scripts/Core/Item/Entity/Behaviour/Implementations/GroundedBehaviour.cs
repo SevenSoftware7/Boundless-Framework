@@ -12,7 +12,7 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 
 	protected readonly TimeDuration jumpBuffer = new(125, false);
 	protected readonly TimeDuration coyoteTimer = new(150, false);
-	protected readonly TimeDuration jumpCooldown = new(500, false);
+	protected readonly TimeDuration jumpCooldown = new(200, false);
 
 
 	protected GroundedBehaviour() : this(null) { }
@@ -120,7 +120,7 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 			float margin = Mathf.Epsilon;
 
 			Vector3 sweepStart = destination;
-			Vector3 sweepMotion = (Entity.Stats.StepHeight + margin) * -Entity.UpDirection;
+			Vector3 sweepMotion = (Entity.GetTraitValue(Traits.GenericStepHeight) + margin) * -Entity.UpDirection;
 
 			// Search above the obstacle to find a step upwards
 			if (stepObstacleCollision is not null) {

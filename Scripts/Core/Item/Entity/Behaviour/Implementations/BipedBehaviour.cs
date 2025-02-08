@@ -84,13 +84,13 @@ public partial class BipedBehaviour : GroundedBehaviour {
 		float floatDelta = (float)delta;
 
 		// ---- Speed Calculation ----
-		float newSpeed = Mathf.Min(_movement.Length(), Entity.Stats.SprintSpeed);
+		float newSpeed = Mathf.Min(_movement.Length(), Entity.GetTraitValue(/* Traits.Sprint */Traits.GenericMoveSpeed));
 
-		float speedDelta = _moveSpeed < newSpeed ? Entity.Stats.Acceleration : Entity.Stats.Deceleration;
+		float speedDelta = Entity.GetTraitValue(_moveSpeed < newSpeed ? Traits.GenericAcceleration : Traits.GenericDeceleration);
 		_moveSpeed = _moveSpeed.MoveToward(newSpeed, speedDelta * floatDelta);
 
 		// ----- Rotation & Movement -----
-		float rotationSpeed = Entity.TraitModifiers.ApplyTo(Traits.GenericTurnSpeed, Entity.Stats.RotationSpeed);
+		float rotationSpeed = Entity.GetTraitValue(Traits.GenericTurnSpeed);
 		float finalSpeed = Entity.TraitModifiers.ApplyTo(Traits.GenericMoveSpeed, _moveSpeed);
 
 		if (!_movement.IsZeroApprox()) {

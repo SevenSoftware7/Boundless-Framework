@@ -33,7 +33,7 @@ public sealed partial class MultiplicativeModifier : TraitModifier {
 	}
 
 	protected override string GetResourceName() {
-		return $"{_multiplier:0.##%} {TraitName}";
+		return $"{_multiplier:0.##%} {Trait.Name}";
 	}
 
 	protected override bool EqualsInternal(TraitModifier other) {

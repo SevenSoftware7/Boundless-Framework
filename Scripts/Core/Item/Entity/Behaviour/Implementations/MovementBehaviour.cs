@@ -23,9 +23,9 @@ public abstract partial class MovementBehaviour : EntityBehaviour {
 
 	protected virtual Vector3 GetMovement(Vector3 direction, MovementType movementType) {
 		float speed = movementType switch {
-			MovementType.Walk => Entity.Stats.SlowSpeed,
-			MovementType.Sprint => Entity.Stats.SprintSpeed,
-			MovementType.Run or _ => Entity.Stats.BaseSpeed,
+			// MovementType.Walk => Entity.EntityTraits.GetOrDefault(SlowSpeed),
+			// MovementType.Sprint => Entity.EntityTraits.GetOrDefault(SprintSpeed),
+			MovementType.Run or _ => Entity.EntityTraits.GetOrDefault(Traits.GenericMoveSpeed),
 		};
 		return direction * speed;
 	}

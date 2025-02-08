@@ -29,7 +29,7 @@ public sealed partial class AdditiveModifier : TraitModifier {
 	}
 
 	protected override string GetResourceName() {
-		return $"{(_adder >= 0 ? '+' : '-')} {Mathf.Abs(_adder)} {TraitName}";
+		return $"{(_adder >= 0 ? '+' : '-')} {Mathf.Abs(_adder)} {Trait.Name}";
 	}
 
 	protected override bool EqualsInternal(TraitModifier other) {
