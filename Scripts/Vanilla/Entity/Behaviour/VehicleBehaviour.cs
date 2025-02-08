@@ -36,8 +36,8 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 		if (!_movement.IsEqualApprox(Vector3.Zero)) {
 			direction = _movement.Normalized();
 
-			newSpeed = Entity.GlobalForward.Dot(direction) * Entity.TraitModifiers.ApplyTo(Traits.GenericMoveSpeed, Entity.Stats.BaseSpeed);
-			Entity.GlobalForward = Entity.GlobalForward.Slerp(direction, floatDelta * 3f);
+			newSpeed = Mathf.Max(Entity.GlobalForward.Dot(direction), 0f) * Entity.TraitModifiers.ApplyTo(Traits.GenericMoveSpeed, Entity.Stats.BaseSpeed);
+			Entity.GlobalForward = Entity.GlobalForward.Slerp(direction, Entity.TraitModifiers.ApplyTo(Traits.GenericTurnSpeed, Entity.Stats.RotationSpeed) * floatDelta);
 		}
 
 		float speedDelta = newSpeed > _moveSpeed ? 1f : 0.25f;
@@ -51,10 +51,9 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 			Vector3 groundUp = groundFlatness > 0.5f ? normal : Entity.UpDirection;
 			Vector3 rightDir = Entity.GlobalForward.Cross(groundUp).Normalized();
 
-			_modelUp = _modelUp.SafeSlerp((groundUp * 4f + direction.Dot(rightDir) * rightDir).Normalized(), 7f * floatDelta);
-			Vector3 modelForward = _modelUp.Cross(rightDir);
+			_modelUp = _modelUp.Lerp((groundUp + direction.Dot(rightDir) * rightDir).Normalized(), 7f * floatDelta).Normalized();
 
-			Basis modelRotation = Basis.LookingAt(modelForward, _modelUp);
+			Basis modelRotation = Basis.LookingAt(Entity.GlobalForward, _modelUp);
 			model.GlobalBasis = modelRotation;
 
 			Basis realRotation = Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection);
@@ -67,6 +66,10 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 
 		_movement = Vector3.Zero;
 		return Entity.GlobalForward * _moveSpeed;
+	}
+
+	protected override Vector3 ProcessHorizontalInertia(double delta, Vector3 horizontalInertia) {
+		return base.ProcessHorizontalInertia(delta, horizontalInertia);
 	}
 
 	public void OnEnterWater(Water water) {
