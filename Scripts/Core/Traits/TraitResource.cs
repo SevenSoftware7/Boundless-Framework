@@ -15,7 +15,6 @@ public partial class TraitResource : Resource, IEquatable<TraitResource> {
 			_trait = value;
 			ResourceName = _trait.Name;
 			EmitChanged();
-			NotifyPropertyListChanged();
 		}
 	}
 	private Trait _trait = defaultTrait;
