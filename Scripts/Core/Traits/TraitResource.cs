@@ -7,7 +7,7 @@ using Godot.Collections;
 [Tool]
 [GlobalClass]
 public partial class TraitResource : Resource, IEquatable<TraitResource> {
-	private static readonly Trait defaultTrait = Traits.GenericTraits[0];
+	private static Trait DefaultTrait => Traits.GenericTraits[0];
 
 	public Trait Trait {
 		get => _trait;
@@ -17,7 +17,7 @@ public partial class TraitResource : Resource, IEquatable<TraitResource> {
 			EmitChanged();
 		}
 	}
-	private Trait _trait = defaultTrait;
+	private Trait _trait = DefaultTrait;
 
 	[Export] private bool Dropdown {
 		get => _useTraitDropdown;
@@ -59,7 +59,7 @@ public partial class TraitResource : Resource, IEquatable<TraitResource> {
 		return base._PropertyCanRevert(property) || property == PropertyName.Name || property == PropertyName.Dropdown;
 	}
 	public override Variant _PropertyGetRevert(StringName property) {
-		if (property == PropertyName.Name) return defaultTrait.Name;
+		if (property == PropertyName.Name) return DefaultTrait.Name;
 		if (property == PropertyName.Dropdown) return Dropdown;
 		return base._PropertyGetRevert(property);
 	}
