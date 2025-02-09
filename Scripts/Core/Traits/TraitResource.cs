@@ -13,8 +13,9 @@ public partial class TraitResource : Resource, IEquatable<TraitResource> {
 		get => _trait;
 		set {
 			_trait = value;
-			ResourceName = value.Name;
+			ResourceName = _trait.Name;
 			EmitChanged();
+			NotifyPropertyListChanged();
 		}
 	}
 	private Trait _trait = defaultTrait;
@@ -29,9 +30,15 @@ public partial class TraitResource : Resource, IEquatable<TraitResource> {
 	private bool _useTraitDropdown = false;
 
 	[Export]
-	public StringName Name {
+	public string Name {
 		get => Trait.Name;
 		private set => Trait = value;
+	}
+
+
+	public TraitResource() : base() { }
+	public TraitResource(Trait trait) : this() {
+		Trait = trait;
 	}
 
 
@@ -75,6 +82,9 @@ public partial class TraitResource : Resource, IEquatable<TraitResource> {
 	public static bool operator !=(TraitResource? left, TraitResource? right) {
 		return !(left == right);
 	}
+
+	public static implicit operator Trait(TraitResource resource) => resource.Trait;
+	public static implicit operator TraitResource(Trait trait) => new(trait);
 
 	public override int GetHashCode() => Trait.GetHashCode();
 }

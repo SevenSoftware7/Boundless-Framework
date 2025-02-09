@@ -163,8 +163,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 		Forward = Vector3.Forward;
 	}
 
-	public float GetTraitValue(Trait trait) => TraitModifiers.ApplyTo(trait, EntityTraits.GetOrDefault(trait));
-	public float GetTraitValue(Trait trait, float @default) => TraitModifiers.ApplyTo(trait, EntityTraits.GetOrDefault(trait, @default));
+	public float GetTraitValue(Trait trait, float @default = default) => TraitModifiers.ApplyTo(trait, EntityTraits.GetValueOrDefault(trait, @default));
 
 	public bool ExecuteAction(Action.Builder builder, bool forceExecute = false) => ExecuteAction(new Action.Wrapper(builder), forceExecute);
 	public bool ExecuteAction(Action.Wrapper action, bool forceExecute = false) {

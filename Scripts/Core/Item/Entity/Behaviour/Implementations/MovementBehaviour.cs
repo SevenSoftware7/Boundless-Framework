@@ -1,5 +1,6 @@
 namespace LandlessSkies.Core;
 
+using System.Collections.Generic;
 using Godot;
 
 [Tool]
@@ -25,7 +26,7 @@ public abstract partial class MovementBehaviour : EntityBehaviour {
 		float speed = movementType switch {
 			// MovementType.Walk => Entity.EntityTraits.GetOrDefault(SlowSpeed),
 			// MovementType.Sprint => Entity.EntityTraits.GetOrDefault(SprintSpeed),
-			MovementType.Run or _ => Entity.EntityTraits.GetOrDefault(Traits.GenericMoveSpeed),
+			MovementType.Run or _ => Entity.EntityTraits.GetValueOrDefault(Traits.GenericMoveSpeed, 1f),
 		};
 		return direction * speed;
 	}

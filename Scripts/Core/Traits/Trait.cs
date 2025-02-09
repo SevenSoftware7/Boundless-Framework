@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using Godot;
 
 public readonly struct Trait {
-	public readonly StringName Name { get; init; }
+	public readonly StringName Name;
 
 	public Trait(string name) {
 		Name = name.ToSnakeCase();

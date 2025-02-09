@@ -23,14 +23,14 @@ public partial class MainNode : Node3D, ISerializationListener {
 		RegisterData();
 		this.PropagateInjection();
 
-		if (Engine.IsEditorHint()) return;
+		// if (Engine.IsEditorHint()) return;
 
 
-		Mod? mod = ModLoader.LoadInternalMod("TestMod");
-		mod?.Start();
+		// Mod? mod = ModLoader.LoadInternalMod("TestMod");
+		// mod?.Start();
 
 
-		mod?.Stop();
+		// mod?.Stop();
 	}
 
 	public void OnBeforeSerialize() { }

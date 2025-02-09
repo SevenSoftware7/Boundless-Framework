@@ -10,50 +10,46 @@ using Godot;
 [GlobalClass]
 public partial class TraitsCollection : Resource, IDictionary<Trait, float>, IReadOnlyDictionary<Trait, float> {
 	public static readonly Dictionary<Trait, float> DefaultTraitValues = new() {
-		{ Traits.GenericMaxHealth, 1f },
-		{ Traits.GenericMeleeDamage, 1f},
-		{ Traits.GenericMoveSpeed, 8f},
-		{ Traits.GenericTurnSpeed, 20f},
-		{ Traits.GenericStepHeight, 0.5f},
-		{ Traits.GenericJumpHeight, 20f},
-		{ Traits.GenericGravity, 1f},
+		{ Traits.GenericMaxHealth, 25f },
+		{ Traits.GenericMoveSpeed, 8f },
+		{ Traits.GenericTurnSpeed, 20f },
+		{ Traits.GenericAcceleration, 50f },
+		{ Traits.GenericDeceleration, 35f },
+		{ Traits.GenericStepHeight, 0.5f },
+		{ Traits.GenericJumpHeight, 20f },
+		{ Traits.GenericGravity, 1f },
 	};
+	private static Dictionary<TraitResource, float> GetDefaultTraitResourceValues() => new(DefaultTraitValues.ToDictionary(trait => new TraitResource(trait.Key), trait => trait.Value));
+	private static readonly Dictionary<TraitResource, float> DefaultTraitResourceDict = GetDefaultTraitResourceValues();
+	private static readonly Godot.Collections.Dictionary<TraitResource, float> DefaultTraitResourceValuesGodotDict = new(DefaultTraitResourceDict);
 
-	public Dictionary<Trait, float> TraitValues = new(DefaultTraitValues);
+	private Dictionary<TraitResource, float> TraitValues = DefaultTraitResourceDict;
 
 	[Export]
-	private Godot.Collections.Dictionary<TraitResource, float> _traitValues {
-		get => new(TraitValues.ToDictionary(pair => new TraitResource { Trait = pair.Key }, pair => pair.Value));
-		set => TraitValues = value.ToDictionary(pair => pair.Key.Trait, pair => pair.Value);
+	protected Godot.Collections.Dictionary<TraitResource, float> TraitValuesDict {
+		get => new (TraitValues);
+		set => TraitValues = new (value);
 	}
-
-
-	public ICollection<Trait> Keys => TraitValues.Keys;
+	public ICollection<Trait> Keys => [.. TraitValues.Keys.Select(traitResource => traitResource.Trait)];
 	public ICollection<float> Values => TraitValues.Values;
 	public int Count => TraitValues.Count;
-	public bool IsReadOnly => ((IDictionary<Trait, float>)TraitValues).IsReadOnly;
-	IEnumerable<Trait> IReadOnlyDictionary<Trait, float>.Keys => TraitValues.Keys;
-	IEnumerable<float> IReadOnlyDictionary<Trait, float>.Values => TraitValues.Values;
+	public bool IsReadOnly => false;
+	IEnumerable<Trait> IReadOnlyDictionary<Trait, float>.Keys => Keys;
+	IEnumerable<float> IReadOnlyDictionary<Trait, float>.Values => Values;
 
 	public float this[Trait key] {
 		get => TraitValues[key];
 		set => TraitValues[key] = value;
 	}
 
-	public TraitsCollection() : base() { }
+	public override bool _PropertyCanRevert(StringName property) {
+		return base._PropertyCanRevert(property) || property == PropertyName.TraitValuesDict;
+	}
+	public override Variant _PropertyGetRevert(StringName property) {
+		if (property == PropertyName.TraitValuesDict) return DefaultTraitResourceValuesGodotDict;
+		return base._PropertyGetRevert(property);
+	}
 
-	public float GetOrDefault(Trait key) {
-		return TraitValues.TryGetValue(key, out float value)
-			? value
-			: DefaultTraitValues.TryGetValue(key, out value)
-				? value
-				: 0f;
-	}
-	public float GetOrDefault(Trait key, float @default) {
-		return TraitValues.TryGetValue(key, out float value)
-			? value
-			: @default;
-	}
 
 	public void Add(Trait key, float value) => TraitValues.Add(key, value);
 
@@ -61,19 +57,27 @@ public partial class TraitsCollection : Resource, IDictionary<Trait, float>, IRe
 
 	public bool Remove(Trait key) => TraitValues.Remove(key);
 
-	public bool TryGetValue(Trait key, [MaybeNullWhen(false)] out float value) => TraitValues.TryGetValue(key, out value);
+	public bool TryGetValue(Trait key, [MaybeNullWhen(false)] out float value) =>
+		TraitValues.TryGetValue(key, out value);
 
-	public void Add(KeyValuePair<Trait, float> item) => ((IDictionary<Trait, float>)TraitValues).Add(item);
+	public void Add(KeyValuePair<Trait, float> item) => Add(item.Key, item.Value);
 
 	public void Clear() => TraitValues.Clear();
 
-	public bool Contains(KeyValuePair<Trait, float> item) => ((IDictionary<Trait, float>)TraitValues).Contains(item);
+	public bool Contains(KeyValuePair<Trait, float> item) =>
+		TraitValues.ContainsKey(item.Key) && TraitValues[item.Key] == item.Value;
 
-	public void CopyTo(KeyValuePair<Trait, float>[] array, int arrayIndex) => ((IDictionary<Trait, float>)TraitValues).CopyTo(array, arrayIndex);
+	public void CopyTo(KeyValuePair<Trait, float>[] array, int arrayIndex) {
+		foreach (var item in TraitValues) {
+			array[arrayIndex++] = new KeyValuePair<Trait, float>(item.Key, item.Value);
+		}
+	}
 
-	public bool Remove(KeyValuePair<Trait, float> item) => ((IDictionary<Trait, float>)TraitValues).Remove(item);
+	public bool Remove(KeyValuePair<Trait, float> item) => Contains(item) && Remove(item.Key);
 
-	public IEnumerator<KeyValuePair<Trait, float>> GetEnumerator() => TraitValues.GetEnumerator();
+	public IEnumerator<KeyValuePair<Trait, float>> GetEnumerator() =>
+		TraitValues.Select(item => new KeyValuePair<Trait, float>(item.Key, item.Value)).GetEnumerator();
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
 }
