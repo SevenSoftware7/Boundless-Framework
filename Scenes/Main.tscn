@@ -1492,42 +1492,42 @@ albedo_color = Color(0.025, 0, 0.75, 0.498039)
 [sub_resource type="SphereMesh" id="SphereMesh_nkuww"]
 material = SubResource("StandardMaterial3D_k6yo1")
 
-[sub_resource type="Resource" id="Resource_5psol"]
+[sub_resource type="Resource" id="Resource_x3rx7"]
 resource_name = "generic_max_health"
 script = ExtResource("17_x3rx7")
 Name = "generic_max_health"
 
-[sub_resource type="Resource" id="Resource_m4llh"]
+[sub_resource type="Resource" id="Resource_6heos"]
 resource_name = "generic_move_speed"
 script = ExtResource("17_x3rx7")
 Name = "generic_move_speed"
 
-[sub_resource type="Resource" id="Resource_lac6x"]
+[sub_resource type="Resource" id="Resource_vvnwx"]
 resource_name = "generic_turn_speed"
 script = ExtResource("17_x3rx7")
 Name = "generic_turn_speed"
 
-[sub_resource type="Resource" id="Resource_hpjjw"]
+[sub_resource type="Resource" id="Resource_vs04g"]
 resource_name = "generic_acceleration"
 script = ExtResource("17_x3rx7")
 Name = "generic_acceleration"
 
-[sub_resource type="Resource" id="Resource_off7b"]
+[sub_resource type="Resource" id="Resource_6ehlx"]
 resource_name = "generic_deceleration"
 script = ExtResource("17_x3rx7")
 Name = "generic_deceleration"
 
-[sub_resource type="Resource" id="Resource_lfh1j"]
+[sub_resource type="Resource" id="Resource_utia5"]
 resource_name = "generic_step_height"
 script = ExtResource("17_x3rx7")
 Name = "generic_step_height"
 
-[sub_resource type="Resource" id="Resource_7sj7i"]
+[sub_resource type="Resource" id="Resource_f7hdo"]
 resource_name = "generic_jump_height"
 script = ExtResource("17_x3rx7")
 Name = "generic_jump_height"
 
-[sub_resource type="Resource" id="Resource_semxg"]
+[sub_resource type="Resource" id="Resource_clvyn"]
 resource_name = "generic_gravity"
 script = ExtResource("17_x3rx7")
 Name = "generic_gravity"
@@ -1535,27 +1535,27 @@ Name = "generic_gravity"
 [sub_resource type="Resource" id="Resource_d8m2u"]
 script = ExtResource("23_qta6b")
 TraitValuesDict = Dictionary[ExtResource("17_x3rx7"), float]({
-SubResource("Resource_5psol"): 25.0,
-SubResource("Resource_m4llh"): 37.5,
-SubResource("Resource_lac6x"): 1.75,
-SubResource("Resource_hpjjw"): 50.0,
-SubResource("Resource_off7b"): 35.0,
-SubResource("Resource_lfh1j"): 0.3,
-SubResource("Resource_7sj7i"): 15.0,
-SubResource("Resource_semxg"): 1.0
+SubResource("Resource_x3rx7"): 25.0,
+SubResource("Resource_6heos"): 37.5,
+SubResource("Resource_vvnwx"): 1.75,
+SubResource("Resource_vs04g"): 50.0,
+SubResource("Resource_6ehlx"): 35.0,
+SubResource("Resource_utia5"): 0.3,
+SubResource("Resource_f7hdo"): 15.0,
+SubResource("Resource_clvyn"): 1.0
 })
 
 [sub_resource type="Resource" id="Resource_ep8v8"]
 script = ExtResource("23_qta6b")
 TraitValuesDict = Dictionary[ExtResource("17_x3rx7"), float]({
-SubResource("Resource_5psol"): 25.0,
-SubResource("Resource_m4llh"): 8.0,
-SubResource("Resource_lac6x"): 20.0,
-SubResource("Resource_hpjjw"): 50.0,
-SubResource("Resource_off7b"): 35.0,
-SubResource("Resource_lfh1j"): 0.5,
-SubResource("Resource_7sj7i"): 20.0,
-SubResource("Resource_semxg"): 1.0
+SubResource("Resource_x3rx7"): 25.0,
+SubResource("Resource_6heos"): 8.0,
+SubResource("Resource_vvnwx"): 20.0,
+SubResource("Resource_vs04g"): 50.0,
+SubResource("Resource_6ehlx"): 35.0,
+SubResource("Resource_utia5"): 0.5,
+SubResource("Resource_f7hdo"): 20.0,
+SubResource("Resource_clvyn"): 1.0
 })
 
 [sub_resource type="Animation" id="Animation_2ppbj"]
