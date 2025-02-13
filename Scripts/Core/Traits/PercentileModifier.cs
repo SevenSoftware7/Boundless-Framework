@@ -28,8 +28,8 @@ public sealed partial class PercentileModifier : TraitModifier {
 
 
 
-	public override float ApplyTo(float baseValue) {
-		return baseValue * Mathf.Lerp(0, _percentile / 100f, Efficiency);
+	public override float ApplyTo(float baseValue, float multiplier = 1f) {
+		return baseValue * Mathf.Lerp(0, _percentile / 100f, multiplier);
 	}
 
 	protected override string GetResourceName() {

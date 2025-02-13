@@ -28,8 +28,8 @@ public sealed partial class MultiplicativeModifier : TraitModifier {
 
 
 
-	public override float ApplyTo(float baseValue) {
-		return baseValue * Mathf.Lerp(1f, _multiplier, Efficiency);
+	public override float ApplyTo(float baseValue, float multiplier = 1f) {
+		return baseValue * Mathf.Lerp(1f, _multiplier, multiplier);
 	}
 
 	protected override string GetResourceName() {

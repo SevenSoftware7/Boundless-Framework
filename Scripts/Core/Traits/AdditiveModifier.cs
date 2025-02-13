@@ -24,8 +24,8 @@ public sealed partial class AdditiveModifier : TraitModifier {
 
 
 
-	public override float ApplyTo(float baseValue) {
-		return baseValue + _adder * Efficiency;
+	public override float ApplyTo(float baseValue, float multiplier = 1f) {
+		return baseValue + _adder * multiplier;
 	}
 
 	protected override string GetResourceName() {

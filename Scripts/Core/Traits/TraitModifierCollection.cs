@@ -11,6 +11,7 @@ using Godot;
 
 public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 	private readonly Dictionary<Trait, TraitModifierEntry> _dictionary = [];
+	private readonly HashSet<TraitModifier> _inOperation = [];
 
 	public int Count => _dictionary.Values.Sum(e => e.Count);
 	public bool IsReadOnly => false;
@@ -35,20 +36,21 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 	}
 
 	private async Task AddProgressivelyInternal(TraitModifier item, uint timeMilliseconds, Func<float, float, float, float>? function) {
-		AddInternal(item);
+		TraitModifierEntry entry = AddInternal(item);
 
 		if (timeMilliseconds > 0) {
 			function ??= Mathf.Lerp;
 
 			float start = 0f;
-			float end = item.Efficiency;
+			float end = 1f;
 
 			await AsyncUtils.WaitAndCall(timeMilliseconds, (elapsed) => {
-				item.Efficiency = function(start, end, (float)elapsed / timeMilliseconds);
+				entry.Modifiers[item] = function(start, end, (float)elapsed / timeMilliseconds);
+				OnModifiersUpdated?.Invoke(item.Trait);
 			});
 		}
 	}
-	private void AddInternal(TraitModifier item) {
+	private TraitModifierEntry AddInternal(TraitModifier item) {
 		ref TraitModifierEntry entry = ref CollectionsMarshal.GetValueRefOrAddDefault(_dictionary, item.Trait, out bool existed);
 
 		if (!existed) {
@@ -59,6 +61,8 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 		}
 
 		item.OnValueModified += OnModifiersUpdated;
+
+		return entry;
 	}
 
 	public void AddRange(IEnumerable<TraitModifier> items) {
@@ -95,11 +99,12 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 		if (timeMilliseconds > 0) {
 			function ??= Mathf.Lerp;
 
-			float start = item.Efficiency;
+			float start = 1f;
 			float end = 0f;
 
 			await AsyncUtils.WaitAndCall(timeMilliseconds, (elapsed) => {
-				item.Efficiency = function(start, end, (float)elapsed / timeMilliseconds);
+				entry.Modifiers[item] = function(start, end, (float)elapsed / timeMilliseconds);
+				OnModifiersUpdated?.Invoke(item.Trait);
 			});
 		}
 
@@ -149,7 +154,7 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 	}
 
 	public void Clear() {
-		var entries = _dictionary.Values;
+		Dictionary<Trait, TraitModifierEntry>.ValueCollection entries = _dictionary.Values;
 
 		foreach (TraitModifierEntry entry in entries) {
 			foreach (TraitModifier modifier in entry.List) {
@@ -177,15 +182,14 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 
 
 	private readonly struct TraitModifierEntry : ICollection<TraitModifier> {
-		private readonly List<TraitModifier> _stacking = [];
-		private readonly List<TraitModifier> _nonStacking = [];
+		public readonly Dictionary<TraitModifier, float> Modifiers = [];
 
 
 		public readonly List<TraitModifier> List =>
-			[.. _nonStacking, .. _stacking];
+			[.. Modifiers.Keys];
 
-		public int Count => _nonStacking.Count + _stacking.Count;
-		public bool IsReadOnly => false;
+		public readonly int Count => Modifiers.Count;
+		public readonly bool IsReadOnly => false;
 
 
 		public TraitModifierEntry() { }
@@ -199,38 +203,36 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 		}
 
 
-		public void Add(TraitModifier item) {
-			if (item.IsStacking) {
-				_stacking.Add(item);
-			}
-			else {
-				_nonStacking.Add(item);
-			}
-		}
+		public readonly void Add(TraitModifier item) =>
+			Modifiers.Add(item, 1f);
 
-		public bool Remove(TraitModifier item) =>
-			_stacking.Remove(item) ||
-			_nonStacking.Remove(item);
+		public readonly bool Remove(TraitModifier item) =>
+			Modifiers.Remove(item);
 
-		public void Clear() {
-			_stacking.Clear();
-			_nonStacking.Clear();
-		}
+		public readonly void Clear() =>
+			Modifiers.Clear();
 
 
-		public void CopyTo(TraitModifier[] array, int arrayIndex) =>
+
+		public readonly void CopyTo(TraitModifier[] array, int arrayIndex) =>
 			List.CopyTo(array, arrayIndex);
 
 
 		public readonly float ApplyTo(float baseValue) {
 			float result = baseValue;
 
-			foreach (ITraitModifier trait in _nonStacking) {
-				result = trait.ApplyTo(result);
+			List<KeyValuePair<TraitModifier, float>> stacking = new(Modifiers.Count);
+
+			foreach (KeyValuePair<TraitModifier, float> kvp in Modifiers) {
+				if (kvp.Key.IsStacking) {
+					stacking.Add(kvp);
+				} else {
+					result = kvp.Key.ApplyTo(result, kvp.Value);
+				}
 			}
 
-			foreach (ITraitModifier trait in _stacking) {
-				result += trait.ApplyTo(baseValue) - baseValue;
+			foreach ((ITraitModifier trait, float multiplier) in stacking) {
+				result += trait.ApplyTo(baseValue, multiplier) - baseValue;
 			}
 
 			return result;
@@ -238,10 +240,10 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 
 
 		public readonly bool Contains(TraitModifier item) =>
-			_stacking.Contains(item) || _nonStacking.Contains(item);
+			Modifiers.ContainsKey(item);
 
 		public readonly IEnumerator<TraitModifier> GetEnumerator() =>
 			List.GetEnumerator();
-		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+		readonly IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 }

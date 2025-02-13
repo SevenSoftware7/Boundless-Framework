@@ -20,16 +20,6 @@ public abstract partial class TraitModifier : Resource, IEquatable<TraitModifier
 	private readonly TraitResource _traitResource = new();
 
 
-	[Export(PropertyHint.Range, "0,1,0.01")]
-	public float Efficiency {
-		get => _efficiency;
-		set {
-			_efficiency = Mathf.Clamp(value, 0f, 1f);
-			EmitValueModified();
-		}
-	}
-	private float _efficiency = 1f;
-
 	public virtual bool IsStacking => false;
 
 	public event Action<Trait>? OnValueModified;
@@ -49,7 +39,7 @@ public abstract partial class TraitModifier : Resource, IEquatable<TraitModifier
 
 
 
-	public abstract float ApplyTo(float baseValue);
+	public abstract float ApplyTo(float baseValue, float multiplier = 1f);
 
 	private void UpdateName() {
 		if (!Engine.IsEditorHint()) return;
@@ -87,5 +77,5 @@ public abstract partial class TraitModifier : Resource, IEquatable<TraitModifier
 		return !(left == right);
 	}
 
-	public override int GetHashCode() => (Trait.GetHashCode() * 397) ^ (Efficiency.GetHashCode() * 397);
+	public override int GetHashCode() => Trait.GetHashCode();
 }

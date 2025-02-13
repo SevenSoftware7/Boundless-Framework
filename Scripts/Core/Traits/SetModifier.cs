@@ -26,8 +26,8 @@ public partial class SetModifier : TraitModifier {
 	private SetModifier() : base() { }
 
 
-	public override float ApplyTo(float baseValue) {
-		return Mathf.Lerp(baseValue, _value, Efficiency);
+	public override float ApplyTo(float baseValue, float multiplier = 1f) {
+		return Mathf.Lerp(baseValue, _value, multiplier);
 	}
 
 	protected override string GetResourceName() {
