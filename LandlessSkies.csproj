@@ -1,7 +1,7 @@
 <Project Sdk="Godot.NET.Sdk/4.4.0-beta.3">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <LangVersion>13</LangVersion>
+    <LangVersion>preview</LangVersion>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>LandlessSkies</RootNamespace>
     <Nullable>enable</Nullable>
@@ -21,9 +21,9 @@
     <PackageReference Include="SevenDev.Boundless.Utility" Version="1.0.2" />
     <!-- <ProjectReference Include="../Boundless.Utility/SevenDev.Boundless.Utility/SevenDev.Boundless.Utility.csproj" /> -->
 
-    <PackageReference Include="SevenDev.Boundless.Injection" Version="1.1.6" />
+    <PackageReference Include="SevenDev.Boundless.Injection" Version="1.1.8" />
     <!-- <ProjectReference Include="../Boundless.Injection/SevenDev.Boundless.Injection/SevenDev.Boundless.Injection.csproj" /> -->
-    <PackageReference Include="SevenDev.Boundless.Injection.Generators" Version="1.1.6" PrivateAssets="all" IncludeAssets="analyzers" />
+    <PackageReference Include="SevenDev.Boundless.Injection.Generators" Version="1.1.8" PrivateAssets="all" IncludeAssets="analyzers" />
     <!-- <ProjectReference Include="../Boundless.Injection/SevenDev.Boundless.Injection.Generators/SevenDev.Boundless.Injection.Generators.csproj" PrivateAssets="all" OutputItemType="analyzer" /> -->
 
     <PackageReference Include="SevenDev.Boundless.Persistence" Version="1.1.1" />
