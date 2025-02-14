@@ -10,14 +10,27 @@ using System.Threading.Tasks;
 using Godot;
 
 public sealed class TraitModifierCollection : ICollection<TraitModifier> {
+	public delegate float InterpFunction(float start, float end, float t);
+
 	private readonly Dictionary<Trait, TraitModifierEntry> _dictionary = [];
-	private readonly HashSet<TraitModifier> _inOperation = [];
 
 	public int Count => _dictionary.Values.Sum(e => e.Count);
 	public bool IsReadOnly => false;
 
 	public event Action<Trait>? OnModifiersUpdated;
 
+
+	private async Task ProgressivelyMoveTo(TraitModifierEntry entry, TraitModifier item, float start, float end, uint timeMilliseconds, InterpFunction? function = null) {
+		function ??= Mathf.Lerp;
+
+		await foreach (int elapsed in AsyncUtils.WaitAndYield(timeMilliseconds)) {
+			ref float multiplierRef = ref CollectionsMarshal.GetValueRefOrNullRef(entry.Modifiers, item);
+			if (Unsafe.IsNullRef(ref multiplierRef)) break;
+
+			multiplierRef = function(start, end, (float)elapsed / timeMilliseconds);
+			OnModifiersUpdated?.Invoke(item.Trait);
+		}
+	}
 
 	public float ApplyTo(Trait target, float baseValue) {
 		if (!_dictionary.TryGetValue(target, out TraitModifierEntry entry))
@@ -30,24 +43,16 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 		AddInternal(item);
 		OnModifiersUpdated?.Invoke(item.Trait);
 	}
-	public async Task AddProgressively(TraitModifier item, uint timeMilliseconds = 0, Func<float, float, float, float>? function = null) {
+	public async Task AddProgressively(TraitModifier item, uint timeMilliseconds = 0, InterpFunction? function = null) {
 		await AddProgressivelyInternal(item, timeMilliseconds, function);
 		if (timeMilliseconds == 0) OnModifiersUpdated?.Invoke(item.Trait);
 	}
 
-	private async Task AddProgressivelyInternal(TraitModifier item, uint timeMilliseconds, Func<float, float, float, float>? function) {
+	private async Task AddProgressivelyInternal(TraitModifier item, uint timeMilliseconds, InterpFunction? function) {
 		TraitModifierEntry entry = AddInternal(item);
 
 		if (timeMilliseconds > 0) {
-			function ??= Mathf.Lerp;
-
-			float start = 0f;
-			float end = 1f;
-
-			await AsyncUtils.WaitAndCall(timeMilliseconds, (elapsed) => {
-				entry.Modifiers[item] = function(start, end, (float)elapsed / timeMilliseconds);
-				OnModifiersUpdated?.Invoke(item.Trait);
-			});
+			await ProgressivelyMoveTo(entry, item, 0f, 1f, timeMilliseconds, function);
 		}
 	}
 	private TraitModifierEntry AddInternal(TraitModifier item) {
@@ -82,14 +87,14 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 
 		return wasRemoved;
 	}
-	public async Task<bool> RemoveProgressively(TraitModifier item, uint timeMilliseconds = 0, Func<float, float, float, float>? function = null) {
+	public async Task<bool> RemoveProgressively(TraitModifier item, uint timeMilliseconds = 0, InterpFunction? function = null) {
 		bool wasRemoved = await RemoveProgressivelyInternal(item, timeMilliseconds, function);
 		if (wasRemoved && timeMilliseconds == 0) OnModifiersUpdated?.Invoke(item.Trait);
 
 		return wasRemoved;
 	}
 
-	private async Task<bool> RemoveProgressivelyInternal(TraitModifier item, uint timeMilliseconds = 0, Func<float, float, float, float>? function = null) {
+	private async Task<bool> RemoveProgressivelyInternal(TraitModifier item, uint timeMilliseconds = 0, InterpFunction? function = null) {
 		ref var entryRef = ref CollectionsMarshal.GetValueRefOrNullRef(_dictionary, item.Trait);
 		if (Unsafe.IsNullRef(ref entryRef)) return false;
 		if (!entryRef.Contains(item)) return false;
@@ -97,15 +102,7 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 		TraitModifierEntry entry = entryRef;
 
 		if (timeMilliseconds > 0) {
-			function ??= Mathf.Lerp;
-
-			float start = 1f;
-			float end = 0f;
-
-			await AsyncUtils.WaitAndCall(timeMilliseconds, (elapsed) => {
-				entry.Modifiers[item] = function(start, end, (float)elapsed / timeMilliseconds);
-				OnModifiersUpdated?.Invoke(item.Trait);
-			});
+			await ProgressivelyMoveTo(entry, item, 1f, 0f, timeMilliseconds, function);
 		}
 
 		if (!entry.Remove(item)) return false;

@@ -9,7 +9,9 @@ public partial class TraitModifierTrigger : EntityTrigger {
 
 
 	protected override async void _EntityEntered(Entity entity) {
-		entity.TraitModifiers.AddRange(_traitModifiers);
+		foreach (TraitModifier traitModifier in _traitModifiers) {
+			Task _ = entity.TraitModifiers.AddProgressively(traitModifier, 1000);
+		}
 		await Task.Delay(3000);
 		foreach (TraitModifier traitModifier in _traitModifiers) {
 			Task<bool> _ = entity.TraitModifiers.RemoveProgressively(traitModifier, 1000);
