@@ -1,6 +1,7 @@
 namespace LandlessSkies.Core;
 
 using System;
+using System.Collections.Generic;
 using Godot;
 using Godot.Collections;
 
@@ -8,6 +9,7 @@ using Godot.Collections;
 [GlobalClass]
 public partial class TraitResource : Resource, IEquatable<TraitResource> {
 	private static Trait DefaultTrait => Traits.GenericTraits[0];
+	private readonly string DropdownTraitsString;
 
 	public Trait Trait {
 		get => _trait;
@@ -35,10 +37,15 @@ public partial class TraitResource : Resource, IEquatable<TraitResource> {
 	}
 
 
-	public TraitResource() : base() { }
-	public TraitResource(Trait trait) : this() {
+	public TraitResource(IEnumerable<Trait> dropdownTraits = null!) : base() {
+		DropdownTraitsString = dropdownTraits is null
+			? Traits.JoinedGenericTraits
+			: string.Join(',', dropdownTraits);
+	}
+	public TraitResource(Trait trait, IEnumerable<Trait> dropdownTraits = null!) : this(dropdownTraits) {
 		Trait = trait;
 	}
+	protected TraitResource() : this(default, null!) { }
 
 
 	public override void _ValidateProperty(Dictionary property) {
@@ -48,7 +55,7 @@ public partial class TraitResource : Resource, IEquatable<TraitResource> {
 
 		if (Dropdown && name == PropertyName.Name) {
 			property["hint"] = (int)PropertyHint.Enum;
-			property["hint_string"] = Traits.JoinedGenericTraits;
+			property["hint_string"] = DropdownTraitsString;
 		}
 		else if (name == PropertyName.Dropdown) {
 			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
@@ -56,7 +63,9 @@ public partial class TraitResource : Resource, IEquatable<TraitResource> {
 	}
 
 	public override bool _PropertyCanRevert(StringName property) {
-		return base._PropertyCanRevert(property) || property == PropertyName.Name || property == PropertyName.Dropdown;
+		return base._PropertyCanRevert(property)
+			|| property == PropertyName.Name
+			|| property == PropertyName.Dropdown;
 	}
 	public override Variant _PropertyGetRevert(StringName property) {
 		if (property == PropertyName.Name) return DefaultTrait.Name;

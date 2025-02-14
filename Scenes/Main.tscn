@@ -1460,7 +1460,6 @@ script = ExtResource("18_6heos")
 Value = 1.0
 _isStacking = false
 TraitResource = SubResource("Resource_qta6b")
-Efficiency = 1.0
 metadata/_custom_type_script = ExtResource("18_6heos")
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_d0jor"]
@@ -2056,20 +2055,20 @@ script = ExtResource("13_d6cna")
 script = ExtResource("13_d6cna")
 
 [node name="Epiphron" parent="Eos/Weapon/Main/First" instance=ExtResource("12_1jl3t")]
-transform = Transform3D(4.37114e-08, -1.50996e-07, 1, -1, -4.37114e-08, 4.37114e-08, 4.37114e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
+transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
 
 [node name="Second" type="Node" parent="Eos/Weapon/Main"]
 script = ExtResource("13_d6cna")
 
 [node name="Nemesis" parent="Eos/Weapon/Main/Second" instance=ExtResource("15_x4bcq")]
-transform = Transform3D(4.37114e-08, -1.50996e-07, 1, -1, -4.37114e-08, 4.37114e-08, 4.37114e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
+transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
 IsHolstered = true
 
 [node name="Third" type="Node" parent="Eos/Weapon/Main"]
 script = ExtResource("13_d6cna")
 
 [node name="Eleos" parent="Eos/Weapon/Main/Third" instance=ExtResource("17_jhoyp")]
-transform = Transform3D(4.37114e-08, -1.50996e-07, 1, -1, -4.37114e-08, 4.37114e-08, 4.37114e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
+transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
 IsHolstered = true
 
 [node name="Erebos" parent="Eos" instance=ExtResource("26_ds8t8")]
