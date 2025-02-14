@@ -13,7 +13,7 @@ public partial class Entity {
 
 
 		if (name == PropertyName.Forward) {
-			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
+			property["usage"] = (long)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
 		}
 	}
 }

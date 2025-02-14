@@ -75,7 +75,7 @@ public partial class Gauge : Node {
 		StringName name = property["name"].AsStringName();
 
 		if (name == PropertyName.Value) {
-			property["hint"] = (int)PropertyHint.Range;
+			property["hint"] = (long)PropertyHint.Range;
 			property["hint_string"] = $"0,{Maximum},";
 		}
 	}

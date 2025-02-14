@@ -54,11 +54,11 @@ public partial class TraitResource : Resource, IEquatable<TraitResource> {
 		StringName name = property["name"].AsStringName();
 
 		if (Dropdown && name == PropertyName.Name) {
-			property["hint"] = (int)PropertyHint.Enum;
+			property["hint"] = (long)PropertyHint.Enum;
 			property["hint_string"] = DropdownTraitsString;
 		}
 		else if (name == PropertyName.Dropdown) {
-			property["usage"] = (int)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
+			property["usage"] = (long)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
 		}
 	}
 
