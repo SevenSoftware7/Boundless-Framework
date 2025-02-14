@@ -69,30 +69,31 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 			Head = boneTransform.RotatedLocal(Vector3.Up, Mathf.DegToRad(180f));
 		}
 
+		// FIXME: On-Faceness should not be directly linked to the healing ability
 		if (OnFace && Entity?.Health is not null) {
 			Entity.Health.Value += floatDelta * 10f;
 		}
 
-		OnFace |= PositionBlocked(Head * rightPosition) && PositionBlocked(Head * leftPosition);
+		bool rightBlocked = PositionBlocked(Head * rightPosition);
+		bool leftBlocked = PositionBlocked(Head * leftPosition);
 
-		if (!OnFace && PositionBlocked(GetPosition(GetCurveT())))
+		OnFace |= rightBlocked && leftBlocked;
+
+		if (!OnFace && (OnRight ? rightBlocked : leftBlocked))
 			OnRight = !OnRight;
 
 
-		T = T.MoveToward(GetCurveT(), 6f * floatDelta);
-		TFace = TFace.Lerp(OnFace ? 1f : 0f, 12f * floatDelta);
+		T = T.MoveToward(OnRight ? 1f : 0f, 6f * floatDelta);
+		TFace = TFace.Lerp(OnFace ? 1f : 0f, (OnFace ? 18f : 6f) * floatDelta);
 
-		Vector3 tPosition = GetPosition(T);
+		Vector3 tPosition = Head * leftPosition.Lerp(rightPosition, T);
 
 		HoveringPosition = HoveringPosition.Lerp(tPosition, 8.5f * floatDelta);
 		HoveringRotation = HoveringRotation.SafeSlerp(Subject.Basis, 12f * floatDelta);
 
 
-		// Curve to Face
-
-
 		float LeftRightT = T * 2f - 1f;
-		float distance = HoveringPosition.DistanceSquaredTo(Head.Origin);
+		float distance = tPosition.DistanceSquaredTo(Head.Origin);
 
 		Curve.SetPointPosition(0, HoveringPosition);
 		Curve.SetPointOut(0, Head.Basis * new Vector3(0, 0, -0.1f));
@@ -106,9 +107,6 @@ public partial class FloatingCompanion : Companion, IPlayerHandler {
 		};
 
 		OnFace = false;
-
-		float GetCurveT() => OnRight ? 1f : 0f;
-		Vector3 GetPosition(float t) => Head * leftPosition.Lerp(rightPosition, t);
 	}
 
 	public override void _Notification(int what) {
