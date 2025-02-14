@@ -37,8 +37,8 @@ public abstract partial class MovementBehaviour : EntityBehaviour {
 		HandleProcess(delta);
 
 		if (IsActive) {
-			Entity.Inertia = ProcessInertia(delta);
 			Entity.Movement = ProcessMovement(delta);
+			Entity.Inertia = ProcessInertia(delta);
 
 			Entity.Velocity = Entity.Inertia + Entity.Movement;
 			Entity.MoveAndSlide();
