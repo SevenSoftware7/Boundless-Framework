@@ -1,6 +1,6 @@
 namespace LandlessSkies.Core;
 
 public interface IDamageable {
-	void Damage(ref DamageData data);
-	void Kill();
+	public void Damage(ref DamageData data);
+	public void Kill();
 }

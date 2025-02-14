@@ -1,5 +1,5 @@
 namespace LandlessSkies.Core;
 
 public interface ICostumable {
-	CostumeHolder? CostumeHolder { get; }
+	public CostumeHolder? CostumeHolder { get; }
 }

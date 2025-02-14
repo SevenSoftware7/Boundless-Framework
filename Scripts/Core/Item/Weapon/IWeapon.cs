@@ -5,14 +5,14 @@ using System.Collections.Generic;
 using SevenDev.Boundless.Persistence;
 
 public interface IWeapon : IUIObject {
-	WeaponKind Kind { get; }
-	WeaponUsage Usage { get; }
-	WeaponSize Size { get; }
+	public WeaponKind Kind { get; }
+	public WeaponUsage Usage { get; }
+	public WeaponSize Size { get; }
 
-	abstract StyleState Style { get; }
-	virtual StyleState MaxStyle => 0;
+	public abstract StyleState Style { get; }
+	public virtual StyleState MaxStyle => 0;
 
-	IEnumerable<Action.Wrapper> GetAttacks(Entity target);
+	public IEnumerable<Action.Wrapper> GetAttacks(Entity target);
 
 	[Flags]
 	public enum WeaponSize : byte {
