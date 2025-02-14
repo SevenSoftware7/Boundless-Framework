@@ -5,7 +5,7 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public abstract partial class TraitModifier : Resource, IEquatable<TraitModifier>, ITraitModifier {
+public abstract partial class TraitModifier : Resource, ITraitModifier {
 	public Trait Trait {
 		get => _traitResource.Trait;
 		private set {
@@ -58,24 +58,24 @@ public abstract partial class TraitModifier : Resource, IEquatable<TraitModifier
 	}
 
 
-	protected abstract bool EqualsInternal(TraitModifier other);
-	public bool Equals(TraitModifier? other) {
-		if (other is null) return false;
-		if (!EqualsInternal(other)) return false;
-		return Trait == other.Trait;
-	}
-	public override bool Equals(object? obj) {
-		return Equals(obj as TraitModifier);
-	}
+	// protected abstract bool EqualsInternal(TraitModifier other);
+	// public bool Equals(TraitModifier? other) {
+	// 	if (other is null) return false;
+	// 	if (!EqualsInternal(other)) return false;
+	// 	return Trait == other.Trait;
+	// }
+	// public override bool Equals(object? obj) {
+	// 	return Equals(obj as TraitModifier);
+	// }
 
 
-	public static bool operator ==(TraitModifier? left, TraitModifier? right) {
-		if (left is null) return right is null;
-		return left.Equals(right);
-	}
-	public static bool operator !=(TraitModifier? left, TraitModifier? right) {
-		return !(left == right);
-	}
+	// public static bool operator ==(TraitModifier? left, TraitModifier? right) {
+	// 	if (left is null) return right is null;
+	// 	return left.Equals(right);
+	// }
+	// public static bool operator !=(TraitModifier? left, TraitModifier? right) {
+	// 	return !(left == right);
+	// }
 
-	public override int GetHashCode() => Trait.GetHashCode();
+	// public override int GetHashCode() => Trait.GetHashCode();
 }

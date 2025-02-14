@@ -23,11 +23,11 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 	private async Task ProgressivelyMoveTo(TraitModifierEntry entry, TraitModifier item, float start, float end, uint timeMilliseconds, InterpFunction? function = null) {
 		function ??= Mathf.Lerp;
 
-		await foreach (int elapsed in AsyncUtils.WaitAndYield(timeMilliseconds)) {
+		await foreach (float elapsed in AsyncUtils.WaitAndYield(timeMilliseconds)) {
 			ref float multiplierRef = ref CollectionsMarshal.GetValueRefOrNullRef(entry.Modifiers, item);
 			if (Unsafe.IsNullRef(ref multiplierRef)) break;
 
-			multiplierRef = function(start, end, (float)elapsed / timeMilliseconds);
+			multiplierRef = function(start, end, elapsed / timeMilliseconds);
 			OnModifiersUpdated?.Invoke(item.Trait);
 		}
 	}
@@ -148,6 +148,19 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 				Add(newModifier);
 			}
 		}
+	}
+
+	public void SetMultiplier(TraitModifier modifier, float multiplier) {
+		ref var entryRef = ref CollectionsMarshal.GetValueRefOrNullRef(_dictionary, modifier.Trait);
+		if (Unsafe.IsNullRef(ref entryRef))
+			throw new KeyNotFoundException("Trait not found in collection");
+
+		ref float multiplierRef = ref CollectionsMarshal.GetValueRefOrNullRef(entryRef.Modifiers, modifier);
+		if (Unsafe.IsNullRef(ref multiplierRef))
+			throw new KeyNotFoundException("TraitModifier not found in collection");
+
+		multiplierRef = multiplier;
+		OnModifiersUpdated?.Invoke(modifier.Trait);
 	}
 
 	public void Clear() {

@@ -35,13 +35,4 @@ public sealed partial class MultiplicativeModifier : TraitModifier {
 	protected override string GetResourceName() {
 		return $"{_multiplier:0.##%} {Trait.Name}";
 	}
-
-	protected override bool EqualsInternal(TraitModifier other) {
-		return other is MultiplicativeModifier multiplicativeModifier && multiplicativeModifier._multiplier == _multiplier;
-	}
-	public override int GetHashCode() {
-		unchecked {
-			return (base.GetHashCode() * 397) ^ (_multiplier.GetHashCode() * 397);
-		}
-	}
 }

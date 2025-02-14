@@ -35,13 +35,4 @@ public sealed partial class PercentileModifier : TraitModifier {
 	protected override string GetResourceName() {
 		return $"{_percentile/100f:0.##%;-#.##%} {Trait.Name}";
 	}
-
-	protected override bool EqualsInternal(TraitModifier other) {
-		return other is PercentileModifier percentileModifier && percentileModifier._percentile == _percentile;
-	}
-	public override int GetHashCode() {
-		unchecked {
-			return (base.GetHashCode() * 397) ^ (_percentile.GetHashCode() * 397);
-		}
-	}
 }

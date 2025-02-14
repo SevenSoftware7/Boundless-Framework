@@ -40,9 +40,6 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 	/// </summary>
 	/// <param name="modifier">The Trait Modifier to add</param>
 	public void AddTraitModifier(TraitModifier modifier) {
-		modifier = (TraitModifier)modifier.Duplicate();
-		if (modifier is null) return;
-
 		modifiers.Add(modifier);
 		Entity.TraitModifiers.Add(modifier);
 	}
@@ -53,9 +50,6 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 	/// <param name="modifier">The Trait Modifier to add</param>
 	/// <param name="timeMilliseconds">The time in milliseconds the TraitModifier will take to "fade in"</param>
 	public async void AddTraitModifier(TraitModifier modifier, uint timeMilliseconds = 0) {
-		modifier = (TraitModifier)modifier.Duplicate();
-		if (modifier is null) return;
-
 		modifiers.Add(modifier);
 		await Entity.TraitModifiers.AddProgressively(modifier, timeMilliseconds);
 	}

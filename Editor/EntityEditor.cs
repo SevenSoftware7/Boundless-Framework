@@ -2,6 +2,7 @@
 
 namespace LandlessSkies.Core;
 
+using System;
 using Godot;
 using Godot.Collections;
 
@@ -16,6 +17,11 @@ public partial class Entity {
 			property["usage"] = (long)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
 		}
 	}
+
+	public static implicit operator Entity(TraitModifierCollection v) {
+		throw new NotImplementedException();
+	}
+
 }
 
 #endif

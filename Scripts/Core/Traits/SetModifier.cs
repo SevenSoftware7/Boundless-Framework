@@ -33,13 +33,4 @@ public partial class SetModifier : TraitModifier {
 	protected override string GetResourceName() {
 		return $"{Trait.Name} = {_value}";
 	}
-
-	protected override bool EqualsInternal(TraitModifier other) {
-		return other is SetModifier setModifier && setModifier._value == _value;
-	}
-	public override int GetHashCode() {
-		unchecked {
-			return (base.GetHashCode() * 397) ^ (_value.GetHashCode() * 397);
-		}
-	}
 }

@@ -31,14 +31,4 @@ public sealed partial class AdditiveModifier : TraitModifier {
 	protected override string GetResourceName() {
 		return $"{(_adder >= 0 ? '+' : '-')} {Mathf.Abs(_adder)} {Trait.Name}";
 	}
-
-	protected override bool EqualsInternal(TraitModifier other) {
-		return other is AdditiveModifier additiveModifier && additiveModifier._adder == _adder;
-	}
-	public override int GetHashCode() {
-		unchecked {
-			return (base.GetHashCode() * 397) ^ (_adder.GetHashCode() * 397);
-		}
-	}
-
 }
