@@ -9,6 +9,9 @@ using SevenDev.Boundless.Utility;
 public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifier {
 	[Export] public DrivingBehaviour? Driver;
 
+	private bool _drifting;
+
+	private Vector3 _inertiaMovement;
 	private float _moveSpeed;
 	private Vector3 _modelUp = Vector3.Up;
 
@@ -27,6 +30,11 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 		Driver?.Dismount();
 	}
 
+	public override void HandlePlayer(Player player) {
+		base.HandlePlayer(player);
+		_drifting = player.InputDevice.IsActionPressed(Inputs.AttackHeavy);
+	}
+
 	protected override Vector3 ProcessGroundedMovement(double delta) {
 		float floatDelta = (float)delta;
 
@@ -36,36 +44,46 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 		if (!_movement.IsEqualApprox(Vector3.Zero)) {
 			direction = _movement.Normalized();
 
-			newSpeed = Mathf.Max(Entity.GlobalForward.Dot(direction), 0f) * Entity.GetTraitValue(Traits.GenericMoveSpeed);
+			newSpeed = Mathf.Clamp(Entity.GlobalForward.Dot(direction) + 0.25f, 0f, 1f) * Entity.GetTraitValue(Traits.GenericMoveSpeed);
 			Entity.GlobalForward = Entity.GlobalForward.Slerp(direction, Entity.GetTraitValue(Traits.GenericTurnSpeed) * floatDelta);
+		}
+
+		if (_drifting) {
+			newSpeed = 0f;
+		}
+		else {
+			_inertiaMovement = _inertiaMovement.Lerp(Entity.GlobalForward, 12f * floatDelta);
 		}
 
 		float speedDelta = newSpeed > _moveSpeed ? 1f : 0.25f;
 		_moveSpeed = _moveSpeed.MoveToward(newSpeed, speedDelta * Entity.GetTraitValue(Traits.GenericAcceleration) * floatDelta);
 
-
-		Vector3 normal = Entity.GetFloorNormal();
-		float groundFlatness = normal.Dot(Entity.UpDirection);
-
-		if (Entity.CostumeHolder?.Costume is Costume model) {
-			Vector3 groundUp = groundFlatness > 0.5f ? normal : Entity.UpDirection;
-			Vector3 rightDir = Entity.GlobalForward.Cross(groundUp).Normalized();
-
-			_modelUp = _modelUp.Lerp((groundUp + direction.Dot(rightDir) * rightDir).Normalized(), 7f * floatDelta).Normalized();
-
-			Basis modelRotation = Basis.LookingAt(Entity.GlobalForward, _modelUp);
-			model.GlobalBasis = modelRotation;
-		}
-
-		Basis newRotation = Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection);
-		Entity.GlobalBasis = newRotation;
+		ComputeRotation(direction, floatDelta);
 
 		_movement = Vector3.Zero;
-		return Entity.GlobalForward * _moveSpeed;
+		return Vector3.Zero;
+
+		void ComputeRotation(Vector3 direction, float floatDelta) {
+			Vector3 normal = Entity.GetFloorNormal();
+			float groundFlatness = normal.Dot(Entity.UpDirection);
+
+			if (Entity.CostumeHolder?.Costume is Costume model) {
+				Vector3 groundUp = groundFlatness > 0.5f ? normal : Entity.UpDirection;
+				Vector3 rightDir = Entity.GlobalForward.Cross(groundUp).Normalized();
+
+				_modelUp = _modelUp.Lerp((groundUp + direction.Dot(rightDir) * rightDir).Normalized(), 7f * floatDelta).Normalized();
+
+				Basis modelRotation = Basis.LookingAt(Entity.GlobalForward, _modelUp);
+				model.GlobalBasis = modelRotation;
+			}
+
+			Basis newRotation = Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection);
+			Entity.GlobalBasis = newRotation;
+		}
 	}
 
 	protected override Vector3 ProcessHorizontalInertia(double delta, Vector3 horizontalInertia) {
-		return base.ProcessHorizontalInertia(delta, horizontalInertia);
+		return _inertiaMovement * _moveSpeed;
 	}
 
 	public void OnEnterWater(Water water) {
