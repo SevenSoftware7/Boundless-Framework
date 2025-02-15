@@ -9,7 +9,7 @@ using Godot.Collections;
 [GlobalClass]
 public partial class TraitResource : Resource, IEquatable<TraitResource> {
 	private static Trait DefaultTrait => Traits.GenericTraits[0];
-	private readonly string DropdownTraitsString;
+	private readonly string DropdownTraitsString = Traits.JoinedGenericTraits;
 
 	public Trait Trait {
 		get => _trait;
@@ -19,7 +19,7 @@ public partial class TraitResource : Resource, IEquatable<TraitResource> {
 			EmitChanged();
 		}
 	}
-	private Trait _trait = DefaultTrait;
+	private Trait _trait;
 
 	[Export] private bool Dropdown {
 		get => _useTraitDropdown;
@@ -37,15 +37,13 @@ public partial class TraitResource : Resource, IEquatable<TraitResource> {
 	}
 
 
-	public TraitResource(IEnumerable<Trait> dropdownTraits = null!) : base() {
-		DropdownTraitsString = dropdownTraits is null
-			? Traits.JoinedGenericTraits
-			: string.Join(',', dropdownTraits);
+	public TraitResource(Trait trait, IEnumerable<Trait> dropdownTraits = null!) : base() {
+		_trait = trait;
+		if (dropdownTraits is not null) {
+			DropdownTraitsString = string.Join(',', dropdownTraits);
+		}
 	}
-	public TraitResource(Trait trait, IEnumerable<Trait> dropdownTraits = null!) : this(dropdownTraits) {
-		Trait = trait;
-	}
-	protected TraitResource() : this(default, null!) { }
+	public TraitResource() : this(DefaultTrait) { }
 
 
 	public override void _ValidateProperty(Dictionary property) {
