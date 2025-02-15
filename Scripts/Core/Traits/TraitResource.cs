@@ -16,7 +16,6 @@ public partial class TraitResource : Resource, IEquatable<TraitResource> {
 		set {
 			_trait = value;
 			ResourceName = _trait.Name;
-			EmitChanged();
 		}
 	}
 	private Trait _trait;
