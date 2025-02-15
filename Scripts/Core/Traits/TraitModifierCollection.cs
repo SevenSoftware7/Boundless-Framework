@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Godot;
 
-public sealed class TraitModifierCollection : ICollection<TraitModifier> {
+public sealed class TraitModifierCollection : ICollection<ITraitModifier> {
 	public delegate float InterpFunction(float start, float end, float t);
 
 	private readonly Dictionary<Trait, TraitModifierEntry> _dictionary = [];
@@ -20,7 +20,7 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 	public event Action<Trait>? OnModifiersUpdated;
 
 
-	private async Task ProgressivelyMoveTo(TraitModifierEntry entry, TraitModifier item, float start, float end, uint timeMilliseconds, InterpFunction? function = null) {
+	private async Task ProgressivelyMoveTo(TraitModifierEntry entry, ITraitModifier item, float start, float end, uint timeMilliseconds, InterpFunction? function = null) {
 		function ??= Mathf.Lerp;
 
 		await foreach (float elapsed in AsyncUtils.WaitAndYield(timeMilliseconds)) {
@@ -39,23 +39,23 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 		return entry.ApplyTo(baseValue);
 	}
 
-	public void Add(TraitModifier item) {
+	public void Add(ITraitModifier item) {
 		AddInternal(item);
 		OnModifiersUpdated?.Invoke(item.Trait);
 	}
-	public async Task AddProgressively(TraitModifier item, uint timeMilliseconds = 0, InterpFunction? function = null) {
+	public async Task AddProgressively(ITraitModifier item, uint timeMilliseconds = 0, InterpFunction? function = null) {
 		await AddProgressivelyInternal(item, timeMilliseconds, function);
 		if (timeMilliseconds == 0) OnModifiersUpdated?.Invoke(item.Trait);
 	}
 
-	private async Task AddProgressivelyInternal(TraitModifier item, uint timeMilliseconds, InterpFunction? function) {
+	private async Task AddProgressivelyInternal(ITraitModifier item, uint timeMilliseconds, InterpFunction? function) {
 		TraitModifierEntry entry = AddInternal(item);
 
 		if (timeMilliseconds > 0) {
 			await ProgressivelyMoveTo(entry, item, 0f, 1f, timeMilliseconds, function);
 		}
 	}
-	private TraitModifierEntry AddInternal(TraitModifier item) {
+	private TraitModifierEntry AddInternal(ITraitModifier item) {
 		ref TraitModifierEntry entry = ref CollectionsMarshal.GetValueRefOrAddDefault(_dictionary, item.Trait, out bool existed);
 
 		if (!existed) {
@@ -70,9 +70,9 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 		return entry;
 	}
 
-	public void AddRange(IEnumerable<TraitModifier> items) {
+	public void AddRange(IEnumerable<ITraitModifier> items) {
 		HashSet<Trait> traits = [];
-		foreach (TraitModifier item in items) {
+		foreach (ITraitModifier item in items) {
 			AddInternal(item);
 			traits.Add(item.Trait);
 		}
@@ -81,7 +81,7 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 		}
 	}
 
-	public bool Remove(TraitModifier item) {
+	public bool Remove(ITraitModifier item) {
 		bool wasRemoved = RemoveInternal(item);
 		if (wasRemoved) OnModifiersUpdated?.Invoke(item.Trait);
 
@@ -110,7 +110,7 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 		item.OnValueModified -= OnModifiersUpdated;
 		return true;
 	}
-	private bool RemoveInternal(TraitModifier item) {
+	private bool RemoveInternal(ITraitModifier item) {
 		ref var entry = ref CollectionsMarshal.GetValueRefOrNullRef(_dictionary, item.Trait);
 		if (Unsafe.IsNullRef(ref entry) || !entry.Remove(item))
 			return false;
@@ -131,26 +131,34 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 		}
 	}
 
-	public void Set(IEnumerable<TraitModifier> modifiers) {
-		HashSet<TraitModifier> newModifiersSet = [.. modifiers];
+	public void Set(IEnumerable<ITraitModifier> modifiers) {
+		HashSet<ITraitModifier> newModifiersSet = [.. modifiers];
+		HashSet<Trait> modifiedTraits = [];
 
 		// Iterate over the current modifiers and collect those that need to be removed
-		List<TraitModifier> currentModifiers = _dictionary.Values.SelectMany(e => e.List).ToList();
-		foreach (TraitModifier currentModifier in currentModifiers) {
+		List<ITraitModifier> currentModifiers = _dictionary.Values.SelectMany(e => e.List).ToList();
+		foreach (ITraitModifier currentModifier in currentModifiers) {
 			if (!newModifiersSet.Contains(currentModifier)) {
-				Remove(currentModifier);
+				RemoveInternal(currentModifier);
+				modifiedTraits.Add(currentModifier.Trait);
 			}
 		}
 
 		// Iterate over the new modifiers and add those that are not already in the collection
-		foreach (TraitModifier newModifier in newModifiersSet) {
+		foreach (ITraitModifier newModifier in newModifiersSet) {
 			if (!Contains(newModifier)) {
-				Add(newModifier);
+				AddInternal(newModifier);
+				modifiedTraits.Add(newModifier.Trait);
 			}
+		}
+
+		// Call OnModifiersUpdated for each modified Trait
+		foreach (Trait trait in modifiedTraits) {
+			OnModifiersUpdated?.Invoke(trait);
 		}
 	}
 
-	public void SetMultiplier(TraitModifier modifier, float multiplier) {
+	public void SetMultiplier(ITraitModifier modifier, float multiplier) {
 		ref var entryRef = ref CollectionsMarshal.GetValueRefOrNullRef(_dictionary, modifier.Trait);
 		if (Unsafe.IsNullRef(ref entryRef))
 			throw new KeyNotFoundException("Trait not found in collection");
@@ -164,26 +172,23 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 	}
 
 	public void Clear() {
-		Dictionary<Trait, TraitModifierEntry>.ValueCollection entries = _dictionary.Values;
-
-		foreach (TraitModifierEntry entry in entries) {
-			foreach (TraitModifier modifier in entry.List) {
-				Remove(modifier);
-			}
+		foreach (Trait trait in _dictionary.Keys) {
+			_dictionary.Remove(trait);
+			OnModifiersUpdated?.Invoke(trait);
 		}
 	}
 
-	public bool Contains(TraitModifier item) =>
+	public bool Contains(ITraitModifier item) =>
 		_dictionary.TryGetValue(item.Trait, out TraitModifierEntry entry) &&
 		entry.Contains(item);
 
-	public void CopyTo(TraitModifier[] array, int arrayIndex) =>
+	public void CopyTo(ITraitModifier[] array, int arrayIndex) =>
 		_dictionary.Values
 			.SelectMany(e => e.List)
 			.ToList()
 			.CopyTo(array, arrayIndex);
 
-	public IEnumerator<TraitModifier> GetEnumerator() =>
+	public IEnumerator<ITraitModifier> GetEnumerator() =>
 		_dictionary.Values
 		.SelectMany(e => e.List)
 		.GetEnumerator();
@@ -191,11 +196,11 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 
 
 
-	private readonly struct TraitModifierEntry : ICollection<TraitModifier> {
-		public readonly Dictionary<TraitModifier, float> Modifiers = [];
+	private readonly struct TraitModifierEntry : ICollection<ITraitModifier> {
+		public readonly Dictionary<ITraitModifier, float> Modifiers = [];
 
 
-		public readonly List<TraitModifier> List =>
+		public readonly List<ITraitModifier> List =>
 			[.. Modifiers.Keys];
 
 		public readonly int Count => Modifiers.Count;
@@ -203,20 +208,20 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 
 
 		public TraitModifierEntry() { }
-		public TraitModifierEntry(TraitModifier modifier) : this() {
+		public TraitModifierEntry(ITraitModifier modifier) : this() {
 			Add(modifier);
 		}
-		public TraitModifierEntry(IEnumerable<TraitModifier> modifiers) : this() {
-			foreach (TraitModifier modifier in modifiers) {
+		public TraitModifierEntry(IEnumerable<ITraitModifier> modifiers) : this() {
+			foreach (ITraitModifier modifier in modifiers) {
 				Add(modifier);
 			}
 		}
 
 
-		public readonly void Add(TraitModifier item) =>
+		public readonly void Add(ITraitModifier item) =>
 			Modifiers.Add(item, 1f);
 
-		public readonly bool Remove(TraitModifier item) =>
+		public readonly bool Remove(ITraitModifier item) =>
 			Modifiers.Remove(item);
 
 		public readonly void Clear() =>
@@ -224,16 +229,16 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 
 
 
-		public readonly void CopyTo(TraitModifier[] array, int arrayIndex) =>
+		public readonly void CopyTo(ITraitModifier[] array, int arrayIndex) =>
 			List.CopyTo(array, arrayIndex);
 
 
 		public readonly float ApplyTo(float baseValue) {
 			float result = baseValue;
 
-			List<KeyValuePair<TraitModifier, float>> stacking = new(Modifiers.Count);
+			List<KeyValuePair<ITraitModifier, float>> stacking = new(Modifiers.Count);
 
-			foreach (KeyValuePair<TraitModifier, float> kvp in Modifiers) {
+			foreach (KeyValuePair<ITraitModifier, float> kvp in Modifiers) {
 				if (kvp.Key.IsStacking) {
 					stacking.Add(kvp);
 				} else {
@@ -249,10 +254,10 @@ public sealed class TraitModifierCollection : ICollection<TraitModifier> {
 		}
 
 
-		public readonly bool Contains(TraitModifier item) =>
+		public readonly bool Contains(ITraitModifier item) =>
 			Modifiers.ContainsKey(item);
 
-		public readonly IEnumerator<TraitModifier> GetEnumerator() =>
+		public readonly IEnumerator<ITraitModifier> GetEnumerator() =>
 			List.GetEnumerator();
 		readonly IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}

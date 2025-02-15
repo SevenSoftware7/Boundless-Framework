@@ -106,8 +106,11 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 	[Export]
 	private Godot.Collections.Array<TraitModifier> _traitModifiers {
-		get => [.. TraitModifiers, null];
-		set => TraitModifiers.Set([.. value.Where(a => a is not null)]);
+		get => [.. TraitModifiers.OfType<TraitModifier>(), null];
+		set {
+			IEnumerable<ITraitModifier> nonResource = TraitModifiers.Where(modifier => modifier is not TraitModifier);
+			TraitModifiers.Set(nonResource.Concat(value.OfType<TraitModifier>()));
+		}
 	}
 	public readonly TraitModifierCollection TraitModifiers = [];
 

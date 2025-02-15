@@ -6,11 +6,11 @@ using Godot;
 public partial class TraitModifierApplier : Node {
 	private readonly uint _durationMsec;
 	private float progress = 0f;
-	private readonly TraitModifier _modifier;
+	private readonly ITraitModifier _modifier;
 	private readonly TraitModifierCollection _modifierCollection;
 
 
-	public TraitModifierApplier(uint durationMsec, TraitModifierCollection entity, TraitModifier modifier) : base() {
+	public TraitModifierApplier(uint durationMsec, TraitModifierCollection entity, ITraitModifier modifier) : base() {
 		_durationMsec = durationMsec;
 		_modifierCollection = entity;
 		_modifier = modifier;

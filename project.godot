@@ -33,9 +33,9 @@ file_logging/enable_file_logging=true
 [display]
 
 window/size/mode=4
-window/size/mode.editor=0
 window/size/borderless=true
 window/vsync/vsync_mode=2
+window/size/mode.editor=0
 
 [dotnet]
 
