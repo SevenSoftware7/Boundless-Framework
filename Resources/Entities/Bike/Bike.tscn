@@ -1,34 +1,75 @@
-[gd_scene load_steps=15 format=3 uid="uid://bxcpbr13uyeh1"]
+[gd_scene load_steps=24 format=3 uid="uid://bxcpbr13uyeh1"]
 
 [ext_resource type="Script" uid="uid://btpoqelwvyeef" path="res://Scripts/Core/Item/Entity/Entity.cs" id="1_46ioo"]
-[ext_resource type="Script" uid="uid://o5n20rntvw6o" path="res://Scripts/Core/Item/Entity/EntityStats.cs" id="2_4vcxx"]
 [ext_resource type="Resource" uid="uid://dyvavvfne7go" path="res://Resources/Entities/Bike/Bike_key.tres" id="2_gl27x"]
 [ext_resource type="Resource" uid="uid://boxbx8vssbjgn" path="res://Resources/Entities/Bike/Bike_ui.tres" id="2_icn6q"]
 [ext_resource type="Script" uid="uid://5gx1ctuejo1p" path="res://Scripts/Core/Item/Entity/HudPack.cs" id="3_aosnt"]
+[ext_resource type="Script" uid="uid://djubduy40g4eb" path="res://Scripts/Core/Traits/TraitResource.cs" id="4_u056q"]
 [ext_resource type="Script" uid="uid://dwtp85ydlhl31" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="5_5toi3"]
 [ext_resource type="Script" uid="uid://klqvajn51glc" path="res://Scripts/Vanilla/Entity/Behaviour/VehicleBehaviour.cs" id="5_6pb3w"]
+[ext_resource type="Script" uid="uid://cpqri6cw2hye2" path="res://Scripts/Core/Traits/TraitsCollection.cs" id="5_8ie50"]
 [ext_resource type="Script" uid="uid://biyf7xcsm2ob8" path="res://Scripts/Vanilla/VehicleSeatInteractable.cs" id="5_kaq40"]
-[ext_resource type="Script" uid="uid://bycrdvgqioks7" path="res://Scripts/Core/Item/Entity/Attribute/TraitModifier.cs" id="6_uy6xw"]
+[ext_resource type="Script" uid="uid://bycrdvgqioks7" path="res://Scripts/Core/Traits/TraitModifier.cs" id="6_uy6xw"]
 [ext_resource type="Resource" uid="uid://djkxop4aum535" path="res://Resources/Entities/Bike/Costumes/Bike-base_key.tres" id="8_5fcav"]
 
-[sub_resource type="Resource" id="Resource_jjk82"]
-script = ExtResource("2_4vcxx")
-MaxHealth = 1.0
-StepHeight = 0.3
-Weight = 12.0
-JumpHeight = 15.0
-Acceleration = 50.0
-Deceleration = 35.0
-RotationSpeed = 1.75
-BaseSpeed = 37.5
-SprintSpeed = 44.0
-SlowSpeed = 12.0
+[sub_resource type="Resource" id="Resource_c3jdb"]
+resource_name = "generic_max_health"
+script = ExtResource("4_u056q")
+Name = "generic_max_health"
+
+[sub_resource type="Resource" id="Resource_k7nyx"]
+resource_name = "generic_move_speed"
+script = ExtResource("4_u056q")
+Name = "generic_move_speed"
+
+[sub_resource type="Resource" id="Resource_lf3id"]
+resource_name = "generic_turn_speed"
+script = ExtResource("4_u056q")
+Name = "generic_turn_speed"
+
+[sub_resource type="Resource" id="Resource_w5bov"]
+resource_name = "generic_acceleration"
+script = ExtResource("4_u056q")
+Name = "generic_acceleration"
+
+[sub_resource type="Resource" id="Resource_mh833"]
+resource_name = "generic_deceleration"
+script = ExtResource("4_u056q")
+Name = "generic_deceleration"
+
+[sub_resource type="Resource" id="Resource_ll5eb"]
+resource_name = "generic_step_height"
+script = ExtResource("4_u056q")
+Name = "generic_step_height"
+
+[sub_resource type="Resource" id="Resource_7radf"]
+resource_name = "generic_jump_height"
+script = ExtResource("4_u056q")
+Name = "generic_jump_height"
+
+[sub_resource type="Resource" id="Resource_xs8l5"]
+resource_name = "generic_gravity"
+script = ExtResource("4_u056q")
+Name = "generic_gravity"
+
+[sub_resource type="Resource" id="Resource_3850e"]
+script = ExtResource("5_8ie50")
+TraitValuesDict = {
+SubResource("Resource_c3jdb"): 25.0,
+SubResource("Resource_k7nyx"): 8.0,
+SubResource("Resource_lf3id"): 20.0,
+SubResource("Resource_w5bov"): 50.0,
+SubResource("Resource_mh833"): 35.0,
+SubResource("Resource_ll5eb"): 0.5,
+SubResource("Resource_7radf"): 20.0,
+SubResource("Resource_xs8l5"): 1.0
+}
 
 [sub_resource type="Resource" id="Resource_bd6gb"]
 script = ExtResource("3_aosnt")
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_3bott"]
-size = Vector3(1, 1.6, 1.25)
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_p1o1o"]
+height = 1.6
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_vd6cg"]
 size = Vector3(1, 1, 3)
@@ -40,7 +81,7 @@ platform_wall_layers = 4294963965
 script = ExtResource("1_46ioo")
 KeyProvider = ExtResource("2_gl27x")
 UI = ExtResource("2_icn6q")
-Stats = SubResource("Resource_jjk82")
+EntityTraits = SubResource("Resource_3850e")
 HudPack = SubResource("Resource_bd6gb")
 _costumeHolder = NodePath("CostumeHolder")
 CurrentBehaviour = NodePath("VehicleBehaviour")
@@ -53,7 +94,7 @@ CostumeKeyProvider = ExtResource("8_5fcav")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
-shape = SubResource("BoxShape3D_3bott")
+shape = SubResource("CapsuleShape3D_p1o1o")
 
 [node name="CenterOfMass" type="Node3D" parent="CollisionShape3D"]
 

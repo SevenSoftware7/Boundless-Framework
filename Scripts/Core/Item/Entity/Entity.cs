@@ -116,6 +116,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 
 	[ExportGroup("Movement")]
+	[Export] public Vector3 Gravity = Vector3.Zero;
 	[Export] public Vector3 Inertia = Vector3.Zero;
 	[Export] public Vector3 Movement = Vector3.Zero;
 

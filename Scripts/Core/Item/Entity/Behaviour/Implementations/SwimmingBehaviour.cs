@@ -48,7 +48,8 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 
 
 	protected override Vector3 ProcessInertia(double delta) {
-		return Entity.Inertia *= Mathf.Max(1 - 6f * (float)delta, 0f);
+		float mult = Mathf.Max(1 - 6f * (float)delta, 0f);
+		return (Entity.Gravity *= mult) + (Entity.Inertia *= mult);
 	}
 
 	protected override Vector3 ProcessMovement(double delta) {
@@ -81,10 +82,10 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 			_floatingDisplacement = _floatingDisplacement.MoveToward(offsetToWaterSurface, 2f * floatDelta);
 			Vector3 floatingDisplacementVector = Vector3.Up * 2f * _floatingDisplacement * floatingSpeed / (Mathf.Abs(distanceToWaterSurface) + 1f);
 
-			Entity.Inertia = Entity.Inertia.MoveToward(floatingDisplacementVector, 12f * floatDelta);
+			Entity.Gravity = Entity.Gravity.MoveToward(floatingDisplacementVector, 12f * floatDelta);
 		}
 
-		return _movement.Normalized() * _moveSpeed;
+		return Entity.Movement = _movement.Normalized() * _moveSpeed;
 	}
 
 

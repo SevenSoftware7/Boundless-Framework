@@ -17,7 +17,7 @@ public partial class TraitsCollection : Resource, IDictionary<Trait, float>, IRe
 		{ Traits.GenericDeceleration, 35f },
 		{ Traits.GenericStepHeight, 0.5f },
 		{ Traits.GenericJumpHeight, 20f },
-		{ Traits.GenericGravity, 1f },
+		{ Traits.GenericGravity, 32f },
 	};
 	private static readonly Dictionary<TraitResource, float> DefaultTraitResourceDict = new(DefaultTraitValues.ToDictionary(trait => new TraitResource(trait.Key), trait => trait.Value));
 	private static readonly Godot.Collections.Dictionary<TraitResource, float> DefaultTraitResourceValuesGodotDict = new(DefaultTraitResourceDict);

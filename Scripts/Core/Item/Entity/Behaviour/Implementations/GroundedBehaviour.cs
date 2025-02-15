@@ -94,116 +94,110 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 
 		Entity.Movement += ProcessGroundedMovement(delta);
 
-		if (MoveStep(delta)) {
-			Entity.Movement = Vector3.Zero;
-		}
+		// if (MoveStep(delta)) {
+		// 	Entity.Movement = Vector3.Zero;
+		// }
 
 		HandleJump(delta);
 
 		return Entity.Movement;
 
 
-		bool MoveStep(double delta) {
-			if (Mathf.IsZeroApprox(Entity.Movement.LengthSquared()) || !Entity.IsOnFloor()) return false;
+		// bool MoveStep(double delta) {
+		// 	if (Mathf.IsZeroApprox(Entity.Movement.LengthSquared()) || !Entity.IsOnFloor()) return false;
 
-			Vector3 movement = Entity.Movement * (float)delta;
-			Vector3 destination = Entity.GlobalTransform.Origin + movement;
-
-
-			// Search for obstacle (step) where the entity is moving
-			KinematicCollision3D? stepObstacleCollision = Entity.MoveAndCollide(movement, true);
-
-			// Not a valid step if the obstacle's surface is not steep
-			if (stepObstacleCollision is not null && Mathf.Abs(stepObstacleCollision.GetNormal().Dot(Entity.UpDirection)) >= Mathfs.RadToDot(Entity.FloorMaxAngle))
-				return false;
-
-			float margin = Mathf.Epsilon;
-
-			Vector3 sweepStart = destination;
-			Vector3 sweepMotion = (Entity.GetTraitValue(Traits.GenericStepHeight) + margin) * -Entity.UpDirection;
-
-			// Search above the obstacle to find a step upwards
-			if (stepObstacleCollision is not null) {
-				sweepStart -= sweepMotion;
-			}
-
-			// Try to collide with the step upwards or downwards
-			PhysicsTestMotionResult3D stepTestResult = new();
-			bool findStep = PhysicsServer3D.BodyTestMotion(
-				Entity.GetRid(),
-				new() {
-					From = Entity.GlobalTransform with { Origin = sweepStart },
-					Motion = sweepMotion,
-				},
-				stepTestResult
-			);
-
-			if (!findStep) return false;
-			// // If the step was not the same collider as the obstacle, we stop here
-			// if (stepObstacleCollision is not null && stepTestResult.GetColliderRid() != stepObstacleCollision.GetColliderRid()) return false;
+		// 	Vector3 movement = Entity.Movement * (float)delta;
+		// 	Vector3 destination = Entity.GlobalTransform.Origin + movement;
 
 
-			Vector3 point = stepTestResult.GetCollisionPoint();
+		// 	// Search for obstacle (step) where the entity is moving
+		// 	KinematicCollision3D? stepObstacleCollision = Entity.MoveAndCollide(movement, true);
 
-			Vector3 destinationHeight = destination.Project(Entity.UpDirection);
-			Vector3 pointHeight = point.Project(Entity.UpDirection);
+		// 	// Not a valid step if the obstacle's surface is not steep
+		// 	if (stepObstacleCollision is not null && Mathf.Abs(stepObstacleCollision.GetNormal().Dot(Entity.UpDirection)) >= Mathfs.RadToDot(Entity.FloorMaxAngle))
+		// 		return false;
 
-			float stepHeightSquared = destinationHeight.DistanceSquaredTo(pointHeight);
-			if (stepHeightSquared >= sweepMotion.LengthSquared()) return false;
+		// 	float margin = Mathf.Epsilon;
+
+		// 	Vector3 sweepStart = destination;
+		// 	Vector3 sweepMotion = (Entity.GetTraitValue(Traits.GenericStepHeight) + margin) * -Entity.UpDirection;
+
+		// 	// Search above the obstacle to find a step upwards
+		// 	if (stepObstacleCollision is not null) {
+		// 		sweepStart -= sweepMotion;
+		// 	}
+
+		// 	// Try to collide with the step upwards or downwards
+		// 	PhysicsTestMotionResult3D stepTestResult = new();
+		// 	bool findStep = PhysicsServer3D.BodyTestMotion(
+		// 		Entity.GetRid(),
+		// 		new() {
+		// 			From = Entity.GlobalTransform with { Origin = sweepStart },
+		// 			Motion = sweepMotion,
+		// 		},
+		// 		stepTestResult
+		// 	);
+
+		// 	if (!findStep) return false;
+		// 	// // If the step was not the same collider as the obstacle, we stop here
+		// 	// if (stepObstacleCollision is not null && stepTestResult.GetColliderRid() != stepObstacleCollision.GetColliderRid()) return false;
 
 
-			Entity.GlobalTransform = Entity.GlobalTransform with { Origin = destination - destinationHeight + pointHeight };
+		// 	Vector3 point = stepTestResult.GetCollisionPoint();
 
-			return true;
-		}
+		// 	Vector3 destinationHeight = destination.Project(Entity.UpDirection);
+		// 	Vector3 pointHeight = point.Project(Entity.UpDirection);
+
+		// 	float stepHeightSquared = destinationHeight.DistanceSquaredTo(pointHeight);
+		// 	if (stepHeightSquared >= sweepMotion.LengthSquared()) return false;
+
+
+		// 	Entity.GlobalTransform = Entity.GlobalTransform with { Origin = destination - destinationHeight + pointHeight };
+
+		// 	return true;
+		// }
 	}
 
 
 	protected override Vector3 ProcessInertia(double delta) {
-		Entity.Inertia.Split(Entity.UpDirection, out Vector3 verticalInertia, out Vector3 horizontalInertia);
-
-		horizontalInertia = ProcessHorizontalInertia(delta, horizontalInertia);
-		verticalInertia = ProcessVerticalInertia(delta, verticalInertia);
-
-		return verticalInertia + horizontalInertia;
-	}
-
-	protected virtual Vector3 ProcessHorizontalInertia(double delta, Vector3 horizontalInertia) {
-		if (horizontalInertia.IsZeroApprox()) return horizontalInertia;
-
-		return horizontalInertia.MoveToward(
-			Vector3.Zero,
-			(Entity.IsOnFloor() && !coyoteTimer.HasElapsed
-				? 25f
-				: 0.5f
-			) * (float)delta
-		);
-	}
-
-	protected virtual Vector3 ProcessVerticalInertia(double delta, Vector3 verticalInertia) {
 		if (Entity.IsOnCeiling()) {
-			verticalInertia = verticalInertia.SlideOnFace(-Entity.UpDirection);
+			Entity.Inertia = Entity.Inertia.SlideOnFace(-Entity.UpDirection);
 		}
 		if (Entity.IsOnFloor()) {
-			verticalInertia = verticalInertia.SlideOnFace(Entity.UpDirection);
-			return verticalInertia;
+			Entity.Gravity = Entity.Gravity.SlideOnFace(Entity.UpDirection);
+			if (!coyoteTimer.HasElapsed) {
+				Entity.Inertia = Entity.Inertia.MoveToward(Vector3.Zero, 25f * (float)delta);
+			}
+		}
+		else {
+			float fallSpeed = Entity.GetTraitValue(Traits.GenericGravity);
+
+			float fallInertia = Entity.Gravity.Dot(-Entity.UpDirection);
+			Vector3 targetGravity = -Entity.UpDirection * fallSpeed;
+
+			const float fallIncreaseFactor = 1.75f;
+
+			// Slightly ramp up inertia when falling
+			float inertiaRampFactor = Mathf.Lerp(1f, fallIncreaseFactor, ((1f + fallInertia) * 0.5f).Clamp01());
+			Entity.Gravity = Entity.Gravity.MoveToward(targetGravity, 45f * inertiaRampFactor * (float)delta);
 		}
 
-		float fallSpeed = Entity.TraitModifiers.ApplyTo(Traits.GenericGravity, 32f);
+		Entity.Inertia = Entity.Inertia.MoveToward(Vector3.Zero, 0.5f * (float)delta);
 
-		float fallInertia = verticalInertia.Dot(-Entity.UpDirection);
-		Vector3 targetInertia = -Entity.UpDirection * fallSpeed;
-
-		if (verticalInertia.IsEqualApprox(targetInertia)) return verticalInertia;
-
-		const float fallIncreaseFactor = 1.75f;
-
-		// Slightly ramp up inertia when falling
-		float inertiaRampFactor = Mathf.Lerp(1f, fallIncreaseFactor, ((1f + fallInertia) * 0.5f).Clamp01());
-
-
-		return verticalInertia.MoveToward(targetInertia, 45f * inertiaRampFactor * (float)delta);
+		return Entity.Gravity + Entity.Inertia;
 	}
+
+	// protected virtual Vector3 ProcessHorizontalInertia(double delta, Vector3 horizontalInertia) {
+	// 	if (horizontalInertia.IsZeroApprox()) return horizontalInertia;
+
+	// 	return horizontalInertia.MoveToward(
+	// 		Vector3.Zero,
+	// 		(Entity.IsOnFloor() && !coyoteTimer.HasElapsed
+	// 			? 25f
+	// 			: 0.5f
+	// 		) * (float)delta
+	// 	);
+	// }
 
 	protected abstract Vector3 ProcessGroundedMovement(double delta);
 

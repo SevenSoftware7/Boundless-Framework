@@ -1,4 +1,4 @@
-[gd_scene load_steps=132 format=3 uid="uid://b505xodur2iff"]
+[gd_scene load_steps=133 format=3 uid="uid://b505xodur2iff"]
 
 [ext_resource type="Script" uid="uid://cvkvg45cwuu2" path="res://Scripts/Core/MainNode.cs" id="1_u7mjy"]
 [ext_resource type="RDShaderFile" uid="uid://br3hg0ejs6wif" path="res://Resources/Rendering/Shaders/FetchWaterData.glsl" id="2_5l7vn"]
@@ -1541,7 +1541,7 @@ SubResource("Resource_vs04g"): 50.0,
 SubResource("Resource_6ehlx"): 35.0,
 SubResource("Resource_utia5"): 0.3,
 SubResource("Resource_f7hdo"): 15.0,
-SubResource("Resource_clvyn"): 1.0
+SubResource("Resource_clvyn"): 32.0
 })
 
 [sub_resource type="Resource" id="Resource_ep8v8"]
@@ -1554,7 +1554,7 @@ SubResource("Resource_vs04g"): 50.0,
 SubResource("Resource_6ehlx"): 35.0,
 SubResource("Resource_utia5"): 0.5,
 SubResource("Resource_f7hdo"): 20.0,
-SubResource("Resource_clvyn"): 1.0
+SubResource("Resource_clvyn"): 32.0
 })
 
 [sub_resource type="Animation" id="Animation_2ppbj"]
@@ -1586,6 +1586,13 @@ size = Vector3(3, 1, 5)
 
 [sub_resource type="BoxMesh" id="BoxMesh_ijdpd"]
 size = Vector3(3, 1, 5)
+
+[sub_resource type="Curve3D" id="Curve3D_x3rx7"]
+_data = {
+"points": PackedVector3Array(6.10899, -0.502903, -0.240525, -6.10899, 0.502903, 0.240525, 0.689384, -0.357537, -0.196157, 2.62323, -3.09666, 0.356269, -2.62323, 3.09666, -0.356269, -15.2974, 4.89184, -0.0272264, -0.0566235, -4.80938, 0.938001, 0.0566235, 4.80938, -0.938001, -18.9312, 15.8193, -1.77963, -2.92992, -3.9494, 1.52996, 2.92992, 3.9494, -1.52996, -14.6091, 28.1784, -5.10472, -4.28674, -0.125225, 0.82911, 4.28674, 0.125225, -0.82911, -0.689568, 33.9461, -8.48528, -4.09738, 4.18072, 1.06397, 4.09738, -4.18072, -1.06397, 14.3886, 27.6601, -11.6734, 1.49006, 7.81517, 0.124016, -1.49006, -7.81517, -0.124016, 18.9105, 11.354, -13.5242, 9.90726, 0.135202, -0.617999, -9.90726, -0.135202, 0.617999, 1.17614, -0.44601, -12.4617),
+"tilts": PackedFloat32Array(0, 0.129641, 0.246752, 0.391108, 0.500419, 0.554715, 0.606778, 0.663536)
+}
+point_count = 8
 
 [node name="Node3D" type="Node3D"]
 script = ExtResource("1_u7mjy")
@@ -1945,7 +1952,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30201, -4.81285)
 curve = SubResource("Curve3D_1g2j1")
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Environment/Path3D"]
-transform = Transform3D(-0.0922569, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97164e-07, 0.995733, 8.27696e-08, -0.0922569, -1.98959, 0, 2.30373)
+transform = Transform3D(-0.0922568, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97163e-07, 0.995733, 8.27696e-08, -0.0922568, -1.98959, 0, 2.30373)
 script = ExtResource("36_x7xeh")
 
 [node name="AnimatableBody3D" type="AnimatableBody3D" parent="Environment/Path3D/PathFollow3D"]
@@ -2055,20 +2062,20 @@ script = ExtResource("13_d6cna")
 script = ExtResource("13_d6cna")
 
 [node name="Epiphron" parent="Eos/Weapon/Main/First" instance=ExtResource("12_1jl3t")]
-transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
+transform = Transform3D(4.37114e-08, -1.50996e-07, 1, -1, -4.37114e-08, 4.37114e-08, 4.37114e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
 
 [node name="Second" type="Node" parent="Eos/Weapon/Main"]
 script = ExtResource("13_d6cna")
 
 [node name="Nemesis" parent="Eos/Weapon/Main/Second" instance=ExtResource("15_x4bcq")]
-transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
+transform = Transform3D(4.37114e-08, -1.50996e-07, 1, -1, -4.37114e-08, 4.37114e-08, 4.37114e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
 IsHolstered = true
 
 [node name="Third" type="Node" parent="Eos/Weapon/Main"]
 script = ExtResource("13_d6cna")
 
 [node name="Eleos" parent="Eos/Weapon/Main/Third" instance=ExtResource("17_jhoyp")]
-transform = Transform3D(8.74228e-08, -1.50996e-07, 1, -1, -8.74228e-08, 8.74228e-08, 8.74228e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
+transform = Transform3D(4.37114e-08, -1.50996e-07, 1, -1, -4.37114e-08, 4.37114e-08, 4.37114e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
 IsHolstered = true
 
 [node name="Erebos" parent="Eos" instance=ExtResource("26_ds8t8")]
@@ -2215,6 +2222,29 @@ script = ExtResource("29_nhfxh")
 Body = NodePath("../..")
 Origin = NodePath("..")
 floaterCount = 4
+
+[node name="Node3D" type="Node3D" parent="."]
+
+[node name="Path3D" type="Path3D" parent="Node3D"]
+transform = Transform3D(0.999999, 0.00116937, 0, -0.00116937, 0.999999, 0, 0, 0, 1, -60.3341, 9.53674e-07, 10.0923)
+curve = SubResource("Curve3D_x3rx7")
+
+[node name="CSGPolygon3D" type="CSGPolygon3D" parent="Node3D"]
+calculate_tangents = false
+use_collision = true
+collision_mask = 256
+polygon = PackedVector2Array(-5.5, 0, -5.5, 0.5, -5.25, 0.25, 5.25, 0.25, 5.5, 0.5, 5.5, 0)
+mode = 2
+path_node = NodePath("../Path3D")
+path_interval_type = 1
+path_interval = 0.07
+path_simplify_angle = 0.0
+path_rotation = 2
+path_rotation_accurate = false
+path_local = false
+path_continuous_u = true
+path_u_distance = 1.0
+path_joined = false
 
 [editable path="Environment/Water/Water"]
 [editable path="Eos"]

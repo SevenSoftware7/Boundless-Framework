@@ -37,18 +37,19 @@ public abstract partial class MovementBehaviour : EntityBehaviour {
 		HandleProcess(delta);
 
 		if (IsActive) {
-			Entity.Movement = ProcessMovement(delta);
-			Entity.Inertia = ProcessInertia(delta);
-
-			Entity.Velocity = Entity.Inertia + Entity.Movement;
+			Entity.Velocity = ProcessMovement(delta) + ProcessInertia(delta);
 			Entity.MoveAndSlide();
+
+			if (Entity.Gravity.Dot(Entity.UpDirection) < 0) {
+				Entity.ApplyFloorSnap();
+			}
 
 			Entity.Movement = _movement = Vector3.Zero;
 		}
 	}
 
 	protected virtual void HandleProcess(double delta) { }
-	protected virtual Vector3 ProcessInertia(double delta) => Entity.Inertia;
+	protected virtual Vector3 ProcessInertia(double delta) => Entity.Gravity + Entity.Inertia;
 	protected virtual Vector3 ProcessMovement(double delta) => Entity.Movement;
 
 

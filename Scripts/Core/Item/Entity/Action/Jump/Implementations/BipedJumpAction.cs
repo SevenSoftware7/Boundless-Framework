@@ -26,7 +26,7 @@ public partial class BipedJumpAction : JumpAction, IPlayerHandler {
 
 		if (maxDistance != 0) {
 			float travelDistance = Mathf.Min(maxDistance * (float)delta * 5f, remainingDistance * maxDistance);
-			Entity.Inertia += Direction * travelDistance;
+			Entity.Gravity += Direction * travelDistance;
 			remainingDistance -= travelDistance / maxDistance;
 		}
 	}
@@ -45,7 +45,7 @@ public partial class BipedJumpAction : JumpAction, IPlayerHandler {
 		float jumpHeight = Entity.GetTraitValue(Traits.GenericJumpHeight);
 
 		float initialJumpHeight = jumpHeight * INITIAL_JUMP_HEIGHT_FRACTION;
-		Entity.Inertia = Entity.Inertia.SlideOnFace(Direction) + Direction * initialJumpHeight;
+		Entity.Gravity = Entity.Gravity.SlideOnFace(Direction) + Direction * initialJumpHeight;
 		maxDistance = jumpHeight - initialJumpHeight;
 	}
 
