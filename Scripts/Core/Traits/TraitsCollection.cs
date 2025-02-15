@@ -22,23 +22,23 @@ public partial class TraitsCollection : Resource, IDictionary<Trait, float>, IRe
 	private static readonly Dictionary<TraitResource, float> DefaultTraitResourceDict = new(DefaultTraitValues.ToDictionary(trait => new TraitResource(trait.Key), trait => trait.Value));
 	private static readonly Godot.Collections.Dictionary<TraitResource, float> DefaultTraitResourceValuesGodotDict = new(DefaultTraitResourceDict);
 
-	private Dictionary<TraitResource, float> TraitValues = DefaultTraitResourceDict;
+
+	private Dictionary<Trait, float> TraitValues = [];
 
 	[Export]
 	protected Godot.Collections.Dictionary<TraitResource, float> TraitValuesDict {
-		get => new (TraitValues);
-		set => TraitValues = new (value);
+		get => _traitValuesDict;
+		set {
+			_traitValuesDict = value;
+			TraitValues = value.ToDictionary(pair => pair.Key.Trait, pair => pair.Value);
+		}
 	}
-	public ICollection<Trait> Keys => [.. TraitValues.Keys.Select(traitResource => traitResource.Trait)];
-	public ICollection<float> Values => TraitValues.Values;
-	public int Count => TraitValues.Count;
-	public bool IsReadOnly => false;
-	IEnumerable<Trait> IReadOnlyDictionary<Trait, float>.Keys => Keys;
-	IEnumerable<float> IReadOnlyDictionary<Trait, float>.Values => Values;
+	private Godot.Collections.Dictionary<TraitResource, float> _traitValuesDict;
 
-	public float this[Trait key] {
-		get => TraitValues[key];
-		set => TraitValues[key] = value;
+
+	public TraitsCollection() : base() {
+		_traitValuesDict = DefaultTraitResourceValuesGodotDict;
+		TraitValues = DefaultTraitValues;
 	}
 
 	public override bool _PropertyCanRevert(StringName property) {
@@ -50,32 +50,59 @@ public partial class TraitsCollection : Resource, IDictionary<Trait, float>, IRe
 	}
 
 
-	public void Add(Trait key, float value) => TraitValues.Add(key, value);
+	public ICollection<Trait> Keys => TraitValues.Keys;
+	public ICollection<float> Values => TraitValues.Values;
+	public int Count => TraitValues.Count;
+	public bool IsReadOnly => false;
+	IEnumerable<Trait> IReadOnlyDictionary<Trait, float>.Keys => Keys;
+	IEnumerable<float> IReadOnlyDictionary<Trait, float>.Values => Values;
+
+	public float this[Trait key] {
+		get => TraitValues[key];
+		set => TraitValues[key] = value;
+	}
+
+	public void Add(Trait key, float value) {
+		TraitValues.Add(key, value);
+
+		TraitResource traitRes = new(key);
+		_traitValuesDict.Add(traitRes, value);
+
+		EmitSignalPropertyListChanged();
+	}
+	public void Add(KeyValuePair<Trait, float> item) => Add(item.Key, item.Value);
 
 	public bool ContainsKey(Trait key) => TraitValues.ContainsKey(key);
 
-	public bool Remove(Trait key) => TraitValues.Remove(key);
+	public bool Remove(Trait key) {
+		if (!TraitValues.ContainsKey(key)) return false;
 
-	public bool TryGetValue(Trait key, [MaybeNullWhen(false)] out float value) =>
-		TraitValues.TryGetValue(key, out value);
+		TraitResource? existing = _traitValuesDict.Keys.FirstOrDefault(traitResource => traitResource.Trait == key);
+		if (existing is null) return false;
 
-	public void Add(KeyValuePair<Trait, float> item) => Add(item.Key, item.Value);
+		bool res = _traitValuesDict.Remove(existing) && TraitValues.Remove(key);
 
-	public void Clear() => TraitValues.Clear();
+		EmitSignalPropertyListChanged();
 
-	public bool Contains(KeyValuePair<Trait, float> item) =>
-		TraitValues.ContainsKey(item.Key) && TraitValues[item.Key] == item.Value;
-
-	public void CopyTo(KeyValuePair<Trait, float>[] array, int arrayIndex) {
-		foreach (var item in TraitValues) {
-			array[arrayIndex++] = new KeyValuePair<Trait, float>(item.Key, item.Value);
-		}
+		return res;
 	}
 
-	public bool Remove(KeyValuePair<Trait, float> item) => Contains(item) && Remove(item.Key);
+	public bool TryGetValue(Trait key, [MaybeNullWhen(false)] out float value) => TraitValues.TryGetValue(key, out value);
 
-	public IEnumerator<KeyValuePair<Trait, float>> GetEnumerator() =>
-		TraitValues.Select(item => new KeyValuePair<Trait, float>(item.Key, item.Value)).GetEnumerator();
+	public void Clear() {
+		TraitValues.Clear();
+		_traitValuesDict.Clear();
+
+		EmitSignalPropertyListChanged();
+	}
+
+	public bool Contains(KeyValuePair<Trait, float> item) => TraitValues.Contains(item);
+
+	public void CopyTo(KeyValuePair<Trait, float>[] array, int arrayIndex) => ((IDictionary<Trait, float>)TraitValues).CopyTo(array, arrayIndex);
+
+	public bool Remove(KeyValuePair<Trait, float> item) => Remove(item.Key);
+
+	public IEnumerator<KeyValuePair<Trait, float>> GetEnumerator() => TraitValues.GetEnumerator();
 
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

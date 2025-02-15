@@ -7,7 +7,7 @@ public readonly struct Trait {
 	public readonly StringName Name;
 
 	public Trait(string name) {
-		Name = name.ToSnakeCase();
+		Name = name?.ToSnakeCase() ?? string.Empty;
 	}
 
 

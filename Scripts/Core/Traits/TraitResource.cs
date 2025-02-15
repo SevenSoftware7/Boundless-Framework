@@ -18,7 +18,7 @@ public partial class TraitResource : Resource, IEquatable<TraitResource> {
 			ResourceName = _trait.Name;
 		}
 	}
-	private Trait _trait;
+	private Trait _trait = DefaultTrait;
 
 	[Export] private bool Dropdown {
 		get => _useTraitDropdown;
@@ -36,13 +36,13 @@ public partial class TraitResource : Resource, IEquatable<TraitResource> {
 	}
 
 
-	public TraitResource(Trait trait, IEnumerable<Trait> dropdownTraits = null!) : base() {
-		_trait = trait;
+	public TraitResource() : base() { }
+	public TraitResource(Trait trait, IEnumerable<Trait> dropdownTraits = null!) : this() {
+		Trait = trait;
 		if (dropdownTraits is not null) {
 			DropdownTraitsString = string.Join(',', dropdownTraits);
 		}
 	}
-	public TraitResource() : this(DefaultTrait) { }
 
 
 	public override void _ValidateProperty(Dictionary property) {
@@ -89,7 +89,6 @@ public partial class TraitResource : Resource, IEquatable<TraitResource> {
 	}
 
 	public static implicit operator Trait(TraitResource resource) => resource.Trait;
-	public static implicit operator TraitResource(Trait trait) => new(trait);
 
 	public override int GetHashCode() => Trait.GetHashCode();
 }
