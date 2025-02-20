@@ -3,6 +3,8 @@ namespace LandlessSkies.Vanilla;
 using Godot;
 using LandlessSkies.Core;
 using SevenDev.Boundless.Utility;
+using static SevenDev.Boundless.Utility.Collisions;
+
 
 [Tool]
 [GlobalClass]
@@ -13,6 +15,8 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 
 	private Vector3 _inertiaMovement;
 	private float _moveSpeed;
+
+	private Vector3 _modelForward = Vector3.Forward;
 	private Vector3 _modelUp = Vector3.Up;
 
 
@@ -37,18 +41,31 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 
 	protected override Vector3 ProcessGroundedMovement(double delta) {
 		float floatDelta = (float)delta;
+		float entityMoveSpeed = Entity.GetTraitValue(Traits.GenericMoveSpeed);
+		bool onFloor = Entity.IsOnFloor();
+		Vector3 entityUp = Entity.UpDirection;
 
-		if (Entity.IsOnFloor()) {
-			Vector3 normal = Entity.GetFloorNormal();
-			Entity.UpDirection = normal;
+		Vector3 groundUp = entityUp;
+		if (onFloor) {
+			Vector3 entityPos = Entity.GlobalPosition;
+			if (Entity.GetWorld3D().IntersectRay3D(entityPos + entityUp, entityPos - entityUp, out IntersectRay3DResult res, Entity.CollisionMask)) {
+				groundUp = res.Normal.Normalized();
+			}
 		}
-		else if (Entity.Inertia.LengthSquared() <= 0.5f) {
-			Entity.UpDirection = Entity.UpDirection.Slerp(Vector3.Up, 3f * floatDelta);
+
+		float deceleration = Mathf.InverseLerp(entityMoveSpeed * 0.5f, 0f, _moveSpeed).Clamp01();
+
+		if (deceleration > 0f) {
+			Entity.UpDirection = entityUp.Slerp(Vector3.Up, 3f * deceleration * floatDelta);
 		}
+		else if (onFloor && groundUp.Dot(entityUp) >= 0.75f) {
+			Entity.UpDirection = groundUp;
+		}
+
 
 		Basis rotationToNormal = Entity.Transform.Up().FromToBasis(Entity.UpDirection);
-		Entity.GlobalForward = Entity.GlobalForward.SafeSlerp(rotationToNormal * Entity.GlobalForward, 18f * floatDelta);
 
+		Entity.GlobalForward = Entity.GlobalForward.SafeSlerp(rotationToNormal * Entity.GlobalForward, 18f * floatDelta);
 		_movement = rotationToNormal * _movement;
 
 
@@ -58,7 +75,7 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 		if (!_movement.IsEqualApprox(Vector3.Zero)) {
 			direction = _movement.Normalized();
 
-			newSpeed = Mathf.Clamp(Entity.GlobalForward.Dot(direction) + 0.25f, 0f, 1f) * Entity.GetTraitValue(Traits.GenericMoveSpeed);
+			newSpeed = Mathf.Clamp(Entity.GlobalForward.Dot(direction) + 0.25f, 0f, 1f) * entityMoveSpeed;
 			Entity.GlobalForward = Entity.GlobalForward.Slerp(direction, Entity.GetTraitValue(Traits.GenericTurnSpeed) * floatDelta);
 		}
 
@@ -74,22 +91,21 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 		float speedDelta = newSpeed > _moveSpeed ? 1f : 0.25f;
 		_moveSpeed = _moveSpeed.MoveToward(newSpeed, speedDelta * Entity.GetTraitValue(Traits.GenericAcceleration) * floatDelta);
 
-		ComputeRotation(direction, floatDelta);
+		ComputeRotation(direction, groundUp, floatDelta);
 
 		_movement = Vector3.Zero;
 		return _inertiaMovement * _moveSpeed;
 
-		void ComputeRotation(Vector3 direction, float floatDelta) {
+		void ComputeRotation(Vector3 direction, Vector3 groundUp, float floatDelta) {
+			if (Entity.CostumeHolder?.Costume is not Costume model) return;
 
-			if (Entity.CostumeHolder?.Costume is Costume model) {
-				Vector3 groundUp = Entity.GlobalBasis.Up();
-				Vector3 rightDir = Entity.GlobalBasis.Right();
+			Basis toGroundUp = Entity.GlobalBasis.Up().FromToBasis(groundUp);
+			Vector3 entityRight = toGroundUp * Entity.GlobalBasis.Right();
 
-				_modelUp = _modelUp.Lerp((groundUp + direction.Dot(rightDir) * rightDir).Normalized(), 7f * floatDelta).Normalized();
+			_modelForward = _modelForward.Lerp(toGroundUp * Entity.GlobalForward, 14f * floatDelta).Normalized();
+			_modelUp = _modelUp.Lerp((groundUp + direction.Dot(entityRight) * entityRight).Normalized(), 7f * floatDelta).Normalized();
 
-				Basis modelRotation = Basis.LookingAt(Entity.GlobalForward, _modelUp);
-				model.GlobalBasis = modelRotation;
-			}
+			model.GlobalBasis = Basis.LookingAt(_modelForward, _modelUp);
 		}
 	}
 

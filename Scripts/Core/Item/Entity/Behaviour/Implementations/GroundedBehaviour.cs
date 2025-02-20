@@ -160,11 +160,19 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 
 
 	protected override Vector3 ProcessInertia(double delta) {
+		Vector3 upDirection = Entity.UpDirection;
 		if (Entity.IsOnCeiling()) {
-			Entity.Inertia = Entity.Inertia.SlideOnFace(-Entity.UpDirection);
+			Entity.Gravity = Entity.Gravity.SlideOnFace(-upDirection);
+			Entity.Inertia = Entity.Inertia.SlideOnFace(-upDirection);
 		}
-		if (Entity.IsOnFloor()) {
-			Entity.Gravity = Entity.Gravity.SlideOnFace(Entity.UpDirection);
+
+		bool isOnFloor = Entity.IsOnFloor();
+
+		if (isOnFloor) {
+			Entity.Gravity = Entity.Gravity.SlideOnFace(upDirection);
+			Entity.Inertia = Entity.Inertia.SlideOnFace(upDirection);
+
+			Entity.Gravity = Entity.Gravity.MoveToward(Vector3.Zero, 25f * (float)delta);
 			if (!coyoteTimer.HasElapsed) {
 				Entity.Inertia = Entity.Inertia.MoveToward(Vector3.Zero, 25f * (float)delta);
 			}
@@ -172,17 +180,18 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 		else {
 			float fallSpeed = Entity.GetTraitValue(Traits.GenericGravity);
 
-			float fallInertia = Entity.Gravity.Dot(-Entity.UpDirection);
-			Vector3 targetGravity = -Entity.UpDirection * fallSpeed;
+			float fallInertia = Entity.Gravity.Dot(-upDirection);
+			Vector3 targetGravity = -upDirection * fallSpeed;
 
 			const float fallIncreaseFactor = 1.75f;
 
 			// Slightly ramp up inertia when falling
-			float inertiaRampFactor = Mathf.Lerp(1f, fallIncreaseFactor, ((1f + fallInertia) * 0.5f).Clamp01());
+			float inertiaRampFactor = Mathf.Lerp(1f, fallIncreaseFactor, (fallInertia * 0.5f + 0.5f).Clamp01());
+
 			Entity.Gravity = Entity.Gravity.MoveToward(targetGravity, 45f * inertiaRampFactor * (float)delta);
+			Entity.Inertia = Entity.Inertia.MoveToward(Vector3.Zero, 0.5f * (float)delta);
 		}
 
-		Entity.Inertia = Entity.Inertia.MoveToward(Vector3.Zero, 0.5f * (float)delta);
 
 		return Entity.Gravity + Entity.Inertia;
 	}
