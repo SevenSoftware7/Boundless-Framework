@@ -21,7 +21,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 	public readonly Queue<StyleState> StyleSwitchBuffer = [];
 
-	public readonly List<Vector3> RecoverLocationBuffer = new(RECOVER_LOCATION_BUFFER_SIZE);
+	private readonly Queue<Vector3> recoverLocationBuffer = new(RECOVER_LOCATION_BUFFER_SIZE + 1);
+	public Vector3? LastRecoverLocation { get; private set; } = null;
 
 
 	public IInjectionNode InjectionNode { get; }
@@ -169,6 +170,15 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 	public float GetTraitValue(Trait trait, float @default = default) => TraitModifiers.ApplyTo(trait, EntityTraits.GetValueOrDefault(trait, @default));
 
+	public void AddRecoverLocation(Vector3 location) {
+		if (recoverLocationBuffer.Count == RECOVER_LOCATION_BUFFER_SIZE) {
+			recoverLocationBuffer.Dequeue();
+		}
+
+		recoverLocationBuffer.Enqueue(location);
+		LastRecoverLocation = location;
+	}
+
 	public bool ExecuteAction(Action.Builder builder, bool forceExecute = false) => ExecuteAction(new Action.Wrapper(builder), forceExecute);
 	public bool ExecuteAction(Action.Wrapper action, bool forceExecute = false) {
 		if (!forceExecute && !CurrentAction.CanCancel()) return false;
@@ -233,14 +243,15 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	}
 
 	public void VoidOut() {
-		if (RecoverLocationBuffer.Count == 0) {
+		if (recoverLocationBuffer.Count == 0) {
 			GD.PushError("Could not Void out Properly, falling back to World Origin");
 			GlobalPosition = Vector3.Zero;
 			return;
 		}
 		else {
-			RecoverLocationBuffer.RemoveRange(1, RecoverLocationBuffer.Count - 1);
-			GlobalPosition = RecoverLocationBuffer[0];
+			GlobalPosition = recoverLocationBuffer.Peek();
+			recoverLocationBuffer.Clear();
+			recoverLocationBuffer.Enqueue(GlobalPosition);
 
 			GD.Print($"Entity {Name} Voided out.");
 		}
