@@ -30,8 +30,8 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 	public float OffsetToWaterSurface => _waterSurface + _waterDisplacement - EntityCenterOfMass;
 	public bool IsOnWaterSurface => Mathf.Abs(OffsetToWaterSurface) <= SurfaceThreshold;
 
-	protected SwimmingBehaviour() : this(null, null!) { }
-	public SwimmingBehaviour(Entity? entity, Water waterArea) : base(entity) {
+	protected SwimmingBehaviour() : this(null!, null!) { }
+	public SwimmingBehaviour(Entity entity, Water waterArea) : base(entity) {
 		Water = waterArea;
 	}
 
@@ -143,7 +143,7 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 		player.CameraController.GetCameraRelativeMovement(input, out _, out Vector3 movement);
 
 		if (player.CameraController.SetOrAddBehaviour<GravitatedCameraBehaviour>(() => new(player.CameraController), out var cameraBehaviour)) {
-			cameraBehaviour.SetEntityAsSubject(Entity);
+			cameraBehaviour.Subject = Entity;
 			cameraBehaviour.MoveCamera(
 				player.InputDevice.GetVector(Inputs.LookLeft, Inputs.LookRight, Inputs.LookDown, Inputs.LookUp) * player.InputDevice.Sensitivity
 			);

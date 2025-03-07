@@ -8,8 +8,8 @@ public abstract partial class MovementBehaviour : EntityBehaviour {
 	protected Vector3 _movement;
 	protected override bool IsOneTime { get; } = false;
 
-	protected MovementBehaviour() : this(null) { }
-	public MovementBehaviour(Entity? entity) : base(entity) { }
+	protected MovementBehaviour() : this(null!) { }
+	public MovementBehaviour(Entity entity) : base(entity) { }
 
 
 

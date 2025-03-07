@@ -5,30 +5,17 @@ using Godot;
 using SevenDev.Boundless.Utility;
 
 public abstract partial class CameraBehaviour : Behaviour<CameraBehaviour> {
-	public abstract Transform3D Transform { get; }
-	public abstract Vector3 TargetPosition { get; protected set; }
-
 	[Export(PropertyHint.Layers3DPhysics)] private uint CollisionMask = uint.MaxValue & ~(CollisionLayers.Water | CollisionLayers.Entity | CollisionLayers.Prop | CollisionLayers.Interactable | CollisionLayers.Damage);
 	private float distanceVelocity;
 
 
-	[Export] public CameraController3D CameraController { get; private set; }
+	public readonly CameraController3D CameraController;
 
 
 
-	protected CameraBehaviour() : this(null) { }
-	public CameraBehaviour(CameraController3D? camera) : base() {
-		CameraController = camera!;
-	}
-
-
-	protected override void _Start(CameraBehaviour? previousBehaviour = null) {
-		if (CameraController is null) {
-			Stop();
-			throw new ArgumentNullException($"Could not start Behaviour {GetType().Name}, no reference to a CameraController");
-		}
-
-		base._Start(previousBehaviour);
+	public CameraBehaviour(CameraController3D camera) : base() {
+		ArgumentNullException.ThrowIfNull(camera, nameof(camera));
+		CameraController = camera;
 	}
 
 

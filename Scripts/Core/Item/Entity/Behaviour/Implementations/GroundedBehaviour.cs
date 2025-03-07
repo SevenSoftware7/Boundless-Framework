@@ -15,8 +15,8 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 	protected readonly TimeDuration jumpCooldown = new(200, false);
 
 
-	protected GroundedBehaviour() : this(null) { }
-	public GroundedBehaviour(Entity? entity, JumpAction.Builder? jumpAction = null) : base(entity) {
+	protected GroundedBehaviour() : this(null!) { }
+	public GroundedBehaviour(Entity entity, JumpAction.Builder? jumpAction = null) : base(entity) {
 		JumpAction = jumpAction;
 	}
 
@@ -59,7 +59,7 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 			() => new(player.CameraController),
 			out var cameraBehaviour))
 		{
-			cameraBehaviour.SetEntityAsSubject(Entity);
+			cameraBehaviour.Subject = Entity;
 			cameraBehaviour.MoveCamera(
 				player.InputDevice.GetVector(Inputs.LookLeft, Inputs.LookRight, Inputs.LookDown, Inputs.LookUp) * player.InputDevice.Sensitivity
 			);

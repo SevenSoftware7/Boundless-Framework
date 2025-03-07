@@ -7,6 +7,7 @@ using LandlessSkies.Core;
 [GlobalClass]
 public partial class DrivingBehaviour : SittingBehaviour {
 	[Export] public VehicleBehaviour Vehicle;
+	private Vector3 _driverUp = Vector3.Up;
 
 	private EntityBehaviour? previousBehaviour;
 
@@ -23,13 +24,21 @@ public partial class DrivingBehaviour : SittingBehaviour {
 			Stop();
 			return;
 		}
+		_driverUp = Entity.UpDirection;
 
 		base._Start(previousBehaviour);
 	}
 
 	protected override void _Stop(EntityBehaviour? nextBehaviour) {
 		base._Stop(nextBehaviour);
+		Entity.UpDirection = _driverUp;
 		Entity.Inertia += Vehicle.Entity.Movement + Vehicle.Entity.Inertia;
+	}
+
+	public override void _Process(double delta) {
+		base._Process(delta);
+		Entity.UpDirection = Vehicle.Entity.UpDirection;
+		Entity.GlobalForward = Vehicle.Entity.GlobalForward;
 	}
 
 	public override void Dismount() {

@@ -4,17 +4,12 @@ using Godot;
 using SevenDev.Boundless.Utility;
 
 public sealed partial class GimbleCameraBehaviour : EntityCameraBehaviour {
-	public override Vector3 TargetPosition {
-		get => smoothPosition;
-		protected set => smoothPosition = value;
-	}
-	private Vector3 smoothPosition = Vector3.Zero;
 
 	public override Vector3 Velocity {
-		get => velocity;
-		protected set => velocity = value;
+		get => _velocity;
+		protected set => _velocity = value;
 	}
-	private Vector3 velocity = Vector3.Zero;
+	private Vector3 _velocity = Vector3.Zero;
 
 	protected override bool IsOneTime { get; } = false;
 
@@ -22,20 +17,23 @@ public sealed partial class GimbleCameraBehaviour : EntityCameraBehaviour {
 	[Export] public float SmoothTime = 0.065f;
 
 
-	private GimbleCameraBehaviour() : this(null) { }
-	public GimbleCameraBehaviour(CameraController3D? controller) : base(controller) { }
+	private GimbleCameraBehaviour() : this(null!) { }
+	public GimbleCameraBehaviour(CameraController3D controller) : base(controller) { }
 
 
 	public override void MoveCamera(Vector2 cameraInput) {
-		LocalRotation *=
-			new Basis(LocalRotation.Inverse().Y, -cameraInput.X) *
+		LookRotation *=
+			new Basis(LookRotation.Inverse().Y, -cameraInput.X) *
 			new Basis(Vector3.Right, cameraInput.Y);
 	}
 
 	public override void _Process(double delta) {
-		Vector3 position = Subject.Origin;
+		if (!IsActive) return;
+		if (!SubjectTransform.HasValue) return;
 
-		smoothPosition = smoothPosition.SmoothDamp(position, ref velocity, SmoothTime, Mathf.Inf, (float)delta);
+		Transform3D transform = SubjectTransform.Value;
+
+		FollowPosition = CameraController.GlobalPosition.SmoothDamp(transform.Origin, ref _velocity, SmoothTime, Mathf.Inf, (float)delta);
 
 		base._Process(delta);
 	}

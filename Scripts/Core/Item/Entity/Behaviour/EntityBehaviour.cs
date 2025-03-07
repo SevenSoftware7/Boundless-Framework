@@ -2,8 +2,6 @@ namespace LandlessSkies.Core;
 
 using System;
 using Godot;
-using SevenDev.Boundless.Utility;
-
 
 /// <summary>
 /// A Hierarchical state machine node for an Entity's Behaviour
@@ -15,9 +13,9 @@ public abstract partial class EntityBehaviour : Behaviour<EntityBehaviour> {
 
 
 
-	protected EntityBehaviour() : this(null) { }
-	public EntityBehaviour(Entity? entity) : base() {
-		Entity = entity!;
+	protected EntityBehaviour() : this(null!) { }
+	public EntityBehaviour(Entity entity) : base() {
+		Entity = entity;
 	}
 
 

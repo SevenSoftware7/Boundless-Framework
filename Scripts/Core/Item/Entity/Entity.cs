@@ -72,16 +72,15 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 	[Export]
 	public AnimationPlayer? AnimationPlayer {
-		get => _animationPlayer;
+		get;
 		private set {
-			_animationPlayer = value;
+			field = value;
 
-			if (_animationPlayer is not null) {
-				_animationPlayer.RootNode = _animationPlayer.GetPathTo(this);
+			if (field is not null) {
+				field.RootNode = field.GetPathTo(this);
 			}
 		}
 	}
-	private AnimationPlayer? _animationPlayer;
 
 
 	[ExportGroup("State")]
@@ -92,15 +91,14 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 	[Export]
 	public Gauge? Health {
-		get => _health;
+		get;
 		set {
-			if (_health == value) return;
+			if (field == value) return;
 
 			Callable onKill = Callable.From<float>(OnKill);
-			NodeExtensions.SwapSignalEmitter(ref _health, value, Gauge.SignalName.Emptied, onKill);
+			NodeExtensions.SwapSignalEmitter(ref field, value, Gauge.SignalName.Emptied, onKill);
 		}
 	}
-	private Gauge? _health;
 
 	private GaugeControl? healthBar;
 
@@ -261,6 +259,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 		}
 
 		Inertia = Vector3.Zero;
+		Gravity = Vector3.Zero;
 	}
 
 	public virtual void HandlePlayer(Player player) {
@@ -307,7 +306,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 
 	private void UpdateHealth(bool keepRatio) {
-		_health?.SetMaximum(GetTraitValue(Traits.GenericMaxHealth), keepRatio);
+		Health?.SetMaximum(GetTraitValue(Traits.GenericMaxHealth), keepRatio);
 	}
 	private void OnHealthModifiersUpdate(Trait trait) {
 		if (trait == Traits.GenericMaxHealth) {

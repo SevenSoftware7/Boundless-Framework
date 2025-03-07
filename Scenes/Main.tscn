@@ -1952,7 +1952,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30201, -4.81285)
 curve = SubResource("Curve3D_1g2j1")
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Environment/Path3D"]
-transform = Transform3D(-0.0922568, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97163e-07, 0.995733, 8.27696e-08, -0.0922568, -1.98959, 0, 2.30373)
+transform = Transform3D(-0.0922569, 8.93337e-07, -0.995733, 2.84216e-14, 0.999997, 8.97164e-07, 0.995733, 8.27696e-08, -0.0922569, -1.98959, 0, 2.30373)
 script = ExtResource("36_x7xeh")
 
 [node name="AnimatableBody3D" type="AnimatableBody3D" parent="Environment/Path3D/PathFollow3D"]
@@ -2035,6 +2035,9 @@ skeleton = NodePath("../../CollisionShape3D/MeshInstance3D")
 process_priority = -50
 Entity = NodePath("../Eos")
 
+[node name="FX" parent="Player/CameraController3D" index="0"]
+transform = Transform3D(-0.730305, -0.683105, -0.00474517, 2.32831e-09, -0.00694631, 0.999976, -0.683121, 0.730287, 0.00507292, 0, 0, 0)
+
 [node name="Bike" parent="." instance=ExtResource("20_pcyav")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.10534, 2, 32.9924)
 EntityTraits = SubResource("Resource_d8m2u")
@@ -2051,6 +2054,12 @@ libraries = {
 &"EpiphronAnimations": ExtResource("22_u7mjy"),
 &"NemesisAnimations": ExtResource("23_4yxf6")
 }
+
+[node name="BipedBehaviour" parent="Eos" index="5"]
+metadata/_custom_type_script = "uid://c5j1rhlh34qan"
+
+[node name="SwimmingBehaviour" parent="Eos" index="6"]
+metadata/_custom_type_script = "uid://bqjcp5j1o01je"
 
 [node name="Weapon" type="Node" parent="Eos"]
 script = ExtResource("11_uqmxm")
@@ -2247,4 +2256,5 @@ path_u_distance = 1.0
 path_joined = false
 
 [editable path="Environment/Water/Water"]
+[editable path="Player"]
 [editable path="Eos"]

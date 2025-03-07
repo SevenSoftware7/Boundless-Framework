@@ -44,6 +44,7 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 		float entityMoveSpeed = Entity.GetTraitValue(Traits.GenericMoveSpeed);
 		bool onFloor = Entity.IsOnFloor();
 		Vector3 entityUp = Entity.UpDirection;
+		Vector3 entityForward = Entity.GlobalForward;
 
 		Vector3 groundUp = entityUp;
 		if (onFloor) {
@@ -53,21 +54,20 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 			}
 		}
 
-		float deceleration = Mathf.InverseLerp(entityMoveSpeed * 0.5f, 0f, _moveSpeed).Clamp01();
+		float deceleration = Mathf.InverseLerp(entityMoveSpeed * 0.75f, 0f, _moveSpeed).Clamp01();
 
 		if (deceleration > 0f) {
-			Entity.UpDirection = entityUp.Slerp(Vector3.Up, 3f * deceleration * floatDelta);
+			entityUp = entityUp.SafeSlerp(Vector3.Up, 18f * deceleration * floatDelta);
 		}
 		else if (onFloor && groundUp.Dot(entityUp) >= 0.75f) {
-			Entity.UpDirection = groundUp;
+			entityUp = groundUp;
 		}
 
 
-		Basis rotationToNormal = Entity.Transform.Up().FromToBasis(Entity.UpDirection);
+		Basis rotationToNormal = Entity.Transform.Up().FromToBasis(entityUp);
 
-		Entity.GlobalForward = Entity.GlobalForward.SafeSlerp(rotationToNormal * Entity.GlobalForward, 18f * floatDelta);
+		entityForward = entityForward.SafeSlerp(rotationToNormal * entityForward, 18f * floatDelta);
 		_movement = rotationToNormal * _movement;
-
 
 
 		float newSpeed = 0f;
@@ -75,11 +75,14 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 		if (!_movement.IsEqualApprox(Vector3.Zero)) {
 			direction = _movement.Normalized();
 
-			newSpeed = Mathf.Clamp(Entity.GlobalForward.Dot(direction) + 0.25f, 0f, 1f) * entityMoveSpeed;
-			Entity.GlobalForward = Entity.GlobalForward.Slerp(direction, Entity.GetTraitValue(Traits.GenericTurnSpeed) * floatDelta);
+			newSpeed = Mathf.Clamp(entityForward.Dot(direction) + 0.25f, 0f, 1f) * entityMoveSpeed;
+			entityForward = entityForward.Slerp(direction, Entity.GetTraitValue(Traits.GenericTurnSpeed) * floatDelta);
 		}
 
+		Entity.UpDirection = entityUp;
+		Entity.GlobalForward = entityForward;
 		Entity.GlobalBasis = Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection);
+
 
 		if (_drifting) {
 			newSpeed = 0f;
@@ -91,14 +94,7 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 		float speedDelta = newSpeed > _moveSpeed ? 1f : 0.25f;
 		_moveSpeed = _moveSpeed.MoveToward(newSpeed, speedDelta * Entity.GetTraitValue(Traits.GenericAcceleration) * floatDelta);
 
-		ComputeRotation(direction, groundUp, floatDelta);
-
-		_movement = Vector3.Zero;
-		return _inertiaMovement * _moveSpeed;
-
-		void ComputeRotation(Vector3 direction, Vector3 groundUp, float floatDelta) {
-			if (Entity.CostumeHolder?.Costume is not Costume model) return;
-
+		if (Entity.CostumeHolder?.Costume is Costume model) {
 			Basis toGroundUp = Entity.GlobalBasis.Up().FromToBasis(groundUp);
 			Vector3 entityRight = toGroundUp * Entity.GlobalBasis.Right();
 
@@ -107,6 +103,10 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifi
 
 			model.GlobalBasis = Basis.LookingAt(_modelForward, _modelUp);
 		}
+
+
+		_movement = Vector3.Zero;
+		return _inertiaMovement * _moveSpeed;
 	}
 
 	// protected override Vector3 ProcessInertia(double delta, Vector3 horizontalInertia) {

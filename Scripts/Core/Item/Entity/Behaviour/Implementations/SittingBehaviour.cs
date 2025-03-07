@@ -12,8 +12,8 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 	protected override bool IsOneTime { get; } = true;
 
 
-	protected SittingBehaviour() : this(null) { }
-	public SittingBehaviour(Entity? entity, EntityBehaviour? previousBehaviour = null) : base(entity) {
+	protected SittingBehaviour() : this(null!) { }
+	public SittingBehaviour(Entity entity, EntityBehaviour? previousBehaviour = null) : base(entity) {
 		this.previousBehaviour = previousBehaviour;
 	}
 
@@ -45,7 +45,7 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 		}
 
 		if (player.Entity == Entity && player.CameraController.SetOrAddBehaviour<GravitatedCameraBehaviour>(() => new(player.CameraController), out var cameraBehaviour)) {
-			cameraBehaviour.SetEntityAsSubject(Entity);
+			cameraBehaviour.Subject = Entity;
 			cameraBehaviour.MoveCamera(
 				player.InputDevice.GetVector(Inputs.LookLeft, Inputs.LookRight, Inputs.LookDown, Inputs.LookUp) * player.InputDevice.Sensitivity
 			);

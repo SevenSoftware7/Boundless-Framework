@@ -75,13 +75,4 @@ public partial class CameraController3D : Camera3D {
 
 		cameraRelativeMovement = camRotation * new Vector3(moveInput.X, 0, moveInput.Y);
 	}
-
-
-	public override void _Process(double delta) {
-		base._Process(delta);
-		if (CurrentBehaviour is null) return;
-
-		Transform3D transform = CurrentBehaviour.Transform;
-		GlobalTransform = transform;
-	}
 }
