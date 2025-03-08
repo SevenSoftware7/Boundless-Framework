@@ -41,8 +41,7 @@ public partial class DrivingBehaviour : SittingBehaviour {
 		Entity.GlobalForward = Vehicle.Entity.GlobalForward;
 	}
 
-	public override void Dismount() {
-		base.Dismount();
+	protected override void OnDismount() {
 		Vehicle.Driver = null;
 	}
 

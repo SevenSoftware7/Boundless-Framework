@@ -23,12 +23,16 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 	}
 	protected override void _Stop(EntityBehaviour? nextBehaviour) {
 		DisavowPlayer();
+		OnDismount();
 	}
 
 
-	public virtual void Dismount() {
+	public void Dismount() {
 		Entity.SetBehaviour(previousBehaviour);
+		OnDismount();
 	}
+
+	protected virtual void OnDismount() { }
 
 
 	public virtual void HandlePlayer(Player player) {
