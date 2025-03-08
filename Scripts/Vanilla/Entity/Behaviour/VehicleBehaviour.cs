@@ -13,8 +13,8 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 
 	private bool _drifting;
 
-	private Vector3 _inertiaMovement;
-	private float _moveSpeed;
+	private Vector3 _inertiaDirection;
+	private float _inertia;
 
 	private Vector3 _modelForward = Vector3.Forward;
 	private Vector3 _modelUp = Vector3.Up;
@@ -41,72 +41,82 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 
 	protected override Vector3 ProcessGroundedMovement(double delta) {
 		float floatDelta = (float)delta;
+
 		float entityMoveSpeed = Entity.GetTraitValue(Traits.GenericMoveSpeed);
-		bool onFloor = Entity.IsOnFloor();
+		bool isOnFloor = Entity.IsOnFloor();
 		Vector3 entityUp = Entity.UpDirection;
 		Vector3 entityForward = Entity.GlobalForward;
 
 		Vector3 groundUp = entityUp;
-		if (onFloor) {
+		if (isOnFloor) {
 			Vector3 entityPos = Entity.GlobalPosition;
 			if (Entity.GetWorld3D().IntersectRay3D(entityPos + entityUp, entityPos - entityUp, out IntersectRay3DResult res, Entity.CollisionMask)) {
 				groundUp = res.Normal.Normalized();
 			}
 		}
 
-		float deceleration = Mathf.InverseLerp(entityMoveSpeed * 0.75f, 0f, _moveSpeed).Clamp01();
 
-		if (deceleration > 0f) {
-			entityUp = entityUp.SafeSlerp(Vector3.Up, 18f * deceleration * floatDelta);
+		float gravityDecay = Mathf.InverseLerp(entityMoveSpeed * 0.75f, 0f, _inertia).Clamp01();
+
+		if (gravityDecay > 0f) {
+			entityUp = entityUp.SafeSlerp(Vector3.Up, 18f * gravityDecay * floatDelta);
 		}
-		else if (onFloor && groundUp.Dot(entityUp) >= 0.75f) {
-			entityUp = groundUp;
+		else if (isOnFloor && groundUp.Dot(entityUp) >= 0.75f) {
+			entityUp = entityUp.SafeSlerp(groundUp, 18f * floatDelta);
 		}
 
 
-		Basis rotationToNormal = Entity.Transform.Up().FromToBasis(entityUp);
+		Basis upRotation = Entity.Transform.Up().FromToBasis(entityUp);
 
-		entityForward = entityForward.SafeSlerp(rotationToNormal * entityForward, 18f * floatDelta);
-		_movement = rotationToNormal * _movement;
+		entityForward = entityForward.SafeSlerp(upRotation * entityForward, 18f * floatDelta);
+		_movement = upRotation * _movement;
 
 
-		float newSpeed = 0f;
+		float newInertia = 0f;
 		Vector3 direction = Vector3.Zero;
 		if (!_movement.IsEqualApprox(Vector3.Zero)) {
 			direction = _movement.Normalized();
 
-			newSpeed = Mathf.Clamp(entityForward.Dot(direction) + 0.25f, 0f, 1f) * entityMoveSpeed;
+			newInertia = Mathf.Clamp(entityForward.Dot(direction) + 0.25f, 0f, 1f) * entityMoveSpeed;
 			entityForward = entityForward.Slerp(direction, Entity.GetTraitValue(Traits.GenericTurnSpeed) * floatDelta);
 		}
 
-		Entity.UpDirection = entityUp;
-		Entity.GlobalForward = entityForward;
-		Entity.GlobalBasis = Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection);
-
 
 		if (_drifting) {
-			newSpeed = 0f;
+			newInertia = 0f;
 		}
 		else {
-			_inertiaMovement = _inertiaMovement.Lerp(Entity.GlobalForward, 12f * floatDelta);
+			_inertiaDirection = _inertiaDirection.Lerp(entityForward, 12f * floatDelta);
 		}
 
-		float speedDelta = newSpeed > _moveSpeed ? 1f : 0.25f;
-		_moveSpeed = _moveSpeed.MoveToward(newSpeed, speedDelta * Entity.GetTraitValue(Traits.GenericAcceleration) * floatDelta);
+		float speedDelta = newInertia > _inertia ? 1f : 0.25f;
+		_inertia = _inertia.MoveToward(newInertia, speedDelta * Entity.GetTraitValue(Traits.GenericAcceleration) * floatDelta);
+
+
 
 		if (Entity.CostumeHolder?.Costume is Costume model) {
 			Basis toGroundUp = Entity.GlobalBasis.Up().FromToBasis(groundUp);
 			Vector3 entityRight = toGroundUp * Entity.GlobalBasis.Right();
 
-			_modelForward = _modelForward.Lerp(toGroundUp * Entity.GlobalForward, 14f * floatDelta).Normalized();
-			_modelUp = _modelUp.Lerp((groundUp + direction.Dot(entityRight) * entityRight).Normalized(), 7f * floatDelta).Normalized();
+			Vector3 leanForward = toGroundUp * entityForward;
+			if (!isOnFloor) leanForward = (leanForward + groundUp * 0.25f).Normalized();
+
+			Vector3 leanRight = direction.Dot(entityRight) * entityRight;
+			Vector3 leanUp = (entityUp + leanRight).Normalized();
+
+			_modelForward = _modelForward.SafeSlerp(leanForward, 14f * floatDelta);
+			_modelUp = _modelUp.SafeSlerp(leanUp, 10f * floatDelta);
 
 			model.GlobalBasis = Basis.LookingAt(_modelForward, _modelUp);
 		}
 
 
+		Entity.UpDirection = entityUp;
+		Entity.GlobalForward = entityForward;
+		Entity.GlobalBasis = Basis.LookingAt(entityForward, Entity.UpDirection);
+
 		_movement = Vector3.Zero;
-		return _inertiaMovement * _moveSpeed;
+		return _inertiaDirection * _inertia;
 	}
 
 	// protected override Vector3 ProcessInertia(double delta, Vector3 horizontalInertia) {
@@ -122,8 +132,8 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 
 	public void OnVoidOut(Entity entity) {
 		if (entity != Entity) return;
-		_inertiaMovement = Vector3.Zero;
-		_moveSpeed = 0f;
+		_inertiaDirection = Vector3.Zero;
+		_inertia = 0f;
 	}
 
 }
