@@ -4,7 +4,7 @@ using Godot;
 using SevenDev.Boundless.Utility;
 
 [GlobalClass]
-public sealed partial class WaterFloater : Node, IWaterDisplacementSubscriber, IWaterCollisionNotifier {
+public sealed partial class WaterFloater : Node, IWaterDisplacementSubscriber, IWaterCollisionListener {
 	[Export] public RigidBody3D? Body;
 	[Export] public Node3D? Origin;
 	[Export] public uint floaterCount = 1;

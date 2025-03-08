@@ -17,15 +17,11 @@ public sealed partial class Water : Area3D {
 
 
 	private void _OnBodyEntered(Node3D body) {
-		body.PropagateAction<IWaterCollisionNotifier>(c => {
-			c.OnEnterWater(this);
-		});
+		body.PropagateAction<IWaterCollisionListener>(c => c.OnEnterWater(this));
 	}
 
 	private void _OnBodyExited(Node3D body) {
-		body.PropagateAction<IWaterCollisionNotifier>(c => {
-			c.OnExitWater(this);
-		});
+		body.PropagateAction<IWaterCollisionListener>(c => c.OnExitWater(this));
 	}
 
 

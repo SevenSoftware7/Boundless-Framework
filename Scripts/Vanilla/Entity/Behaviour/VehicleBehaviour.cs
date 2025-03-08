@@ -8,7 +8,7 @@ using static SevenDev.Boundless.Utility.Collisions;
 
 [Tool]
 [GlobalClass]
-public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionNotifier {
+public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListener {
 	[Export] public DrivingBehaviour? Driver;
 
 	private bool _drifting;

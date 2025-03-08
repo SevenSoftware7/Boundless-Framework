@@ -6,7 +6,7 @@ using static Godot.CharacterBody3D;
 
 [Tool]
 [GlobalClass]
-public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWaterCollisionNotifier, IWaterDisplacementSubscriber {
+public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWaterCollisionListener, IWaterDisplacementSubscriber {
 	private const float SurfaceThreshold = 2f;
 	private const float CenterOfMassOffset = 2f;
 
