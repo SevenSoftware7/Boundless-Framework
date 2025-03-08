@@ -249,6 +249,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 		if (Health is not null) {
 			Health.Value -= Health.Maximum / 8f;
 		}
+
+		this.PropagateAction<IVoidOutListener>(listener => listener.OnVoidOut(this), true);
 	}
 
 	public virtual void HandlePlayer(Player player) {

@@ -8,7 +8,7 @@ using static SevenDev.Boundless.Utility.Collisions;
 
 [Tool]
 [GlobalClass]
-public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListener {
+public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListener, IVoidOutListener {
 	[Export] public DrivingBehaviour? Driver;
 
 	private bool _drifting;
@@ -119,4 +119,11 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 	}
 
 	public void OnExitWater(Water water) { }
+
+	public void OnVoidOut(Entity entity) {
+		if (entity != Entity) return;
+		_inertiaMovement = Vector3.Zero;
+		_moveSpeed = 0f;
+	}
+
 }
