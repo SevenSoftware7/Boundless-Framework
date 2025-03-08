@@ -16,13 +16,12 @@ using SevenDev.Boundless.Persistence;
 [GlobalClass]
 [Injector]
 public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDamageDealer, ICostumable, IUIObject, IPersistent<Entity>, IItem {
-	public const int RECOVER_LOCATION_BUFFER_SIZE = 5;
+	public const int RECOVER_STATE_BUFFER_SIZE = 5;
 
 
 	public readonly Queue<StyleState> StyleSwitchBuffer = [];
 
-	private readonly Queue<Vector3> recoverLocationBuffer = new(RECOVER_LOCATION_BUFFER_SIZE + 1);
-	public Vector3? LastRecoverLocation { get; private set; } = null;
+	public RecoverState? recoverState { get; private set; }
 
 
 	public IInjectionNode InjectionNode { get; }
@@ -168,13 +167,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 	public float GetTraitValue(Trait trait, float @default = default) => TraitModifiers.ApplyTo(trait, EntityTraits.GetValueOrDefault(trait, @default));
 
-	public void AddRecoverLocation(Vector3 location) {
-		if (recoverLocationBuffer.Count == RECOVER_LOCATION_BUFFER_SIZE) {
-			recoverLocationBuffer.Dequeue();
-		}
-
-		recoverLocationBuffer.Enqueue(location);
-		LastRecoverLocation = location;
+	public void UpdateRecoverState() {
+		recoverState = new RecoverState(this);
 	}
 
 	public bool ExecuteAction(Action.Builder builder, bool forceExecute = false) => ExecuteAction(new Action.Wrapper(builder), forceExecute);
@@ -241,15 +235,13 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	}
 
 	public void VoidOut() {
-		if (recoverLocationBuffer.Count == 0) {
+		if (recoverState is null) {
 			GD.PushError("Could not Void out Properly, falling back to World Origin");
 			GlobalPosition = Vector3.Zero;
 			return;
 		}
 		else {
-			GlobalPosition = recoverLocationBuffer.Peek();
-			recoverLocationBuffer.Clear();
-			recoverLocationBuffer.Enqueue(GlobalPosition);
+			recoverState.Value.Apply();
 
 			GD.Print($"Entity {Name} Voided out.");
 		}
@@ -257,9 +249,6 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 		if (Health is not null) {
 			Health.Value -= Health.Maximum / 8f;
 		}
-
-		Inertia = Vector3.Zero;
-		Gravity = Vector3.Zero;
 	}
 
 	public virtual void HandlePlayer(Player player) {
@@ -376,6 +365,30 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 			foreach (IPersistenceData data in MiscData) {
 				(data.Load(registry) as Node)?.ParentTo(item);
 			}
+		}
+	}
+
+	public readonly struct RecoverState {
+		private readonly Entity entity;
+		public readonly Vector3 Location;
+		public readonly Vector3 UpDirection;
+
+		public RecoverState(Entity entity) {
+			this.entity = entity;
+			Location = entity.GlobalPosition;
+			UpDirection = entity.UpDirection;
+		}
+
+		public void Apply() {
+			entity.GlobalPosition = Location;
+			entity.UpDirection = UpDirection;
+
+			entity.Movement = Vector3.Zero;
+			entity.Gravity = Vector3.Zero;
+			entity.Velocity = Vector3.Zero;
+
+			entity.Inertia = Vector3.Zero;
+			entity.Gravity = Vector3.Zero;
 		}
 	}
 }

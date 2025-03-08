@@ -84,9 +84,9 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 	protected sealed override Vector3 ProcessMovement(double delta) {
 		if (
 			Entity.IsOnFloor() && Entity.GetPlatformVelocity().IsZeroApprox() &&
-			(!Entity.LastRecoverLocation.HasValue || Entity.GlobalPosition.DistanceSquaredTo(Entity.LastRecoverLocation.Value) > 0.1f)
+			(!Entity.recoverState.HasValue || Entity.GlobalPosition.DistanceSquaredTo(Entity.recoverState.Value.Location) > 0.1f)
 		) {
-			Entity.AddRecoverLocation(Entity.GlobalPosition);
+			Entity.UpdateRecoverState();
 		}
 
 		Entity.Movement += ProcessGroundedMovement(delta);
