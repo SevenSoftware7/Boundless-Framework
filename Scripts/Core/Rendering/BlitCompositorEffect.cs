@@ -11,9 +11,9 @@ public partial class BlitCompositorEffect : BaseCompositorEffect {
 
 	[Export]
 	private RDShaderFile? ShaderFile {
-		get => _shaderFile;
+		get;
 		set {
-			_shaderFile = value;
+			field = value;
 
 			if (RenderingDevice is not null) {
 				Destruct();
@@ -21,7 +21,6 @@ public partial class BlitCompositorEffect : BaseCompositorEffect {
 			}
 		}
 	}
-	private RDShaderFile? _shaderFile;
 	private Rid shader;
 
 	private Rid computePipeline;

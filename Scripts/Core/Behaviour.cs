@@ -14,8 +14,11 @@ public abstract partial class Behaviour<T> : Node where T : Behaviour<T> {
 	/// This will always return false in Editor mode.<para/>
 	/// Processing can still run when the behaviour is inactive, so you need to check if the behaviour is active before executing it fully.
 	/// </summary>
-	public bool IsActive => _isActive && !Engine.IsEditorHint();
-	private bool _isActive = false;
+	public bool IsActive {
+		get => field && !Engine.IsEditorHint();
+		private set;
+	} = false;
+
 
 	/// <summary>
 	/// Returns whether the behaviour is a 'one-time' behaviour and will be destroyed upon being stopped.<para/>
@@ -34,7 +37,7 @@ public abstract partial class Behaviour<T> : Node where T : Behaviour<T> {
 	/// <param name="previousBehaviour">The last behaviour to be active before this one.</param>
 	public void Start(T? previousBehaviour = null) {
 		_Start((previousBehaviour is null || previousBehaviour.IsOneTime) ? null : previousBehaviour);
-		_isActive = true;
+		IsActive = true;
 	}
 	/// <summary>
 	/// Stop the Behaviour's activity.<para/>
@@ -44,7 +47,7 @@ public abstract partial class Behaviour<T> : Node where T : Behaviour<T> {
 	/// <param name="nextBehaviour">The next behaviour to be activated after this one.</param>
 	public void Stop(T? nextBehaviour = null) {
 		_Stop(nextBehaviour);
-		_isActive = false;
+		IsActive = false;
 
 		if (IsOneTime) {
 			this.UnparentAndQueueFree();

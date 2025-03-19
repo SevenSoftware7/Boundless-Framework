@@ -15,22 +15,21 @@ public abstract partial class GaugeControl : Control {
 
 	[Export]
 	public Gauge? Value {
-		get => _value;
+		get;
 		set {
-			if (value == _value) return;
+			if (value == field) return;
 
 			Callable onMaximumChanged = Callable.From<float>(OnMaximumChanged);
 			Callable onValueChanged = Callable.From<float>(OnValueChanged);
-			NodeExtensions.SwapSignalEmitter(ref _value, value, Gauge.SignalName.MaximumChanged, onMaximumChanged);
-			NodeExtensions.SwapSignalEmitter(ref _value, value, Gauge.SignalName.ValueChanged, onValueChanged);
+			NodeExtensions.SwapSignalEmitter(ref field, value, Gauge.SignalName.MaximumChanged, onMaximumChanged);
+			NodeExtensions.SwapSignalEmitter(ref field, value, Gauge.SignalName.ValueChanged, onValueChanged);
 
-			if (_value is not null) {
-				OnMaximumChanged(_value.Value);
-				OnValueChanged(_value.Value);
+			if (field is not null) {
+				OnMaximumChanged(field.Value);
+				OnValueChanged(field.Value);
 			}
 		}
 	}
-	private Gauge? _value;
 
 	protected virtual void OnMaximumChanged(float value) { }
 	protected virtual void OnValueChanged(float value) { }

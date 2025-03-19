@@ -14,9 +14,9 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 
 	[Export]
 	private RDShaderFile? RenderShaderFile {
-		get => _renderShaderFile;
+		get;
 		set {
-			_renderShaderFile = value;
+			field = value;
 
 			if (RenderingDevice is not null) {
 				Destruct();
@@ -24,14 +24,13 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			}
 		}
 	}
-	private RDShaderFile? _renderShaderFile;
 	private Rid renderShader;
 
 	[Export]
 	private RDShaderFile? ComputeShaderFile {
-		get => _computeShaderFile;
+		get;
 		set {
-			_computeShaderFile = value;
+			field = value;
 
 			if (RenderingDevice is not null) {
 				Destruct();
@@ -39,7 +38,6 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			}
 		}
 	}
-	private RDShaderFile? _computeShaderFile;
 	private Rid computeShader;
 
 	private Rid displacementSampler;
@@ -82,7 +80,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 	public override void _RenderCallback(int effectCallbackType, RenderData renderData) {
 		base._RenderCallback(effectCallbackType, renderData);
 
-		if (RenderingDevice is null || _renderShaderFile is null || _computeShaderFile is null) return;
+		if (RenderingDevice is null || RenderShaderFile is null || ComputeShaderFile is null) return;
 		if (WaterDisplacementTexture is null || !WaterDisplacementTexture.TextureRdRid.IsValid) return;
 
 

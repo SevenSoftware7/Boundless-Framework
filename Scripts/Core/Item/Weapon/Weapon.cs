@@ -36,18 +36,17 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem, IUIObject, ICostu
 
 	[Injectable]
 	public WeaponHolsterState HolsterState {
-		get => _holsterState;
+		get;
 		set {
-			_holsterState = value;
-			if (_holsterState.IsHolstered) {
+			field = value;
+			if (field.IsHolstered) {
 				_costumeHolder?.Disable();
 			}
 			else {
 				_costumeHolder?.Enable();
 			}
 		}
-	}
-	private WeaponHolsterState _holsterState = WeaponHolsterState.Unholstered;
+	} = WeaponHolsterState.Unholstered;
 
 	[Export]
 	private bool IsHolstered {
@@ -57,10 +56,9 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem, IUIObject, ICostu
 
 	[Injectable]
 	public StyleState Style {
-		get => _style;
-		set => _style = value.WrappedWith(MaxStyle);
+		get;
+		set => field = value.WrappedWith(MaxStyle);
 	}
-	private StyleState _style;
 	public virtual StyleState MaxStyle { get; } = StyleState.Primary;
 
 	public abstract IWeapon.WeaponKind Kind { get; }
@@ -70,13 +68,12 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem, IUIObject, ICostu
 
 	[Export]
 	public AnimationLibrary? AnimationLibrary {
-		get => _animationLibrary;
+		get;
 		set {
-			_animationLibrary = value;
-			LibraryName = _animationLibrary?.ResourceName ?? string.Empty;
+			field = value;
+			LibraryName = field?.ResourceName ?? string.Empty;
 		}
 	}
-	private AnimationLibrary? _animationLibrary;
 
 	public StringName LibraryName { get; protected set; } = string.Empty;
 

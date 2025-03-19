@@ -15,22 +15,20 @@ public sealed partial class AkimboWeapon : CompositeWeapon, IInjectionIntercepto
 	public IInjectionNode InjectionNode { get; }
 
 	public IWeapon? MainWeapon {
-		get => _mainWeapon;
+		get;
 		private set {
-			_mainWeapon = value;
+			field = value;
 			if (value is Node mainWeaponNode) mainWeaponNode.SafeReparentTo(this);
 		}
 	}
-	private IWeapon? _mainWeapon;
 
 	public IWeapon? SideWeapon {
-		get => _sideWeapon;
+		get;
 		private set {
-			_sideWeapon = value;
+			field = value;
 			if (value is Node sideWeaponNode) sideWeaponNode.SafeReparentTo(this);
 		}
 	}
-	private IWeapon? _sideWeapon;
 
 
 	public override StyleState Style => MainWeapon?.Style ?? 0;

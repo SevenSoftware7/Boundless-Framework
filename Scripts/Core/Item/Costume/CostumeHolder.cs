@@ -13,12 +13,12 @@ public sealed partial class CostumeHolder : Node3D, ICustomizable {
 
 	public Costume? Costume { get; private set; }
 
-	private IItemDataProvider? _registry;
+
 	[Injectable]
 	private IItemDataProvider? Registry {
-		get => _registry;
+		get;
 		set {
-			_registry = value;
+			field = value;
 			Reload();
 		}
 	}
@@ -75,10 +75,10 @@ public sealed partial class CostumeHolder : Node3D, ICustomizable {
 	public void Reload() {
 		Unload();
 
-		if (_registry is null) return;
+		if (Registry is null) return;
 		if (_costumeKeyProvider?.ItemKey is null) return;
 
-		IItemData<Costume>? costumeData = _registry.GetData<Costume>(_costumeKeyProvider.ItemKey);
+		IItemData<Costume>? costumeData = Registry.GetData<Costume>(_costumeKeyProvider.ItemKey);
 		Costume = costumeData?.Instantiate()?.ParentTo(this);
 	}
 

@@ -12,22 +12,20 @@ public partial class TraitResource : Resource, IEquatable<TraitResource> {
 	private readonly string DropdownTraitsString = Traits.JoinedGenericTraits;
 
 	public Trait Trait {
-		get => _trait;
+		get;
 		set {
-			_trait = value;
-			ResourceName = _trait.Name;
+			field = value;
+			ResourceName = field.Name;
 		}
-	}
-	private Trait _trait = DefaultTrait;
+	} = DefaultTrait;
 
 	[Export] private bool Dropdown {
-		get => _useTraitDropdown;
+		get;
 		set {
-			_useTraitDropdown = value;
+			field = value;
 			NotifyPropertyListChanged();
 		}
-	}
-	private bool _useTraitDropdown = false;
+	} = false;
 
 	[Export]
 	public string Name {

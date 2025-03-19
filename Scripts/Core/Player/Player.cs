@@ -14,18 +14,17 @@ public sealed partial class Player : Node {
 
 	[Export]
 	public Entity? Entity {
-		get => _entity;
+		get;
 		set {
-			if (_entity == value) return;
+			if (field == value) return;
 
-			Entity? oldEntity = _entity;
+			Entity? oldEntity = field;
 			Callable.From(() => oldEntity?.PropagatePlayerDisavowing()).CallDeferred();
 
 			Callable onKill = Callable.From<float>(OnEntityDeath);
-			NodeExtensions.SwapSignalEmitter(ref _entity, value, Entity.SignalName.Death, onKill);
+			NodeExtensions.SwapSignalEmitter(ref field, value, Entity.SignalName.Death, onKill);
 		}
 	}
-	private Entity? _entity;
 
 	public InputDevice InputDevice => InputManager.CurrentDevice; // TODO: actual Device Management
 
@@ -60,7 +59,7 @@ public sealed partial class Player : Node {
 	public override void _Process(double delta) {
 		base._Process(delta);
 
-		_entity?.PropagatePlayerHandling(this);
+		Entity?.PropagatePlayerHandling(this);
 	}
 
 	public override void _Ready() {

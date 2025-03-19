@@ -12,29 +12,27 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 	public static readonly StringName DisplacementMapName = "water_displacement";
 	[Export]
 	private Texture2Drd? Texture {
-		get => _texture;
+		get;
 		set {
 			if (RenderingDevice is not null) Destruct();
 
-			_texture = value;
+			field = value;
 
 			if (RenderingDevice is not null) Construct();
 		}
 	}
-	private Texture2Drd? _texture;
 
 	[Export]
 	private RDShaderFile? ComputeShaderFile {
-		get => _computeShaderFile;
+		get;
 		set {
 			if (RenderingDevice is not null) Destruct();
 
-			_computeShaderFile = value;
+			field = value;
 
 			if (RenderingDevice is not null) Construct();
 		}
 	}
-	private RDShaderFile? _computeShaderFile;
 	private Rid computeShader;
 
 	private Rid computePipeline;
@@ -42,16 +40,15 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 
 	[Export]
 	private RDShaderFile? FetchShaderFile {
-		get => _fetchShaderFile;
+		get;
 		set {
 			if (RenderingDevice is not null) Destruct();
 
-			_fetchShaderFile = value;
+			field = value;
 
 			if (RenderingDevice is not null) Construct();
 		}
 	}
-	private RDShaderFile? _fetchShaderFile;
 	private Rid fetchShader;
 
 	private Rid fetchPipeline;
@@ -83,7 +80,7 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 	public override void _RenderCallback(int effectCallbackType, RenderData renderData) {
 		base._RenderCallback(effectCallbackType, renderData);
 
-		if (RenderingDevice is null || _computeShaderFile is null || Texture is null) return;
+		if (RenderingDevice is null || ComputeShaderFile is null || Texture is null) return;
 
 
 		Vector2I renderSize = new(128, 128);
@@ -124,7 +121,7 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 		}
 
 		void FetchDisplacementData(uint xGroups, uint yGroups) {
-			if (!FetchWaterDisplacement || _fetchShaderFile is null) return;
+			if (!FetchWaterDisplacement || FetchShaderFile is null) return;
 
 			// ----- Get WaterDisplacementSubscriber Info -----
 			Span<IWaterDisplacementSubscriber> subs = [.. Subscribers];
@@ -197,7 +194,7 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 
 
 	protected override void ConstructBehaviour(RenderingDevice renderingDevice) {
-		if (_computeShaderFile is null || _texture is null) return;
+		if (ComputeShaderFile is null || Texture is null) return;
 
 		displacementSampler = renderingDevice.SamplerCreate(new() {
 			MinFilter = RenderingDevice.SamplerFilter.Linear,
@@ -207,7 +204,7 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 			RepeatW = RenderingDevice.SamplerRepeatMode.Repeat,
 		});
 
-		computeShader = renderingDevice.ShaderCreateFromSpirV(_computeShaderFile.GetSpirV());
+		computeShader = renderingDevice.ShaderCreateFromSpirV(ComputeShaderFile.GetSpirV());
 		if (!computeShader.IsValid) {
 			throw new ArgumentException("Compute Shader is Invalid");
 		}
@@ -217,8 +214,8 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 			throw new ArgumentException("Compute Pipeline is Invalid");
 		}
 
-		if (_fetchShaderFile is not null) {
-			fetchShader = renderingDevice.ShaderCreateFromSpirV(_fetchShaderFile.GetSpirV());
+		if (FetchShaderFile is not null) {
+			fetchShader = renderingDevice.ShaderCreateFromSpirV(FetchShaderFile.GetSpirV());
 			if (!fetchShader.IsValid) {
 				throw new ArgumentException("Fetch Shader is Invalid");
 			}
@@ -231,7 +228,7 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 
 
 		waterDisplacementMap = renderingDevice.TextureCreate(waterDisplacementMapAttachmentFormat, new RDTextureView(), null);
-		_texture.TextureRdRid = waterDisplacementMap;
+		Texture.TextureRdRid = waterDisplacementMap;
 	}
 
 

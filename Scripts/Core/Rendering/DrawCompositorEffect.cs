@@ -9,9 +9,9 @@ using SevenDev.Boundless.Utility;
 public partial class DrawCompositorEffect : BaseCompositorEffect {
 	[Export]
 	private RDShaderFile? DrawShaderFile {
-		get => _drawShaderFile;
+		get;
 		set {
-			_drawShaderFile = value;
+			field = value;
 
 			if (RenderingDevice is not null) {
 				Destruct();
@@ -19,7 +19,8 @@ public partial class DrawCompositorEffect : BaseCompositorEffect {
 			}
 		}
 	}
-	private RDShaderFile? _drawShaderFile;
+
+
 	private Rid drawShader;
 
 	private Rid frameBuffer;

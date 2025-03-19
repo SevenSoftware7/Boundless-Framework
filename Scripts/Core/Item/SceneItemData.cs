@@ -7,13 +7,12 @@ using SevenDev.Boundless.Persistence;
 public abstract partial class SceneItemData<[MustBeVariant] T> : Resource, IItemData<T> where T : Node, IItem {
 	IItemKeyProvider IItemData.KeyProvider => KeyProvider;
 	[Export] private GenericResourceItemKey<T> KeyProvider {
-		get => _keyProvider;
+		get;
 		set {
 			if (value is null) return;
-			_keyProvider = value;
+			field = value;
 		}
-	}
-	private GenericResourceItemKey<T> _keyProvider = new();
+	} = new();
 
 	[Export] public ItemUIData? UIData { get; private set; } = new();
 	public string DisplayName => UIData?.DisplayName ?? string.Empty;

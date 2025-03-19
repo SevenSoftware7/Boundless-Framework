@@ -30,73 +30,67 @@ public sealed partial class WaterMesh : MeshInstance3D, ISerializationListener {
 
 	[Export]
 	public float WaterIntensity {
-		get => _waterIntensity;
+		get;
 		set {
-			_waterIntensity = value;
+			field = value;
 
 			if (Mesh?.SurfaceGetMaterial(0) is not ShaderMaterial shaderMaterial) return;
-			shaderMaterial.SetShaderParameter("water_intensity", _waterIntensity);
+			shaderMaterial.SetShaderParameter("water_intensity", field);
 		}
-	}
-	private float _waterIntensity = 1f;
+	} = 1f;
 
 	[Export]
 	public float WaterScale {
-		get => _waterScale;
+		get;
 		set {
-			_waterScale = value;
+			field = value;
 
 			if (Mesh?.SurfaceGetMaterial(0) is not ShaderMaterial shaderMaterial) return;
-			shaderMaterial.SetShaderParameter("water_scale", _waterScale);
+			shaderMaterial.SetShaderParameter("water_scale", field);
 		}
-	}
-	private float _waterScale = 70f;
+	} = 70f;
 
 	[Export]
 	public float FogDistance {
-		get => _fogDistance;
+		get;
 		set {
-			_fogDistance = value;
+			field = value;
 
 			if (Mesh?.SurfaceGetMaterial(0) is not ShaderMaterial shaderMaterial) return;
-			shaderMaterial.SetShaderParameter("water_fog_distance", _fogDistance);
+			shaderMaterial.SetShaderParameter("water_fog_distance", field);
 		}
-	}
-	private float _fogDistance = 90f;
+	} = 90f;
 
 	[Export(PropertyHint.Range, "0,20,0.01")] public float FogFade {
-		get => _fogFade;
+		get;
 		set {
-			_fogFade = value;
+			field = value;
 
 			if (Mesh?.SurfaceGetMaterial(0) is not ShaderMaterial shaderMaterial) return;
-			shaderMaterial.SetShaderParameter("water_fog_fade", _fogFade);
+			shaderMaterial.SetShaderParameter("water_fog_fade", field);
 		}
-	}
-	private float _fogFade = 1f;
+	} = 1f;
 
 
 	[Export] public float TransparencyDistance {
-		get => _transparencyDistance;
+		get;
 		set {
-			_transparencyDistance = value;
+			field = value;
 
 			if (Mesh?.SurfaceGetMaterial(0) is not ShaderMaterial shaderMaterial) return;
-			shaderMaterial.SetShaderParameter("water_transparency_distance", _transparencyDistance);
+			shaderMaterial.SetShaderParameter("water_transparency_distance", field);
 		}
-	}
-	private float _transparencyDistance = 45f;
+	} = 45f;
 
 	[Export(PropertyHint.Range, "0,20,0.01")] public float TransparencyFade {
-		get => _transparencyFade;
+		get;
 		set {
-			_transparencyFade = value;
+			field = value;
 
 			if (Mesh?.SurfaceGetMaterial(0) is not ShaderMaterial shaderMaterial) return;
-			shaderMaterial.SetShaderParameter("water_transparency_fade", _transparencyFade);
+			shaderMaterial.SetShaderParameter("water_transparency_fade", field);
 		}
-	}
-	private float _transparencyFade = 1f;
+	} = 1f;
 
 
 	public WaterMesh() : base() {
