@@ -6,14 +6,14 @@ using LandlessSkies.Core;
 
 [Tool]
 [GlobalClass]
-public sealed partial class NemesisWeapon : Weapon, IPlayerHandler {
+public sealed partial class PaxWeapon : Weapon, IPlayerHandler {
 	private readonly SlashAttack.Builder slashAttack;
 	public override IWeapon.WeaponKind Kind => IWeapon.WeaponKind.Sword;
 	public override IWeapon.WeaponUsage Usage => IWeapon.WeaponUsage.Slash | IWeapon.WeaponUsage.Strike;
 	public override IWeapon.WeaponSize Size => IWeapon.WeaponSize.TwoHanded;
 
 
-	public NemesisWeapon() : base() {
+	public PaxWeapon() : base() {
 		slashAttack = new(this);
 	}
 

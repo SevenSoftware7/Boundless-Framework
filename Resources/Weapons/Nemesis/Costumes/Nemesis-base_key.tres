@@ -1,7 +1,0 @@
-[gd_resource type="Resource" script_class="WeaponCostumeResourceItemKey" load_steps=2 format=3 uid="uid://nv3cruo4dqdt"]
-
-[ext_resource type="Script" uid="uid://boajo5fn61w5h" path="res://Scripts/Core/Item/Weapon/Costume/WeaponCostumeResourceItemKey.cs" id="1_g5ysc"]
-
-[resource]
-script = ExtResource("1_g5ysc")
-String = "nemesis_base=cos"

@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ItemUIData" load_steps=2 format=3 uid="uid://c8q8b6jgvn4vo"]
+
+[ext_resource type="Script" uid="uid://blvmpg5qx577a" path="res://Scripts/Core/Item/ItemUIData.cs" id="1_v7v64"]
+
+[resource]
+script = ExtResource("1_v7v64")
+DisplayName = "Pax"

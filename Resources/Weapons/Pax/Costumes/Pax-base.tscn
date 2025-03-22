@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=3 uid="uid://cbkv4cstjgb7i"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Implementation/MeshCostume.cs" id="1_sjax7"]
-[ext_resource type="Resource" uid="uid://nv3cruo4dqdt" path="res://Resources/Weapons/Nemesis/Costumes/Nemesis-base_key.tres" id="2_irdqo"]
-[ext_resource type="Resource" uid="uid://bcby6xfogpbuj" path="res://Resources/Weapons/Nemesis/Costumes/Nemesis-base_ui.tres" id="3_r1ifs"]
+[ext_resource type="Script" uid="uid://b6ohxi3uuv71d" path="res://Scripts/Core/Item/Costume/Implementation/MeshCostume.cs" id="1_sjax7"]
+[ext_resource type="Resource" uid="uid://nv3cruo4dqdt" path="res://Resources/Weapons/Pax/Costumes/Pax-base_key.tres" id="2_irdqo"]
+[ext_resource type="Resource" uid="uid://bcby6xfogpbuj" path="res://Resources/Weapons/Pax/Costumes/Pax-base_ui.tres" id="3_r1ifs"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_tb6pr"]
 size = Vector3(0.25, 3.4, 0.6)
@@ -10,7 +10,7 @@ size = Vector3(0.25, 3.4, 0.6)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_55qpj"]
 albedo_color = Color(0.580392, 0.219608, 0.219608, 1)
 
-[node name="Model - Nemesis (base)" type="Node3D" node_paths=PackedStringArray("Meshes")]
+[node name="Model - Pax (base)" type="Node3D" node_paths=PackedStringArray("Meshes")]
 script = ExtResource("1_sjax7")
 Meshes = [NodePath("Model")]
 ResourceKey = ExtResource("2_irdqo")

@@ -51,8 +51,8 @@ public partial class MainNode : Node3D, ISerializationListener {
 
 		_registry.RegisterData(GD.Load<WeaponSceneData>("uid://7vx1dn4qvh34")); // Epiphron
 		_registry.RegisterData(GD.Load<WeaponCostumeSceneData>("uid://c376t1le83xwr")); // Epiphron Base
-		_registry.RegisterData(GD.Load<WeaponSceneData>("uid://ci6ahybitat4f")); // Nemesis
-		_registry.RegisterData(GD.Load<WeaponCostumeSceneData>("uid://ctyrw08y4svjk")); // Nemesis Base
+		_registry.RegisterData(GD.Load<WeaponSceneData>("uid://ci6ahybitat4f")); // Pax
+		_registry.RegisterData(GD.Load<WeaponCostumeSceneData>("uid://ctyrw08y4svjk")); // Pax Base
 		_registry.RegisterData(GD.Load<WeaponSceneData>("uid://dwoudcgmk0aae")); // Eleos
 		_registry.RegisterData(GD.Load<WeaponCostumeSceneData>("uid://q68mneifjek2")); // Eleos Base
 

@@ -18,7 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://ckd33ejkd5cqi" path="res://Resources/FX/Water.tscn" id="12_xdv3s"]
 [ext_resource type="Script" uid="uid://d3j00f1kcv4c2" path="res://Scripts/Core/Item/Weapon/Collection/Implementations/MultiWeapon.cs" id="13_d6cna"]
 [ext_resource type="Script" uid="uid://demu2xbt0bpng" path="res://Scripts/Core/Traits/TraitModifierTrigger.cs" id="15_4yxf6"]
-[ext_resource type="PackedScene" uid="uid://b7b17ebmgtrfy" path="res://Resources/Weapons/Nemesis/Nemesis.tscn" id="15_x4bcq"]
+[ext_resource type="PackedScene" uid="uid://b7b17ebmgtrfy" path="res://Resources/Weapons/Pax/Pax.tscn" id="15_x4bcq"]
 [ext_resource type="Script" uid="uid://bycrdvgqioks7" path="res://Scripts/Core/Traits/TraitModifier.cs" id="16_qta6b"]
 [ext_resource type="PackedScene" uid="uid://bp1e6thwkkcrr" path="res://Resources/Weapons/Eleos/Eleos.tscn" id="17_jhoyp"]
 [ext_resource type="Script" uid="uid://djubduy40g4eb" path="res://Scripts/Core/Traits/TraitResource.cs" id="17_x3rx7"]
@@ -27,7 +27,7 @@
 [ext_resource type="PackedScene" uid="uid://bxcpbr13uyeh1" path="res://Resources/Entities/Bike/Bike.tscn" id="20_pcyav"]
 [ext_resource type="AnimationLibrary" uid="uid://dvww6dpnwphxd" path="res://Resources/Weapons/Eleos/EleosAnimations.tres" id="21_xvtyr"]
 [ext_resource type="AnimationLibrary" uid="uid://b0gic15n8ccgn" path="res://Resources/Weapons/Epiphron/EpiphronAnimations.tres" id="22_u7mjy"]
-[ext_resource type="AnimationLibrary" uid="uid://caafq3ok75ukn" path="res://Resources/Weapons/Nemesis/NemesisAnimations.tres" id="23_4yxf6"]
+[ext_resource type="AnimationLibrary" uid="uid://caafq3ok75ukn" path="res://Resources/Weapons/Pax/PaxAnimations.tres" id="23_4yxf6"]
 [ext_resource type="Script" uid="uid://cpqri6cw2hye2" path="res://Scripts/Core/Traits/TraitsCollection.cs" id="23_qta6b"]
 [ext_resource type="PackedScene" uid="uid://b7hcoc81x5g0i" path="res://Resources/Companions/Erebos/Erebos.tscn" id="26_ds8t8"]
 [ext_resource type="PackedScene" uid="uid://7ic4jncm8p1a" path="res://Scenes/Player.tscn" id="26_rkn04"]
@@ -2076,7 +2076,7 @@ transform = Transform3D(4.37114e-08, -1.50996e-07, 1, -1, -4.37114e-08, 4.37114e
 [node name="Second" type="Node" parent="Eos/Weapon/Main"]
 script = ExtResource("13_d6cna")
 
-[node name="Nemesis" parent="Eos/Weapon/Main/Second" instance=ExtResource("15_x4bcq")]
+[node name="Pax" parent="Eos/Weapon/Main/Second" instance=ExtResource("15_x4bcq")]
 transform = Transform3D(4.37114e-08, -1.50996e-07, 1, -1, -4.37114e-08, 4.37114e-08, 4.37114e-08, -1, -1.50996e-07, 1.96616, 4.61968, 34.1249)
 IsHolstered = true
 
