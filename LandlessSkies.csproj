@@ -26,7 +26,7 @@
     <PackageReference Include="SevenDev.Boundless.Injection.Generators" Version="1.1.9" PrivateAssets="all" IncludeAssets="analyzers" />
     <!-- <ProjectReference Include="../Boundless.Injection/SevenDev.Boundless.Injection.Generators/SevenDev.Boundless.Injection.Generators.csproj" PrivateAssets="all" OutputItemType="analyzer" /> -->
 
-    <PackageReference Include="SevenDev.Boundless.Persistence" Version="1.2.0" />
+    <PackageReference Include="SevenDev.Boundless.Persistence" Version="1.2.1" />
     <!-- <ProjectReference Include="../Boundless.Persistence/SevenDev.Boundless.Persistence/SevenDev.Boundless.Persistence.csproj" /> -->
 
     <PackageReference Include="KGySoft.CoreLibraries" Version="8.1.0" />

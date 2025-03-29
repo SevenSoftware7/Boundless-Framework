@@ -10,27 +10,28 @@ public partial class ResourceItemKey : Resource {
 	[Export] public string String {
 		get => ItemKey?.String ?? string.Empty;
 		private set {
-			ItemKey? newKey = null;
+			if (string.IsNullOrWhiteSpace(value)) {
+				ItemKey = null;
+				return;
+			}
+
 			try {
-				newKey = new(value);
+				ItemKey = new(value);
 			}
 			catch (Exception e) {
-				if (ItemKey is not null) GD.PrintErr($"Invalid Item Key: {value} - {e}");
-			}
-			finally {
-				ItemKey?.Dispose();
-				ItemKey = newKey;
+				GD.PrintErr($"Invalid Item Key ({value}) - {e}");
+				ItemKey = null;
 			}
 		}
 	}
 	public ItemKey? ItemKey { get; set; }
 
 
-	public ResourceItemKey() : this(key: null) { }
-	public ResourceItemKey(string? @string = null) : base() {
+	public ResourceItemKey() : base() { }
+	public ResourceItemKey(string @string) : this() {
 		String = @string ?? string.Empty;
 	}
-	public ResourceItemKey(ItemKey? key = null) : base() {
+	public ResourceItemKey(ItemKey key) : this() {
 		ItemKey = key;
 	}
 }
