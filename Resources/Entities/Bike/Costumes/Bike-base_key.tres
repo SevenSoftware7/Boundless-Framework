@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="EntityCostumeResourceItemKey" load_steps=2 format=3 uid="uid://djkxop4aum535"]
+[gd_resource type="Resource" script_class="ResourceItemKey" load_steps=2 format=3 uid="uid://djkxop4aum535"]
 
-[ext_resource type="Script" uid="uid://ceq55s2upen1a" path="res://Scripts/Core/Item/Entity/Costume/EntityCostumeResourceItemKey.cs" id="1_uixj8"]
+[ext_resource type="Script" uid="uid://dugqykx48qmhv" path="res://Scripts/Core/Item/ResourceItemKey.cs" id="1_uixj8"]
 
 [resource]
 script = ExtResource("1_uixj8")
-String = "bike_base=cos"
+String = "proioxis_base=cos"

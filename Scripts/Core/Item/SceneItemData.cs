@@ -4,11 +4,11 @@ using Godot;
 using SevenDev.Boundless.Persistence;
 
 [Tool]
-public abstract partial class SceneItemData<[MustBeVariant] T> : Resource, IItemData<T> where T : Node, IItem {
-	IItemKeyProvider IItemData.KeyProvider => KeyProvider;
-	[Export] private GenericResourceItemKey<T> KeyProvider {
+public abstract partial class SceneItemData<[MustBeVariant] T> : Resource, IItemData<T> where T : Node, IItem<T> {
+	ItemKey? IItemData.ItemKey => KeyProvider.ItemKey;
+	[Export] public ResourceItemKey KeyProvider {
 		get;
-		set {
+		private set {
 			if (value is null) return;
 			field = value;
 		}
@@ -19,36 +19,35 @@ public abstract partial class SceneItemData<[MustBeVariant] T> : Resource, IItem
 	public Texture2D? DisplayPortrait => UIData?.DisplayPortrait;
 
 
-	[Export] public PackedScene? Scene {
-		get => _scene;
+	// We export a scene path instead of a PackedScene because otherwise Godot has issues with cyclical resource loading.
+	[Export(PropertyHint.File, "*.tscn")]
+	public string? ScenePath {
+		get;
 		private set {
-			if (value is null) {
-				_scene = null;
-				return;
-			}
-
-			Node? instance = value?.Instantiate();
-
-			if (instance is T) {
-				_scene = value;
-			}
-			else {
-				GD.PushError($"SceneItemData<{typeof(T).Name}>: Scene must be a PackedScene of type {typeof(T).Name}");
-			}
-
-			instance?.QueueFree();
+			field = value;
+			Scene = null;
 		}
 	}
 
-	private PackedScene? _scene = null;
 
-
-	public SceneItemData(PackedScene? scene) : base() {
-		_scene = scene;
+	protected PackedScene? Scene {
+		get {
+			if (field is null && ScenePath is not null) field = ResourceLoader.Load<PackedScene>(ScenePath);
+			return field;
+		}
+		private set;
 	}
-	public SceneItemData(string path) : this(ResourceLoader.Load<PackedScene>(path)) { }
-	public SceneItemData() : this(scene: null) { }
 
 
-	public T Instantiate() => Scene?.InstantiateOrNull<T>() ?? throw new System.NullReferenceException();
+	public SceneItemData(string? scenePath) : base() {
+		ScenePath = scenePath;
+	}
+	public SceneItemData() : this(scenePath: null) { }
+
+
+	public T Instantiate() {
+		if (Scene is null) throw new System.InvalidOperationException($"Trying to Instantiate Scene Item without a valid Scene Path - {nameof(ScenePath)}");
+
+		return Scene.Instantiate<T>();
+	}
 }

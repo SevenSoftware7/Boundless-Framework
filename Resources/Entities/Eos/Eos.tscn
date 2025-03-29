@@ -1,33 +1,74 @@
-[gd_scene load_steps=21 format=3 uid="uid://b7rhbgw2dujty"]
+[gd_scene load_steps=30 format=3 uid="uid://b7rhbgw2dujty"]
 
 [ext_resource type="Script" uid="uid://btpoqelwvyeef" path="res://Scripts/Core/Item/Entity/Entity.cs" id="1_44rt4"]
-[ext_resource type="Resource" uid="uid://b56txqwbw36sk" path="res://Resources/Entities/Eos/Eos_key.tres" id="2_ctdcn"]
-[ext_resource type="Resource" uid="uid://hpsfrfhvt5ll" path="res://Resources/Entities/Eos/Eos_ui.tres" id="2_hamhv"]
-[ext_resource type="Script" uid="uid://o5n20rntvw6o" path="res://Scripts/Core/Item/Entity/EntityStats.cs" id="2_lubr1"]
+[ext_resource type="Resource" uid="uid://djyqyaq7lwdkr" path="res://Resources/Entities/Eos/Eos_data.tres" id="2_sat4e"]
 [ext_resource type="PackedScene" uid="uid://dr77fv5m8yjck" path="res://Scenes/UI/Pointer.tscn" id="3_qcq8b"]
 [ext_resource type="PackedScene" uid="uid://cck2wboppochk" path="res://Scenes/UI/Gauge.tscn" id="3_uuynt"]
+[ext_resource type="Script" uid="uid://djubduy40g4eb" path="res://Scripts/Core/Traits/TraitResource.cs" id="4_fjsq6"]
 [ext_resource type="PackedScene" uid="uid://br8bdv51nxt4p" path="res://Scenes/UI/Prompt.tscn" id="4_qonq2"]
+[ext_resource type="Script" uid="uid://cpqri6cw2hye2" path="res://Scripts/Core/Traits/TraitsCollection.cs" id="5_27hs1"]
 [ext_resource type="PackedScene" uid="uid://bjf6xuch8ncq0" path="res://Resources/Entities/Eos/EosSkeleton.tscn" id="5_j1koo"]
 [ext_resource type="Script" uid="uid://5gx1ctuejo1p" path="res://Scripts/Core/Item/Entity/HudPack.cs" id="5_y0ifp"]
 [ext_resource type="Script" uid="uid://bdyyn2i12mh6c" path="res://Scripts/Core/Item/Entity/Gauge.cs" id="8_emu8a"]
 [ext_resource type="AnimationLibrary" uid="uid://caafq3ok75ukn" path="res://Resources/Weapons/Pax/PaxAnimations.tres" id="8_uaax8"]
 [ext_resource type="Script" uid="uid://dwtp85ydlhl31" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="9_8kq40"]
+[ext_resource type="Script" uid="uid://bycrdvgqioks7" path="res://Scripts/Core/Traits/TraitModifier.cs" id="10_2qnhm"]
 [ext_resource type="Script" uid="uid://c5j1rhlh34qan" path="res://Scripts/Core/Item/Entity/Behaviour/Implementations/BipedBehaviour.cs" id="14_5nb4q"]
 [ext_resource type="Resource" uid="uid://bi8pp11ga45x3" path="res://Resources/Entities/Eos/Costumes/Eos-base_key.tres" id="15_cn8qi"]
 [ext_resource type="Script" uid="uid://bqjcp5j1o01je" path="res://Scripts/Core/Item/Entity/Behaviour/Implementations/SwimmingBehaviour.cs" id="15_sat4e"]
 
-[sub_resource type="Resource" id="Resource_v01j0"]
-script = ExtResource("2_lubr1")
-MaxHealth = 25.0
-StepHeight = 0.5
-Weight = 12.0
-JumpHeight = 20.0
-Acceleration = 50.0
-Deceleration = 35.0
-RotationSpeed = 20.0
-BaseSpeed = 8.0
-SprintSpeed = 14.0
-SlowSpeed = 3.0
+[sub_resource type="Resource" id="Resource_iivwa"]
+resource_name = "generic_max_health"
+script = ExtResource("4_fjsq6")
+Name = "generic_max_health"
+
+[sub_resource type="Resource" id="Resource_t6mu6"]
+resource_name = "generic_move_speed"
+script = ExtResource("4_fjsq6")
+Name = "generic_move_speed"
+
+[sub_resource type="Resource" id="Resource_dscr4"]
+resource_name = "generic_turn_speed"
+script = ExtResource("4_fjsq6")
+Name = "generic_turn_speed"
+
+[sub_resource type="Resource" id="Resource_ppkqq"]
+resource_name = "generic_acceleration"
+script = ExtResource("4_fjsq6")
+Name = "generic_acceleration"
+
+[sub_resource type="Resource" id="Resource_xxmdo"]
+resource_name = "generic_deceleration"
+script = ExtResource("4_fjsq6")
+Name = "generic_deceleration"
+
+[sub_resource type="Resource" id="Resource_y3her"]
+resource_name = "generic_step_height"
+script = ExtResource("4_fjsq6")
+Name = "generic_step_height"
+
+[sub_resource type="Resource" id="Resource_ahnjs"]
+resource_name = "generic_jump_height"
+script = ExtResource("4_fjsq6")
+Name = "generic_jump_height"
+
+[sub_resource type="Resource" id="Resource_fafpq"]
+resource_name = "generic_gravity"
+script = ExtResource("4_fjsq6")
+Name = "generic_gravity"
+
+[sub_resource type="Resource" id="Resource_mqqnp"]
+script = ExtResource("5_27hs1")
+TraitValuesDict = Dictionary[ExtResource("4_fjsq6"), float]({
+SubResource("Resource_iivwa"): 25.0,
+SubResource("Resource_t6mu6"): 8.0,
+SubResource("Resource_dscr4"): 20.0,
+SubResource("Resource_ppkqq"): 50.0,
+SubResource("Resource_xxmdo"): 35.0,
+SubResource("Resource_y3her"): 0.5,
+SubResource("Resource_ahnjs"): 20.0,
+SubResource("Resource_fafpq"): 32.0
+})
 
 [sub_resource type="Resource" id="Resource_qwv27"]
 script = ExtResource("5_y0ifp")
@@ -52,16 +93,15 @@ floor_constant_speed = true
 platform_floor_layers = 4294963965
 platform_wall_layers = 4294963965
 script = ExtResource("1_44rt4")
-KeyProvider = ExtResource("2_ctdcn")
-UI = ExtResource("2_hamhv")
-Stats = SubResource("Resource_v01j0")
+Data = ExtResource("2_sat4e")
+EntityTraits = SubResource("Resource_mqqnp")
 HudPack = SubResource("Resource_qwv27")
 _costumeHolder = NodePath("CostumeHolder")
 Skeleton = NodePath("Skeleton3D")
 AnimationPlayer = NodePath("AnimationPlayer")
 CurrentBehaviour = NodePath("BipedBehaviour")
 Health = NodePath("Health")
-_traitModifiers = [null]
+_traitModifiers = Array[ExtResource("10_2qnhm")]([null])
 CenterOfMass = NodePath("Collisions/CenterOfMass")
 
 [node name="Skeleton3D" parent="." instance=ExtResource("5_j1koo")]
@@ -92,9 +132,9 @@ libraries = {
 [node name="BipedBehaviour" type="Node" parent="." node_paths=PackedStringArray("Entity")]
 script = ExtResource("14_5nb4q")
 Entity = NodePath("..")
-metadata/_custom_type_script = ExtResource("14_5nb4q")
+metadata/_custom_type_script = "uid://c5j1rhlh34qan"
 
 [node name="SwimmingBehaviour" type="Node" parent="." node_paths=PackedStringArray("Entity")]
 script = ExtResource("15_sat4e")
 Entity = NodePath("..")
-metadata/_custom_type_script = ExtResource("15_sat4e")
+metadata/_custom_type_script = "uid://bqjcp5j1o01je"

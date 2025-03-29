@@ -4,4 +4,4 @@ using Godot;
 
 [Tool]
 [GlobalClass]
-public partial class WeaponCostumeSceneData : SceneItemData<Costume>;
+public partial class WeaponCostumeSceneData : SceneCostumeData;

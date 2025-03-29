@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="EntityResourceItemKey" load_steps=2 format=3 uid="uid://dyvavvfne7go"]
+[gd_resource type="Resource" script_class="ResourceItemKey" load_steps=2 format=3 uid="uid://dyvavvfne7go"]
 
-[ext_resource type="Script" uid="uid://cdg2fxpkp5ohc" path="res://Scripts/Core/Item/Entity/EntityResourceItemKey.cs" id="1_x3psl"]
+[ext_resource type="Script" uid="uid://dugqykx48qmhv" path="res://Scripts/Core/Item/ResourceItemKey.cs" id="1_mr8hx"]
 
 [resource]
-script = ExtResource("1_x3psl")
-String = "bike=chr"
+script = ExtResource("1_mr8hx")
+String = "proioxis=ent"

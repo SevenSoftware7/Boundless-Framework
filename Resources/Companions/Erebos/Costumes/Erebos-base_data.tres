@@ -1,7 +1,6 @@
-[gd_resource type="Resource" script_class="CompanionCostumeSceneData" load_steps=5 format=3 uid="uid://caqyvip0olism"]
+[gd_resource type="Resource" script_class="CompanionCostumeSceneData" load_steps=4 format=3 uid="uid://caqyvip0olism"]
 
 [ext_resource type="Resource" uid="uid://dld7ow8og42nk" path="res://Resources/Companions/Erebos/Costumes/Erebos-base_key.tres" id="1_2r0ae"]
-[ext_resource type="PackedScene" uid="uid://r6yqclqm3ubp" path="res://Resources/Companions/Erebos/Costumes/Erebos-base.tscn" id="1_3hm32"]
 [ext_resource type="Script" uid="uid://dndyn1l8j1xki" path="res://Scripts/Core/Item/Companion/Costume/CompanionCostumeSceneData.cs" id="3_lly3k"]
 [ext_resource type="Resource" uid="uid://cywx36nmhnlrf" path="res://Resources/Companions/Erebos/Costumes/Erebos-base_ui.tres" id="3_wairn"]
 
@@ -9,4 +8,4 @@
 script = ExtResource("3_lly3k")
 KeyProvider = ExtResource("1_2r0ae")
 UIData = ExtResource("3_wairn")
-Scene = ExtResource("1_3hm32")
+ScenePath = "uid://r6yqclqm3ubp"

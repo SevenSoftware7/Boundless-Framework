@@ -9,15 +9,13 @@ using SevenDev.Boundless.Persistence;
 
 [Tool]
 [GlobalClass]
-public partial class Companion : Node3D, ICustomizable, ICostumable, IPersistent<Companion>, IItem, IInjectionBlocker<Skeleton3D> {
+public partial class Companion : Node3D, ICustomizable, ICostumable, IPersistent<Companion>, IItem<Companion>, IInjectionBlocker<Skeleton3D> {
 	public IInjectionNode InjectionNode { get; }
 
-	IItemKeyProvider IItem.KeyProvider => KeyProvider;
-	[Export] private CompanionResourceItemKey KeyProvider = new();
-
-	[Export] public ItemUIData? UI { get; private set; }
-	public string DisplayName => UI?.DisplayName ?? string.Empty;
-	public Texture2D? DisplayPortrait => UI?.DisplayPortrait;
+	IItemData<Companion>? IItem<Companion>.Data => Data;
+	[Export] public CompanionSceneData? Data { get; private set; }
+	public string DisplayName => Data?.UIData?.DisplayName ?? string.Empty;
+	public Texture2D? DisplayPortrait => Data?.UIData?.DisplayPortrait;
 
 
 	[Export]

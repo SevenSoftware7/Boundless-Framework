@@ -23,11 +23,18 @@ public sealed partial class CostumeHolder : Node3D, ICustomizable {
 		}
 	}
 
-	private IItemKeyProvider? _costumeKeyProvider;
-	[Export] public CostumeResourceItemKey? CostumeKeyProvider {
-		get => _costumeKeyProvider as CostumeResourceItemKey;
+	[Export] public ResourceItemKey CostumeKeyProvider {
+		get;
 		set {
-			_costumeKeyProvider = value;
+			field = value;
+			Reload();
+		}
+	} = new();
+
+	public ItemKey? ItemKey {
+		get => CostumeKeyProvider.ItemKey;
+		set {
+			CostumeKeyProvider.ItemKey = value;
 			Reload();
 		}
 	}
@@ -56,29 +63,32 @@ public sealed partial class CostumeHolder : Node3D, ICustomizable {
 		SetCostume(costume);
 	}
 
-	public void SetCostume(IItemKeyProvider? newCostumeKey) {
-		_costumeKeyProvider = newCostumeKey;
+	public void SetCostume(IItemData<Costume>? newCostume) {
+		ItemKey = newCostume?.ItemKey;
 
 		Load(true);
 	}
-	public void SetCostume(IItemData<Costume>? newCostume) => SetCostume(newCostume?.KeyProvider);
 
 	public void SetCostume(IPersistenceData<Costume> costumeData) {
 		Unload();
 		if (Registry is null) return;
 
 		Costume = costumeData.Load(Registry)?.ParentTo(this);
-		_costumeKeyProvider = Costume?.ResourceKey;
+		if (Costume?.Data?.KeyProvider is ResourceItemKey keyProvider) {
+			CostumeKeyProvider = keyProvider;
+		}
 	}
 
 
 	public void Reload() {
+		if (!IsNodeReady()) return;
+
 		Unload();
 
 		if (Registry is null) return;
-		if (_costumeKeyProvider?.ItemKey is null) return;
+		if (ItemKey is not ItemKey itemKey) return;
 
-		IItemData<Costume>? costumeData = Registry.GetData<Costume>(_costumeKeyProvider.ItemKey);
+		IItemData<Costume>? costumeData = Registry.GetData<Costume>(itemKey);
 		Costume = costumeData?.Instantiate()?.ParentTo(this);
 	}
 

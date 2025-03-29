@@ -15,7 +15,7 @@ using SevenDev.Boundless.Persistence;
 [Tool]
 [GlobalClass]
 [Injector]
-public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDamageDealer, ICostumable, IUIObject, IPersistent<Entity>, IItem {
+public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDamageDealer, ICostumable, IUIObject, IPersistent<Entity>, IItem<Entity> {
 	public const int RECOVER_STATE_BUFFER_SIZE = 5;
 
 
@@ -26,12 +26,10 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 	public IInjectionNode InjectionNode { get; }
 
-	IItemKeyProvider IItem.KeyProvider => KeyProvider;
-	[Export] private EntityResourceItemKey KeyProvider = new();
-
-	[Export] public ItemUIData? UI { get; private set; }
-	public string DisplayName => UI?.DisplayName ?? string.Empty;
-	public Texture2D? DisplayPortrait => UI?.DisplayPortrait;
+	IItemData<Entity>? IItem<Entity>.Data => Data;
+	[Export] public EntitySceneData? Data { get; private set; }
+	public string DisplayName => Data?.UIData?.DisplayName ?? string.Empty;
+	public Texture2D? DisplayPortrait => Data?.UIData?.DisplayPortrait;
 
 
 	public IDamageable? Damageable => this;

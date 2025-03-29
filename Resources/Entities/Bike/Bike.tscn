@@ -1,8 +1,7 @@
-[gd_scene load_steps=24 format=3 uid="uid://bxcpbr13uyeh1"]
+[gd_scene load_steps=23 format=3 uid="uid://bxcpbr13uyeh1"]
 
 [ext_resource type="Script" uid="uid://btpoqelwvyeef" path="res://Scripts/Core/Item/Entity/Entity.cs" id="1_46ioo"]
-[ext_resource type="Resource" uid="uid://dyvavvfne7go" path="res://Resources/Entities/Bike/Bike_key.tres" id="2_gl27x"]
-[ext_resource type="Resource" uid="uid://boxbx8vssbjgn" path="res://Resources/Entities/Bike/Bike_ui.tres" id="2_icn6q"]
+[ext_resource type="Resource" uid="uid://q4arq6wxs6ho" path="res://Resources/Entities/Bike/Bike_data.tres" id="2_uy6xw"]
 [ext_resource type="Script" uid="uid://5gx1ctuejo1p" path="res://Scripts/Core/Item/Entity/HudPack.cs" id="3_aosnt"]
 [ext_resource type="Script" uid="uid://djubduy40g4eb" path="res://Scripts/Core/Traits/TraitResource.cs" id="4_u056q"]
 [ext_resource type="Script" uid="uid://dwtp85ydlhl31" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="5_5toi3"]
@@ -54,7 +53,7 @@ Name = "generic_gravity"
 
 [sub_resource type="Resource" id="Resource_3850e"]
 script = ExtResource("5_8ie50")
-TraitValuesDict = {
+TraitValuesDict = Dictionary[ExtResource("4_u056q"), float]({
 SubResource("Resource_c3jdb"): 25.0,
 SubResource("Resource_k7nyx"): 8.0,
 SubResource("Resource_lf3id"): 20.0,
@@ -63,7 +62,7 @@ SubResource("Resource_mh833"): 35.0,
 SubResource("Resource_ll5eb"): 0.5,
 SubResource("Resource_7radf"): 20.0,
 SubResource("Resource_xs8l5"): 1.0
-}
+})
 
 [sub_resource type="Resource" id="Resource_bd6gb"]
 script = ExtResource("3_aosnt")
@@ -79,8 +78,7 @@ collision_layer = 256
 platform_floor_layers = 4294963965
 platform_wall_layers = 4294963965
 script = ExtResource("1_46ioo")
-KeyProvider = ExtResource("2_gl27x")
-UI = ExtResource("2_icn6q")
+Data = ExtResource("2_uy6xw")
 EntityTraits = SubResource("Resource_3850e")
 HudPack = SubResource("Resource_bd6gb")
 _costumeHolder = NodePath("CostumeHolder")

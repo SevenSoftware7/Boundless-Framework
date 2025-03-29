@@ -5,7 +5,7 @@ using static LandlessSkies.Core.IPortraitProvider;
 
 [Tool]
 [GlobalClass]
-public partial class CompanionCostumeSceneData : SceneItemData<Costume>, IPortraitProvider {
+public partial class CompanionCostumeSceneData : SceneCostumeData, IPortraitProvider {
 	[ExportGroup("Portraits")]
 	[Export] public Texture2D? PortraitDetermined { get; private set; }
 	[Export] public Texture2D? PortraitHesitant { get; private set; }

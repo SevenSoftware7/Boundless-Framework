@@ -6,7 +6,7 @@ using SevenDev.Boundless.Persistence;
 
 [Tool]
 [GlobalClass]
-public partial class ResourceItemKey : Resource, IItemKeyProvider {
+public partial class ResourceItemKey : Resource {
 	[Export] public string String {
 		get => ItemKey?.String ?? string.Empty;
 		private set {
@@ -23,11 +23,14 @@ public partial class ResourceItemKey : Resource, IItemKeyProvider {
 			}
 		}
 	}
-	public ItemKey? ItemKey { get; private set; }
+	public ItemKey? ItemKey { get; set; }
 
 
-	public ResourceItemKey() : this(null) { }
+	public ResourceItemKey() : this(key: null) { }
 	public ResourceItemKey(string? @string = null) : base() {
-		ItemKey = @string is null ? null : new(@string);
+		String = @string ?? string.Empty;
+	}
+	public ResourceItemKey(ItemKey? key = null) : base() {
+		ItemKey = key;
 	}
 }

@@ -1,6 +1,5 @@
-[gd_resource type="Resource" script_class="WeaponSceneData" load_steps=5 format=3 uid="uid://ci6ahybitat4f"]
+[gd_resource type="Resource" script_class="WeaponSceneData" load_steps=4 format=3 uid="uid://ci6ahybitat4f"]
 
-[ext_resource type="PackedScene" uid="uid://b7b17ebmgtrfy" path="res://Resources/Weapons/Pax/Pax.tscn" id="1_clv3l"]
 [ext_resource type="Resource" uid="uid://4x2qnwvdg3se" path="res://Resources/Weapons/Pax/Pax_key.tres" id="1_kstfl"]
 [ext_resource type="Resource" uid="uid://c8q8b6jgvn4vo" path="res://Resources/Weapons/Pax/Pax_ui.tres" id="2_mmvg1"]
 [ext_resource type="Script" uid="uid://cjb4jgm8obkbv" path="res://Scripts/Core/Item/Weapon/WeaponSceneData.cs" id="2_u0qmf"]
@@ -9,4 +8,4 @@
 script = ExtResource("2_u0qmf")
 KeyProvider = ExtResource("1_kstfl")
 UIData = ExtResource("2_mmvg1")
-Scene = ExtResource("1_clv3l")
+ScenePath = "uid://b7b17ebmgtrfy"

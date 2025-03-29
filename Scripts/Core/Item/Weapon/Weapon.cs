@@ -12,7 +12,7 @@ using SevenDev.Boundless.Persistence;
 /// </summary>
 [Tool]
 [GlobalClass]
-public abstract partial class Weapon : Node3D, IWeapon, IItem, IUIObject, ICostumable, IDamageDealerProxy, IPersistent<Weapon> {
+public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject, ICostumable, IDamageDealerProxy, IPersistent<Weapon> {
 	private static readonly StringName LeftWeapon = "LeftWeapon";
 	private static readonly StringName RightWeapon = "RightWeapon";
 	private static readonly StringName LeftHand = "LeftHand";
@@ -24,12 +24,10 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem, IUIObject, ICostu
 
 	public IInjectionNode InjectionNode { get; }
 
-	IItemKeyProvider IItem.KeyProvider => KeyProvider;
-	[Export] private WeaponResourceItemKey KeyProvider = new();
-
-	[Export] public ItemUIData? UI { get; private set; }
-	public string DisplayName => UI?.DisplayName ?? string.Empty;
-	public Texture2D? DisplayPortrait => UI?.DisplayPortrait;
+	IItemData<Weapon>? IItem<Weapon>.Data => Data;
+	[Export] public WeaponSceneData? Data { get; private set; }
+	public string DisplayName => Data?.UIData?.DisplayName ?? string.Empty;
+	public Texture2D? DisplayPortrait => Data?.UIData?.DisplayPortrait;
 
 	public IDamageDealer? Sender => Entity;
 

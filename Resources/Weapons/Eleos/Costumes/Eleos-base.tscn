@@ -1,8 +1,7 @@
-[gd_scene load_steps=9 format=3 uid="uid://chsj82irsedw6"]
+[gd_scene load_steps=8 format=3 uid="uid://chsj82irsedw6"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Implementation/MeshCostume.cs" id="1_rpy7d"]
-[ext_resource type="Resource" uid="uid://dw0tbdkonwsel" path="res://Resources/Weapons/Eleos/Costumes/Eleos-base_key.tres" id="2_2xexw"]
-[ext_resource type="Resource" uid="uid://xtp020wlwyfq" path="res://Resources/Weapons/Eleos/Costumes/Eleos-base_ui.tres" id="3_df4kq"]
+[ext_resource type="Script" uid="uid://b6ohxi3uuv71d" path="res://Scripts/Core/Item/Costume/Implementation/MeshCostume.cs" id="1_rpy7d"]
+[ext_resource type="Resource" uid="uid://q68mneifjek2" path="res://Resources/Weapons/Eleos/Costumes/Eleos-base_data.tres" id="2_iujcp"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g4lnn"]
 albedo_color = Color(0.2412, 0.362693, 0.67, 1)
@@ -26,8 +25,7 @@ size = Vector3(0.3, 1, 0.1)
 [node name="Model - Eleos (base)" type="Node3D" node_paths=PackedStringArray("Meshes")]
 script = ExtResource("1_rpy7d")
 Meshes = [NodePath("Handle"), NodePath("Guard"), NodePath("Guard/Blade"), NodePath("Guard/Blade/Tip")]
-ResourceKey = ExtResource("2_2xexw")
-UI = ExtResource("3_df4kq")
+Data = ExtResource("2_iujcp")
 
 [node name="Handle" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)

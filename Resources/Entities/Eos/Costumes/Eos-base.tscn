@@ -1,8 +1,7 @@
-[gd_scene load_steps=9 format=4 uid="uid://hje36y5wrdyu"]
+[gd_scene load_steps=8 format=4 uid="uid://hje36y5wrdyu"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Item/Costume/Implementation/SkinnedCostume.cs" id="1_ut7ww"]
-[ext_resource type="Resource" uid="uid://bi8pp11ga45x3" path="res://Resources/Entities/Eos/Costumes/Eos-base_key.tres" id="2_ul7je"]
-[ext_resource type="Resource" uid="uid://djr6ag7agl07c" path="res://Resources/Entities/Eos/Costumes/Eos-base_ui.tres" id="3_7u2op"]
+[ext_resource type="Script" uid="uid://cjnldef25dpub" path="res://Scripts/Core/Item/Costume/Implementation/SkinnedCostume.cs" id="1_ut7ww"]
+[ext_resource type="Resource" uid="uid://dvcjw3gon7rak" path="res://Resources/Entities/Eos/Costumes/Eos-base_data.tres" id="2_hfni6"]
 
 [sub_resource type="Curve" id="Curve_51t5c"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.97556, 0), 0.0, 0.0, 0, 0]
@@ -272,8 +271,7 @@ bind/72/pose = Transform3D(1, 1.11293e-07, 8.20728e-07, 5.54894e-07, -6.85453e-0
 [node name="Model - Eos (base)" type="Node3D" node_paths=PackedStringArray("Meshes")]
 script = ExtResource("1_ut7ww")
 Meshes = [NodePath("Costume - Eos (base)")]
-ResourceKey = ExtResource("2_ul7je")
-UI = ExtResource("3_7u2op")
+Data = ExtResource("2_hfni6")
 
 [node name="Costume - Eos (base)" type="MeshInstance3D" parent="."]
 mesh = SubResource("ArrayMesh_2tk1n")

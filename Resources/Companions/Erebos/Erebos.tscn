@@ -1,9 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://b7hcoc81x5g0i"]
+[gd_scene load_steps=6 format=3 uid="uid://b7hcoc81x5g0i"]
 
 [ext_resource type="Script" uid="uid://dwnwlqecyrjhn" path="res://Scripts/Vanilla/Companion/FloatingCompanion.cs" id="1_1r20i"]
+[ext_resource type="Resource" uid="uid://7o3ch4vnd7ux" path="res://Resources/Companions/Erebos/Erebos_data.tres" id="2_ca1ga"]
 [ext_resource type="Script" uid="uid://dwtp85ydlhl31" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="2_iwojg"]
-[ext_resource type="Resource" uid="uid://dos7n2066u00b" path="res://Resources/Companions/Erebos/Erebos_ui.tres" id="2_n7qo5"]
-[ext_resource type="Resource" uid="uid://ddocod3xa3gvp" path="res://Resources/Companions/Erebos/Erebos_key.tres" id="2_xa4iv"]
 [ext_resource type="Resource" uid="uid://dld7ow8og42nk" path="res://Resources/Companions/Erebos/Costumes/Erebos-base_key.tres" id="5_avcnb"]
 
 [sub_resource type="Curve3D" id="Curve3D_11sy3"]
@@ -17,8 +16,7 @@ up_vector_enabled = false
 [node name="Erebos" type="Node3D" node_paths=PackedStringArray("Skeleton", "_costumeHolder")]
 script = ExtResource("1_1r20i")
 Curve = SubResource("Curve3D_11sy3")
-KeyProvider = ExtResource("2_xa4iv")
-UI = ExtResource("2_n7qo5")
+Data = ExtResource("2_ca1ga")
 Skeleton = NodePath("Skeleton")
 _costumeHolder = NodePath("CostumeHolder")
 
