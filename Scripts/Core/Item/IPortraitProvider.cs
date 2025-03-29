@@ -17,12 +17,12 @@ public interface IPortraitProvider {
 		Texture2D? joyous = null
 	) => emotion switch {
 		CharacterEmotion.Neutral => neutral,
-		CharacterEmotion.Determined => determined,
-		CharacterEmotion.Hesitant => hesitant,
-		CharacterEmotion.Shocked => shocked,
-		CharacterEmotion.Disgusted => disgusted,
-		CharacterEmotion.Melancholic => melancholic,
-		CharacterEmotion.Joyous => joyous,
+		CharacterEmotion.Determined => determined ?? neutral,
+		CharacterEmotion.Hesitant => hesitant ?? neutral,
+		CharacterEmotion.Shocked => shocked ?? neutral,
+		CharacterEmotion.Disgusted => disgusted ?? neutral,
+		CharacterEmotion.Melancholic => melancholic ?? neutral,
+		CharacterEmotion.Joyous => joyous ?? neutral,
 		_ when Enum.IsDefined(emotion) => throw new UnreachableException($"Case for {nameof(CharacterEmotion)} {emotion} not implemented."),
 		_ => throw new InvalidEnumArgumentException()
 	};
