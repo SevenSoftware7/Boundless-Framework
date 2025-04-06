@@ -1,16 +1,18 @@
 namespace LandlessSkies.Core;
 
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using SevenDev.Boundless.Persistence;
 
 [Tool]
 [GlobalClass]
 public abstract partial class CompositeWeapon : Node, IWeapon, ISerializationListener {
+	protected bool _listLock = false;
+
+
 	public virtual string DisplayName => CurrentWeapon?.DisplayName ?? "";
 	public virtual Texture2D? DisplayPortrait => CurrentWeapon?.DisplayPortrait;
-
-	protected bool _lockBackingList = false;
 
 	public virtual IWeapon.WeaponKind Kind => CurrentWeapon?.Kind ?? 0;
 	public virtual IWeapon.WeaponUsage Usage => CurrentWeapon?.Usage ?? 0;
@@ -21,18 +23,25 @@ public abstract partial class CompositeWeapon : Node, IWeapon, ISerializationLis
 
 	public abstract IWeapon? CurrentWeapon { get; }
 
-	protected abstract void UpdateWeapons();
+	private void RefreshWeapons() {
+		if (_listLock) return;
+		_listLock = true;
+		_RefreshWeapons();
+		_listLock = false;
+	}
+	protected abstract void _RefreshWeapons();
 
 
-	public virtual IEnumerable<Action.Wrapper> GetAttacks(Entity target) => [];
-
+	public abstract IEnumerable<IWeapon> GetWeapons();
+	public virtual IEnumerable<Action.Wrapper> GetAttacks(Entity target) => GetWeapons().SelectMany(w => w.GetAttacks(target));
 	public virtual Dictionary<string, ICustomization> GetCustomizations() => [];
-	public virtual IEnumerable<IUIObject> GetSubObjects() => [];
+	public virtual IEnumerable<IUIObject> GetSubObjects() => GetWeapons();
+
 
 
 	public override void _Ready() {
 		base._Ready();
-		UpdateWeapons();
+		RefreshWeapons();
 	}
 	public override void _Notification(int what) {
 		base._Notification(what);
@@ -40,16 +49,14 @@ public abstract partial class CompositeWeapon : Node, IWeapon, ISerializationLis
 
 		switch ((ulong)what) {
 			case NotificationChildOrderChanged:
-				if (!_lockBackingList) {
-					UpdateWeapons();
-				}
+				RefreshWeapons();
 				break;
 		}
 	}
 
 	public void OnBeforeSerialize() { }
 	public void OnAfterDeserialize() {
-		UpdateWeapons();
+		RefreshWeapons();
 	}
 
 	public abstract IPersistenceData<CompositeWeapon> Save();

@@ -46,6 +46,11 @@ public sealed partial class AkimboWeapon : CompositeWeapon, IInjectionIntercepto
 	}
 	public override StyleState MaxStyle => (MainWeapon?.MaxStyle ?? 0) + (SideWeapon is null ? 0 : 1);
 
+	Handedness IInjectionInterceptor<Handedness>.Intercept(IInjectionNode child, Handedness value) {
+		if (child.UnderlyingObject == SideWeapon) return value.Reverse();
+		return value;
+	}
+
 	public override IWeapon? CurrentWeapon => MainWeapon;
 
 
@@ -59,31 +64,13 @@ public sealed partial class AkimboWeapon : CompositeWeapon, IInjectionIntercepto
 	public AkimboWeapon(IPersistenceData<IWeapon>? mainWeaponSave, IPersistenceData<IWeapon>? sideWeaponSave, IItemDataProvider registry) : this(mainWeaponSave?.Load(registry), sideWeaponSave?.Load(registry)) { }
 
 
-	public override Dictionary<string, ICustomization> GetCustomizations() => base.GetCustomizations();
-	public override IEnumerable<IUIObject> GetSubObjects() {
-		IEnumerable<IUIObject> subObjects = base.GetSubObjects();
-		if (MainWeapon is not null) subObjects = subObjects.Append(MainWeapon);
-		if (SideWeapon is not null) subObjects = subObjects.Append(SideWeapon);
-		return subObjects;
+	public override IEnumerable<IWeapon> GetWeapons() {
+		if (MainWeapon is not null) yield return MainWeapon;
+		if (SideWeapon is not null) yield return SideWeapon;
 	}
 
-	public override IEnumerable<Action.Wrapper> GetAttacks(Entity target) {
-		IWeapon? currentWeapon = MainWeapon;
-		return new IWeapon?[] { MainWeapon, SideWeapon }
-			.OfType<IWeapon>()
-			.SelectMany(w => w.GetAttacks(target))
-			.Concat(base.GetAttacks(target));
-	}
-
-
-	Handedness IInjectionInterceptor<Handedness>.Intercept(IInjectionNode child, Handedness value) {
-		if (child.UnderlyingObject == SideWeapon) return value.Reverse();
-		return value;
-	}
-
-
-	protected override void UpdateWeapons() {
-		IWeapon[] weapons = GetChildren().OfType<IWeapon>().ToArray();
+	protected override void _RefreshWeapons() {
+		IWeapon[] weapons = [.. GetChildren().OfType<IWeapon>()];
 		MainWeapon = weapons.Length > 0 ? weapons[0] : null;
 		if (MainWeapon is Node nodeMainWeapon) {
 			nodeMainWeapon.SafeRename("Main");

@@ -2055,12 +2055,6 @@ libraries = {
 &"NemesisAnimations": ExtResource("23_4yxf6")
 }
 
-[node name="BipedBehaviour" parent="Eos" index="5"]
-metadata/_custom_type_script = "uid://c5j1rhlh34qan"
-
-[node name="SwimmingBehaviour" parent="Eos" index="6"]
-metadata/_custom_type_script = "uid://bqjcp5j1o01je"
-
 [node name="Weapon" type="Node" parent="Eos"]
 script = ExtResource("11_uqmxm")
 

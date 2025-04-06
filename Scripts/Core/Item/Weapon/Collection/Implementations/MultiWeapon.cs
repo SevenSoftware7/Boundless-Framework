@@ -16,6 +16,17 @@ public sealed partial class MultiWeapon : CompositeWeapon, IInjectionInterceptor
 
 	private List<IWeapon> _weapons = [];
 	private uint _currentIndex;
+	[Export] private uint CurrentIndex {
+		get => _currentIndex;
+		set {
+			uint newValue = value % ((uint)MaxStyle + 1);
+			if (_currentIndex == newValue) return;
+
+			_currentIndex = newValue;
+
+			this.PropagateInjection<WeaponHolsterState>();
+		}
+	}
 
 	public override IWeapon? CurrentWeapon => _currentIndex < _weapons.Count ? _weapons[(int)_currentIndex] : null;
 
@@ -36,8 +47,6 @@ public sealed partial class MultiWeapon : CompositeWeapon, IInjectionInterceptor
 			return weapon.Style + 1;
 		}
 
-		_currentIndex = (uint)value;
-
 		// Reset style on Weapon to be equipped
 		// TODO: if the Entity is a player, check for the preference setting
 		// to get the corresponding switch-to-weapon behaviour.
@@ -57,7 +66,10 @@ public sealed partial class MultiWeapon : CompositeWeapon, IInjectionInterceptor
 	public MultiWeapon(ImmutableArray<IPersistenceData<IWeapon>> weaponSaves, IItemDataProvider registry) : this(weaponSaves.Select(save => save.Load(registry))) { }
 
 
-	private void UpdateCurrent() {
+	protected override void _RefreshWeapons() {
+		IEnumerable<IWeapon> nonNodeWeapons = _weapons.Where(w => w is not Node);
+		_weapons = [.. GetChildren().OfType<IWeapon>().Concat(nonNodeWeapons)];
+
 		if (_currentIndex >= _weapons.Count) {
 			_currentIndex = 0;
 		}
@@ -71,10 +83,10 @@ public sealed partial class MultiWeapon : CompositeWeapon, IInjectionInterceptor
 			return;
 		}
 
-		_lockBackingList = true;
+		_listLock = true;
 		weaponNode.SetOwnerAndParent(this);
 		_weapons.Add(weapon);
-		_lockBackingList = false;
+		_listLock = false;
 	}
 	public void AddWeapons(IEnumerable<IWeapon> weapons) {
 		foreach (IWeapon weapon in weapons) {
@@ -88,12 +100,12 @@ public sealed partial class MultiWeapon : CompositeWeapon, IInjectionInterceptor
 			return;
 		}
 
-		_lockBackingList = true;
+		_listLock = true;
 		if (weaponNode.GetParent() == this) {
 			RemoveChild(weaponNode);
 			_weapons.Remove(weapon);
 		}
-		_lockBackingList = false;
+		_listLock = false;
 	}
 	public void RemoveWeapons(IEnumerable<IWeapon> weapons) {
 		foreach (IWeapon weapon in weapons) {
@@ -104,20 +116,14 @@ public sealed partial class MultiWeapon : CompositeWeapon, IInjectionInterceptor
 
 	public void SwitchTo(IWeapon? weapon) {
 		if (weapon is null) return;
-		SwitchTo((uint)_weapons.IndexOf(weapon));
+		CurrentIndex = (uint)_weapons.IndexOf(weapon);
 	}
-	public void SwitchTo(uint index) {
-		_currentIndex = index % ((uint)MaxStyle + 1);
-		UpdateCurrent();
-	}
-	[Injectable] public void SwitchTo(StyleState style) => SwitchTo((uint)style);
+	[Injectable] public void SwitchTo(StyleState style) => CurrentIndex = (uint)style;
 
-
+	public override IEnumerable<IWeapon> GetWeapons() => _weapons;
 	public override IEnumerable<Action.Wrapper> GetAttacks(Entity target) {
 		IWeapon? currentWeapon = CurrentWeapon;
-		return _weapons
-			.SelectMany((w) => w?.GetAttacks(target) ?? [])
-			.Concat(base.GetAttacks(target))
+		return base.GetAttacks(target)
 			.Select(a => {
 				if (a.Builder is Attack.Builder attack && attack.Weapon != currentWeapon) {
 					a.BeforeExecute += () => SwitchTo(attack.Weapon);
@@ -134,14 +140,6 @@ public sealed partial class MultiWeapon : CompositeWeapon, IInjectionInterceptor
 		subObjects = subObjects.Concat(_weapons);
 
 		return subObjects;
-	}
-
-
-
-	protected override void UpdateWeapons() {
-		IEnumerable<IWeapon> nonNodeWeapons = _weapons.Where(w => w is not Node);
-		_weapons = [.. GetChildren().OfType<IWeapon>().Concat(nonNodeWeapons)];
-		UpdateCurrent();
 	}
 
 
