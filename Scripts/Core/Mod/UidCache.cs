@@ -36,18 +36,20 @@ public record class UidCache {
 		_uidToPath = [];
 
 		byte[] buffer = new byte[8];
-		stream.Read(buffer, 0, 4);
+		stream.ReadExactly(buffer, 0, 4);
 		uint count = BitConverter.ToUInt32(buffer, 0);
 
 		for (uint i = 0; i < count; i++) {
-			stream.Read(buffer, 0, 8);
+			stream.ReadExactly(buffer, 0, 8);
 			long uid = BitConverter.ToInt64(buffer, 0);
 
-			stream.Read(buffer, 0, 4);
+			stream.ReadExactly(buffer, 0, 4);
 			uint pathSize = BitConverter.ToUInt32(buffer, 0);
 
-			buffer = new byte[pathSize];
-			stream.Read(buffer, 0, (int)pathSize);
+			if (buffer.Length < pathSize) {
+				buffer = new byte[pathSize];
+			}
+			stream.ReadExactly(buffer, 0, (int)pathSize);
 			FilePath path = new(Encoding.UTF8.GetString(buffer));
 
 
@@ -99,6 +101,7 @@ public record class UidCache {
 
 		WriteToFile(file, mergedDictionary);
 	}
+
 
 	public void WriteToFile(FilePath path) {
 		using Godot.FileAccess file = Godot.FileAccess.Open(path, Godot.FileAccess.ModeFlags.Write);
