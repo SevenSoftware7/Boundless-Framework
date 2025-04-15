@@ -20,7 +20,7 @@ public sealed partial class EpiphronWeapon : Weapon, IPlayerHandler {
 
 	public override Vector3 GetTipPosition() => new(0f, 1.6f, 0f);
 
-	public override IEnumerable<Action.Wrapper> GetAttacks(Entity target) {
+	public override IEnumerable<EntityAction.Wrapper> GetAttacks(Entity target) {
 		return [
 			slashAttack,
 		];

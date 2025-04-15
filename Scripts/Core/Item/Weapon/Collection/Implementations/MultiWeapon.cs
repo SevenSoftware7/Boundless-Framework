@@ -121,7 +121,7 @@ public sealed partial class MultiWeapon : CompositeWeapon, IInjectionInterceptor
 	[Injectable] public void SwitchTo(StyleState style) => CurrentIndex = (uint)style;
 
 	public override IEnumerable<IWeapon> GetWeapons() => _weapons;
-	public override IEnumerable<Action.Wrapper> GetAttacks(Entity target) {
+	public override IEnumerable<EntityAction.Wrapper> GetAttacks(Entity target) {
 		IWeapon? currentWeapon = CurrentWeapon;
 		return base.GetAttacks(target)
 			.Select(a => {

@@ -107,7 +107,7 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject
 	public virtual IEnumerable<IUIObject> GetSubObjects() => [CostumeHolder];
 	public virtual Dictionary<string, ICustomization> GetCustomizations() => [];
 
-	public abstract IEnumerable<Action.Wrapper> GetAttacks(Entity target);
+	public abstract IEnumerable<EntityAction.Wrapper> GetAttacks(Entity target);
 
 
 	[Injectable]

@@ -12,7 +12,7 @@ public interface IWeapon : IUIObject {
 	public abstract StyleState Style { get; }
 	public virtual StyleState MaxStyle => 0;
 
-	public IEnumerable<Action.Wrapper> GetAttacks(Entity target);
+	public IEnumerable<EntityAction.Wrapper> GetAttacks(Entity target);
 
 	[Flags]
 	public enum WeaponSize : byte {

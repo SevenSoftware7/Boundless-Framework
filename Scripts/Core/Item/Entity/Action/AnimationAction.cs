@@ -9,10 +9,10 @@ using SevenDev.Boundless.Utility;
 /// <summary>
 /// An Attack that mainly functions through Animation, with callback events.
 /// </summary>
-/// <param name="entity">Inherited from <see cref="Action"/>.</param>
+/// <param name="entity">Inherited from <see cref="EntityAction"/>.</param>
 /// <param name="path">The AnimationPath used to play the corresponding animation.</param>
-/// <param name="innateModifiers">Inherited from <see cref="Action"/>.</param>
-public abstract partial class AnimationAction(Entity entity, AnimationPath path, IEnumerable<TraitModifier>? innateModifiers = null) : Action(entity, innateModifiers) {
+/// <param name="innateModifiers">Inherited from <see cref="EntityAction"/>.</param>
+public abstract partial class AnimationAction(Entity entity, AnimationPath path, IEnumerable<TraitModifier>? innateModifiers = null) : EntityAction(entity, innateModifiers) {
 	private readonly List<TraitModifier?> modifiers = [];
 	public override bool IsCancellable => _isCancellable;
 	private bool _isCancellable = false;

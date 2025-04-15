@@ -8,9 +8,9 @@ using SevenDev.Boundless.Utility;
 /// <summary>
 /// An Attack that an Entity can execute, using a given Weapon.
 /// </summary>
-/// <param name="entity">Inherited from <see cref="Action"/>.</param>
+/// <param name="entity">Inherited from <see cref="EntityAction"/>.</param>
 /// <param name="weapon">The Weapon which will be used in the Attack.</param>
-/// <param name="modifiers">Inherited from <see cref="Action"/>.</param>
+/// <param name="modifiers">Inherited from <see cref="EntityAction"/>.</param>
 public abstract partial class Attack(Entity entity, Weapon weapon, AnimationPath path, IEnumerable<TraitModifier>? modifiers = null) : AnimationAction(entity, path, modifiers), IDamageDealerProxy {
 	private readonly List<DamageArea?> damageAreas = [];
 
@@ -99,7 +99,7 @@ public abstract partial class Attack(Entity entity, Weapon weapon, AnimationPath
 
 
 
-	public new abstract class Builder(Weapon weapon) : Action.Builder() {
+	public new abstract class Builder(Weapon weapon) : EntityAction.Builder() {
 		public readonly Weapon Weapon = weapon;
 		public float PotentialDamage { get; }
 		public AttackType Type { get; }

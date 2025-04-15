@@ -7,11 +7,11 @@ using SevenDev.Boundless.Utility;
 /// <summary>
 /// A Charge Attack composed of two Attacks, with a determinate charge time.
 /// </summary>
-/// <param name="entity">Inherited from <see cref="Action"/>.</param>
+/// <param name="entity">Inherited from <see cref="EntityAction"/>.</param>
 /// <param name="weapon">Inherited from <see cref="Attack"/>.</param>
 /// <param name="library">The Animation Library of the attacks</param>
 /// <param name="info">The Composite Charge Attack Parameters to use when setting up the Charge Attack</param>
-/// <param name="modifiers">Inherited from <see cref="Action"/>.</param>
+/// <param name="modifiers">Inherited from <see cref="EntityAction"/>.</param>
 public partial class CompositeChargeAttack(Entity entity, Weapon weapon, AnimationPath animationPath, CompositeChargeAttack.Builder info, IEnumerable<TraitModifier>? modifiers = null) : ChargeAttack(entity, weapon, animationPath, modifiers) {
 	private readonly TimeDuration chargeTime = new(info.ChargeDuration, true);
 	private bool isDone;

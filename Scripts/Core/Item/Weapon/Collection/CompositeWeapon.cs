@@ -33,7 +33,7 @@ public abstract partial class CompositeWeapon : Node, IWeapon, ISerializationLis
 
 
 	public abstract IEnumerable<IWeapon> GetWeapons();
-	public virtual IEnumerable<Action.Wrapper> GetAttacks(Entity target) => GetWeapons().SelectMany(w => w.GetAttacks(target));
+	public virtual IEnumerable<EntityAction.Wrapper> GetAttacks(Entity target) => GetWeapons().SelectMany(w => w.GetAttacks(target));
 	public virtual Dictionary<string, ICustomization> GetCustomizations() => [];
 	public virtual IEnumerable<IUIObject> GetSubObjects() => GetWeapons();
 

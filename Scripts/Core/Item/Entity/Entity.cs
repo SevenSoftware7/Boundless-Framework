@@ -81,7 +81,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 
 	[ExportGroup("State")]
-	[Export] public Action? CurrentAction { get; private set; }
+	[Export] public EntityAction? CurrentAction { get; private set; }
 	[Export] public EntityBehaviour? CurrentBehaviour { get; private set; }
 	protected virtual Func<EntityBehaviour> DefaultBehaviour => () => new BipedBehaviour(this);
 
@@ -169,8 +169,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 		recoverState = new RecoverState(this);
 	}
 
-	public bool ExecuteAction(Action.Builder builder, bool forceExecute = false) => ExecuteAction(new Action.Wrapper(builder), forceExecute);
-	public bool ExecuteAction(Action.Wrapper action, bool forceExecute = false) {
+	public bool ExecuteAction(EntityAction.Builder builder, bool forceExecute = false) => ExecuteAction(new EntityAction.Wrapper(builder), forceExecute);
+	public bool ExecuteAction(EntityAction.Wrapper action, bool forceExecute = false) {
 		if (!forceExecute && !CurrentAction.CanCancel()) return false;
 
 		CurrentAction?.Stop();
