@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using Godot;
 
+
 public sealed class TraitModifierCollection : ICollection<ITraitModifier> {
-	public delegate float InterpFunction(float start, float end, float t);
+	public delegate double InterpFunction(double start, double end, double t);
 
 	private readonly Dictionary<Trait, TraitModifierEntry> _dictionary = [];
 
@@ -20,17 +20,17 @@ public sealed class TraitModifierCollection : ICollection<ITraitModifier> {
 	public event Action<Trait>? OnModifiersUpdated;
 
 
-	private async Task ProgressivelyMoveTo(TraitModifierEntry entry, ITraitModifier item, float start, float end, uint timeMilliseconds, InterpFunction? function = null) {
-		function ??= Mathf.Lerp;
+	// private async Task ProgressivelyMoveTo(TraitModifierEntry entry, ITraitModifier item, float start, float end, uint timeMilliseconds, InterpFunction? function = null) {
+	// 	function ??= Mathf.Lerp;
 
-		await foreach (float elapsed in AsyncUtils.WaitAndYield(timeMilliseconds)) {
-			ref float multiplierRef = ref CollectionsMarshal.GetValueRefOrNullRef(entry.Modifiers, item);
-			if (Unsafe.IsNullRef(ref multiplierRef)) break;
+	// 	await foreach (float elapsed in AsyncUtils.WaitAndYield(timeMilliseconds)) {
+	// 		ref float multiplierRef = ref CollectionsMarshal.GetValueRefOrNullRef(entry.Modifiers, item);
+	// 		if (Unsafe.IsNullRef(ref multiplierRef)) break;
 
-			multiplierRef = function(start, end, elapsed / timeMilliseconds);
-			OnModifiersUpdated?.Invoke(item.Trait);
-		}
-	}
+	// 		multiplierRef = function(start, end, elapsed / timeMilliseconds);
+	// 		OnModifiersUpdated?.Invoke(item.Trait);
+	// 	}
+	// }
 
 	public float ApplyTo(Trait target, float baseValue) {
 		if (!_dictionary.TryGetValue(target, out TraitModifierEntry entry))
@@ -43,18 +43,52 @@ public sealed class TraitModifierCollection : ICollection<ITraitModifier> {
 		AddInternal(item);
 		OnModifiersUpdated?.Invoke(item.Trait);
 	}
-	public async Task AddProgressively(ITraitModifier item, uint timeMilliseconds = 0, InterpFunction? function = null) {
-		await AddProgressivelyInternal(item, timeMilliseconds, function);
-		if (timeMilliseconds == 0) OnModifiersUpdated?.Invoke(item.Trait);
-	}
 
-	private async Task AddProgressivelyInternal(ITraitModifier item, uint timeMilliseconds, InterpFunction? function) {
-		TraitModifierEntry entry = AddInternal(item);
-
-		if (timeMilliseconds > 0) {
-			await ProgressivelyMoveTo(entry, item, 0f, 1f, timeMilliseconds, function);
+	public void AddRange(IEnumerable<ITraitModifier> items) {
+		HashSet<Trait> traits = [];
+		foreach (ITraitModifier item in items) {
+			AddInternal(item);
+			traits.Add(item.Trait);
+		}
+		foreach (Trait trait in traits) {
+			OnModifiersUpdated?.Invoke(trait);
 		}
 	}
+
+	public void AddProgressively(Node node, ITraitModifier item, uint durationMilliseconds, uint delayMilliseconds = 0, InterpFunction? function = null) {
+		if (durationMilliseconds > 0) {
+			Add(item);
+			return;
+		}
+
+		TraitModifierAdder adder =
+			function is null
+			? new TraitModifierAdder(this, item) {
+				DurationMsec = durationMilliseconds,
+				DelayMsec = delayMilliseconds
+			}
+			: new TraitModifierAdder(this, item) {
+				DurationMsec = durationMilliseconds,
+				DelayMsec = delayMilliseconds,
+				InterpolationFunction = function
+			};
+
+		node.AddChild(adder);
+	}
+
+	// public async Task AddProgressively(ITraitModifier item, uint timeMilliseconds = 0, InterpFunction? function = null) {
+	// 	await AddProgressivelyInternal(item, timeMilliseconds, function);
+	// 	if (timeMilliseconds == 0) OnModifiersUpdated?.Invoke(item.Trait);
+	// }
+
+	// private async Task AddProgressivelyInternal(ITraitModifier item, uint timeMilliseconds, InterpFunction? function) {
+	// 	TraitModifierEntry entry = AddInternal(item);
+
+	// 	if (timeMilliseconds > 0) {
+	// 		await ProgressivelyMoveTo(entry, item, 0f, 1f, timeMilliseconds, function);
+	// 	}
+	// }
+
 	private TraitModifierEntry AddInternal(ITraitModifier item) {
 		ref TraitModifierEntry entry = ref CollectionsMarshal.GetValueRefOrAddDefault(_dictionary, item.Trait, out bool existed);
 
@@ -70,53 +104,12 @@ public sealed class TraitModifierCollection : ICollection<ITraitModifier> {
 		return entry;
 	}
 
-	public void AddRange(IEnumerable<ITraitModifier> items) {
-		HashSet<Trait> traits = [];
-		foreach (ITraitModifier item in items) {
-			AddInternal(item);
-			traits.Add(item.Trait);
-		}
-		foreach (Trait trait in traits) {
-			OnModifiersUpdated?.Invoke(trait);
-		}
-	}
 
 	public bool Remove(ITraitModifier item) {
 		bool wasRemoved = RemoveInternal(item);
 		if (wasRemoved) OnModifiersUpdated?.Invoke(item.Trait);
 
 		return wasRemoved;
-	}
-	public async Task<bool> RemoveProgressively(TraitModifier item, uint timeMilliseconds = 0, InterpFunction? function = null) {
-		bool wasRemoved = await RemoveProgressivelyInternal(item, timeMilliseconds, function);
-		if (wasRemoved && timeMilliseconds == 0) OnModifiersUpdated?.Invoke(item.Trait);
-
-		return wasRemoved;
-	}
-
-	private async Task<bool> RemoveProgressivelyInternal(TraitModifier item, uint timeMilliseconds = 0, InterpFunction? function = null) {
-		ref var entryRef = ref CollectionsMarshal.GetValueRefOrNullRef(_dictionary, item.Trait);
-		if (Unsafe.IsNullRef(ref entryRef)) return false;
-		if (!entryRef.Contains(item)) return false;
-
-		TraitModifierEntry entry = entryRef;
-
-		if (timeMilliseconds > 0) {
-			await ProgressivelyMoveTo(entry, item, 1f, 0f, timeMilliseconds, function);
-		}
-
-		if (!entry.Remove(item)) return false;
-
-		item.OnValueModified -= OnModifiersUpdated;
-		return true;
-	}
-	private bool RemoveInternal(ITraitModifier item) {
-		ref var entry = ref CollectionsMarshal.GetValueRefOrNullRef(_dictionary, item.Trait);
-		if (Unsafe.IsNullRef(ref entry) || !entry.Remove(item))
-			return false;
-
-		item.OnValueModified -= OnModifiersUpdated;
-		return true;
 	}
 
 	public void RemoveRange(IEnumerable<TraitModifier> items) {
@@ -130,6 +123,61 @@ public sealed class TraitModifierCollection : ICollection<ITraitModifier> {
 			OnModifiersUpdated?.Invoke(trait);
 		}
 	}
+
+	public void RemoveProgressively(Node node, ITraitModifier item, uint timeMilliseconds, uint delayMilliseconds = 0, InterpFunction? function = null) {
+		if (timeMilliseconds > 0) {
+			Remove(item);
+			return;
+		}
+
+		TraitModifierRemover remover =
+			function is null
+			? new TraitModifierRemover(this, item) {
+				DurationMsec = timeMilliseconds,
+				DelayMsec = delayMilliseconds
+			}
+			: new TraitModifierRemover(this, item) {
+				DurationMsec = timeMilliseconds,
+				DelayMsec = delayMilliseconds,
+				InterpolationFunction = function
+			};
+
+		node.AddChild(remover);
+	}
+
+	// public async Task<bool> RemoveProgressively(TraitModifier item, uint timeMilliseconds = 0, InterpFunction? function = null) {
+	// 	bool wasRemoved = await RemoveProgressivelyInternal(item, timeMilliseconds, function);
+	// 	if (wasRemoved && timeMilliseconds == 0) OnModifiersUpdated?.Invoke(item.Trait);
+
+	// 	return wasRemoved;
+	// }
+
+	// private async Task<bool> RemoveProgressivelyInternal(TraitModifier item, uint timeMilliseconds = 0, InterpFunction? function = null) {
+	// 	ref var entryRef = ref CollectionsMarshal.GetValueRefOrNullRef(_dictionary, item.Trait);
+	// 	if (Unsafe.IsNullRef(ref entryRef)) return false;
+	// 	if (!entryRef.Contains(item)) return false;
+
+	// 	TraitModifierEntry entry = entryRef;
+
+	// 	if (timeMilliseconds > 0) {
+	// 		await ProgressivelyMoveTo(entry, item, 1f, 0f, timeMilliseconds, function);
+	// 	}
+
+	// 	if (!entry.Remove(item)) return false;
+
+	// 	item.OnValueModified -= OnModifiersUpdated;
+	// 	return true;
+	// }
+
+	private bool RemoveInternal(ITraitModifier item) {
+		ref var entry = ref CollectionsMarshal.GetValueRefOrNullRef(_dictionary, item.Trait);
+		if (Unsafe.IsNullRef(ref entry) || !entry.Remove(item))
+			return false;
+
+		item.OnValueModified -= OnModifiersUpdated;
+		return true;
+	}
+
 
 	public void Set(IEnumerable<ITraitModifier> modifiers) {
 		HashSet<ITraitModifier> newModifiersSet = [.. modifiers];

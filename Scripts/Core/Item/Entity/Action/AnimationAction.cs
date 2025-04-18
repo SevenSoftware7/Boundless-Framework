@@ -49,9 +49,17 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 	/// </summary>
 	/// <param name="modifier">The Trait Modifier to add</param>
 	/// <param name="timeMilliseconds">The time in milliseconds the TraitModifier will take to "fade in"</param>
-	public async void AddTraitModifier(TraitModifier modifier, uint timeMilliseconds = 0) {
+	public void AddTraitModifier(TraitModifier modifier, uint timeMilliseconds = 0) {
 		modifiers.Add(modifier);
-		await Entity.TraitModifiers.AddProgressively(modifier, timeMilliseconds);
+		// await Entity.TraitModifiers.AddProgressively(modifier, timeMilliseconds);
+		if (timeMilliseconds == 0) {
+			Entity.TraitModifiers.Add(modifier);
+		}
+		else {
+			AddChild(new TraitModifierAdder(Entity.TraitModifiers, modifier) {
+				DurationMsec = timeMilliseconds
+			});
+		}
 	}
 
 	/// <summary>
@@ -74,14 +82,22 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 	/// </summary>
 	/// <param name="index">The Cache Index of the Trait Modifier to remove</param>
 	/// <param name="timeMilliseconds">The time in milliseconds the TraitModifier will take to "fade out"</param>
-	public async void RemoveTraitModifier(int index, uint timeMilliseconds = 0) {
+	public void RemoveTraitModifier(int index, uint timeMilliseconds = 0) {
 		if (index < 0 || modifiers.Count <= index) return;
 
 		TraitModifier? modifier = modifiers[index];
 		if (modifier is null) return;
 
 		modifiers[index] = null;
-		await Entity.TraitModifiers.RemoveProgressively(modifier, timeMilliseconds);
+		// await Entity.TraitModifiers.RemoveProgressively(modifier, timeMilliseconds);
+		if (timeMilliseconds == 0) {
+			Entity.TraitModifiers.Remove(modifier);
+		}
+		else {
+			AddChild(new TraitModifierRemover(Entity.TraitModifiers, modifier) {
+				DurationMsec = timeMilliseconds
+			});
+		}
 	}
 	/// <summary>
 	/// Method to remove an already existing Trait Modifier.<para/>
@@ -103,14 +119,21 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 	/// Mainly for Animations, but can be used via script too.
 	/// </summary>
 	/// <param name="modifier">The Trait Modifier to remove</param>
-	public async void RemoveTraitModifier(TraitModifier modifier, uint timeMilliseconds = 0) {
+	public void RemoveTraitModifier(TraitModifier modifier, uint timeMilliseconds = 0) {
 		if (modifier is null) return;
 
 		int index = modifiers.IndexOf(modifier);
 		if (index < 0) return;
 
 		modifiers[index] = null;
-		await Entity.TraitModifiers.RemoveProgressively(modifier, timeMilliseconds);
+		if (timeMilliseconds == 0) {
+			Entity.TraitModifiers.Remove(modifier);
+		}
+		else {
+			AddChild(new TraitModifierRemover(Entity.TraitModifiers, modifier) {
+				DurationMsec = timeMilliseconds
+			});
+		}
 	}
 
 	/// <summary>

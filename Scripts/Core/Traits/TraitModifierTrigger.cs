@@ -1,7 +1,6 @@
 namespace LandlessSkies.Core;
 
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Godot;
 
 [GlobalClass]
@@ -26,18 +25,12 @@ public partial class TraitModifierTrigger : EntityTrigger {
 	}
 
 	private void ApplyModifiers(Entity target) {
-		// // foreach (TraitModifier traitModifier in _traitModifiers) {
-		// // 	Task _ = target.TraitModifiers.AddProgressively(traitModifier, 1000);
-		// // }
-		// // await Task.Delay(3000);
-		// target.TraitModifiers.AddRange(_traitModifiers);
-		// foreach (TraitModifier traitModifier in _traitModifiers) {
-		// 	Task<bool> _ = target.TraitModifiers.RemoveProgressively(traitModifier, 1000);
-		// }
 		TraitModifierCollection targetTraitModifiers = target.TraitModifiers;
 		foreach (TraitModifier item in _traitModifiers) {
-			// if (targetTraitModifiers.Contains(item)) continue;
-			AddChild(new TraitModifierApplier(1000, targetTraitModifiers, (TraitModifier)item.Duplicate()));
+			TraitModifier modifier = (TraitModifier) item.Duplicate();
+
+			targetTraitModifiers.Add(modifier);
+			targetTraitModifiers.RemoveProgressively(target, modifier, 1000);
 		}
 	}
 }
