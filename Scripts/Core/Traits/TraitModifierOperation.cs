@@ -2,7 +2,7 @@ namespace LandlessSkies.Core;
 
 using Godot;
 
-public partial class TraitModifierOperation : Processor {
+public partial class TraitModifierOperation : Node {
 	public readonly ITraitModifier Modifier;
 	public readonly TraitModifierCollection ModifierCollection;
 

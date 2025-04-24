@@ -21,7 +21,6 @@ public partial class TraitModifierRemover : TraitModifierOperation {
 		}
 
 		if (DurationMsec == 0 && DelayMsec == 0) {
-			GD.Print("Immediate");
 			ModifierCollection.Remove(Modifier);
 			QueueFree();
 			return;
