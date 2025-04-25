@@ -1,13 +1,18 @@
 namespace LandlessSkies.Core;
 
+using System;
 using System.Collections.Generic;
 using Godot;
 
 public partial class TraitModifierAdder : TraitModifierOperation {
-	public required uint DurationMsec { get; init; }
-	public uint DelayMsec { get; init; } = 0;
+	public required TimeSpan Duration { init => _durationSec = value.TotalSeconds; }
+	private double _durationSec = 0;
+
+	public TimeSpan Delay { init => _delaySec = value.TotalSeconds; }
+	private double _delaySec = 0;
+
 	public TraitModifierCollection.InterpFunction InterpolationFunction { get; init; } = Mathf.Lerp;
-	private double elapsed = 0f;
+	private double _elapsedSec = 0f;
 
 
 	public TraitModifierAdder(TraitModifierCollection collection, ITraitModifier modifier) : base(collection, modifier) { }
@@ -21,7 +26,7 @@ public partial class TraitModifierAdder : TraitModifierOperation {
 		}
 		ModifierCollection.Add(Modifier);
 
-		if (DurationMsec == 0 && DelayMsec == 0) {
+		if (_delaySec == 0 && _durationSec == 0) {
 			QueueFree();
 			return;
 		}
@@ -31,7 +36,7 @@ public partial class TraitModifierAdder : TraitModifierOperation {
 	public override void _Process(double delta) {
 		base._Process(delta);
 		try {
-			double t = (elapsed - DelayMsec) / DurationMsec;
+			double t = (_elapsedSec - _delaySec) / _durationSec;
 			t = Mathf.Clamp(t, 0, 1);
 			ModifierCollection.SetMultiplier(Modifier, (float)InterpolationFunction(0, 1, t));
 		}
@@ -40,11 +45,11 @@ public partial class TraitModifierAdder : TraitModifierOperation {
 			return;
 		}
 
-		if (elapsed >= DurationMsec + DelayMsec) {
+		if (_elapsedSec >= _delaySec + _durationSec) {
 			QueueFree();
 			return;
 		}
 
-		elapsed += 1000 * delta;
+		_elapsedSec += delta;
 	}
 }

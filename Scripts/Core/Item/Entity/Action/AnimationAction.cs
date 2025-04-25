@@ -57,7 +57,7 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 		}
 		else {
 			AddChild(new TraitModifierAdder(Entity.TraitModifiers, modifier) {
-				DurationMsec = timeMilliseconds
+				Duration = TimeSpan.FromMilliseconds(timeMilliseconds)
 			});
 		}
 	}
@@ -95,7 +95,7 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 		}
 		else {
 			AddChild(new TraitModifierRemover(Entity.TraitModifiers, modifier) {
-				DurationMsec = timeMilliseconds
+				Duration = TimeSpan.FromMilliseconds(timeMilliseconds)
 			});
 		}
 	}
@@ -131,7 +131,7 @@ public abstract partial class AnimationAction(Entity entity, AnimationPath path,
 		}
 		else {
 			AddChild(new TraitModifierRemover(Entity.TraitModifiers, modifier) {
-				DurationMsec = timeMilliseconds
+				Duration = TimeSpan.FromMilliseconds(timeMilliseconds)
 			});
 		}
 	}

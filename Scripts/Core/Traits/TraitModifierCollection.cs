@@ -56,7 +56,7 @@ public sealed class TraitModifierCollection : ICollection<ITraitModifier> {
 	}
 
 	public void AddProgressively(Node node, ITraitModifier item, uint durationMilliseconds, uint delayMilliseconds = 0, InterpFunction? function = null) {
-		if (durationMilliseconds > 0) {
+		if (durationMilliseconds == 0 && delayMilliseconds == 0) {
 			Add(item);
 			return;
 		}
@@ -64,12 +64,12 @@ public sealed class TraitModifierCollection : ICollection<ITraitModifier> {
 		TraitModifierAdder adder =
 			function is null
 			? new TraitModifierAdder(this, item) {
-				DurationMsec = durationMilliseconds,
-				DelayMsec = delayMilliseconds
+				Duration = TimeSpan.FromMilliseconds(durationMilliseconds),
+				Delay = TimeSpan.FromMilliseconds(delayMilliseconds)
 			}
 			: new TraitModifierAdder(this, item) {
-				DurationMsec = durationMilliseconds,
-				DelayMsec = delayMilliseconds,
+				Duration = TimeSpan.FromMilliseconds(durationMilliseconds),
+				Delay = TimeSpan.FromMilliseconds(delayMilliseconds),
 				InterpolationFunction = function
 			};
 
@@ -124,8 +124,8 @@ public sealed class TraitModifierCollection : ICollection<ITraitModifier> {
 		}
 	}
 
-	public void RemoveProgressively(Node node, ITraitModifier item, uint timeMilliseconds, uint delayMilliseconds = 0, InterpFunction? function = null) {
-		if (timeMilliseconds > 0) {
+	public void RemoveProgressively(Node node, ITraitModifier item, uint durationMilliseconds, uint delayMilliseconds = 0, InterpFunction? function = null) {
+		if (durationMilliseconds == 0 && delayMilliseconds == 0) {
 			Remove(item);
 			return;
 		}
@@ -133,12 +133,12 @@ public sealed class TraitModifierCollection : ICollection<ITraitModifier> {
 		TraitModifierRemover remover =
 			function is null
 			? new TraitModifierRemover(this, item) {
-				DurationMsec = timeMilliseconds,
-				DelayMsec = delayMilliseconds
+				Duration = TimeSpan.FromMilliseconds(durationMilliseconds),
+				Delay = TimeSpan.FromMilliseconds(delayMilliseconds)
 			}
 			: new TraitModifierRemover(this, item) {
-				DurationMsec = timeMilliseconds,
-				DelayMsec = delayMilliseconds,
+				Duration = TimeSpan.FromMilliseconds(durationMilliseconds),
+				Delay = TimeSpan.FromMilliseconds(delayMilliseconds),
 				InterpolationFunction = function
 			};
 

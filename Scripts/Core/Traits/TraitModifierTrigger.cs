@@ -30,7 +30,7 @@ public partial class TraitModifierTrigger : EntityTrigger {
 			TraitModifier modifier = (TraitModifier) item.Duplicate();
 
 			targetTraitModifiers.Add(modifier);
-			targetTraitModifiers.RemoveProgressively(target, modifier, 1000);
+			targetTraitModifiers.RemoveProgressively(target, modifier, 1000, 1000);
 		}
 	}
 }
