@@ -13,7 +13,7 @@ public interface IPlayerHandler {
 
 	/// <summary>
 	/// Stop Handling the Player.<para/>
-	/// Reset all the UI, and Inputs here.<para/>
+	/// Reset all the UI and Inputs here.<para/>
 	/// </summary>
 	public void DisavowPlayer();
 }
