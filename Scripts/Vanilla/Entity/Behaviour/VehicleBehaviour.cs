@@ -11,6 +11,7 @@ using static SevenDev.Boundless.Utility.Collisions;
 public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListener, IVoidOutListener {
 	[Export] public DrivingBehaviour? Driver;
 
+	private bool _gravityShift;
 	private bool _drifting;
 
 	private Vector3 _inertiaDirection;
@@ -37,12 +38,16 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 	public override void HandlePlayer(Player player) {
 		base.HandlePlayer(player);
 		_drifting = player.InputDevice.IsActionPressed(Inputs.AttackHeavy);
+		if (player.InputDevice.IsActionJustPressed(Inputs.Focus)) {
+			_gravityShift = !_gravityShift;
+		}
 	}
 
 	protected override Vector3 ProcessGroundedMovement(double delta) {
 		float floatDelta = (float)delta;
 
-		float entityMoveSpeed = Entity.GetTraitValue(Traits.GenericMoveSpeed);
+		float moveSpeed = Entity.GetTraitValue(Traits.GenericMoveSpeed);
+		float speedReverseLerp = Mathf.InverseLerp(0f, moveSpeed, _inertia);
 		bool isOnFloor = Entity.IsOnFloor();
 		Vector3 entityUp = Entity.UpDirection;
 		Vector3 entityForward = Entity.GlobalForward;
@@ -56,10 +61,8 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 		}
 
 
-		float gravityDecay = Mathf.InverseLerp(entityMoveSpeed * 0.75f, 0f, _inertia).Clamp01();
-
-		if (gravityDecay > 0f) {
-			entityUp = entityUp.SafeSlerp(Vector3.Up, 18f * gravityDecay * floatDelta);
+		if (!_gravityShift) {
+			entityUp = entityUp.SafeSlerp(Vector3.Up, 18f * floatDelta);
 		}
 		else if (isOnFloor && groundUp.Dot(entityUp) >= 0.75f) {
 			entityUp = entityUp.SafeSlerp(groundUp, 18f * floatDelta);
@@ -77,7 +80,7 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 		if (!_movement.IsEqualApprox(Vector3.Zero)) {
 			direction = _movement.Normalized();
 
-			newInertia = Mathf.Clamp(entityForward.Dot(direction) + 0.25f, 0f, 1f) * entityMoveSpeed;
+			newInertia = Mathf.Clamp(entityForward.Dot(direction) + 0.25f, 0f, 1f) * moveSpeed;
 			entityForward = entityForward.Slerp(direction, Entity.GetTraitValue(Traits.GenericTurnSpeed) * floatDelta);
 		}
 
@@ -99,7 +102,7 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 			Vector3 entityRight = toGroundUp * Entity.GlobalBasis.Right();
 
 			Vector3 leanForward = toGroundUp * entityForward;
-			if (!isOnFloor) leanForward = (leanForward + groundUp * 0.25f).Normalized();
+			if (!isOnFloor) leanForward = (leanForward + groundUp * 0.25f * speedReverseLerp).Normalized();
 
 			Vector3 leanRight = direction.Dot(entityRight) * entityRight;
 			Vector3 leanUp = (entityUp + leanRight).Normalized();
