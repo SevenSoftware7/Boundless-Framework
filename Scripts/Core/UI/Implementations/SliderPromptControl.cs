@@ -1,18 +1,17 @@
 namespace LandlessSkies.Core;
 
 using Godot;
-using Godot.Collections;
 using SevenDev.Boundless.Utility;
 
 [Tool]
 [GlobalClass]
 public partial class SliderPromptControl : PromptControl {
+	private const float NEAR_ZERO = 0.25f;
 	[Export] private bool shrinkInView;
 	[Export] private Control Wrapper = null!;
 	[Export] private RichTextLabel Label = null!;
 	[Export] private TextureRect Key = null!;
 
-	private float velocity;
 	private bool _queuedForDestruction = false;
 
 
@@ -57,20 +56,27 @@ public partial class SliderPromptControl : PromptControl {
 		Vector2 size = Wrapper.Size;
 		Vector2 position = Wrapper.Position;
 
+		bool isDeployed = Enabled && !_queuedForDestruction;
+		bool shouldShrink = !isDeployed && (shrinkInView || Mathf.Abs(position.X - (-size.X)) <= NEAR_ZERO);
 
-		float targetPositionX = !(Enabled && !_queuedForDestruction) ? -size.X : 0f;
-		float targetSizeY = !(Enabled && !_queuedForDestruction) && (shrinkInView || Mathf.Abs(position.X - targetPositionX) <= 0.25f) ? 0f : size.Y;
 
+		float targetPositionX = isDeployed ? 0f : -size.X;
+		float positionX = position.X.ClampedLerp(targetPositionX, 15f * floatDelta);
+
+		Wrapper.Position = position with { X = positionX };
+
+
+		float targetSizeY = shouldShrink ? 0f : size.Y;
 		float sizeY = Size.Y.ClampedLerp(targetSizeY, 25f * floatDelta);
+
 		CustomMinimumSize = CustomMinimumSize with { Y = sizeY };
 		Size = Size with { Y = sizeY };
 
-		Wrapper.Position = position with { X = position.X.ClampedLerp(targetPositionX, 15f * floatDelta) };
-
 
 		bool wasNotVisible = !Visible;
-		Visible = !(sizeY <= 0.25f);
-		if (Visible && wasNotVisible) {
+		bool isVisible = Mathf.Abs(sizeY) > NEAR_ZERO;
+		Visible = isVisible;
+		if (isVisible && wasNotVisible) {
 			GetParent()?.MoveChild(this, 0);
 		}
 
