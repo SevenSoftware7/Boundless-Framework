@@ -1,11 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://7ic4jncm8p1a"]
+[gd_scene load_steps=6 format=3 uid="uid://7ic4jncm8p1a"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Player/Player.cs" id="1_mxve3"]
+[ext_resource type="Script" uid="uid://bd4yl7w3pwp2j" path="res://Scripts/Core/Player/Player.cs" id="1_mxve3"]
 [ext_resource type="PackedScene" uid="uid://vl78r4m1s2to" path="res://Resources/FX/Rain.tscn" id="3_532s7"]
-[ext_resource type="Script" path="res://Scripts/Core/Utility/TransformOverride.cs" id="3_t1f3d"]
-[ext_resource type="Script" path="res://Scripts/Core/Player/CameraController3D.cs" id="4_8b0k0"]
-[ext_resource type="Script" path="res://Scripts/Core/UI/HudManager.cs" id="5_oov52"]
-[ext_resource type="Script" path="res://Scripts/Core/UI/TestContainer.cs" id="7_v7vwx"]
+[ext_resource type="Script" uid="uid://c6cdr5c7f5wid" path="res://Scripts/Core/Utility/TransformOverride.cs" id="3_t1f3d"]
+[ext_resource type="Script" uid="uid://cnxkjgk36nb2f" path="res://Scripts/Core/Player/CameraController3D.cs" id="4_8b0k0"]
+[ext_resource type="Script" uid="uid://7v14v1n26mtm" path="res://Scripts/Core/UI/HudManager.cs" id="5_oov52"]
 
 [node name="Player" type="Node" node_paths=PackedStringArray("CameraController", "HudManager")]
 process_priority = 10
@@ -41,8 +40,8 @@ mouse_filter = 2
 script = ExtResource("5_oov52")
 ProjectorCamera = NodePath("../CameraController3D")
 PointerContainer = NodePath("Pointer Container")
-InfoContainer = NodePath("Top Half/Top Left Quadrant/Info Container")
-PromptContainer = NodePath("Top Half/Top Left Quadrant/Prompt Container")
+InfoContainer = NodePath("VBoxContainer/Top Half/Top Left Quadrant/Info Container")
+PromptContainer = NodePath("VBoxContainer/Top Half/Top Left Quadrant/Interact Prompt Container")
 
 [node name="Pointer Container" type="Control" parent="HUD"]
 layout_mode = 1
@@ -53,28 +52,42 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="Top Half" type="HBoxContainer" parent="HUD"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD"]
 layout_mode = 1
-anchors_preset = -1
+anchors_preset = 15
 anchor_right = 1.0
-anchor_bottom = 0.5
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Top Left Quadrant" type="VBoxContainer" parent="HUD/Top Half"]
+[node name="Top Half" type="HBoxContainer" parent="HUD/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Top Left Quadrant" type="VBoxContainer" parent="HUD/VBoxContainer/Top Half"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 2.0
 theme_override_constants/separation = 20
 
-[node name="Info Container" type="VBoxContainer" parent="HUD/Top Half/Top Left Quadrant"]
+[node name="Info Container" type="VBoxContainer" parent="HUD/VBoxContainer/Top Half/Top Left Quadrant"]
 layout_mode = 2
 
-[node name="Prompt Container" type="Container" parent="HUD/Top Half/Top Left Quadrant"]
+[node name="Interact Prompt Container" type="VBoxContainer" parent="HUD/VBoxContainer/Top Half/Top Left Quadrant"]
 layout_mode = 2
-script = ExtResource("7_v7vwx")
+size_flags_vertical = 3
 
-[node name="Top Right Quadrant" type="VBoxContainer" parent="HUD/Top Half"]
+[node name="Top Right Quadrant" type="VBoxContainer" parent="HUD/VBoxContainer/Top Half"]
 layout_mode = 2
 size_flags_horizontal = 3
 alignment = 2
+
+[node name="Bottom Half" type="HBoxContainer" parent="HUD/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Input Prompt Container" type="HBoxContainer" parent="HUD/VBoxContainer/Bottom Half"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+alignment = 1

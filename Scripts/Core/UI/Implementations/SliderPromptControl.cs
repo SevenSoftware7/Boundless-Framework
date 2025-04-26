@@ -1,21 +1,19 @@
 namespace LandlessSkies.Core;
 
 using Godot;
+using Godot.Collections;
 using SevenDev.Boundless.Utility;
 
 [Tool]
 [GlobalClass]
 public partial class SliderPromptControl : PromptControl {
 	[Export] private bool shrinkInView;
+	[Export] private Control Wrapper = null!;
 	[Export] private RichTextLabel Label = null!;
 	[Export] private TextureRect Key = null!;
 
 	private float velocity;
 	private bool _queuedForDestruction = false;
-
-	// Store the position and scale here because some precision is lost when modifying the Position and Scale properties
-	private float _positionX;
-	private float _scaleY;
 
 
 	public override void SetText(string text) {
@@ -28,12 +26,12 @@ public partial class SliderPromptControl : PromptControl {
 	public override void _Ready() {
 		base._Ready();
 		Enabled = false;
-		Position = Position with { X = -Size.X };
-		Scale = new(1f, 0f);
 		Visible = false;
 
-		_positionX = Position.X;
-		_scaleY = Scale.Y;
+		Size = Size with { Y = 0f };
+		CustomMinimumSize = CustomMinimumSize with { Y = 0f };
+
+		Wrapper.Position = Wrapper.Position with { X = -Wrapper.Size.X };
 	}
 
 	public override void Destroy() {
@@ -56,27 +54,26 @@ public partial class SliderPromptControl : PromptControl {
 
 		float floatDelta = (float)delta;
 
+		Vector2 size = Wrapper.Size;
+		Vector2 position = Wrapper.Position;
 
-		float targetPositionX = (Enabled && !_queuedForDestruction) ? 0 : -Size.X;
-		_positionX = _positionX.ClampedLerp(targetPositionX, 15f * floatDelta);
-		Position = Position with { X = _positionX };
 
-		float targetScaleY = !(Enabled && !_queuedForDestruction) && (shrinkInView || _positionX.IsEqualApprox(targetPositionX)) ? 0f : 1f;
-		_scaleY = _scaleY.ClampedLerp(targetScaleY, 25f * floatDelta);
-		Scale = Scale with { Y = _scaleY };
+		float targetPositionX = !(Enabled && !_queuedForDestruction) ? -size.X : 0f;
+		float targetSizeY = !(Enabled && !_queuedForDestruction) && (shrinkInView || Mathf.Abs(position.X - targetPositionX) <= 0.25f) ? 0f : size.Y;
+
+		float sizeY = Size.Y.ClampedLerp(targetSizeY, 25f * floatDelta);
+		CustomMinimumSize = CustomMinimumSize with { Y = sizeY };
+		Size = Size with { Y = sizeY };
+
+		Wrapper.Position = position with { X = position.X.ClampedLerp(targetPositionX, 15f * floatDelta) };
 
 
 		bool wasNotVisible = !Visible;
-		Visible = !_scaleY.IsZeroApprox();
+		Visible = !(sizeY <= 0.25f);
 		if (Visible && wasNotVisible) {
 			GetParent()?.MoveChild(this, 0);
 		}
 
-		UpdateMinimumSize();
-	}
-
-	public override Vector2 _GetMinimumSize() {
-		return Size * Scale;
 	}
 
 	// public override void _Notification(int what) {

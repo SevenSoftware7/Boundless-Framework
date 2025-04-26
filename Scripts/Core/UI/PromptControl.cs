@@ -1,6 +1,7 @@
 namespace LandlessSkies.Core;
 
 using Godot;
+using Godot.Collections;
 
 [GlobalClass]
 public abstract partial class PromptControl : Control {
@@ -43,4 +44,16 @@ public abstract partial class PromptControl : Control {
 	}
 
 	public virtual void Destroy() { } // TODO: When CancelFree works (again), replace with the standard QueueFree pipeline
+
+
+	public override void _ValidateProperty(Dictionary property) {
+		base._ValidateProperty(property);
+
+		StringName name = property["name"].AsStringName();
+
+
+		if (name == PropertyName.Enabled) {
+			property["usage"] = (long)(property["usage"].As<PropertyUsageFlags>() & ~PropertyUsageFlags.Storage);
+		}
+	}
 }
