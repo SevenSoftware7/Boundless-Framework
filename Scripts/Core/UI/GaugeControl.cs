@@ -5,7 +5,7 @@ using SevenDev.Boundless.Utility;
 
 [GlobalClass]
 public abstract partial class GaugeControl : Control {
-	protected readonly TimeDuration DamagedTimer = new(1000, false);
+	protected readonly Countdown DamagedTimer = new(1000, false);
 
 	[Export]
 	public float DamageDelay {

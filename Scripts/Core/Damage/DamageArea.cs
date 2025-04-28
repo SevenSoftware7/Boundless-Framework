@@ -19,7 +19,7 @@ public partial class DamageArea : Area3D {
 			}
 		}
 	}
-	public TimeDuration? _lifeTime;
+	public Countdown? _lifeTime;
 
 	[Export] public float Damage = 1f;
 	[Export] public IDamageDealer.DamageFlags Flags = IDamageDealer.DamageFlags.Physical;
@@ -79,7 +79,7 @@ public partial class DamageArea : Area3D {
 
 	public override void _Process(double delta) {
 		base._Process(delta);
-		if (_lifeTime is not null && _lifeTime.HasElapsed) {
+		if (_lifeTime is not null && _lifeTime.IsCompleted) {
 			QueueFree();
 		}
 	}
