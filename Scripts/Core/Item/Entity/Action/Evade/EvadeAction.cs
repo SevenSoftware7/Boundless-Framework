@@ -2,10 +2,12 @@ namespace LandlessSkies.Core;
 
 using Godot;
 
-public abstract partial class EvadeAction(Entity entity) : EntityAction(entity) {
+public abstract partial class EvadeAction : EntityAction {
 	public abstract Vector3 Direction { get; set; }
 	public abstract float Progress { get; }
 
+
+	public EvadeAction(Entity entity, Builder builder) : base(entity, builder) { }
 
 
 	public new abstract class Builder() : EntityAction.Builder {

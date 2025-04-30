@@ -6,7 +6,7 @@ using SevenDev.Boundless.Utility;
 
 /// <summary>
 /// An Action is analogous to an RPG's turn action, for example, throwing a projectile, using a weapon or evading.<para/>
-/// An Entity can only execute one Action at a time. <see cref="EntityBehaviour"=
+/// An Entity can only execute one <see cref="EntityAction"/> at a time. See <see cref="EntityBehaviour"/> to possibly implement non-exclusive Actions.<para/>
 /// </summary>
 public abstract partial class EntityAction : Node {
 	/// <summary>
@@ -18,6 +18,7 @@ public abstract partial class EntityAction : Node {
 	/// The Entity which is executing the Action
 	/// </summary>
 	[Export] public Entity Entity;
+	public Builder? ActionBuilder { get; init; }
 	public IEnumerable<TraitModifier> Modifiers;
 
 	public event System.Action? OnStart;
@@ -28,8 +29,9 @@ public abstract partial class EntityAction : Node {
 	/// The Modifiers intrisic to the Action,<para/>
 	/// they will be applied to the Entity when the Action is started and removed from the Entity when the Action is stopped.
 	/// </param>
-	public EntityAction(Entity entity, IEnumerable<TraitModifier>? modifiers = null) {
+	public EntityAction(Entity entity, Builder builder, IEnumerable<TraitModifier>? modifiers = null) {
 		Entity = entity;
+		ActionBuilder = builder;
 		Modifiers = modifiers ?? [];
 	}
 

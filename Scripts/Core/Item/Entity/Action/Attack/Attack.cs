@@ -11,11 +11,16 @@ using SevenDev.Boundless.Utility;
 /// <param name="entity">Inherited from <see cref="EntityAction"/>.</param>
 /// <param name="weapon">The Weapon which will be used in the Attack.</param>
 /// <param name="modifiers">Inherited from <see cref="EntityAction"/>.</param>
-public abstract partial class Attack(Entity entity, Weapon weapon, AnimationPath path, IEnumerable<TraitModifier>? modifiers = null) : AnimationAction(entity, path, modifiers), IDamageDealerProxy {
+public abstract partial class Attack : AnimationAction, IDamageDealerProxy {
 	private readonly List<DamageArea?> damageAreas = [];
 
-	public Weapon Weapon { get; private set; } = weapon;
+	public Weapon Weapon { get; private set; }
 	public IDamageDealer? Sender => Weapon;
+
+
+	public Attack(Entity entity, Builder builder, Weapon weapon, AnimationPath path, IEnumerable<TraitModifier>? modifiers = null) : base(entity, builder, path, modifiers) {
+		Weapon = weapon;
+	}
 
 
 	public void CreateHitBox(AttackDamageAreaBuilder builder) {

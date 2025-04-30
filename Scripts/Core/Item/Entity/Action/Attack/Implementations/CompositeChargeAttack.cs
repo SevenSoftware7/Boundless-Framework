@@ -12,13 +12,17 @@ using SevenDev.Boundless.Utility;
 /// <param name="library">The Animation Library of the attacks</param>
 /// <param name="info">The Composite Charge Attack Parameters to use when setting up the Charge Attack</param>
 /// <param name="modifiers">Inherited from <see cref="EntityAction"/>.</param>
-public partial class CompositeChargeAttack(Entity entity, Weapon weapon, AnimationPath animationPath, CompositeChargeAttack.Builder info, IEnumerable<TraitModifier>? modifiers = null) : ChargeAttack(entity, weapon, animationPath, modifiers) {
-	private readonly Countdown chargeTime = new(info.ChargeDuration, true);
+public partial class CompositeChargeAttack : ChargeAttack {
+	private readonly Countdown chargeTime;
 	private bool isDone;
 
 
+	public CompositeChargeAttack(Entity entity, Builder builder, Weapon weapon, AnimationPath animationPath, IEnumerable<TraitModifier>? modifiers = null) : base(entity, builder, weapon, animationPath, modifiers) {
+		chargeTime = new(builder.ChargeDuration, true);
+	}
 
-	protected sealed override bool IsChargeStopped(InputDevice inputDevice) => !inputDevice.IsActionPressed(info.ActionInput);
+
+	protected sealed override bool IsChargeStopped(InputDevice inputDevice) => !inputDevice.IsActionPressed(((Builder)ActionBuilder!).ActionInput);
 
 	/// <summary>
 	/// Called when the Attack finishes Charging.
@@ -29,12 +33,12 @@ public partial class CompositeChargeAttack(Entity entity, Weapon weapon, Animati
 
 	protected override void _Attack() {
 		if (isDone) {
-			Entity.ExecuteAction(info.ChargedAttack, true);
+			Entity.ExecuteAction(((Builder)ActionBuilder!).ChargedAttack, true);
 			_ChargedAttack();
 			GD.Print("Full Charge Attack");
 		}
 		else {
-			Entity.ExecuteAction(info.UnchargedAttack, true);
+			Entity.ExecuteAction(((Builder)ActionBuilder!).UnchargedAttack, true);
 			_UnchargedAttack();
 			GD.Print("Premature Charge Attack");
 		}
@@ -81,6 +85,6 @@ public partial class CompositeChargeAttack(Entity entity, Weapon weapon, Animati
 		}
 
 
-		public override CompositeChargeAttack Build(Entity entity) => new(entity, Weapon, new(Weapon.LibraryName, AnimationName), this, modifiers);
+		public override CompositeChargeAttack Build(Entity entity) => new(entity, this, Weapon, new(Weapon.LibraryName, AnimationName), modifiers);
 	}
 }

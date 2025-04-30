@@ -12,7 +12,7 @@ public partial class BipedJumpAction : JumpAction, IPlayerHandler {
 	public override bool IsCancellable => true;
 	public override bool IsInterruptable => true;
 
-	public BipedJumpAction(Entity entity, Vector3 direction) : base(entity) {
+	public BipedJumpAction(Entity entity, Builder builder, Vector3 direction) : base(entity, builder) {
 		Direction = direction;
 	}
 
@@ -53,11 +53,11 @@ public partial class BipedJumpAction : JumpAction, IPlayerHandler {
 
 
 
-	public new class Builder : JumpAction.Builder {
+	public new sealed class Builder : JumpAction.Builder {
 		public Vector3? Direction;
 
 
 
-		public override JumpAction Build(Entity entity) => new BipedJumpAction(entity, Direction ?? entity.UpDirection);
+		public override JumpAction Build(Entity entity) => new BipedJumpAction(entity, this, Direction ?? entity.UpDirection);
 	}
 }

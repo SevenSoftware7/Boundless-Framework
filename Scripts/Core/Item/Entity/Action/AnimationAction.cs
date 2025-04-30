@@ -12,7 +12,7 @@ using SevenDev.Boundless.Utility;
 /// <param name="entity">Inherited from <see cref="EntityAction"/>.</param>
 /// <param name="path">The AnimationPath used to play the corresponding animation.</param>
 /// <param name="innateModifiers">Inherited from <see cref="EntityAction"/>.</param>
-public abstract partial class AnimationAction(Entity entity, AnimationPath path, IEnumerable<TraitModifier>? innateModifiers = null) : EntityAction(entity, innateModifiers) {
+public abstract partial class AnimationAction(Entity entity, EntityAction.Builder builder, AnimationPath path, IEnumerable<TraitModifier>? innateModifiers = null) : EntityAction(entity, builder, innateModifiers) {
 	private readonly List<TraitModifier?> modifiers = [];
 	public override bool IsCancellable => _isCancellable;
 	private bool _isCancellable = false;
