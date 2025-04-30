@@ -3,13 +3,11 @@
 [ext_resource type="Script" uid="uid://ck7ewnrcr0weu" path="res://Scripts/Core/UI/Implementations/SliderPromptControl.cs" id="1_3bqfl"]
 
 [node name="SliderPromptControl" type="Control" node_paths=PackedStringArray("Wrapper", "Label", "Key")]
-visible = false
-clip_contents = true
-custom_minimum_size = Vector2(200, 0.0)
+custom_minimum_size = Vector2(200, 26)
 layout_mode = 3
 anchors_preset = 0
 offset_right = 200.0
-offset_bottom = 0.0
+offset_bottom = 26.0
 size_flags_horizontal = 2
 script = ExtResource("1_3bqfl")
 Wrapper = NodePath("Control")
@@ -19,8 +17,7 @@ Key = NodePath("Control/MarginContainer/HBoxContainer/Prompt Texture")
 [node name="Control" type="Control" parent="."]
 custom_minimum_size = Vector2(200, 26)
 anchors_preset = 0
-offset_left = -200.0
-offset_right = 0.0
+offset_right = 200.0
 offset_bottom = 26.0
 
 [node name="ColorRect" type="ColorRect" parent="Control"]

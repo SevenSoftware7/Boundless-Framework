@@ -75,6 +75,7 @@ layout_mode = 2
 
 [node name="Interact Prompt Container" type="VBoxContainer" parent="HUD/VBoxContainer/Top Half/Top Left Quadrant"]
 layout_mode = 2
+size_flags_horizontal = 0
 size_flags_vertical = 3
 
 [node name="Top Right Quadrant" type="VBoxContainer" parent="HUD/VBoxContainer/Top Half"]
