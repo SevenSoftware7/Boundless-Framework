@@ -15,7 +15,14 @@ public partial class InputManager : Node {
 
 
 
-	public static InputDevice CurrentDevice { get; private set; } = null!;
+	public static InputDevice CurrentDevice {
+		get;
+		private set {
+			if (field == value || value is null) return;
+			GD.Print($"InputManager: Current device changed to {value.FullName}");
+			field = value;
+		}
+	} = null!;
 	public static KMInputDevice KeyboardMouseDevice { get; private set; } = null!;
 
 
@@ -64,12 +71,8 @@ public partial class InputManager : Node {
 			return;
 		}
 
-		if (@event is InputEventJoypadButton joypadButton && JoypadDevices.Count > joypadButton.Device) {
-			CurrentDevice = JoypadDevices[joypadButton.Device];
-			return;
-		}
-		if (@event is InputEventJoypadMotion joypadMotion && JoypadDevices.Count > joypadMotion.Device) {
-			CurrentDevice = JoypadDevices[joypadMotion.Device];
+		if (@event.Device < JoypadDevices.Count && (@event is InputEventJoypadButton || @event is InputEventJoypadMotion)) {
+			CurrentDevice = JoypadDevices[@event.Device];
 			return;
 		}
 	}
@@ -82,6 +85,7 @@ public partial class InputManager : Node {
 			KeyboardMouseDevice = new();
 			AddChild(KeyboardMouseDevice);
 			KeyboardMouseDevice.Connect();
+
 			CurrentDevice = KeyboardMouseDevice;
 		}
 

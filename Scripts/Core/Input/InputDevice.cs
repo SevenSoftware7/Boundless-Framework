@@ -8,6 +8,7 @@ public abstract partial class InputDevice : Node {
 
 
 	public abstract float Sensitivity { get; }
+	public abstract StringName FullName { get; }
 	protected abstract StringName DeviceSuffix { get; }
 
 	protected static void RebindInput(StringName actionName, float deadzone = 0.5f, params InputEvent[] events) {
@@ -58,7 +59,7 @@ public abstract partial class InputDevice : Node {
 
 
 	public Texture2D GetActionSymbol(StringName action) =>
-		InputManager.ActionSymbol; // TODO
+		InputManager.ActionSymbol; // TODO: Implement this to return the correct symbol for the action
 
 
 
@@ -82,8 +83,9 @@ public abstract partial class InputDevice : Node {
 		DeviceConnected ? Input.GetActionRawStrength(GetActionName(action)) : 0f;
 
 
-	public virtual void Connect() {
+	public void Connect() {
 		if (DeviceConnected) return;
+		DeviceConnected = true;
 
 		foreach (StringName action in InputManager.BaseActions) {
 			StringName newAction = GetActionName(action);
@@ -91,11 +93,15 @@ public abstract partial class InputDevice : Node {
 			RebindInput(newAction, InputMap.ActionGetDeadzone(action), [.. InputMap.ActionGetEvents(action).Where(IsEventSupported).Select(ConvertEvent)]);
 		}
 
-		DeviceConnected = true;
-	}
+		GD.Print($"Device {FullName} Connected");
 
-	public virtual void Disconnect() {
+		OnConnect();
+	}
+	protected virtual void OnConnect() { }
+
+	public void Disconnect() {
 		if (!DeviceConnected) return;
+		DeviceConnected = false;
 
 		foreach (StringName action in InputManager.BaseActions) {
 			StringName newAction = GetActionName(action);
@@ -103,6 +109,9 @@ public abstract partial class InputDevice : Node {
 			UnbindInput(newAction);
 		}
 
-		DeviceConnected = false;
+		GD.Print($"Device {FullName} Disconnected");
+
+		OnDisconnect();
 	}
+	protected virtual void OnDisconnect() { }
 }

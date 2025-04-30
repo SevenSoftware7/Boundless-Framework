@@ -4,6 +4,7 @@ using Godot;
 
 public sealed partial class JoypadInputDevice(int DeviceId) : InputDevice() {
 	public override float Sensitivity => 0.025f;
+	public override StringName FullName => $"Joypad {DeviceId} ({DeviceName})";
 
 	protected override StringName DeviceSuffix => _deviceSuffix;
 	private readonly StringName _deviceSuffix = $"joy{DeviceId}";
@@ -22,18 +23,9 @@ public sealed partial class JoypadInputDevice(int DeviceId) : InputDevice() {
 	protected override bool IsEventSupported(InputEvent @event) => @event is InputEventJoypadButton || @event is InputEventJoypadMotion;
 
 
-	public override void Connect() {
-		base.Connect();
-
+	protected override void OnConnect() {
 		DeviceName = Input.GetJoyName(DeviceId);
 		DeviceGUID = Input.GetJoyGuid(DeviceId);
-		GD.Print($"Device {DeviceId} ({DeviceName}) Connected");
-	}
-
-	public override void Disconnect() {
-		base.Disconnect();
-
-		GD.Print($"Device {DeviceId} ({DeviceName}) Disconnected");
 	}
 
 }
