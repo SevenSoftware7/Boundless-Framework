@@ -6,9 +6,9 @@ using SevenDev.Boundless.Utility;
 using System.Collections.Generic;
 using static SevenDev.Boundless.Utility.Collisions;
 
-public sealed class InteractTarget(Interactable interactable, int shapeIndex) {
-	public Interactable Interactable => interactable;
-	public int ShapeIndex => shapeIndex;
+public struct InteractTarget(Interactable interactable, int shapeIndex) {
+	public readonly Interactable Interactable => interactable;
+	public readonly int ShapeIndex => shapeIndex;
 
 	public static InteractTarget? GetBestTarget(Entity entity, float maxDistance) {
 		return InteractCandidate.GetNearCandidates(entity, maxDistance)?
@@ -19,10 +19,10 @@ public sealed class InteractTarget(Interactable interactable, int shapeIndex) {
 	}
 
 
-	private sealed class InteractCandidate(InteractTarget target, float distanceSquared, float incidence) {
-		public InteractTarget Target => target;
-		public float DistanceSquared => distanceSquared;
-		public float Incidence => incidence;
+	private struct InteractCandidate(InteractTarget target, float distanceSquared, float incidence) {
+		public readonly InteractTarget Target => target;
+		public readonly float DistanceSquared => distanceSquared;
+		public readonly float Incidence => incidence;
 
 
 		public static IEnumerable<InteractCandidate> GetNearCandidates(Entity entity, float maxDistance) {

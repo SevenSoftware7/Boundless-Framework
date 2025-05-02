@@ -40,7 +40,7 @@ public abstract partial class PromptControl : Control {
 		}
 
 		SetEnabled(true);
-		SetText(interactTarget.Interactable.InteractLabel);
+		SetText(interactTarget.Value.Interactable.InteractLabel);
 	}
 
 	public virtual void Destroy() { } // TODO: When CancelFree works (again), replace with the standard QueueFree pipeline

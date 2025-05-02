@@ -13,7 +13,6 @@ public partial class BipedBehaviour : GroundedBehaviour {
 	private PromptControl? interactPrompt;
 	private PointerControl? interactPointer;
 
-
 	protected BipedBehaviour() : this(null!) { }
 	public BipedBehaviour(Entity entity) : base(entity, new BipedJumpAction.Builder()) { }
 
@@ -52,9 +51,9 @@ public partial class BipedBehaviour : GroundedBehaviour {
 
 			InteractTarget? target = InteractTarget.GetBestTarget(Entity, 3.25f);
 
-			if (target is not null) {
-				if (player.InputDevice.IsActionJustPressed(Inputs.Interact) && target.Interactable.IsInteractable(Entity)) {
-					target.Interactable.Interact(Entity, player, target.ShapeIndex);
+			if (target.HasValue) {
+				if (player.InputDevice.IsActionJustPressed(Inputs.Interact) && target.Value.Interactable.IsInteractable(Entity)) {
+					target.Value.Interactable.Interact(Entity, player, target.Value.ShapeIndex);
 				}
 			}
 
