@@ -14,9 +14,8 @@ public abstract partial class SceneItemData<[MustBeVariant] T> : Resource, IItem
 		}
 	} = new();
 
-	[Export] public ItemUIData? UIData { get; private set; } = new();
-	public string DisplayName => UIData?.DisplayName ?? string.Empty;
-	public Texture2D? DisplayPortrait => UIData?.DisplayPortrait;
+	[Export] public string DisplayName { get; private set; } = string.Empty;
+	[Export] public Texture2D? DisplayPortrait { get; private set; } = null;
 
 
 	// We export a scene path instead of a PackedScene because otherwise Godot has issues with cyclical resource loading.

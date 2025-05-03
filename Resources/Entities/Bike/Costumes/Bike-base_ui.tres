@@ -1,7 +1,0 @@
-[gd_resource type="Resource" script_class="ItemUIData" load_steps=2 format=3 uid="uid://dpxmaply7ike1"]
-
-[ext_resource type="Script" path="res://Scripts/Core/Item/ItemUIData.cs" id="1_eewld"]
-
-[resource]
-script = ExtResource("1_eewld")
-DisplayName = "Bike (base)"

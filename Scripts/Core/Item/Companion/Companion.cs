@@ -14,8 +14,8 @@ public partial class Companion : Node3D, ICustomizable, ICostumable, IPersistent
 
 	IItemData<Companion>? IItem<Companion>.Data => Data;
 	[Export] public CompanionSceneData? Data { get; private set; }
-	public string DisplayName => Data?.UIData?.DisplayName ?? string.Empty;
-	public Texture2D? DisplayPortrait => Data?.UIData?.DisplayPortrait;
+	public string DisplayName => Data?.DisplayName ?? string.Empty;
+	public Texture2D? DisplayPortrait => Data?.DisplayPortrait;
 
 
 	[Export]

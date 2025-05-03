@@ -9,8 +9,8 @@ using SevenDev.Boundless.Persistence;
 public abstract partial class Costume : Node3D, IPersistent<Costume>, IItem<Costume>, ICustomizable {
 	IItemData<Costume>? IItem<Costume>.Data => Data;
 	[Export] public SceneCostumeData? Data { get; private set; }
-	public string DisplayName => Data?.UIData?.DisplayName ?? string.Empty;
-	public Texture2D? DisplayPortrait => Data?.UIData?.DisplayPortrait;
+	public string DisplayName => Data?.DisplayName ?? string.Empty;
+	public Texture2D? DisplayPortrait => Data?.DisplayPortrait;
 
 	public abstract Material? MaterialOverride { get; protected set; }
 	public abstract Material? MaterialOverlay { get; protected set; }

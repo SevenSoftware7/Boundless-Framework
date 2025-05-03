@@ -1,11 +1,10 @@
-[gd_resource type="Resource" script_class="EntityCostumeSceneData" load_steps=4 format=3 uid="uid://bb3xo4pwx7g3y"]
+[gd_resource type="Resource" script_class="EntityCostumeSceneData" load_steps=3 format=3 uid="uid://bb3xo4pwx7g3y"]
 
 [ext_resource type="Resource" uid="uid://djkxop4aum535" path="res://Resources/Entities/Bike/Costumes/Bike-base_key.tres" id="1_japl1"]
-[ext_resource type="Resource" uid="uid://dpxmaply7ike1" path="res://Resources/Entities/Bike/Costumes/Bike-base_ui.tres" id="3_dejvl"]
 [ext_resource type="Script" uid="uid://upq7u1vamnru" path="res://Scripts/Core/Item/Entity/Costume/EntityCostumeSceneData.cs" id="4_j77cf"]
 
 [resource]
 script = ExtResource("4_j77cf")
 KeyProvider = ExtResource("1_japl1")
-UIData = ExtResource("3_dejvl")
+DisplayName = "Bike (base)"
 ScenePath = "uid://burrwvhjdl2u3"

@@ -26,8 +26,8 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject
 
 	IItemData<Weapon>? IItem<Weapon>.Data => Data;
 	[Export] public WeaponSceneData? Data { get; private set; }
-	public string DisplayName => Data?.UIData?.DisplayName ?? string.Empty;
-	public Texture2D? DisplayPortrait => Data?.UIData?.DisplayPortrait;
+	public string DisplayName => Data?.DisplayName ?? string.Empty;
+	public Texture2D? DisplayPortrait => Data?.DisplayPortrait;
 
 	public IDamageDealer? Sender => Entity;
 

@@ -1,11 +1,10 @@
-[gd_resource type="Resource" script_class="WeaponCostumeSceneData" load_steps=4 format=3 uid="uid://c376t1le83xwr"]
+[gd_resource type="Resource" script_class="WeaponCostumeSceneData" load_steps=3 format=3 uid="uid://c376t1le83xwr"]
 
 [ext_resource type="Resource" uid="uid://b5vpfmo67yl6e" path="res://Resources/Weapons/Epiphron/Costumes/Epiphron-base_key.tres" id="1_mid7c"]
-[ext_resource type="Resource" uid="uid://cofdps2evpaco" path="res://Resources/Weapons/Epiphron/Costumes/Epiphron-base_ui.tres" id="2_578hx"]
 [ext_resource type="Script" uid="uid://2l2r58pjqet5" path="res://Scripts/Core/Item/Weapon/Costume/WeaponCostumeSceneData.cs" id="3_qpj6o"]
 
 [resource]
 script = ExtResource("3_qpj6o")
 KeyProvider = ExtResource("1_mid7c")
-UIData = ExtResource("2_578hx")
+DisplayName = "Epiphron (base)"
 ScenePath = "uid://ceqxywrq7p5l3"

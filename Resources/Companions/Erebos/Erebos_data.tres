@@ -1,11 +1,10 @@
-[gd_resource type="Resource" script_class="CompanionSceneData" load_steps=4 format=3 uid="uid://7o3ch4vnd7ux"]
+[gd_resource type="Resource" script_class="CompanionSceneData" load_steps=3 format=3 uid="uid://7o3ch4vnd7ux"]
 
 [ext_resource type="Resource" uid="uid://ddocod3xa3gvp" path="res://Resources/Companions/Erebos/Erebos_key.tres" id="1_kcqgu"]
-[ext_resource type="Resource" uid="uid://dos7n2066u00b" path="res://Resources/Companions/Erebos/Erebos_ui.tres" id="2_503o0"]
 [ext_resource type="Script" uid="uid://b5lh2rdkvo7fc" path="res://Scripts/Core/Item/Companion/CompanionSceneData.cs" id="2_svujt"]
 
 [resource]
 script = ExtResource("2_svujt")
 KeyProvider = ExtResource("1_kcqgu")
-UIData = ExtResource("2_503o0")
+DisplayName = "Erebos"
 ScenePath = "uid://b7hcoc81x5g0i"

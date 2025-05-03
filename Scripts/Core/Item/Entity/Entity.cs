@@ -28,8 +28,8 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 	IItemData<Entity>? IItem<Entity>.Data => Data;
 	[Export] public EntitySceneData? Data { get; private set; }
-	public string DisplayName => Data?.UIData?.DisplayName ?? string.Empty;
-	public Texture2D? DisplayPortrait => Data?.UIData?.DisplayPortrait;
+	public string DisplayName => Data?.DisplayName ?? string.Empty;
+	public Texture2D? DisplayPortrait => Data?.DisplayPortrait;
 
 
 	public IDamageable? Damageable => this;

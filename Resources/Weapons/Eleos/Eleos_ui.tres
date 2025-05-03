@@ -1,7 +1,0 @@
-[gd_resource type="Resource" script_class="ItemUIData" load_steps=2 format=3 uid="uid://cvuwijf5xqma6"]
-
-[ext_resource type="Script" path="res://Scripts/Core/Item/ItemUIData.cs" id="1_7jlbl"]
-
-[resource]
-script = ExtResource("1_7jlbl")
-DisplayName = "Eleos"
