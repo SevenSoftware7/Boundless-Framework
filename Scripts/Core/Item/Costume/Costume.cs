@@ -23,6 +23,6 @@ public abstract partial class Costume : Node3D, IPersistent<Costume>, IItem<Cost
 
 	public virtual Aabb GetAabb() => default;
 
-	public IPersistenceData<Costume> Save() => new ItemPersistenceData<Costume>(this);
+	public IPersistenceData<Costume> Save() => new CustomizableItemPersistenceData<Costume>(this);
 
 }

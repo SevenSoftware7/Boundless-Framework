@@ -12,7 +12,7 @@ using SevenDev.Boundless.Persistence;
 /// </summary>
 [Tool]
 [GlobalClass]
-public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject, ICostumable, IDamageDealerProxy, IPersistent<Weapon> {
+public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, ICustomizable, ICostumable, IDamageDealerProxy, IPersistent<Weapon> {
 	private static readonly StringName LeftWeapon = "LeftWeapon";
 	private static readonly StringName RightWeapon = "RightWeapon";
 	private static readonly StringName LeftHand = "LeftHand";
@@ -180,5 +180,5 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, IUIObject
 
 	public virtual IPersistenceData<Weapon> Save() => new WeaponSaveData<Weapon>(this);
 	[Serializable]
-	public class WeaponSaveData<T>(T weapon) : ItemPersistenceData<T>(weapon) where T : Weapon, IItem;
+	public class WeaponSaveData<T>(T weapon) : CustomizableItemPersistenceData<T>(weapon) where T : Weapon, IItem;
 }

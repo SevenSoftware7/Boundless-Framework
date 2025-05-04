@@ -52,5 +52,5 @@ public partial class Companion : Node3D, ICustomizable, ICostumable, IPersistent
 	public virtual IPersistenceData<Companion> Save() => new CompanionSaveData<Companion>(this);
 
 	[Serializable]
-	public class CompanionSaveData<T>(T companion) : ItemPersistenceData<Companion>(companion) where T : Companion;
+	public class CompanionSaveData<T>(T companion) : CustomizableItemPersistenceData<Companion>(companion) where T : Companion;
 }

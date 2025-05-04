@@ -15,7 +15,7 @@ using SevenDev.Boundless.Persistence;
 [Tool]
 [GlobalClass]
 [Injector]
-public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDamageDealer, ICostumable, IUIObject, IPersistent<Entity>, IItem<Entity> {
+public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDamageDealer, ICustomizable, ICostumable, IUIObject, IPersistent<Entity>, IItem<Entity> {
 	public const int RECOVER_STATE_BUFFER_SIZE = 5;
 
 
@@ -163,7 +163,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 		Forward = Vector3.Forward;
 	}
 
-	public float GetTraitValue(Trait trait, float @default = default) => TraitModifiers.ApplyTo(trait, EntityTraits.GetValueOrDefault(trait, @default));
+	public float GetTraitValue(Trait trait, float @default = default) => TraitModifiers.ApplyTo(trait, EntityTraits.GetOrDefault(trait, @default));
 
 	public void UpdateRecoverState() {
 		recoverState = new RecoverState(this);
@@ -358,7 +358,7 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 
 	public virtual IPersistenceData<Entity> Save() => new EntitySaveData<Entity>(this);
 	[Serializable]
-	public class EntitySaveData<T>(T entity) : ItemPersistenceData<Entity>(entity) where T : Entity {
+	public class EntitySaveData<T>(T entity) : CustomizableItemPersistenceData<Entity>(entity) where T : Entity {
 		public IPersistenceData[] MiscData = [.. entity.GetChildren().OfType<IPersistent>().Select(d => d.Save())];
 
 		protected override void LoadInternal(Entity item, IItemDataProvider registry) {
