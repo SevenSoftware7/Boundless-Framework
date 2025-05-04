@@ -14,7 +14,7 @@ public struct InteractTarget(Interactable interactable, int shapeIndex) {
 		return InteractCandidate.GetNearCandidates(entity, maxDistance)?
 			.OrderByDescending(x => x.Incidence)
 			.ThenBy(x => x.DistanceSquared)
-			.Select(x => x.Target)
+			.Select(x => new InteractTarget?(x.Target))
 			.FirstOrDefault();
 	}
 
