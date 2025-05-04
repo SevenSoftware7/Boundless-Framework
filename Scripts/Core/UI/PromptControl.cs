@@ -34,7 +34,7 @@ public abstract partial class PromptControl : Control {
 	}
 
 	public void Update(InteractTarget? interactTarget) {
-		if (interactTarget is null) {
+		if (!interactTarget.HasValue) {
 			SetEnabled(false);
 			return;
 		}
