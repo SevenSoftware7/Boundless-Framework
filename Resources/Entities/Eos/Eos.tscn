@@ -1,12 +1,12 @@
-[gd_scene load_steps=30 format=3 uid="uid://b7rhbgw2dujty"]
+[gd_scene load_steps=32 format=3 uid="uid://b7rhbgw2dujty"]
 
 [ext_resource type="Script" uid="uid://btpoqelwvyeef" path="res://Scripts/Core/Item/Entity/Entity.cs" id="1_44rt4"]
 [ext_resource type="Resource" uid="uid://djyqyaq7lwdkr" path="res://Resources/Entities/Eos/Eos_data.tres" id="2_sat4e"]
 [ext_resource type="PackedScene" uid="uid://dr77fv5m8yjck" path="res://Scenes/UI/Pointer.tscn" id="3_qcq8b"]
+[ext_resource type="Script" uid="uid://djubduy40g4eb" path="res://Scripts/Core/Traits/TraitResource.cs" id="3_sat4e"]
 [ext_resource type="PackedScene" uid="uid://cck2wboppochk" path="res://Scenes/UI/Gauge.tscn" id="3_uuynt"]
-[ext_resource type="Script" uid="uid://djubduy40g4eb" path="res://Scripts/Core/Traits/TraitResource.cs" id="4_fjsq6"]
+[ext_resource type="Script" uid="uid://cpqri6cw2hye2" path="res://Scripts/Core/Traits/TraitsCollection.cs" id="4_fjsq6"]
 [ext_resource type="PackedScene" uid="uid://br8bdv51nxt4p" path="res://Scenes/UI/Prompt.tscn" id="4_qonq2"]
-[ext_resource type="Script" uid="uid://cpqri6cw2hye2" path="res://Scripts/Core/Traits/TraitsCollection.cs" id="5_27hs1"]
 [ext_resource type="PackedScene" uid="uid://bjf6xuch8ncq0" path="res://Resources/Entities/Eos/EosSkeleton.tscn" id="5_j1koo"]
 [ext_resource type="Script" uid="uid://5gx1ctuejo1p" path="res://Scripts/Core/Item/Entity/HudPack.cs" id="5_y0ifp"]
 [ext_resource type="Script" uid="uid://bdyyn2i12mh6c" path="res://Scripts/Core/Item/Entity/Gauge.cs" id="8_emu8a"]
@@ -17,57 +17,69 @@
 [ext_resource type="Resource" uid="uid://bi8pp11ga45x3" path="res://Resources/Entities/Eos/Costumes/Eos-base_key.tres" id="15_cn8qi"]
 [ext_resource type="Script" uid="uid://bqjcp5j1o01je" path="res://Scripts/Core/Item/Entity/Behaviour/Implementations/SwimmingBehaviour.cs" id="15_sat4e"]
 
-[sub_resource type="Resource" id="Resource_iivwa"]
+[sub_resource type="Resource" id="Resource_uy6xw"]
 resource_name = "generic_max_health"
-script = ExtResource("4_fjsq6")
+script = ExtResource("3_sat4e")
 Name = "generic_max_health"
 
-[sub_resource type="Resource" id="Resource_t6mu6"]
+[sub_resource type="Resource" id="Resource_u056q"]
 resource_name = "generic_move_speed"
-script = ExtResource("4_fjsq6")
+script = ExtResource("3_sat4e")
 Name = "generic_move_speed"
 
-[sub_resource type="Resource" id="Resource_dscr4"]
+[sub_resource type="Resource" id="Resource_8ie50"]
+resource_name = "generic_slow_move_speed_multiplier"
+script = ExtResource("3_sat4e")
+Name = "generic_slow_move_speed_multiplier"
+
+[sub_resource type="Resource" id="Resource_c3jdb"]
+resource_name = "generic_fast_move_speed_multiplier"
+script = ExtResource("3_sat4e")
+Name = "generic_fast_move_speed_multiplier"
+
+[sub_resource type="Resource" id="Resource_k7nyx"]
 resource_name = "generic_turn_speed"
-script = ExtResource("4_fjsq6")
+script = ExtResource("3_sat4e")
 Name = "generic_turn_speed"
 
-[sub_resource type="Resource" id="Resource_ppkqq"]
+[sub_resource type="Resource" id="Resource_lf3id"]
 resource_name = "generic_acceleration"
-script = ExtResource("4_fjsq6")
+script = ExtResource("3_sat4e")
 Name = "generic_acceleration"
 
-[sub_resource type="Resource" id="Resource_xxmdo"]
+[sub_resource type="Resource" id="Resource_w5bov"]
 resource_name = "generic_deceleration"
-script = ExtResource("4_fjsq6")
+script = ExtResource("3_sat4e")
 Name = "generic_deceleration"
 
-[sub_resource type="Resource" id="Resource_y3her"]
+[sub_resource type="Resource" id="Resource_mh833"]
 resource_name = "generic_step_height"
-script = ExtResource("4_fjsq6")
+script = ExtResource("3_sat4e")
 Name = "generic_step_height"
 
-[sub_resource type="Resource" id="Resource_ahnjs"]
+[sub_resource type="Resource" id="Resource_ll5eb"]
 resource_name = "generic_jump_height"
-script = ExtResource("4_fjsq6")
+script = ExtResource("3_sat4e")
 Name = "generic_jump_height"
 
-[sub_resource type="Resource" id="Resource_fafpq"]
+[sub_resource type="Resource" id="Resource_7radf"]
 resource_name = "generic_gravity"
-script = ExtResource("4_fjsq6")
+script = ExtResource("3_sat4e")
 Name = "generic_gravity"
 
-[sub_resource type="Resource" id="Resource_mqqnp"]
-script = ExtResource("5_27hs1")
-TraitValuesDict = Dictionary[ExtResource("4_fjsq6"), float]({
-SubResource("Resource_iivwa"): 25.0,
-SubResource("Resource_t6mu6"): 8.0,
-SubResource("Resource_dscr4"): 20.0,
-SubResource("Resource_ppkqq"): 50.0,
-SubResource("Resource_xxmdo"): 35.0,
-SubResource("Resource_y3her"): 0.5,
-SubResource("Resource_ahnjs"): 20.0,
-SubResource("Resource_fafpq"): 32.0
+[sub_resource type="Resource" id="Resource_fafpq"]
+script = ExtResource("4_fjsq6")
+TraitValuesDict = Dictionary[ExtResource("3_sat4e"), float]({
+SubResource("Resource_uy6xw"): 25.0,
+SubResource("Resource_u056q"): 8.0,
+SubResource("Resource_8ie50"): 0.375,
+SubResource("Resource_c3jdb"): 1.5,
+SubResource("Resource_k7nyx"): 20.0,
+SubResource("Resource_lf3id"): 50.0,
+SubResource("Resource_w5bov"): 35.0,
+SubResource("Resource_mh833"): 0.5,
+SubResource("Resource_ll5eb"): 20.0,
+SubResource("Resource_7radf"): 32.0
 })
 
 [sub_resource type="Resource" id="Resource_qwv27"]
@@ -94,7 +106,7 @@ platform_floor_layers = 4294963965
 platform_wall_layers = 4294963965
 script = ExtResource("1_44rt4")
 Data = ExtResource("2_sat4e")
-EntityTraits = SubResource("Resource_mqqnp")
+EntityTraits = SubResource("Resource_fafpq")
 HudPack = SubResource("Resource_qwv27")
 _costumeHolder = NodePath("CostumeHolder")
 Skeleton = NodePath("Skeleton3D")

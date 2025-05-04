@@ -8,6 +8,7 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 	private EntityBehaviour? previousBehaviour;
 	private PromptControl? dismountPrompt;
 
+	protected sealed override CharacterBody3D.MotionModeEnum MotionMode => CharacterBody3D.MotionModeEnum.Floating;
 	protected abstract Transform3D SittingPosition { get; }
 	protected override bool IsOneTime { get; } = true;
 

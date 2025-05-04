@@ -10,6 +10,7 @@ using Godot;
 [GlobalClass]
 public abstract partial class EntityBehaviour : Behaviour<EntityBehaviour> {
 	[Export] public Entity Entity;
+	protected abstract CharacterBody3D.MotionModeEnum MotionMode { get; }
 
 
 
@@ -24,6 +25,10 @@ public abstract partial class EntityBehaviour : Behaviour<EntityBehaviour> {
 			Stop();
 			throw new ArgumentNullException($"Could not start Behaviour {GetType().Name}, no reference to an Entity");
 		}
+
+		Entity.MotionMode = MotionMode;
+
+		GD.Print($"Starting Behaviour {GetType().Name} on Entity {Entity.Name}");
 
 		base._Start(previousBehaviour);
 	}

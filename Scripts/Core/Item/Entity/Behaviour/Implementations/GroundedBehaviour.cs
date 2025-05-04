@@ -2,7 +2,6 @@ namespace LandlessSkies.Core;
 
 using Godot;
 using SevenDev.Boundless.Utility;
-using static Godot.CharacterBody3D;
 
 [Tool]
 public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHandler {
@@ -14,6 +13,8 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 	protected readonly Countdown coyoteTimer = new(150, false);
 	protected readonly Countdown jumpCooldown = new(200, false);
 
+	protected sealed override CharacterBody3D.MotionModeEnum MotionMode => CharacterBody3D.MotionModeEnum.Grounded;
+
 
 	protected GroundedBehaviour() : this(null!) { }
 	public GroundedBehaviour(Entity entity, JumpAction.Builder? jumpAction = null) : base(entity) {
@@ -22,12 +23,13 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 
 
 	protected override void _Start(EntityBehaviour? previousBehaviour) {
-		Entity.GlobalForward = Entity.GlobalForward.SlideOnFace(Entity.UpDirection).Normalized();
-		Entity.GlobalBasis = Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection);
+		base._Start(previousBehaviour);
 
-		Entity.MotionMode = MotionModeEnum.Grounded;
+		NormalizeRotation();
 	}
 	protected override void _Stop(EntityBehaviour? nextBehaviour) {
+		base._Stop(nextBehaviour);
+
 		DisavowPlayer();
 	}
 
@@ -43,17 +45,18 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 			Inputs.MoveLeft, Inputs.MoveRight,
 			Inputs.MoveForward, Inputs.MoveBackward
 		).ClampMagnitude(1f);
-		player.CameraController.GetGroundedMovement(Entity.UpDirection, input, out _, out Vector3 movement);
 
-		float speedSquared = movement.LengthSquared();
-		MovementType type = speedSquared switch {
-			_ when speedSquared <= 0.25f || player.InputDevice.IsActionPressed(Inputs.Walk) => MovementType.Walk,
-			_ when player.InputDevice.IsActionPressed(Inputs.Evade) => MovementType.Sprint,
-			_ => MovementType.Run
-		};
+		if (player.CameraController.GetGroundedMovement(Entity.UpDirection, input, out _, out Vector3 movement)) {
+			float speedSquared = movement.LengthSquared();
+			MovementType type = speedSquared switch {
+				_ when speedSquared.IsZeroApprox() => MovementType.Idle,
+				_ when speedSquared <= 0.25f || player.InputDevice.IsActionPressed(Inputs.Walk) => MovementType.Slow,
+				_ when player.InputDevice.IsActionPressed(Inputs.Evade) => MovementType.Fast,
+				_ => MovementType.Normal,
+			};
 
-		Move(movement, type);
-
+			Move(movement, type);
+		}
 
 		if (player.Entity == Entity && player.CameraController.SetOrAddBehaviour<GravitatedCameraBehaviour>(
 			() => new(player.CameraController),

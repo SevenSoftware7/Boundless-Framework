@@ -1,8 +1,8 @@
 namespace LandlessSkies.Core;
 
+using System.Collections.Generic;
 using Godot;
 using SevenDev.Boundless.Utility;
-using static Godot.CharacterBody3D;
 
 [Tool]
 [GlobalClass]
@@ -15,7 +15,10 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 	[Export] private Water? Water;
 	private EntityBehaviour? previousBehaviour;
 
-	private float _moveSpeed;
+	private Vector3 _targetMovement;
+	private Vector3 _currentMovement;
+	private float _targetSpeed;
+	private float _currentSpeed;
 
 	private float _floatingDisplacement = 0f;
 
@@ -25,6 +28,7 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 	private bool _jumpInput;
 
 
+	protected sealed override CharacterBody3D.MotionModeEnum MotionMode => CharacterBody3D.MotionModeEnum.Floating;
 
 	public float EntityCenterOfMass => Entity.CenterOfMass is null ? (Entity.GlobalPosition.Y + CenterOfMassOffset) : Entity.CenterOfMass.GlobalPosition.Y;
 	public float OffsetToWaterSurface => _waterSurface + _waterDisplacement - EntityCenterOfMass;
@@ -46,6 +50,16 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 	}
 
 
+	public override void Move(Vector3 movement, MovementType movementType = MovementType.Normal) {
+		float speed = Entity.GetTraitValue(Traits.GenericMoveSpeed);
+		_targetSpeed = movementType switch {
+			MovementType.Slow => Entity.GetTraitValue(Traits.GenericSlowMoveSpeedMultiplier) * speed,
+			MovementType.Fast => Entity.GetTraitValue(Traits.GenericFastMoveSpeedMultiplier) * speed,
+			MovementType.Normal or _ => speed,
+		};
+		_targetMovement = movement.Normalized();
+	}
+
 
 	protected override Vector3 ProcessInertia(double delta) {
 		float mult = Mathf.Max(1 - 6f * (float)delta, 0f);
@@ -61,10 +75,10 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 		bool isOnWaterSurface = distanceToWaterSurface <= SurfaceThreshold;
 
 
-		float newSpeed = Entity.GetTraitValue(Traits.GenericMoveSpeed);
+		_currentMovement = _targetMovement;
 
-		float speedDelta = Entity.GetTraitValue(_moveSpeed < newSpeed ? Traits.GenericAcceleration : Traits.GenericDeceleration);
-		_moveSpeed = _moveSpeed.MoveToward(newSpeed, speedDelta * floatDelta);
+		float speedDelta = Entity.GetTraitValue(_currentSpeed < _targetSpeed ? Traits.GenericAcceleration : Traits.GenericDeceleration);
+		_currentSpeed = _currentSpeed.MoveToward(_targetSpeed, speedDelta * floatDelta);
 
 
 		// ----- Rotation & Movement -----
@@ -85,7 +99,9 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 			Entity.Gravity = Entity.Gravity.MoveToward(floatingDisplacementVector, 12f * floatDelta);
 		}
 
-		return Entity.Movement = _movement.Normalized() * _moveSpeed;
+		_targetMovement = Vector3.Zero;
+		_targetSpeed = 0f;
+		return Entity.Movement = _currentMovement * _currentSpeed;
 	}
 
 
@@ -113,18 +129,19 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 	}
 
 	protected override void _Start(EntityBehaviour? previousBehaviour) {
+		base._Start(previousBehaviour);
+
 		this.previousBehaviour = previousBehaviour;
 
-		Entity.GlobalForward = Entity.GlobalForward.SlideOnFace(Entity.UpDirection).Normalized();
-		Entity.GlobalBasis = Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection);
-
-		Entity.MotionMode = MotionModeEnum.Floating;
+		NormalizeRotation();
 
 		WaterDisplacementEffect.Subscribers.Add(this);
 	}
 	protected override void _Stop(EntityBehaviour? nextBehaviour) {
+		base._Stop(nextBehaviour);
+
 		if (_jumpInput && OffsetToWaterSurface <= 0f && nextBehaviour is GroundedBehaviour groundedBehaviour) {
-			groundedBehaviour.Jump(true);
+			groundedBehaviour.Jump(force: true);
 		}
 
 		DisavowPlayer();
@@ -140,25 +157,29 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 			Inputs.MoveLeft, Inputs.MoveRight,
 			Inputs.MoveForward, Inputs.MoveBackward
 		).ClampMagnitude(1f);
-		player.CameraController.GetCameraRelativeMovement(input, out _, out Vector3 movement);
 
-		if (player.CameraController.SetOrAddBehaviour<GravitatedCameraBehaviour>(() => new(player.CameraController), out var cameraBehaviour)) {
+		if (player.CameraController.GetCameraRelativeMovement(input, out _, out Vector3 movement)) {
+			if (IsOnWaterSurface) {
+				movement = movement.SlideOnFace(-Entity.UpDirection);
+			}
+
+			_jumpInput = player.InputDevice.IsActionPressed(Inputs.Jump);
+			if (_jumpInput) {
+				movement = (movement + Entity.UpDirection).ClampMagnitude(1f);
+			}
+
+			Move(movement);
+		}
+
+		if (player.CameraController.SetOrAddBehaviour<GravitatedCameraBehaviour>(
+			() => new(player.CameraController),
+			out var cameraBehaviour)
+		) {
 			cameraBehaviour.Subject = Entity;
 			cameraBehaviour.MoveCamera(
 				player.InputDevice.GetVector(Inputs.LookLeft, Inputs.LookRight, Inputs.LookDown, Inputs.LookUp) * player.InputDevice.Sensitivity
 			);
 		}
-
-		if (IsOnWaterSurface) {
-			movement = movement.SlideOnFace(-Entity.UpDirection);
-		}
-
-		_jumpInput = player.InputDevice.IsActionPressed(Inputs.Jump);
-		if (_jumpInput) {
-			movement = (movement + Entity.UpDirection).ClampMagnitude(1f);
-		}
-
-		Move(movement);
 	}
 
 	public virtual void DisavowPlayer() {

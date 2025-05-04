@@ -13,6 +13,8 @@ public partial class TraitsCollection : Resource, IDictionary<Trait, float>, IRe
 	public static readonly Dictionary<Trait, float> DefaultTraitValues = new() {
 		{ Traits.GenericMaxHealth, 25f },
 		{ Traits.GenericMoveSpeed, 8f },
+		{ Traits.GenericSlowMoveSpeedMultiplier, 0.375f },
+		{ Traits.GenericFastMoveSpeedMultiplier, 1.5f },
 		{ Traits.GenericTurnSpeed, 20f },
 		{ Traits.GenericAcceleration, 50f },
 		{ Traits.GenericDeceleration, 35f },
@@ -80,6 +82,12 @@ public partial class TraitsCollection : Resource, IDictionary<Trait, float>, IRe
 		TraitValues.Clear();
 
 		EmitSignalPropertyListChanged();
+	}
+
+	public float GetOrDefault(Trait key, float defaultValue = default) {
+		if (TraitValues.TryGetValue(key, out float value)) return value;
+		if (DefaultTraitValues.TryGetValue(key, out value)) return value;
+		return defaultValue;
 	}
 
 	public bool ContainsKey(Trait key) => TraitValues.ContainsKey(key);

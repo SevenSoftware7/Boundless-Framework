@@ -36,8 +36,10 @@ public abstract partial class Behaviour<T> : Node where T : Behaviour<T> {
 	/// </summary>
 	/// <param name="previousBehaviour">The last behaviour to be active before this one.</param>
 	public void Start(T? previousBehaviour = null) {
-		_Start((previousBehaviour is null || previousBehaviour.IsOneTime) ? null : previousBehaviour);
+		if (IsActive) return;
 		IsActive = true;
+
+		_Start((previousBehaviour is null || previousBehaviour.IsOneTime) ? null : previousBehaviour);
 	}
 	/// <summary>
 	/// Stop the Behaviour's activity.<para/>
@@ -46,8 +48,10 @@ public abstract partial class Behaviour<T> : Node where T : Behaviour<T> {
 	/// </summary>
 	/// <param name="nextBehaviour">The next behaviour to be activated after this one.</param>
 	public void Stop(T? nextBehaviour = null) {
-		_Stop(nextBehaviour);
+		if (!IsActive) return;
 		IsActive = false;
+
+		_Stop(nextBehaviour);
 
 		if (IsOneTime) {
 			this.UnparentAndQueueFree();

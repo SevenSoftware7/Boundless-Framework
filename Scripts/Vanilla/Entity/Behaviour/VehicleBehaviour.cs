@@ -1,5 +1,6 @@
 namespace LandlessSkies.Vanilla;
 
+using System.Collections.Generic;
 using Godot;
 using LandlessSkies.Core;
 using SevenDev.Boundless.Utility;
@@ -14,6 +15,8 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 	private bool _gravityShift;
 	private bool _drifting;
 
+	private Vector3 _movement;
+	private float _speed;
 	private Vector3 _inertiaDirection;
 	private float _inertia;
 
@@ -23,6 +26,18 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 
 	protected VehicleBehaviour() : this(null!) { }
 	public VehicleBehaviour(Entity entity) : base(entity, new BipedJumpAction.Builder()) { }
+
+
+	public override void Move(Vector3 movement, MovementType movementType = MovementType.Normal) {
+		float speed = Entity.GetTraitValue(Traits.GenericMoveSpeed);
+		_speed = movementType switch {
+			MovementType.Slow => Entity.GetTraitValue(Traits.GenericSlowMoveSpeedMultiplier) * speed,
+			MovementType.Fast => Entity.GetTraitValue(Traits.GenericFastMoveSpeedMultiplier) * speed,
+			MovementType.Normal or _ => speed,
+		};
+
+		_movement = movement.Normalized();
+	}
 
 
 
@@ -46,8 +61,7 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 	protected override Vector3 ProcessGroundedMovement(double delta) {
 		float floatDelta = (float)delta;
 
-		float moveSpeed = Entity.GetTraitValue(Traits.GenericMoveSpeed);
-		float speedReverseLerp = Mathf.InverseLerp(0f, moveSpeed, _inertia);
+		float speedReverseLerp = Mathf.InverseLerp(0f, _speed, _inertia);
 		bool isOnFloor = Entity.IsOnFloor();
 		Vector3 entityUp = Entity.UpDirection;
 		Vector3 entityForward = Entity.GlobalForward;
@@ -76,12 +90,9 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 
 
 		float newInertia = 0f;
-		Vector3 direction = Vector3.Zero;
 		if (!_movement.IsEqualApprox(Vector3.Zero)) {
-			direction = _movement.Normalized();
-
-			newInertia = Mathf.Clamp(entityForward.Dot(direction) + 0.25f, 0f, 1f) * moveSpeed;
-			entityForward = entityForward.Slerp(direction, Entity.GetTraitValue(Traits.GenericTurnSpeed) * floatDelta);
+			newInertia = Mathf.Clamp(entityForward.Dot(_movement) + 0.75f, 0f, 1f) * _speed;
+			entityForward = entityForward.Slerp(_movement, Entity.GetTraitValue(Traits.GenericTurnSpeed) * floatDelta);
 		}
 
 
@@ -104,7 +115,7 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 			Vector3 leanForward = toGroundUp * entityForward;
 			if (!isOnFloor) leanForward = (leanForward + groundUp * 0.25f * speedReverseLerp).Normalized();
 
-			Vector3 leanRight = direction.Dot(entityRight) * entityRight;
+			Vector3 leanRight = _movement.Dot(entityRight) * entityRight;
 			Vector3 leanUp = (entityUp + leanRight).Normalized();
 
 			_modelForward = _modelForward.SafeSlerp(leanForward, 14f * floatDelta);
@@ -119,6 +130,7 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 		Entity.GlobalBasis = Basis.LookingAt(entityForward, Entity.UpDirection);
 
 		_movement = Vector3.Zero;
+		_speed = 0f;
 		return _inertiaDirection * _inertia;
 	}
 
@@ -138,5 +150,4 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 		_inertiaDirection = Vector3.Zero;
 		_inertia = 0f;
 	}
-
 }

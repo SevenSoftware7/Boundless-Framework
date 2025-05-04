@@ -1,4 +1,4 @@
-[gd_scene load_steps=133 format=3 uid="uid://b505xodur2iff"]
+[gd_scene load_steps=122 format=3 uid="uid://b505xodur2iff"]
 
 [ext_resource type="Script" uid="uid://cvkvg45cwuu2" path="res://Scripts/Core/MainNode.cs" id="1_u7mjy"]
 [ext_resource type="RDShaderFile" uid="uid://br3hg0ejs6wif" path="res://Resources/Rendering/Shaders/FetchWaterData.glsl" id="2_5l7vn"]
@@ -28,7 +28,6 @@
 [ext_resource type="AnimationLibrary" uid="uid://dvww6dpnwphxd" path="res://Resources/Weapons/Eleos/EleosAnimations.tres" id="21_xvtyr"]
 [ext_resource type="AnimationLibrary" uid="uid://b0gic15n8ccgn" path="res://Resources/Weapons/Epiphron/EpiphronAnimations.tres" id="22_u7mjy"]
 [ext_resource type="AnimationLibrary" uid="uid://caafq3ok75ukn" path="res://Resources/Weapons/Pax/PaxAnimations.tres" id="23_4yxf6"]
-[ext_resource type="Script" uid="uid://cpqri6cw2hye2" path="res://Scripts/Core/Traits/TraitsCollection.cs" id="23_qta6b"]
 [ext_resource type="PackedScene" uid="uid://b7hcoc81x5g0i" path="res://Resources/Companions/Erebos/Erebos.tscn" id="26_ds8t8"]
 [ext_resource type="PackedScene" uid="uid://7ic4jncm8p1a" path="res://Scenes/Player.tscn" id="26_rkn04"]
 [ext_resource type="Script" uid="uid://bai7ordbru3t1" path="res://Scripts/Core/Water/WaterFloater.cs" id="29_nhfxh"]
@@ -1449,7 +1448,7 @@ size = Vector3(3, 1, 6)
 [sub_resource type="BoxMesh" id="BoxMesh_juan7"]
 size = Vector3(3, 1, 6)
 
-[sub_resource type="Resource" id="Resource_qta6b"]
+[sub_resource type="Resource" id="Resource_4yxf6"]
 resource_name = "generic_max_health"
 script = ExtResource("17_x3rx7")
 Name = "generic_max_health"
@@ -1459,7 +1458,7 @@ resource_name = "generic_max_health = 1"
 script = ExtResource("18_6heos")
 Value = 1.0
 _isStacking = false
-TraitResource = SubResource("Resource_qta6b")
+TraitResource = SubResource("Resource_4yxf6")
 metadata/_custom_type_script = ExtResource("18_6heos")
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_d0jor"]
@@ -1490,72 +1489,6 @@ albedo_color = Color(0.025, 0, 0.75, 0.498039)
 
 [sub_resource type="SphereMesh" id="SphereMesh_nkuww"]
 material = SubResource("StandardMaterial3D_k6yo1")
-
-[sub_resource type="Resource" id="Resource_x3rx7"]
-resource_name = "generic_max_health"
-script = ExtResource("17_x3rx7")
-Name = "generic_max_health"
-
-[sub_resource type="Resource" id="Resource_6heos"]
-resource_name = "generic_move_speed"
-script = ExtResource("17_x3rx7")
-Name = "generic_move_speed"
-
-[sub_resource type="Resource" id="Resource_vvnwx"]
-resource_name = "generic_turn_speed"
-script = ExtResource("17_x3rx7")
-Name = "generic_turn_speed"
-
-[sub_resource type="Resource" id="Resource_vs04g"]
-resource_name = "generic_acceleration"
-script = ExtResource("17_x3rx7")
-Name = "generic_acceleration"
-
-[sub_resource type="Resource" id="Resource_6ehlx"]
-resource_name = "generic_deceleration"
-script = ExtResource("17_x3rx7")
-Name = "generic_deceleration"
-
-[sub_resource type="Resource" id="Resource_utia5"]
-resource_name = "generic_step_height"
-script = ExtResource("17_x3rx7")
-Name = "generic_step_height"
-
-[sub_resource type="Resource" id="Resource_f7hdo"]
-resource_name = "generic_jump_height"
-script = ExtResource("17_x3rx7")
-Name = "generic_jump_height"
-
-[sub_resource type="Resource" id="Resource_clvyn"]
-resource_name = "generic_gravity"
-script = ExtResource("17_x3rx7")
-Name = "generic_gravity"
-
-[sub_resource type="Resource" id="Resource_d8m2u"]
-script = ExtResource("23_qta6b")
-TraitValuesDict = Dictionary[ExtResource("17_x3rx7"), float]({
-SubResource("Resource_x3rx7"): 25.0,
-SubResource("Resource_6heos"): 37.5,
-SubResource("Resource_vvnwx"): 1.75,
-SubResource("Resource_vs04g"): 50.0,
-SubResource("Resource_6ehlx"): 35.0,
-SubResource("Resource_utia5"): 0.3,
-SubResource("Resource_f7hdo"): 15.0,
-SubResource("Resource_clvyn"): 32.0
-})
-
-[sub_resource type="Resource" id="Resource_ep8v8"]
-script = ExtResource("23_qta6b")
-TraitValuesDict = Dictionary[ExtResource("17_x3rx7"), float]({
-SubResource("Resource_x3rx7"): 25.0,
-SubResource("Resource_6heos"): 8.0,
-SubResource("Resource_vvnwx"): 20.0,
-SubResource("Resource_vs04g"): 50.0,
-SubResource("Resource_6ehlx"): 35.0,
-SubResource("Resource_utia5"): 0.5,
-SubResource("Resource_f7hdo"): 20.0,
-SubResource("Resource_clvyn"): 32.0
-})
 
 [sub_resource type="Animation" id="Animation_2ppbj"]
 length = 0.001
@@ -2040,12 +1973,10 @@ transform = Transform3D(-0.730305, -0.683105, -0.00474517, 2.32831e-09, -0.00694
 
 [node name="Bike" parent="." instance=ExtResource("20_pcyav")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.10534, 2, 32.9924)
-EntityTraits = SubResource("Resource_d8m2u")
 
 [node name="Eos" parent="." instance=ExtResource("9_0jt21")]
 process_priority = -10
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.873384, 2, 34.141)
-EntityTraits = SubResource("Resource_ep8v8")
 
 [node name="AnimationPlayer" parent="Eos" index="4"]
 libraries = {

@@ -2,6 +2,7 @@ namespace LandlessSkies.Core;
 
 using System;
 using System.ComponentModel.Design;
+using System.Diagnostics.CodeAnalysis;
 using Godot;
 using SevenDev.Boundless.Utility;
 
@@ -13,7 +14,7 @@ public partial class CameraController3D : Camera3D {
 	public ServiceContainer Behaviours = new();
 
 
-	public bool SetOrAddBehaviour<T>(Func<T> creator, out T behaviour) where T : CameraBehaviour {
+	public bool SetOrAddBehaviour<T>(Func<T> creator, [NotNullWhen(true)] out T behaviour) where T : CameraBehaviour {
 		Type tType = typeof(T);
 		if (CurrentBehaviour is T tBehaviour) {
 			behaviour = tBehaviour;
@@ -54,12 +55,19 @@ public partial class CameraController3D : Camera3D {
 		CurrentBehaviour = behaviour.SafeReparentTo(this);
 	}
 
-	public void GetGroundedMovement(Vector3 upDirection, Vector2 moveInput, out Basis camRotation, out Vector3 groundedMovement) {
+	public bool GetGroundedMovement(Vector3 upDirection, Vector2 moveInput, out Basis camRotation, out Vector3 groundedMovement) {
 		if (!IsNodeReady()) {
 			camRotation = Basis.Identity;
 			groundedMovement = Vector3.Zero;
-			return;
+			return false;
 		}
+		Vector3 rawInput = new(moveInput.X, 0, moveInput.Y);
+		if (rawInput.LengthSquared().IsZeroApprox()) {
+			camRotation = Basis.Identity;
+			groundedMovement = Vector3.Zero;
+			return false;
+		}
+
 		Vector3 camRight = GlobalBasis.X;
 		float localAlignment = Mathf.Ceil(upDirection.Dot(GlobalBasis.Y));
 		Vector3 targetUp = upDirection * (localAlignment * 2f - 1f);
@@ -67,12 +75,21 @@ public partial class CameraController3D : Camera3D {
 
 		camRotation = Basis.LookingAt(groundedCamForward, targetUp);
 
-		groundedMovement = camRotation * new Vector3(moveInput.X, 0, moveInput.Y).ClampMagnitude(1f);
+		groundedMovement = camRotation * rawInput.ClampMagnitude(1f);
+
+		return true;
 	}
 
-	public void GetCameraRelativeMovement(Vector2 moveInput, out Basis camRotation, out Vector3 cameraRelativeMovement) {
-		camRotation = GlobalBasis;
+	public bool GetCameraRelativeMovement(Vector2 moveInput, out Basis camRotation, out Vector3 cameraRelativeMovement) {
+		Vector3 rawInput = new(moveInput.X, 0, moveInput.Y);
+		if (rawInput.LengthSquared().IsZeroApprox()) {
+			camRotation = Basis.Identity;
+			cameraRelativeMovement = Vector3.Zero;
+			return false;
+		}
 
-		cameraRelativeMovement = camRotation * new Vector3(moveInput.X, 0, moveInput.Y);
+		camRotation = GlobalBasis;
+		cameraRelativeMovement = camRotation * rawInput.ClampMagnitude(1f);
+		return true;
 	}
 }

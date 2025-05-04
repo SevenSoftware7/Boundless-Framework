@@ -6,6 +6,8 @@ using Godot;
 public static class Traits {
 	public static readonly Trait GenericMaxHealth = "generic_max_health";
 	public static readonly Trait GenericMoveSpeed = "generic_move_speed";
+	public static readonly Trait GenericSlowMoveSpeedMultiplier = "generic_slow_move_speed_multiplier";
+	public static readonly Trait GenericFastMoveSpeedMultiplier = "generic_fast_move_speed_multiplier";
 	public static readonly Trait GenericTurnSpeed = "generic_turn_speed";
 	public static readonly Trait GenericAcceleration = "generic_acceleration";
 	public static readonly Trait GenericDeceleration = "generic_deceleration";
@@ -16,6 +18,8 @@ public static class Traits {
 	public static readonly List<Trait> GenericTraits = [
 		GenericMaxHealth,
 		GenericMoveSpeed,
+		GenericSlowMoveSpeedMultiplier,
+		GenericFastMoveSpeedMultiplier,
 		GenericTurnSpeed,
 		GenericAcceleration,
 		GenericDeceleration,

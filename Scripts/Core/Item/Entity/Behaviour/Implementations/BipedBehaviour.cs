@@ -1,14 +1,17 @@
 namespace LandlessSkies.Core;
 
+using System.Collections.Generic;
 using Godot;
 using SevenDev.Boundless.Utility;
 
 [Tool]
 [GlobalClass]
 public partial class BipedBehaviour : GroundedBehaviour {
-	private float _moveSpeed;
+	private Vector3 _targetDirection;
+	private Vector3 _currentDirection;
+	private float _targetSpeed;
+	private float _currentSpeed;
 
-	private Vector3 _lastDirection;
 
 	private PromptControl? interactPrompt;
 	private PointerControl? interactPointer;
@@ -29,6 +32,16 @@ public partial class BipedBehaviour : GroundedBehaviour {
 		interactPointer?.Disable();
 	}
 
+
+	public override void Move(Vector3 movement, MovementType movementType = MovementType.Normal) {
+		float speed = Entity.GetTraitValue(Traits.GenericMoveSpeed);
+		_targetSpeed = movementType switch {
+			MovementType.Slow => Entity.GetTraitValue(Traits.GenericSlowMoveSpeedMultiplier) * speed,
+			MovementType.Fast => Entity.GetTraitValue(Traits.GenericFastMoveSpeedMultiplier) * speed,
+			MovementType.Normal or _ => speed,
+		};
+		_targetDirection = movement.Normalized();
+	}
 
 	public override void HandlePlayer(Player player) {
 		base.HandlePlayer(player);
@@ -82,30 +95,27 @@ public partial class BipedBehaviour : GroundedBehaviour {
 	protected override Vector3 ProcessGroundedMovement(double delta) {
 		float floatDelta = (float)delta;
 
-		// ---- Speed Calculation ----
-		float newSpeed = Mathf.Min(_movement.Length(), Entity.GetTraitValue(/* Traits.Sprint */Traits.GenericMoveSpeed));
-
-		float speedDelta = Entity.GetTraitValue(_moveSpeed < newSpeed ? Traits.GenericAcceleration : Traits.GenericDeceleration);
-		_moveSpeed = _moveSpeed.MoveToward(newSpeed, speedDelta * floatDelta);
+		float speedDelta = Entity.GetTraitValue(_currentSpeed < _targetSpeed ? Traits.GenericAcceleration : Traits.GenericDeceleration);
+		_currentSpeed = _currentSpeed.MoveToward(_targetSpeed, speedDelta * floatDelta);
 
 		// ----- Rotation & Movement -----
 		float rotationSpeed = Entity.GetTraitValue(Traits.GenericTurnSpeed);
-		float finalSpeed = Entity.TraitModifiers.ApplyTo(Traits.GenericMoveSpeed, _moveSpeed);
 
-		if (!_movement.IsZeroApprox()) {
-			Vector3 normalizedInput = _movement.Normalized();
+		Vector3 forward = Entity.GlobalForward;
+		if (!_targetDirection.IsZeroApprox()) {
+			_currentDirection = _currentDirection.Lerp(_targetDirection, rotationSpeed * floatDelta);
+			forward = forward.SafeSlerp(_targetDirection, rotationSpeed * floatDelta);
 
-			_lastDirection = _lastDirection.Lerp(normalizedInput, rotationSpeed * floatDelta);
-			Entity.GlobalForward = Entity.GlobalForward.SafeSlerp(normalizedInput, rotationSpeed * floatDelta);
-
-			finalSpeed *= Mathf.Clamp(_lastDirection.Dot(Entity.GlobalForward), 0f, 1f);
+			_currentSpeed *= Mathf.Clamp(_currentDirection.Dot(forward) + 0.5f, 0f, 1f);
+			Entity.GlobalForward = forward;
 		}
 
 
-		Basis newRotation = Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection);
+		Basis newRotation = Basis.LookingAt(forward, Entity.UpDirection);
 		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * rotationSpeed);
 
-		return _lastDirection * finalSpeed;
+		_targetDirection = Vector3.Zero;
+		_targetSpeed = 0f;
+		return _currentDirection * _currentSpeed;
 	}
-
 }

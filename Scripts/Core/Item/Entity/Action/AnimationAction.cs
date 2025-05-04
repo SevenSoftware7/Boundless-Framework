@@ -21,7 +21,7 @@ public abstract partial class AnimationAction(Entity entity, EntityAction.Builde
 	private bool _isInterruptable = false;
 
 	private Vector3 _movement = Vector3.Zero;
-	private MovementBehaviour.MovementType _movementType = MovementBehaviour.MovementType.Run;
+	private MovementBehaviour.MovementType _movementType = MovementBehaviour.MovementType.Normal;
 
 	private AnimationPlayer AnimPlayer = entity.AnimationPlayer is AnimationPlayer animPlayer
 		? animPlayer

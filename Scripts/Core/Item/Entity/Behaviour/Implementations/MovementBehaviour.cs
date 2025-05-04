@@ -1,11 +1,11 @@
 namespace LandlessSkies.Core;
 
-using System.Collections.Generic;
 using Godot;
+using SevenDev.Boundless.Utility;
+
 
 [Tool]
 public abstract partial class MovementBehaviour : EntityBehaviour {
-	protected Vector3 _movement;
 	protected override bool IsOneTime { get; } = false;
 
 	protected MovementBehaviour() : this(null!) { }
@@ -13,23 +13,17 @@ public abstract partial class MovementBehaviour : EntityBehaviour {
 
 
 
-	public void Move(Vector3 direction, MovementType movementType = MovementType.Run) {
-		float oldMagnitude = _movement.LengthSquared();
+	public abstract void Move(Vector3 movement, MovementType movementType = MovementType.Normal);
 
-		Vector3 newMovement = GetMovement(direction, movementType);
-		float newMagnitude = newMovement.LengthSquared();
+	protected void NormalizeRotation() {
+		Vector3 upDirection = Entity.UpDirection;
+		Vector3 globalForward = Entity.GlobalForward;
+		globalForward = globalForward.SlideOnFace(upDirection).Normalized();
+		Entity.GlobalForward = globalForward;
 
-		_movement = (_movement + newMovement).Normalized() * Mathf.Sqrt(Mathf.Max(oldMagnitude, newMagnitude));
+		Entity.GlobalBasis = Basis.LookingAt(globalForward, upDirection);
 	}
 
-	protected virtual Vector3 GetMovement(Vector3 direction, MovementType movementType) {
-		float speed = movementType switch {
-			// MovementType.Walk => Entity.EntityTraits.GetOrDefault(SlowSpeed),
-			// MovementType.Sprint => Entity.EntityTraits.GetOrDefault(SprintSpeed),
-			MovementType.Run or _ => Entity.EntityTraits.GetValueOrDefault(Traits.GenericMoveSpeed, 1f),
-		};
-		return direction * speed;
-	}
 
 	public override void _Process(double delta) {
 		base._Process(delta);
@@ -40,11 +34,11 @@ public abstract partial class MovementBehaviour : EntityBehaviour {
 			Entity.Velocity = ProcessMovement(delta) + ProcessInertia(delta);
 			Entity.MoveAndSlide();
 
-			if (Entity.Gravity.Dot(Entity.UpDirection) < 0) {
+			if (Entity.MotionMode == CharacterBody3D.MotionModeEnum.Grounded && Entity.Gravity.Dot(Entity.UpDirection) < 0) {
 				Entity.ApplyFloorSnap();
 			}
 
-			Entity.Movement = _movement = Vector3.Zero;
+			Entity.Movement = Vector3.Zero;
 		}
 	}
 
@@ -55,8 +49,9 @@ public abstract partial class MovementBehaviour : EntityBehaviour {
 
 
 	public enum MovementType {
-		Walk,
-		Run,
-		Sprint
+		Idle,
+		Slow,
+		Normal,
+		Fast
 	}
 }
