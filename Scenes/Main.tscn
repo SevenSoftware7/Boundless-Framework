@@ -1420,7 +1420,7 @@ shader = ExtResource("11_cp2h1")
 shader_parameter/shallow_color = Color(0.1395, 0.279225, 0.45, 1)
 shader_parameter/deep_color = Color(0.068, 0.127, 0.2, 1)
 shader_parameter/water_intensity = 0.5
-shader_parameter/water_scale = 2.0
+shader_parameter/water_scale = 15.0
 shader_parameter/water_fog_distance = 60.0
 shader_parameter/water_fog_fade = 2.5
 shader_parameter/water_transparency_distance = 3.0
@@ -1858,14 +1858,6 @@ shape = SubResource("BoxShape3D_tw615")
 
 [node name="WaterMesh" parent="Environment/Water/Water" index="1"]
 mesh = SubResource("BoxMesh_eyrr3")
-ShallowColor = Color(0.1395, 0.279225, 0.45, 1)
-DeepColor = Color(0.068, 0.127, 0.2, 1)
-WaterIntensity = 0.5
-WaterScale = 2.0
-FogDistance = 60.0
-FogFade = 2.5
-TransparencyDistance = 3.0
-TransparencyFade = 2.5
 
 [node name="GPUParticlesCollisionBox3D" parent="Environment/Water/Water" index="2"]
 size = Vector3(60, 12, 58)

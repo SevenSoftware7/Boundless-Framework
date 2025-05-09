@@ -1,8 +1,8 @@
 [gd_scene load_steps=7 format=3 uid="uid://ckd33ejkd5cqi"]
 
-[ext_resource type="Script" path="res://Scripts/Core/Water/Water.cs" id="1_wguud"]
-[ext_resource type="Shader" path="res://Resources/Rendering/Shaders/Water.gdshader" id="2_13n3k"]
-[ext_resource type="Script" path="res://Scripts/Core/Water/WaterMesh.cs" id="3_wi2hl"]
+[ext_resource type="Script" uid="uid://dgbx34hehb76a" path="res://Scripts/Core/Water/Water.cs" id="1_wguud"]
+[ext_resource type="Shader" uid="uid://ceapbykjnn2sq" path="res://Resources/Rendering/Shaders/Water.gdshader" id="2_13n3k"]
+[ext_resource type="Script" uid="uid://b6i6jq4qhapkw" path="res://Scripts/Core/Water/WaterMesh.cs" id="3_wi2hl"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_asmth"]
 size = Vector3(20, 20, 20)
@@ -10,12 +10,14 @@ size = Vector3(20, 20, 20)
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_nn348"]
 render_priority = 0
 shader = ExtResource("2_13n3k")
-shader_parameter/shallow_color = null
-shader_parameter/deep_color = null
-shader_parameter/water_intensity = 1.0
-shader_parameter/water_scale = 70.0
-shader_parameter/water_fog_start = null
-shader_parameter/water_fog_end = null
+shader_parameter/shallow_color = Color(0.1395, 0.279225, 0.45, 1)
+shader_parameter/deep_color = Color(0.068, 0.127, 0.2, 1)
+shader_parameter/water_intensity = 0.5
+shader_parameter/water_scale = 15.0
+shader_parameter/water_fog_distance = 60.0
+shader_parameter/water_fog_fade = 2.5
+shader_parameter/water_transparency_distance = 3.0
+shader_parameter/water_transparency_fade = 2.5
 
 [sub_resource type="BoxMesh" id="BoxMesh_oe5ee"]
 material = SubResource("ShaderMaterial_nn348")
@@ -34,11 +36,20 @@ Mesh = NodePath("WaterMesh")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape3D_asmth")
+debug_fill = false
 
 [node name="WaterMesh" type="MeshInstance3D" parent="."]
 layers = 4
 mesh = SubResource("BoxMesh_oe5ee")
 script = ExtResource("3_wi2hl")
+ShallowColor = Color(0.1395, 0.279225, 0.45, 1)
+DeepColor = Color(0.068, 0.127, 0.2, 1)
+WaterIntensity = 0.5
+WaterScale = 15.0
+FogDistance = 60.0
+FogFade = 2.5
+TransparencyDistance = 3.0
+TransparencyFade = 2.5
 
 [node name="GPUParticlesCollisionBox3D" type="GPUParticlesCollisionBox3D" parent="."]
 layers = 4
