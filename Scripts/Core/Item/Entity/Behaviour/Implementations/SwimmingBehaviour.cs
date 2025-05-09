@@ -1,6 +1,5 @@
 namespace LandlessSkies.Core;
 
-using System.Collections.Generic;
 using Godot;
 using SevenDev.Boundless.Utility;
 
@@ -30,9 +29,10 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 
 	protected sealed override CharacterBody3D.MotionModeEnum MotionMode => CharacterBody3D.MotionModeEnum.Floating;
 
-	public float EntityCenterOfMass => Entity.CenterOfMass is null ? (Entity.GlobalPosition.Y + CenterOfMassOffset) : Entity.CenterOfMass.GlobalPosition.Y;
-	public float OffsetToWaterSurface => _waterSurface + _waterDisplacement - EntityCenterOfMass;
-	public bool IsOnWaterSurface => Mathf.Abs(OffsetToWaterSurface) <= SurfaceThreshold;
+	public float GetEntityCenterOfMassHeight() => Entity.CenterOfMass is null ? (Entity.GlobalPosition.Y + CenterOfMassOffset) : Entity.CenterOfMass.GlobalPosition.Y;
+	public float GetWaterSurfaceHeight() => _waterSurface + _waterDisplacement;
+	public float GetOffsetToWaterSurface() => GetWaterSurfaceHeight() - GetEntityCenterOfMassHeight();
+	public bool GetIsOnWaterSurface() => Mathf.Abs(GetOffsetToWaterSurface()) <= SurfaceThreshold;
 
 	protected SwimmingBehaviour() : this(null!, null!) { }
 	public SwimmingBehaviour(Entity entity, Water waterArea) : base(entity) {
@@ -70,7 +70,8 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 		float floatDelta = (float)delta;
 		UpdateWaterSurfaceHeight();
 
-		float offsetToWaterSurface = OffsetToWaterSurface;
+		float surfaceHeight = GetWaterSurfaceHeight();
+		float offsetToWaterSurface = surfaceHeight - GetEntityCenterOfMassHeight();
 		float distanceToWaterSurface = Mathf.Abs(offsetToWaterSurface);
 		bool isOnWaterSurface = distanceToWaterSurface <= SurfaceThreshold;
 
@@ -116,7 +117,7 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 
 	public override void _Process(double delta) {
 		if (!Engine.IsEditorHint() && Water is not null) {
-			bool isSubmerged = EntityCenterOfMass < _waterSurface;
+			bool isSubmerged = GetEntityCenterOfMassHeight() < _waterSurface;
 			bool hasFoothold = Entity.IsOnWall() && Entity.GetWallNormal().Dot(Entity.UpDirection) >= 0f;
 			if (IsActive && !isSubmerged && hasFoothold) {
 				ExitWater();
@@ -140,7 +141,7 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 	protected override void _Stop(EntityBehaviour? nextBehaviour) {
 		base._Stop(nextBehaviour);
 
-		if (_jumpInput && OffsetToWaterSurface <= 0f && nextBehaviour is GroundedBehaviour groundedBehaviour) {
+		if (_jumpInput && GetOffsetToWaterSurface() <= 0f && nextBehaviour is GroundedBehaviour groundedBehaviour) {
 			groundedBehaviour.Jump(force: true);
 		}
 
@@ -157,19 +158,22 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 			Inputs.MoveLeft, Inputs.MoveRight,
 			Inputs.MoveForward, Inputs.MoveBackward
 		).ClampMagnitude(1f);
+		_jumpInput = player.InputDevice.IsActionPressed(Inputs.Jump);
 
-		if (player.CameraController.GetCameraRelativeMovement(input, out _, out Vector3 movement)) {
-			if (IsOnWaterSurface) {
-				movement = movement.SlideOnFace(-Entity.UpDirection);
-			}
 
-			_jumpInput = player.InputDevice.IsActionPressed(Inputs.Jump);
-			if (_jumpInput) {
-				movement = (movement + Entity.UpDirection).ClampMagnitude(1f);
-			}
-
-			Move(movement);
+		bool hasMovementInput = player.CameraController.GetCameraRelativeMovement(input, out _, out Vector3 inputMovement);
+		if (hasMovementInput && GetIsOnWaterSurface()) {
+			inputMovement = inputMovement.SlideOnFace(-Entity.UpDirection);
 		}
+
+		if (_jumpInput) {
+			inputMovement = (inputMovement + Entity.UpDirection).ClampMagnitude(1f);
+		}
+
+		if (hasMovementInput || _jumpInput) {
+			Move(inputMovement);
+		}
+
 
 		if (player.CameraController.SetOrAddBehaviour<GravitatedCameraBehaviour>(
 			() => new(player.CameraController),
