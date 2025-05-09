@@ -105,8 +105,11 @@ CostumeKeyProvider = ExtResource("8_5fcav")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 shape = SubResource("CapsuleShape3D_p1o1o")
+debug_fill = false
 
-[node name="CenterOfMass" type="Node3D" parent="CollisionShape3D"]
+[node name="CenterOfMass" type="Marker3D" parent="CollisionShape3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.787365)
+gizmo_extents = 1.2
 
 [node name="Seat" type="Area3D" parent="." node_paths=PackedStringArray("Vehicle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1.2)
@@ -116,10 +119,12 @@ Vehicle = NodePath("../VehicleBehaviour")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Seat"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 0, 0)
 shape = SubResource("BoxShape3D_vd6cg")
+debug_fill = false
 
 [node name="CollisionShape3D_2" type="CollisionShape3D" parent="Seat"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, 0, 0)
 shape = SubResource("BoxShape3D_vd6cg")
+debug_fill = false
 
 [node name="VehicleBehaviour" type="Node" parent="." node_paths=PackedStringArray("Entity")]
 script = ExtResource("5_6pb3w")
