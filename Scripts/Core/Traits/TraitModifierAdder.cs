@@ -2,6 +2,7 @@ namespace LandlessSkies.Core;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Godot;
 
 public partial class TraitModifierAdder : TraitModifierOperation {
@@ -11,7 +12,11 @@ public partial class TraitModifierAdder : TraitModifierOperation {
 	public TimeSpan Delay { init => _delaySec = value.TotalSeconds; }
 	private double _delaySec = 0;
 
-	public TraitModifierCollection.InterpFunction InterpolationFunction { get; init; } = Mathf.Lerp;
+	[AllowNull]
+	public TraitModifierCollection.InterpFunction InterpolationFunction {
+		get;
+		init => field = value ?? Mathf.Lerp;
+	} = Mathf.Lerp;
 	private double _elapsedSec = 0f;
 
 

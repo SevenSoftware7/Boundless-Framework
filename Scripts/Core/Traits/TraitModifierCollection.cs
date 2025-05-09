@@ -61,17 +61,11 @@ public sealed class TraitModifierCollection : ICollection<ITraitModifier> {
 			return;
 		}
 
-		TraitModifierAdder adder =
-			function is null
-			? new TraitModifierAdder(this, item) {
-				Duration = TimeSpan.FromMilliseconds(durationMilliseconds),
-				Delay = TimeSpan.FromMilliseconds(delayMilliseconds)
-			}
-			: new TraitModifierAdder(this, item) {
-				Duration = TimeSpan.FromMilliseconds(durationMilliseconds),
-				Delay = TimeSpan.FromMilliseconds(delayMilliseconds),
-				InterpolationFunction = function
-			};
+		TraitModifierAdder adder = new(this, item) {
+			Duration = TimeSpan.FromMilliseconds(durationMilliseconds),
+			Delay = TimeSpan.FromMilliseconds(delayMilliseconds),
+			InterpolationFunction = function
+		};
 
 		node.AddChild(adder);
 	}
@@ -130,17 +124,11 @@ public sealed class TraitModifierCollection : ICollection<ITraitModifier> {
 			return;
 		}
 
-		TraitModifierRemover remover =
-			function is null
-			? new TraitModifierRemover(this, item) {
-				Duration = TimeSpan.FromMilliseconds(durationMilliseconds),
-				Delay = TimeSpan.FromMilliseconds(delayMilliseconds)
-			}
-			: new TraitModifierRemover(this, item) {
-				Duration = TimeSpan.FromMilliseconds(durationMilliseconds),
-				Delay = TimeSpan.FromMilliseconds(delayMilliseconds),
-				InterpolationFunction = function
-			};
+		TraitModifierRemover remover = new(this, item) {
+			Duration = TimeSpan.FromMilliseconds(durationMilliseconds),
+			Delay = TimeSpan.FromMilliseconds(delayMilliseconds),
+			InterpolationFunction = function
+		};
 
 		node.AddChild(remover);
 	}
