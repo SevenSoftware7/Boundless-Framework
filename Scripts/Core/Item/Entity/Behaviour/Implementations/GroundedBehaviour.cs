@@ -7,6 +7,7 @@ using SevenDev.Boundless.Utility;
 public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHandler {
 	protected JumpAction.Builder? JumpAction { get; init; }
 
+	protected Vector3 _gravityVelocity;
 	protected Vector3 _jumpDirection;
 
 	protected readonly Countdown jumpBuffer = new(125, false);
@@ -29,6 +30,8 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 	}
 	protected override void _Stop(EntityBehaviour? nextBehaviour) {
 		base._Stop(nextBehaviour);
+
+		_gravityVelocity = Vector3.Zero;
 
 		DisavowPlayer();
 	}
@@ -160,7 +163,9 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 
 
 	protected override Vector3 ProcessInertia(double delta) {
+		float floatDelta = (float)delta;
 		Vector3 upDirection = Entity.UpDirection;
+
 		if (Entity.IsOnCeiling()) {
 			Entity.Gravity = Entity.Gravity.SlideOnFace(-upDirection);
 			Entity.Inertia = Entity.Inertia.SlideOnFace(-upDirection);
@@ -169,13 +174,17 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 		bool isOnFloor = Entity.IsOnFloor();
 
 		if (isOnFloor) {
-			Entity.Gravity = Entity.Gravity.SlideOnFace(upDirection);
-			Entity.Inertia = Entity.Inertia.SlideOnFace(upDirection);
+			_gravityVelocity = Vector3.Zero;
 
-			Entity.Gravity = Entity.Gravity.MoveToward(Vector3.Zero, 25f * (float)delta);
+			Vector3 newGravity = Entity.Gravity.SlideOnFace(upDirection).MoveToward(Vector3.Zero, 25f * floatDelta);
+			Vector3 newInertia = Entity.Inertia.SlideOnFace(upDirection);
+
 			if (!coyoteTimer.IsCompleted) {
-				Entity.Inertia = Entity.Inertia.MoveToward(Vector3.Zero, 25f * (float)delta);
+				newInertia = newInertia.MoveToward(Vector3.Zero, 25f * floatDelta);
 			}
+
+			Entity.Gravity = newGravity;
+			Entity.Inertia = newInertia;
 		}
 		else {
 			float fallSpeed = Entity.GetTraitValue(Traits.GenericGravity);
@@ -183,13 +192,12 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 			float fallInertia = Entity.Gravity.Dot(-upDirection);
 			Vector3 targetGravity = -upDirection * fallSpeed;
 
-			const float fallIncreaseFactor = 1.75f;
-
 			// Slightly ramp up inertia when falling
-			float inertiaRampFactor = Mathf.Lerp(1f, fallIncreaseFactor, (fallInertia * 0.5f + 0.5f).Clamp01());
+			float accelerateSpeed = Mathf.Clamp(Mathf.Remap(fallInertia, -2f, 2f, 0.9f, 0.4f), 0.4f, 0.9f);
+			// float accelerateSpeed = Mathf.Lerp(1.5f, 0.7f, Mathf.Remap(fallInertia, -2f, 2f, 0f, 1f).Clamp01());
 
-			Entity.Gravity = Entity.Gravity.MoveToward(targetGravity, 45f * inertiaRampFactor * (float)delta);
-			Entity.Inertia = Entity.Inertia.MoveToward(Vector3.Zero, 0.5f * (float)delta);
+			Entity.Gravity = Entity.Gravity.SmoothDamp(targetGravity, ref _gravityVelocity, accelerateSpeed, Mathf.Inf, floatDelta);
+			Entity.Inertia = Entity.Inertia.MoveToward(Vector3.Zero, 0.5f * floatDelta);
 		}
 
 

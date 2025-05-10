@@ -4,9 +4,9 @@ using Godot;
 using SevenDev.Boundless.Utility;
 
 public partial class BipedJumpAction : JumpAction, IPlayerHandler {
-	public const float INITIAL_JUMP_HEIGHT_FRACTION = 2f / 3f;
+	public const float INITIAL_JUMP_HEIGHT_FRACTION = 4f / 5f;
 
-	private float maxDistance = EntityStats.DEFAULT_JUMP_HEIGHT * (1f - INITIAL_JUMP_HEIGHT_FRACTION);
+	private float maxDistance = 20f * (1f - INITIAL_JUMP_HEIGHT_FRACTION);
 	private float remainingDistance = 1f;
 
 	public override bool IsCancellable => true;
@@ -20,15 +20,14 @@ public partial class BipedJumpAction : JumpAction, IPlayerHandler {
 	public override void _Process(double delta) {
 		base._Process(delta);
 
-		if (remainingDistance <= 0 || Entity.IsOnFloor()) {
+		if (maxDistance == 0 || remainingDistance <= 0 || Entity.IsOnFloor()) {
 			Stop();
+			return;
 		}
 
-		if (maxDistance != 0) {
-			float travelDistance = Mathf.Min(maxDistance * (float)delta * 5f, remainingDistance * maxDistance);
-			Entity.Gravity += Direction * travelDistance;
-			remainingDistance -= travelDistance / maxDistance;
-		}
+		float travelDistance = Mathf.Min(maxDistance * (float)delta * 5f, remainingDistance * maxDistance);
+		Entity.Gravity += Direction * travelDistance;
+		remainingDistance -= travelDistance / maxDistance;
 	}
 
 

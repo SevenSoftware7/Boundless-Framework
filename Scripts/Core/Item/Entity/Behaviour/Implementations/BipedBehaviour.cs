@@ -1,6 +1,5 @@
 namespace LandlessSkies.Core;
 
-using System.Collections.Generic;
 using Godot;
 using SevenDev.Boundless.Utility;
 
@@ -27,6 +26,9 @@ public partial class BipedBehaviour : GroundedBehaviour {
 	}
 	protected override void _Stop(EntityBehaviour? nextBehaviour) {
 		base._Stop(nextBehaviour);
+
+		_currentDirection = Vector3.Zero;
+		_currentSpeed = 0f;
 
 		interactPrompt?.SetEnabled(false);
 		interactPointer?.Disable();
