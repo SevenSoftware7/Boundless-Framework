@@ -40,11 +40,14 @@ public abstract partial class MovementBehaviour : EntityBehaviour {
 
 			Entity.Movement = Vector3.Zero;
 		}
+
+		HandlePostMovement(delta);
 	}
 
 	protected virtual void HandleProcess(double delta) { }
 	protected virtual Vector3 ProcessInertia(double delta) => Entity.Gravity + Entity.Inertia;
 	protected virtual Vector3 ProcessMovement(double delta) => Entity.Movement;
+	protected virtual void HandlePostMovement(double delta) { }
 
 
 

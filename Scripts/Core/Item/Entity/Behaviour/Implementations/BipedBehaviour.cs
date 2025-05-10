@@ -114,7 +114,7 @@ public partial class BipedBehaviour : GroundedBehaviour {
 
 
 		Basis newRotation = Basis.LookingAt(forward, Entity.UpDirection);
-		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, (float)delta * rotationSpeed);
+		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, rotationSpeed * floatDelta);
 
 		_targetDirection = Vector3.Zero;
 		_targetSpeed = 0f;

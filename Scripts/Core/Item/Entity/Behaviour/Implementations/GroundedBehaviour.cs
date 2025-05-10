@@ -142,9 +142,6 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 			);
 
 			if (!findStep) return false;
-			// // If the step was not the same collider as the obstacle, we stop here
-			// if (stepObstacleCollision is not null && stepTestResult.GetColliderRid() != stepObstacleCollision.GetColliderRid()) return false;
-
 
 			Vector3 point = stepTestResult.GetCollisionPoint();
 
@@ -160,6 +157,7 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 			return true;
 		}
 	}
+	protected abstract Vector3 ProcessGroundedMovement(double delta);
 
 
 	protected override Vector3 ProcessInertia(double delta) {
@@ -171,9 +169,7 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 			Entity.Inertia = Entity.Inertia.SlideOnFace(-upDirection);
 		}
 
-		bool isOnFloor = Entity.IsOnFloor();
-
-		if (isOnFloor) {
+		if (Entity.IsOnFloor()) {
 			_gravityVelocity = Vector3.Zero;
 
 			Vector3 newGravity = Entity.Gravity.SlideOnFace(upDirection).MoveToward(Vector3.Zero, 25f * floatDelta);
@@ -204,7 +200,27 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 		return Entity.Gravity + Entity.Inertia;
 	}
 
-	protected abstract Vector3 ProcessGroundedMovement(double delta);
+
+	protected override void HandlePostMovement(double delta) {
+		base.HandlePostMovement(delta);
+
+		HandleRotation(delta);
+	}
+
+	private void HandleRotation(double delta) {
+		float floatDelta = (float)delta;
+		Vector3 forward = Entity.GlobalForward;
+		Vector3 up = ProcessUpDirection(delta);
+		Entity.UpDirection = up;
+
+		Basis upRotation = Entity.Transform.Up().FromToBasis(up);
+
+		forward = forward.SafeSlerp(upRotation * forward, 18f * floatDelta);
+
+		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(Basis.LookingAt(forward, up), 18f * floatDelta);
+		Entity.GlobalForward = forward;
+	}
+	protected virtual Vector3 ProcessUpDirection(double delta) => Entity.UpDirection;
 
 
 	protected virtual void HandleJump(double delta) {
