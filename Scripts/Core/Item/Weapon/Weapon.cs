@@ -171,7 +171,6 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, ICustomiz
 
 	public override void _Process(double delta) {
 		base._Process(delta);
-			RequestReady();
 
 		if (/* OnHand */true) {
 			StickToSkeletonBone();
