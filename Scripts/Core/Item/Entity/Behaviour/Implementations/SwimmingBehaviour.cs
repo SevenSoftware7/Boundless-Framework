@@ -85,7 +85,8 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 		// ----- Rotation & Movement -----
 		float rotationSpeed = Entity.GetTraitValue(Traits.GenericTurnSpeed);
 
-		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection), (float)delta * rotationSpeed);
+		Basis rotation = Entity.GlobalBasis;
+		Entity.GlobalBasis = rotation = rotation.SafeSlerp(Basis.LookingAt(rotation.Forward(), Entity.UpDirection), floatDelta * rotationSpeed);
 
 
 		// ----- Floating at the Surface -----
@@ -133,8 +134,6 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 		base._Start(previousBehaviour);
 
 		this.previousBehaviour = previousBehaviour;
-
-		NormalizeRotation();
 
 		WaterDisplacementEffect.Subscribers.Add(this);
 	}

@@ -103,13 +103,12 @@ public partial class BipedBehaviour : GroundedBehaviour {
 		// ----- Rotation & Movement -----
 		float rotationSpeed = Entity.GetTraitValue(Traits.GenericTurnSpeed);
 
-		Vector3 forward = Entity.GlobalForward;
+		Vector3 forward = Entity.GlobalBasis.Forward();
 		if (!_targetDirection.IsZeroApprox()) {
 			_currentDirection = _currentDirection.Lerp(_targetDirection, rotationSpeed * floatDelta);
 			forward = forward.SafeSlerp(_targetDirection, rotationSpeed * floatDelta);
 
 			_currentSpeed *= Mathf.Clamp(_currentDirection.Dot(forward) + 0.5f, 0f, 1f);
-			Entity.GlobalForward = forward;
 		}
 
 

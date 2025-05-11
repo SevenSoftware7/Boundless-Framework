@@ -88,7 +88,7 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 
 		float speedReverseLerp = Mathf.InverseLerp(0f, _speed, _inertia);
 		Basis rotation = Entity.GlobalBasis;
-		Vector3 entityForward = Entity.GlobalForward;
+		Vector3 entityForward = rotation.Forward();
 		Vector3 entityUp = Entity.UpDirection;
 
 
@@ -96,7 +96,6 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 		if (!_movement.IsEqualApprox(Vector3.Zero)) {
 			newInertia = Mathf.Clamp(entityForward.Dot(_movement) + 0.75f, 0f, 1f) * _speed;
 			entityForward = entityForward.Slerp(_movement, Entity.GetTraitValue(Traits.GenericTurnSpeed) * floatDelta);
-			Entity.GlobalForward = entityForward;
 		}
 
 

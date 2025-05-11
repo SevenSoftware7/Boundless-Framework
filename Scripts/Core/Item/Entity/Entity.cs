@@ -116,30 +116,6 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 	[Export] public Vector3 Inertia = Vector3.Zero;
 	[Export] public Vector3 Movement = Vector3.Zero;
 
-	/// <summary>
-	/// The forward direction in global space of the Entity.
-	/// </summary>
-	/// <remarks>
-	/// Editing this value also changes <see cref="Forward"/> to match.
-	/// </remarks>
-	[Export]
-	public Vector3 GlobalForward {
-		get => _globalForward;
-		set => _globalForward = value.Normalized();
-	}
-	private Vector3 _globalForward = Vector3.Forward;
-
-	/// <summary>
-	/// The forward direction in relative space of the Entity.
-	/// </summary>
-	/// <remarks>
-	/// Editing this value also changes <see cref="GlobalForward"/> to match.
-	/// </remarks>
-	[Export]
-	public Vector3 Forward {
-		get => Transform.Basis.Inverse() * _globalForward;
-		set => _globalForward = Transform.Basis * value;
-	}
 
 	[ExportGroup("")]
 	[Export]
@@ -159,8 +135,6 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 		uint movingPlatformLayers = uint.MaxValue & ~(CollisionLayers.Entity | CollisionLayers.Water | CollisionLayers.Interactable | CollisionLayers.Damage);
 		PlatformFloorLayers = movingPlatformLayers;
 		PlatformWallLayers = movingPlatformLayers;
-
-		Forward = Vector3.Forward;
 	}
 
 	public float GetTraitValue(Trait trait, float @default = default) => TraitModifiers.ApplyTo(trait, EntityTraits.GetOrDefault(trait, @default));
@@ -313,10 +287,6 @@ public partial class Entity : CharacterBody3D, IPlayerHandler, IDamageable, IDam
 		UpdateHealth(true);
 
 		TraitModifiers.OnModifiersUpdated += OnHealthModifiersUpdate;
-
-		if (_globalForward == Vector3.Zero) {
-			_globalForward = GlobalBasis.Forward();
-		}
 
 		if (Engine.IsEditorHint()) return;
 

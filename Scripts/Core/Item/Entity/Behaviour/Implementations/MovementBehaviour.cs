@@ -15,15 +15,6 @@ public abstract partial class MovementBehaviour : EntityBehaviour {
 
 	public abstract void Move(Vector3 movement, MovementType movementType = MovementType.Normal);
 
-	protected void NormalizeRotation() {
-		Vector3 upDirection = Entity.UpDirection;
-		Vector3 globalForward = Entity.GlobalForward;
-		globalForward = globalForward.SlideOnFace(upDirection).Normalized();
-		Entity.GlobalForward = globalForward;
-
-		Entity.GlobalBasis = Basis.LookingAt(globalForward, upDirection);
-	}
-
 
 	public override void _Process(double delta) {
 		base._Process(delta);

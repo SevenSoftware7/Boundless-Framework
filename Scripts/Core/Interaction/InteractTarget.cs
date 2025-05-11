@@ -50,7 +50,7 @@ public struct InteractTarget(Interactable interactable, int shapeIndex) {
 					float distanceSquared = entity.GlobalPosition.To(shapeTransform.Origin).Slide(entity.UpDirection).LengthSquared();
 
 					Vector3 direction = entity.GlobalPosition.To(interactable.GlobalPosition).Slide(entity.UpDirection).Normalized();
-					float incidence = direction.Dot(entity.GlobalForward);
+					float incidence = direction.Dot(entity.GlobalBasis.Forward());
 
 					return new InteractCandidate(new InteractTarget(interactable, x.Shape), distanceSquared, incidence);
 				})

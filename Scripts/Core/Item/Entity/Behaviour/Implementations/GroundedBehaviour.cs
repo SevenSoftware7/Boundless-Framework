@@ -22,12 +22,6 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 		JumpAction = jumpAction;
 	}
 
-
-	protected override void _Start(EntityBehaviour? previousBehaviour) {
-		base._Start(previousBehaviour);
-
-		NormalizeRotation();
-	}
 	protected override void _Stop(EntityBehaviour? nextBehaviour) {
 		base._Stop(nextBehaviour);
 
@@ -209,7 +203,8 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 
 	private void HandleRotation(double delta) {
 		float floatDelta = (float)delta;
-		Vector3 forward = Entity.GlobalForward;
+		Basis rotation = Entity.GlobalBasis;
+		Vector3 forward = rotation.Forward();
 		Vector3 up = ProcessUpDirection(delta);
 		Entity.UpDirection = up;
 
@@ -217,8 +212,7 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 
 		forward = forward.SafeSlerp(upRotation * forward, 18f * floatDelta);
 
-		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(Basis.LookingAt(forward, up), 18f * floatDelta);
-		Entity.GlobalForward = forward;
+		Entity.GlobalBasis = rotation.SafeSlerp(Basis.LookingAt(forward, up), 18f * floatDelta);
 	}
 	protected virtual Vector3 ProcessUpDirection(double delta) => Entity.UpDirection;
 

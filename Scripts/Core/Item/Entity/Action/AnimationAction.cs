@@ -221,7 +221,7 @@ public abstract partial class AnimationAction(Entity entity, EntityAction.Builde
 		base._Process(delta);
 
 		if (!_movement.IsZeroApprox() && Entity.CurrentBehaviour is GroundedBehaviour groundedBehaviour) {
-			groundedBehaviour.Move(Basis.LookingAt(Entity.GlobalForward, Entity.UpDirection) * _movement, _movementType);
+			groundedBehaviour.Move(Basis.LookingAt(Entity.GlobalBasis.Forward(), Entity.UpDirection) * _movement, _movementType);
 		}
 	}
 }

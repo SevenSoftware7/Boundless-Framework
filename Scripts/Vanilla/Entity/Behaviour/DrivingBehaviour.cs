@@ -38,7 +38,6 @@ public partial class DrivingBehaviour : SittingBehaviour {
 	public override void _Process(double delta) {
 		base._Process(delta);
 		Entity.UpDirection = Vehicle.Entity.UpDirection;
-		Entity.GlobalForward = Vehicle.Entity.GlobalForward;
 	}
 
 	protected override void OnDismount() {

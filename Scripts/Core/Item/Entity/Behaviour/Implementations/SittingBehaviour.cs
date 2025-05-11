@@ -68,6 +68,5 @@ public abstract partial class SittingBehaviour : EntityBehaviour, IPlayerHandler
 		if (!IsActive) return;
 
 		Entity.GlobalTransform = SittingPosition;
-		Entity.GlobalForward = SittingPosition.Basis.Forward();
 	}
 }
