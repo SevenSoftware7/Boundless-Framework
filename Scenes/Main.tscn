@@ -1869,7 +1869,27 @@ collision_mask = 256
 monitorable = false
 script = ExtResource("5_aiymr")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/EntityVoidoutTrigger"]
+[node name="Top" type="CollisionShape3D" parent="Environment/EntityVoidoutTrigger"]
+transform = Transform3D(-1, -8.74228e-08, 0, 8.74228e-08, -1, 0, 0, 0, 1, 0, 80, 0)
+shape = SubResource("WorldBoundaryShape3D_n387p")
+
+[node name="Bottom" type="CollisionShape3D" parent="Environment/EntityVoidoutTrigger"]
+shape = SubResource("WorldBoundaryShape3D_n387p")
+
+[node name="North" type="CollisionShape3D" parent="Environment/EntityVoidoutTrigger"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, -80)
+shape = SubResource("WorldBoundaryShape3D_n387p")
+
+[node name="South" type="CollisionShape3D" parent="Environment/EntityVoidoutTrigger"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 130)
+shape = SubResource("WorldBoundaryShape3D_n387p")
+
+[node name="West" type="CollisionShape3D" parent="Environment/EntityVoidoutTrigger"]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, -110, 0, 0)
+shape = SubResource("WorldBoundaryShape3D_n387p")
+
+[node name="East" type="CollisionShape3D" parent="Environment/EntityVoidoutTrigger"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 60, 0, 0)
 shape = SubResource("WorldBoundaryShape3D_n387p")
 
 [node name="Path3D" type="Path3D" parent="Environment"]
