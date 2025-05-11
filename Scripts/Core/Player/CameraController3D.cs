@@ -56,11 +56,6 @@ public partial class CameraController3D : Camera3D {
 	}
 
 	public bool GetGroundedMovement(Vector3 upDirection, Vector2 moveInput, out Basis camRotation, out Vector3 groundedMovement) {
-		if (!IsNodeReady()) {
-			camRotation = Basis.Identity;
-			groundedMovement = Vector3.Zero;
-			return false;
-		}
 		Vector3 rawInput = new(moveInput.X, 0, moveInput.Y);
 		if (rawInput.LengthSquared().IsZeroApprox()) {
 			camRotation = Basis.Identity;
