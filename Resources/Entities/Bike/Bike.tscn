@@ -70,7 +70,7 @@ SubResource("Resource_8ie50"): 0.2,
 SubResource("Resource_c3jdb"): 1.15,
 SubResource("Resource_k7nyx"): 1.75,
 SubResource("Resource_lf3id"): 50.0,
-SubResource("Resource_w5bov"): 35.0,
+SubResource("Resource_w5bov"): 12.5,
 SubResource("Resource_mh833"): 0.3,
 SubResource("Resource_ll5eb"): 15.0,
 SubResource("Resource_7radf"): 32.0

@@ -6,7 +6,7 @@ public sealed partial class KMInputDevice : InputDevice {
 	private static readonly StringName suffix = "km";
 	private static InputEventMouseMotion mouseMotion = new();
 
-	public override float Sensitivity => 0.00325f;
+	public override float Sensitivity => 0.2f;
 	public override StringName FullName => "Keyboard & Mouse";
 
 	protected override StringName DeviceSuffix => suffix;

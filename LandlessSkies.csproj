@@ -18,7 +18,7 @@
     <Using Include="SimdLinq" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="SevenDev.Boundless.Utility" Version="1.0.4" />
+    <PackageReference Include="SevenDev.Boundless.Utility" Version="1.0.6" />
     <!-- <ProjectReference Include="../Boundless.Utility/SevenDev.Boundless.Utility/SevenDev.Boundless.Utility.csproj" /> -->
 
     <PackageReference Include="SevenDev.Boundless.Injection" Version="1.1.9" />

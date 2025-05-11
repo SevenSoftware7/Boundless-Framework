@@ -106,14 +106,14 @@ public partial class BipedBehaviour : GroundedBehaviour {
 		Vector3 forward = Entity.GlobalBasis.Forward();
 		if (!_targetDirection.IsZeroApprox()) {
 			_currentDirection = _currentDirection.Lerp(_targetDirection, rotationSpeed * floatDelta);
-			forward = forward.SafeSlerp(_targetDirection, rotationSpeed * floatDelta);
+			forward = _currentDirection.Normalized();
 
-			_currentSpeed *= Mathf.Clamp(_currentDirection.Dot(forward) + 0.5f, 0f, 1f);
+			_currentSpeed *= Mathf.Clamp(_targetDirection.Dot(forward) + 0.5f, 0f, 1f);
 		}
 
-
-		Basis newRotation = Basis.LookingAt(forward, Entity.UpDirection);
-		Entity.GlobalBasis = Entity.GlobalBasis.SafeSlerp(newRotation, rotationSpeed * floatDelta);
+		Basis rotation = Entity.GlobalBasis;
+		Basis newRotation = BasisExtensions.UpTowards(rotation.Up(), forward);
+		Entity.GlobalBasis = rotation = rotation.SafeSlerp(newRotation, rotationSpeed * floatDelta);
 
 		_targetDirection = Vector3.Zero;
 		_targetSpeed = 0f;

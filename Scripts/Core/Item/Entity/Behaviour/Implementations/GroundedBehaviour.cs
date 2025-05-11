@@ -30,7 +30,6 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 		DisavowPlayer();
 	}
 
-
 	public virtual void HandlePlayer(Player player) {
 		if (!IsActive) return;
 
@@ -82,6 +81,8 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 
 
 	protected sealed override Vector3 ProcessMovement(double delta) {
+		HandleGravityRotation(delta);
+
 		if (
 			Entity.IsOnFloor() && Entity.GetPlatformVelocity().IsZeroApprox() &&
 			(!Entity.recoverState.HasValue || Entity.GlobalPosition.DistanceSquaredTo(Entity.recoverState.Value.Location) > 0.1f)
@@ -153,6 +154,22 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 	}
 	protected abstract Vector3 ProcessGroundedMovement(double delta);
 
+	private void HandleGravityRotation(double delta) {
+		Basis newRotation = ProcessGravityRotation(delta);
+		Entity.UpDirection = newRotation.Up();
+
+		Basis targetRotation = Entity.GlobalBasis.Slerp(newRotation, 22f * (float)delta);
+		Entity.GlobalBasis = targetRotation;
+	}
+	protected Basis ProcessGravityRotation(double delta) {
+		Basis rotation = Entity.GlobalBasis.Orthonormalized();
+
+		Vector3 newUp = ProcessUpDirection(delta).Normalized();
+
+		return rotation.WarpUpTowards(newUp).Orthonormalized();
+	}
+	protected virtual Vector3 ProcessUpDirection(double delta) => Entity.UpDirection;
+
 
 	protected override Vector3 ProcessInertia(double delta) {
 		float floatDelta = (float)delta;
@@ -193,28 +210,6 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 
 		return Entity.Gravity + Entity.Inertia;
 	}
-
-
-	protected override void HandlePostMovement(double delta) {
-		base.HandlePostMovement(delta);
-
-		HandleRotation(delta);
-	}
-
-	private void HandleRotation(double delta) {
-		float floatDelta = (float)delta;
-		Basis rotation = Entity.GlobalBasis;
-		Vector3 forward = rotation.Forward();
-		Vector3 up = ProcessUpDirection(delta);
-		Entity.UpDirection = up;
-
-		Basis upRotation = Entity.Transform.Up().FromToBasis(up);
-
-		forward = forward.SafeSlerp(upRotation * forward, 18f * floatDelta);
-
-		Entity.GlobalBasis = rotation.SafeSlerp(Basis.LookingAt(forward, up), 18f * floatDelta);
-	}
-	protected virtual Vector3 ProcessUpDirection(double delta) => Entity.UpDirection;
 
 
 	protected virtual void HandleJump(double delta) {

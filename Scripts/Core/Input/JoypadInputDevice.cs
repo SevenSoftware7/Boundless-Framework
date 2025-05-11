@@ -3,7 +3,7 @@ namespace LandlessSkies.Core;
 using Godot;
 
 public sealed partial class JoypadInputDevice(int DeviceId) : InputDevice() {
-	public override float Sensitivity => 0.025f;
+	public override float Sensitivity => 0.03f;
 	public override StringName FullName => $"Joypad {DeviceId} ({DeviceName})";
 
 	protected override StringName DeviceSuffix => _deviceSuffix;

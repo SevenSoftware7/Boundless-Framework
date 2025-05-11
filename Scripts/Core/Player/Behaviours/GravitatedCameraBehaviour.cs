@@ -16,6 +16,7 @@ public sealed partial class GravitatedCameraBehaviour : EntityCameraBehaviour {
 
 	protected override bool IsOneTime { get; } = false;
 
+	private float _verticalLookAngle = 0f;
 
 	[Export] public float HorizontalSmoothTime = 0.065f;
 	[Export] public float VerticalSmoothTime = 0.16f;
@@ -31,14 +32,12 @@ public sealed partial class GravitatedCameraBehaviour : EntityCameraBehaviour {
 
 
 	public override void MoveCamera(Vector2 cameraInput) {
-		float maxAngle = Mathf.Pi / 2f - Mathf.Epsilon;
+		float maxVerticalAngle = Mathf.Pi / 2f - Mathf.Epsilon;
 
-		Vector3 eulerAngles = LookRotation.GetEuler();
-		LookRotation = Basis.FromEuler(new(
-			Mathf.Clamp(eulerAngles.X + cameraInput.Y, -maxAngle, maxAngle),
-			eulerAngles.Y - cameraInput.X,
-			0
-		));
+		_verticalLookAngle = Mathf.Clamp(_verticalLookAngle + Mathf.DegToRad(cameraInput.Y), -maxVerticalAngle, maxVerticalAngle);
+		LookRotation = new Basis(Vector3.Right, _verticalLookAngle);
+
+		LocalRotation = LocalRotation.Rotated(LocalRotation.Up(), Mathf.DegToRad(-cameraInput.X));
 	}
 
 
@@ -48,7 +47,8 @@ public sealed partial class GravitatedCameraBehaviour : EntityCameraBehaviour {
 		if (Subject is null) return;
 		Transform3D subjectTransform = SubjectTransform;
 
-		Basis rotationToNewUp = LocalRotation.Up().FromToBasis(Subject.UpDirection);
+		Basis warpedRotation = LocalRotation.WarpUpTowards(Subject.UpDirection);
+		LocalRotation = LocalRotation.SafeSlerp(warpedRotation.Orthonormalized(), 8f * floatDelta);
 
 		FollowPosition.Split(LocalRotation.Up(), out Vector3 smoothVerticalPosition, out Vector3 smoothHorizontalPosition);
 		subjectTransform.Origin.Split(LocalRotation.Up(), out Vector3 verticalPos, out Vector3 horizontalPos);
