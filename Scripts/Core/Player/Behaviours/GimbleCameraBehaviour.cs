@@ -29,9 +29,10 @@ public sealed partial class GimbleCameraBehaviour : EntityCameraBehaviour {
 
 	public override void _Process(double delta) {
 		if (!IsActive) return;
-		if (!SubjectTransform.HasValue) return;
+		if (Subject is null) return;
+		Transform3D subjectTransform = SubjectTransform;
 
-		Transform3D transform = SubjectTransform.Value;
+		Transform3D transform = subjectTransform;
 
 		FollowPosition = CameraController.GlobalPosition.SmoothDamp(transform.Origin, ref _velocity, SmoothTime, Mathf.Inf, (float)delta);
 

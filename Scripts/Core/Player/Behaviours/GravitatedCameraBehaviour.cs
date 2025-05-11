@@ -45,12 +45,10 @@ public sealed partial class GravitatedCameraBehaviour : EntityCameraBehaviour {
 	public override void _Process(double delta) {
 		float floatDelta = (float)delta;
 
-		if (!SubjectTransform.HasValue) return;
-		Transform3D subjectTransform = SubjectTransform.Value;
+		if (Subject is null) return;
+		Transform3D subjectTransform = SubjectTransform;
 
-		Basis rotationToNewUp = LocalRotation.Up().FromToBasis(Subject!.UpDirection);
-
-		LocalRotation = LocalRotation.SafeSlerp(rotationToNewUp * LocalRotation, 8f * floatDelta);
+		Basis rotationToNewUp = LocalRotation.Up().FromToBasis(Subject.UpDirection);
 
 		FollowPosition.Split(LocalRotation.Up(), out Vector3 smoothVerticalPosition, out Vector3 smoothHorizontalPosition);
 		subjectTransform.Origin.Split(LocalRotation.Up(), out Vector3 verticalPos, out Vector3 horizontalPos);

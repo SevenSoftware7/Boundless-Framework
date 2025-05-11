@@ -17,9 +17,9 @@ public abstract partial class EntityCameraBehaviour : CameraBehaviour {
 	private float _offsetMagnitude;
 
 	[Export] public Entity? Subject;
-	public Transform3D? SubjectTransform {
+	public Transform3D SubjectTransform {
 		get {
-			if (Subject is null) return null;
+			if (Subject is null) return Transform3D.Identity;
 
 			Transform3D entityTransform = Subject.GlobalTransform;
 			Vector3 origin = Subject.CenterOfMass?.GlobalPosition ?? entityTransform.Origin;
