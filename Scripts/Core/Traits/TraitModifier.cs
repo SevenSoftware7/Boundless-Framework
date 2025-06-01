@@ -6,18 +6,14 @@ using Godot;
 [Tool]
 [GlobalClass]
 public abstract partial class TraitModifier : Resource, ITraitModifier {
-	public Trait Trait {
-		get => _traitResource.Trait;
+	public Trait Trait { get; private set; }
+	[Export] protected string TraitName {
+		get => Trait.Name;
 		private set {
-			_traitResource.Trait = value;
+			Trait = new(value);
 			EmitValueModified();
 		}
 	}
-	[Export] protected TraitResource TraitResource {
-		get => _traitResource;
-		private set => Trait = value.Trait;
-	}
-	private readonly TraitResource _traitResource = new();
 
 
 	public virtual bool IsStacking => false;
@@ -33,9 +29,7 @@ public abstract partial class TraitModifier : Resource, ITraitModifier {
 	public TraitModifier(Trait target) : this() {
 		Trait = target;
 	}
-	protected TraitModifier() : base() {
-		_traitResource.Changed += EmitValueModified;
-	}
+	protected TraitModifier() : base() { }
 
 
 
@@ -50,10 +44,10 @@ public abstract partial class TraitModifier : Resource, ITraitModifier {
 
 
 	public override bool _PropertyCanRevert(StringName property) {
-		return base._PropertyCanRevert(property) || property == PropertyName.TraitResource;
+		return base._PropertyCanRevert(property) || property == PropertyName.TraitName;
 	}
 	public override Variant _PropertyGetRevert(StringName property) {
-		if (property == PropertyName.TraitResource) return _traitResource;
+		if (property == PropertyName.TraitName) return Trait.Name;
 		return base._PropertyGetRevert(property);
 	}
 

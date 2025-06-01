@@ -1,4 +1,4 @@
-[gd_scene load_steps=122 format=3 uid="uid://b505xodur2iff"]
+[gd_scene load_steps=120 format=3 uid="uid://b505xodur2iff"]
 
 [ext_resource type="Script" uid="uid://cvkvg45cwuu2" path="res://Scripts/Core/MainNode.cs" id="1_u7mjy"]
 [ext_resource type="RDShaderFile" uid="uid://br3hg0ejs6wif" path="res://Resources/Rendering/Shaders/FetchWaterData.glsl" id="2_5l7vn"]
@@ -21,7 +21,6 @@
 [ext_resource type="PackedScene" uid="uid://b7b17ebmgtrfy" path="res://Resources/Weapons/Pax/Pax.tscn" id="15_x4bcq"]
 [ext_resource type="Script" uid="uid://bycrdvgqioks7" path="res://Scripts/Core/Traits/TraitModifier.cs" id="16_qta6b"]
 [ext_resource type="PackedScene" uid="uid://bp1e6thwkkcrr" path="res://Resources/Weapons/Eleos/Eleos.tscn" id="17_jhoyp"]
-[ext_resource type="Script" uid="uid://djubduy40g4eb" path="res://Scripts/Core/Traits/TraitResource.cs" id="17_x3rx7"]
 [ext_resource type="Script" uid="uid://clw5y4grhymdv" path="res://Scripts/Core/Traits/SetModifier.cs" id="18_6heos"]
 [ext_resource type="Script" uid="uid://cdkgbhb2txfvj" path="res://Scripts/Core/Damage/DamageArea.cs" id="18_pbwgl"]
 [ext_resource type="PackedScene" uid="uid://bxcpbr13uyeh1" path="res://Resources/Entities/Bike/Bike.tscn" id="20_pcyav"]
@@ -1448,17 +1447,12 @@ size = Vector3(3, 1, 6)
 [sub_resource type="BoxMesh" id="BoxMesh_juan7"]
 size = Vector3(3, 1, 6)
 
-[sub_resource type="Resource" id="Resource_4yxf6"]
-resource_name = "generic_max_health"
-script = ExtResource("17_x3rx7")
-Name = "generic_max_health"
-
 [sub_resource type="Resource" id="Resource_btbly"]
 resource_name = "generic_max_health = 1"
 script = ExtResource("18_6heos")
 Value = 1.0
 _isStacking = false
-TraitResource = SubResource("Resource_4yxf6")
+TraitName = "generic_max_health"
 metadata/_custom_type_script = ExtResource("18_6heos")
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_d0jor"]

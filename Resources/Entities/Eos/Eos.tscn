@@ -1,9 +1,8 @@
-[gd_scene load_steps=32 format=3 uid="uid://b7rhbgw2dujty"]
+[gd_scene load_steps=21 format=3 uid="uid://b7rhbgw2dujty"]
 
 [ext_resource type="Script" uid="uid://btpoqelwvyeef" path="res://Scripts/Core/Item/Entity/Entity.cs" id="1_44rt4"]
 [ext_resource type="Resource" uid="uid://djyqyaq7lwdkr" path="res://Resources/Entities/Eos/Eos_data.tres" id="2_sat4e"]
 [ext_resource type="PackedScene" uid="uid://dr77fv5m8yjck" path="res://Scenes/UI/Pointer.tscn" id="3_qcq8b"]
-[ext_resource type="Script" uid="uid://djubduy40g4eb" path="res://Scripts/Core/Traits/TraitResource.cs" id="3_sat4e"]
 [ext_resource type="PackedScene" uid="uid://cck2wboppochk" path="res://Scenes/UI/Gauge.tscn" id="3_uuynt"]
 [ext_resource type="Script" uid="uid://cpqri6cw2hye2" path="res://Scripts/Core/Traits/TraitsCollection.cs" id="4_fjsq6"]
 [ext_resource type="PackedScene" uid="uid://br8bdv51nxt4p" path="res://Scenes/UI/Prompt.tscn" id="4_qonq2"]
@@ -17,69 +16,19 @@
 [ext_resource type="Resource" uid="uid://bi8pp11ga45x3" path="res://Resources/Entities/Eos/Costumes/Eos-base_key.tres" id="15_cn8qi"]
 [ext_resource type="Script" uid="uid://bqjcp5j1o01je" path="res://Scripts/Core/Item/Entity/Behaviour/Implementations/SwimmingBehaviour.cs" id="15_sat4e"]
 
-[sub_resource type="Resource" id="Resource_uy6xw"]
-resource_name = "generic_max_health"
-script = ExtResource("3_sat4e")
-Name = "generic_max_health"
-
-[sub_resource type="Resource" id="Resource_u056q"]
-resource_name = "generic_move_speed"
-script = ExtResource("3_sat4e")
-Name = "generic_move_speed"
-
-[sub_resource type="Resource" id="Resource_8ie50"]
-resource_name = "generic_slow_move_speed_multiplier"
-script = ExtResource("3_sat4e")
-Name = "generic_slow_move_speed_multiplier"
-
-[sub_resource type="Resource" id="Resource_c3jdb"]
-resource_name = "generic_fast_move_speed_multiplier"
-script = ExtResource("3_sat4e")
-Name = "generic_fast_move_speed_multiplier"
-
-[sub_resource type="Resource" id="Resource_k7nyx"]
-resource_name = "generic_turn_speed"
-script = ExtResource("3_sat4e")
-Name = "generic_turn_speed"
-
-[sub_resource type="Resource" id="Resource_lf3id"]
-resource_name = "generic_acceleration"
-script = ExtResource("3_sat4e")
-Name = "generic_acceleration"
-
-[sub_resource type="Resource" id="Resource_w5bov"]
-resource_name = "generic_deceleration"
-script = ExtResource("3_sat4e")
-Name = "generic_deceleration"
-
-[sub_resource type="Resource" id="Resource_mh833"]
-resource_name = "generic_step_height"
-script = ExtResource("3_sat4e")
-Name = "generic_step_height"
-
-[sub_resource type="Resource" id="Resource_ll5eb"]
-resource_name = "generic_jump_height"
-script = ExtResource("3_sat4e")
-Name = "generic_jump_height"
-
-[sub_resource type="Resource" id="Resource_7radf"]
-resource_name = "generic_gravity"
-script = ExtResource("3_sat4e")
-Name = "generic_gravity"
-
 [sub_resource type="Resource" id="Resource_fafpq"]
 script = ExtResource("4_fjsq6")
-TraitValuesDict = Dictionary[ExtResource("3_sat4e"), float]({
-SubResource("Resource_uy6xw"): 25.0,
-SubResource("Resource_u056q"): 8.0,
-SubResource("Resource_8ie50"): 0.375,
-SubResource("Resource_c3jdb"): 1.5,
-SubResource("Resource_k7nyx"): 20.0,
-SubResource("Resource_lf3id"): 50.0,
-SubResource("Resource_w5bov"): 35.0,
-SubResource("Resource_mh833"): 0.5,
-SubResource("Resource_ll5eb"): 12.5,
-SubResource("Resource_7radf"): 40.0
+TraitValues = Dictionary[StringName, float]({
+&"generic_acceleration": 50.0,
+&"generic_deceleration": 35.0,
+&"generic_fast_move_speed_multiplier": 1.5,
+&"generic_gravity": 32.0,
+&"generic_jump_height": 20.0,
+&"generic_max_health": 25.0,
+&"generic_move_speed": 8.0,
+&"generic_slow_move_speed_multiplier": 0.375,
+&"generic_step_height": 0.5,
+&"generic_turn_speed": 20.0
 })
 
 [sub_resource type="Resource" id="Resource_qwv27"]

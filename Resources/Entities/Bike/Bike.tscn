@@ -1,9 +1,8 @@
-[gd_scene load_steps=25 format=3 uid="uid://bxcpbr13uyeh1"]
+[gd_scene load_steps=14 format=3 uid="uid://bxcpbr13uyeh1"]
 
 [ext_resource type="Script" uid="uid://btpoqelwvyeef" path="res://Scripts/Core/Item/Entity/Entity.cs" id="1_46ioo"]
 [ext_resource type="Resource" uid="uid://q4arq6wxs6ho" path="res://Resources/Entities/Bike/Bike_data.tres" id="2_uy6xw"]
 [ext_resource type="Script" uid="uid://5gx1ctuejo1p" path="res://Scripts/Core/Item/Entity/HudPack.cs" id="3_aosnt"]
-[ext_resource type="Script" uid="uid://djubduy40g4eb" path="res://Scripts/Core/Traits/TraitResource.cs" id="4_u056q"]
 [ext_resource type="Script" uid="uid://dwtp85ydlhl31" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="5_5toi3"]
 [ext_resource type="Script" uid="uid://klqvajn51glc" path="res://Scripts/Vanilla/Entity/Behaviour/VehicleBehaviour.cs" id="5_6pb3w"]
 [ext_resource type="Script" uid="uid://cpqri6cw2hye2" path="res://Scripts/Core/Traits/TraitsCollection.cs" id="5_8ie50"]
@@ -11,69 +10,19 @@
 [ext_resource type="Script" uid="uid://bycrdvgqioks7" path="res://Scripts/Core/Traits/TraitModifier.cs" id="6_uy6xw"]
 [ext_resource type="Resource" uid="uid://djkxop4aum535" path="res://Resources/Entities/Bike/Costumes/Bike-base_key.tres" id="8_5fcav"]
 
-[sub_resource type="Resource" id="Resource_uy6xw"]
-resource_name = "generic_max_health"
-script = ExtResource("4_u056q")
-Name = "generic_max_health"
-
-[sub_resource type="Resource" id="Resource_u056q"]
-resource_name = "generic_move_speed"
-script = ExtResource("4_u056q")
-Name = "generic_move_speed"
-
-[sub_resource type="Resource" id="Resource_8ie50"]
-resource_name = "generic_slow_move_speed_multiplier"
-script = ExtResource("4_u056q")
-Name = "generic_slow_move_speed_multiplier"
-
-[sub_resource type="Resource" id="Resource_c3jdb"]
-resource_name = "generic_fast_move_speed_multiplier"
-script = ExtResource("4_u056q")
-Name = "generic_fast_move_speed_multiplier"
-
-[sub_resource type="Resource" id="Resource_k7nyx"]
-resource_name = "generic_turn_speed"
-script = ExtResource("4_u056q")
-Name = "generic_turn_speed"
-
-[sub_resource type="Resource" id="Resource_lf3id"]
-resource_name = "generic_acceleration"
-script = ExtResource("4_u056q")
-Name = "generic_acceleration"
-
-[sub_resource type="Resource" id="Resource_w5bov"]
-resource_name = "generic_deceleration"
-script = ExtResource("4_u056q")
-Name = "generic_deceleration"
-
-[sub_resource type="Resource" id="Resource_mh833"]
-resource_name = "generic_step_height"
-script = ExtResource("4_u056q")
-Name = "generic_step_height"
-
-[sub_resource type="Resource" id="Resource_ll5eb"]
-resource_name = "generic_jump_height"
-script = ExtResource("4_u056q")
-Name = "generic_jump_height"
-
-[sub_resource type="Resource" id="Resource_7radf"]
-resource_name = "generic_gravity"
-script = ExtResource("4_u056q")
-Name = "generic_gravity"
-
 [sub_resource type="Resource" id="Resource_xs8l5"]
 script = ExtResource("5_8ie50")
-TraitValuesDict = Dictionary[ExtResource("4_u056q"), float]({
-SubResource("Resource_uy6xw"): 25.0,
-SubResource("Resource_u056q"): 37.5,
-SubResource("Resource_8ie50"): 0.2,
-SubResource("Resource_c3jdb"): 1.15,
-SubResource("Resource_k7nyx"): 1.75,
-SubResource("Resource_lf3id"): 50.0,
-SubResource("Resource_w5bov"): 12.5,
-SubResource("Resource_mh833"): 0.3,
-SubResource("Resource_ll5eb"): 15.0,
-SubResource("Resource_7radf"): 32.0
+TraitValues = Dictionary[StringName, float]({
+&"generic_acceleration": 50.0,
+&"generic_deceleration": 12.5,
+&"generic_fast_move_speed_multiplier": 1.15,
+&"generic_gravity": 32.0,
+&"generic_jump_height": 15.0,
+&"generic_max_health": 25.0,
+&"generic_move_speed": 37.5,
+&"generic_slow_move_speed_multiplier": 0.2,
+&"generic_step_height": 0.3,
+&"generic_turn_speed": 1.75
 })
 
 [sub_resource type="Resource" id="Resource_bd6gb"]
