@@ -40,6 +40,12 @@ public partial class SwimmingBehaviour : MovementBehaviour, IPlayerHandler, IWat
 	}
 
 
+	protected override void _ResetMovement(EntityBehaviour? previousBehaviour = null) {
+		Vector3 movement = Entity.Movement + Entity.Inertia + Entity.Gravity;
+		_currentSpeed = movement.Length();
+		_currentMovement = movement / _currentSpeed;
+	}
+
 	public (Vector3 location, WaterMesh mesh)? GetInfo() => Water?.Mesh is null ? null : (Entity.GlobalPosition, Water.Mesh);
 	public void UpdateWaterDisplacement(Vector3 waterDisplacement) => _waterDisplacement = waterDisplacement.Y;
 

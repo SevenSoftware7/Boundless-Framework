@@ -24,6 +24,10 @@ public partial class BipedBehaviour : GroundedBehaviour {
 
 		interactPointer?.Enable();
 	}
+	protected override void _ResetMovement(EntityBehaviour? previousBehaviour = null) {
+		_currentSpeed = Entity.Movement.Length();
+	}
+
 	protected override void _Stop(EntityBehaviour? nextBehaviour) {
 		base._Stop(nextBehaviour);
 

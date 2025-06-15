@@ -1,8 +1,6 @@
 namespace LandlessSkies.Core;
 
 using Godot;
-using SevenDev.Boundless.Utility;
-
 
 [Tool]
 public abstract partial class MovementBehaviour : EntityBehaviour {
@@ -10,6 +8,13 @@ public abstract partial class MovementBehaviour : EntityBehaviour {
 
 	protected MovementBehaviour() : this(null!) { }
 	public MovementBehaviour(Entity entity) : base(entity) { }
+
+	protected override void _Start(EntityBehaviour? previousBehaviour = null) {
+		base._Start(previousBehaviour);
+
+		_ResetMovement(previousBehaviour);
+	}
+	protected abstract void _ResetMovement(EntityBehaviour? previousBehaviour = null);
 
 
 

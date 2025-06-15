@@ -1,6 +1,5 @@
 namespace LandlessSkies.Vanilla;
 
-using System.Collections.Generic;
 using Godot;
 using LandlessSkies.Core;
 using SevenDev.Boundless.Utility;
@@ -12,8 +11,8 @@ using static SevenDev.Boundless.Utility.Collisions;
 public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListener, IVoidOutListener {
 	[Export] public DrivingBehaviour? Driver;
 
-	private bool _gravityShift;
-	private bool _drifting;
+	private bool _isGravityShifting;
+	private bool _isDrifting;
 
 	private Vector3 _targetDirection;
 	private float _targetSpeed;
@@ -41,9 +40,8 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 	}
 
 
-
-	protected override void _Start(EntityBehaviour? previousBehaviour) {
-		base._Start(previousBehaviour);
+	protected override void _ResetMovement(EntityBehaviour? previousBehaviour = null) {
+		_currentSpeed = Entity.Movement.Length();
 	}
 	protected override void _Stop(EntityBehaviour? nextBehaviour) {
 		base._Stop(nextBehaviour);
@@ -53,9 +51,9 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 
 	public override void HandlePlayer(Player player) {
 		base.HandlePlayer(player);
-		_drifting = player.InputDevice.IsActionPressed(Inputs.AttackHeavy);
+		_isDrifting = player.InputDevice.IsActionPressed(Inputs.AttackHeavy);
 		if (player.InputDevice.IsActionJustPressed(Inputs.Focus)) {
-			_gravityShift = !_gravityShift;
+			_isGravityShifting = !_isGravityShifting;
 		}
 	}
 
@@ -72,7 +70,7 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 		}
 
 
-		if (!_gravityShift) {
+		if (!_isGravityShifting) {
 			entityUp = Vector3.Up;
 		}
 		else if (isOnFloor && groundUp.Dot(entityUp) >= 0.75f) {
@@ -101,7 +99,7 @@ public partial class VehicleBehaviour : GroundedBehaviour, IWaterCollisionListen
 
 
 
-		if (_drifting) {
+		if (_isDrifting) {
 			newSpeed = 0f;
 		}
 		else {
