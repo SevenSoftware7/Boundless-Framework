@@ -22,7 +22,7 @@ TraitValues = Dictionary[StringName, float]({
 &"generic_move_speed": 37.5,
 &"generic_slow_move_speed_multiplier": 0.2,
 &"generic_step_height": 0.3,
-&"generic_turn_speed": 1.75
+&"generic_turn_speed": 2.0
 })
 
 [sub_resource type="Resource" id="Resource_bd6gb"]
