@@ -9,14 +9,6 @@ public partial class SliderPromptControl : PromptControl {
 	private const float NEAR_ZERO = 1E-2F;
 	[Export] private bool shrinkInView;
 
-	public enum SlidingDirection {
-		Left,
-		Top,
-		Right,
-		Bottom
-	};
-	[Export] private SlidingDirection direction = SlidingDirection.Left;
-
 	[Export] private Control Wrapper = null!;
 	[Export] private RichTextLabel Label = null!;
 	[Export] private TextureRect Key = null!;
@@ -24,6 +16,9 @@ public partial class SliderPromptControl : PromptControl {
 	private bool _queuedForDestruction = false;
 	private float _slideProgress = 1.0f;
 	private float _shrinkProgress = 1.0f;
+
+	private Vector2 _minimumSize;
+	public override Vector2 _GetMinimumSize() => _minimumSize;
 
 
 	public override void SetText(string text) {
@@ -58,32 +53,35 @@ public partial class SliderPromptControl : PromptControl {
 
 
 		Vector2 hidPosition = direction switch {
-			SlidingDirection.Left => new Vector2(-size.X, position.Y),
-			SlidingDirection.Top => new Vector2(position.X, -size.Y),
-			SlidingDirection.Right => new Vector2(GetViewportRect().Size.X + size.X, position.Y),
-			SlidingDirection.Bottom => new Vector2(position.X, GetViewportRect().Size.Y + size.Y),
+			PromptHideDirection.Left => new Vector2(-size.X, position.Y),
+			PromptHideDirection.Top => new Vector2(position.X, -size.Y),
+			PromptHideDirection.Right => new Vector2(GetViewportRect().Size.X + size.X, position.Y),
+			PromptHideDirection.Bottom => new Vector2(position.X, GetViewportRect().Size.Y + size.Y),
 			_ => Vector2.Zero
 		};
 
 		Vector2 targetPosition = position.Lerp(hidPosition, _slideProgress);
 		Wrapper.GlobalPosition = targetPosition;
 
-
+		Vector2 oldMinimumSize = _minimumSize;
 		switch (direction) {
-			case SlidingDirection.Left:
-			case SlidingDirection.Right:
-				Vector2 targetSize = size.Lerp(new Vector2(size.X, 0f), _shrinkProgress);
+			case PromptHideDirection.Left:
+			case PromptHideDirection.Right:
+				float targetYSize = size.Y.Lerp(0f, _shrinkProgress);
 
-				CustomMinimumSize = CustomMinimumSize with { Y = targetSize.Y };
-				Size = Size with { Y = targetSize.Y };
+				_minimumSize = size with { Y = targetYSize };
+				Size = Size with { Y = targetYSize };
 				break;
-			case SlidingDirection.Top:
-			case SlidingDirection.Bottom:
-				targetSize = size.Lerp(new Vector2(0f, size.Y), _shrinkProgress);
+			case PromptHideDirection.Top:
+			case PromptHideDirection.Bottom:
+				float targetXSize = size.X.Lerp(0f, _shrinkProgress);
 
-				CustomMinimumSize = CustomMinimumSize with { X = targetSize.X };
-				Size = Size with { X = targetSize.X };
+				_minimumSize = size with { X = targetXSize };
+				Size = Size with { X = targetXSize };
 				break;
+		}
+		if (oldMinimumSize != _minimumSize) {
+			UpdateMinimumSize();
 		}
 
 

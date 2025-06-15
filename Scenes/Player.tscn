@@ -29,7 +29,7 @@ sorting_use_aabb_center = false
 lifetime = 0.6
 visibility_aabb = AABB(-20, -119, -20, 40, 120, 40)
 
-[node name="HUD" type="Control" parent="." node_paths=PackedStringArray("ProjectorCamera", "PointerContainer", "InfoContainer", "PromptContainer")]
+[node name="HUD" type="Control" parent="." node_paths=PackedStringArray("ProjectorCamera", "PointerContainer", "InfoContainer", "InteractPromptContainer", "InputPromptContainer")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -41,7 +41,8 @@ script = ExtResource("5_oov52")
 ProjectorCamera = NodePath("../CameraController3D")
 PointerContainer = NodePath("Pointer Container")
 InfoContainer = NodePath("VBoxContainer/Top Half/Top Left Quadrant/Info Container")
-PromptContainer = NodePath("VBoxContainer/Top Half/Top Left Quadrant/Interact Prompt Container")
+InteractPromptContainer = NodePath("VBoxContainer/Top Half/Top Left Quadrant/Interact Prompt Container")
+InputPromptContainer = NodePath("VBoxContainer/Bottom Half/Input Prompt Container")
 
 [node name="Pointer Container" type="Control" parent="HUD"]
 layout_mode = 1
@@ -91,4 +92,5 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 8
+theme_override_constants/separation = 10
 alignment = 1

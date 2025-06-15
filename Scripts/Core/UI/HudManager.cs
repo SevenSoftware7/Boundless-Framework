@@ -5,11 +5,16 @@ using SevenDev.Boundless.Utility;
 
 [GlobalClass]
 public partial class HudManager : Control {
+	public enum PromptType {
+		Interact,
+		Input
+	}
 	[Export] public Camera3D? ProjectorCamera;
 
 	[Export] public Control PointerContainer { get; private set; } = null!;
 	[Export] public Control InfoContainer { get; private set; } = null!;
-	[Export] public Control PromptContainer { get; private set; } = null!;
+	[Export] public Control InteractPromptContainer { get; private set; } = null!;
+	[Export] public Control InputPromptContainer { get; private set; } = null!;
 
 
 	public HudManager() { }
@@ -27,12 +32,23 @@ public partial class HudManager : Control {
 		return info;
 	}
 
-	public PromptControl AddPrompt(PackedScene prompt) {
-		return AddPrompt(prompt.Instantiate<PromptControl>());
+	public PromptControl AddPrompt(PackedScene prompt, PromptType type = PromptType.Interact) {
+		return AddPrompt(prompt.Instantiate<PromptControl>(), type);
 	}
-	public PromptControl AddPrompt(PromptControl prompt) {
-		prompt.ParentTo(PromptContainer);
-		PromptContainer.MoveChild(prompt, 0);
+	public PromptControl AddPrompt(PromptControl prompt, PromptType type = PromptType.Interact) {
+		switch (type) {
+			default:
+			case PromptType.Interact:
+				prompt.direction = PromptControl.PromptHideDirection.Left;
+				prompt.ParentTo(InteractPromptContainer);
+				InteractPromptContainer.MoveChild(prompt, 0);
+				break;
+			case PromptType.Input:
+				prompt.direction = PromptControl.PromptHideDirection.Bottom;
+				prompt.ParentTo(InputPromptContainer);
+				InputPromptContainer.MoveChild(prompt, 0);
+				break;
+		}
 		return prompt;
 	}
 

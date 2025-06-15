@@ -5,8 +5,15 @@ using Godot.Collections;
 
 [GlobalClass]
 public abstract partial class PromptControl : Control {
-	[Export] public bool Enabled;
+	public enum PromptHideDirection {
+		Left,
+		Top,
+		Right,
+		Bottom
+	};
 
+	[Export] public bool Enabled;
+	[Export] public PromptHideDirection direction = PromptHideDirection.Left;
 
 	public void SetEnabled(bool enabled) {
 		Enabled = enabled;
