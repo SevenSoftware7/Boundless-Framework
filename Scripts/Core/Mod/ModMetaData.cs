@@ -6,7 +6,7 @@ using Godot;
 using YamlDotNet.Serialization;
 using SevenDev.Boundless.Utility;
 
-public record class ModMetaData {
+public class ModMetaData : IEquatable<ModMetaData> {
 	public static readonly IDeserializer Deserializer = new DeserializerBuilder()
 		.WithNamingConvention(YamlDotNet.Serialization.NamingConventions.HyphenatedNamingConvention.Instance)
 		.WithTypeConverter(new FilePathConverter())
@@ -43,11 +43,29 @@ public record class ModMetaData {
 
 	public Mod? Load() {
 		try {
-			return new Mod(this);
+			return Mod.Load(this);
 		}
 		catch (Exception e) {
 			GD.PrintErr(e.Message);
 			return null;
 		}
 	}
+
+	bool IEquatable<ModMetaData>.Equals(ModMetaData? other) {
+		if (other is null) return false;
+		if (ReferenceEquals(this, other)) return true;
+
+		return Name == other.Name
+			&& Version == other.Version
+			&& Author == other.Author;
+	}
+
+	public override bool Equals(object? obj) {
+		if (obj is ModMetaData other) {
+			return Equals(other);
+		}
+		return false;
+	}
+
+	public override int GetHashCode() => HashCode.Combine(Name, Version, Author);
 }

@@ -1,41 +1,53 @@
 namespace LandlessSkies.Core;
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using Godot;
 using SevenDev.Boundless.Utility;
 
-public record class Mod : IDisposable {
+public class Mod : IDisposable {
+	private static readonly Dictionary<ModMetaData, Mod> _loadedMods = [];
+	public static IEnumerable<Mod> LoadedMods => _loadedMods.Values;
+
 	private static readonly DirectoryPath ModAssetsPath = new("res://ModAssets/");
 	private bool _disposed = false;
 	private bool _started = false;
 
 	public ModMetaData MetaData { get; init; }
 
-	public (Assembly, AssemblyLoadContext)[] Assemblies { get; init; }
-	public PckFile[] AssetPacks { get; init; }
+	public (Assembly, AssemblyLoadContext)[] Assemblies { get; private set; }
+	public PckFile[] AssetPacks { get; private set; }
 
+	public static Mod? Load(ModMetaData metaData) {
+		ref Mod? mod = ref CollectionsMarshal.GetValueRefOrAddDefault(_loadedMods, metaData, out bool exists);
+		if (exists) return mod;
 
-	public Mod(ModMetaData metaData) {
+		return mod = new Mod(metaData);
+	}
+	private Mod(ModMetaData metaData) {
 		if (Engine.IsEditorHint()) {
 			throw new InvalidOperationException("Cannot load mods in the editor.");
 		}
 
 		MetaData = metaData;
 
-		Assemblies = metaData.AssemblyPaths
-			.Select(metaData.Path.Combine)
-			.Select(LoadAssembly)
-			.OfType<(Assembly, AssemblyLoadContext)>()
-			.ToArray();
+		Assemblies = [..
+			metaData.AssemblyPaths
+				.Select(metaData.Path.Combine)
+				.Select(LoadAssembly)
+				.OfType<(Assembly, AssemblyLoadContext)>()
+		];
 
-		AssetPacks = metaData.AssetPaths
-			.Select(metaData.Path.Combine)
-			.Select(PckFile.Load)
-			.ToArray();
+		AssetPacks = [..
+			metaData.AssetPaths
+				.Select(metaData.Path.Combine)
+				.Select(PckFile.Load)
+		];
 	}
 
 	~Mod() {
@@ -49,9 +61,21 @@ public record class Mod : IDisposable {
 		if (_disposed) return;
 		_disposed = true;
 
+		_loadedMods.Remove(MetaData);
+
+
 		Stop();
-		Unload();
+
+		foreach ((_, AssemblyLoadContext context) in Assemblies) {
+			context.Unload();
+		}
+		Assemblies = null!;
+
+		AssetPacks = null!;
 	}
+
+	public void Unload() => Dispose();
+
 
 	private static (Assembly, AssemblyLoadContext)? LoadAssembly(FilePath assemblyPath) {
 		if (string.IsNullOrEmpty(assemblyPath.Path)) return null;
@@ -67,19 +91,8 @@ public record class Mod : IDisposable {
 		return (assemblyLoadContext.LoadFromStream(stream), assemblyLoadContext);
 	}
 
-	public void Unload() {
-		foreach (PckFile asset in AssetPacks) {
-			asset.Uninstall();
-		}
-		foreach ((_, AssemblyLoadContext context) in Assemblies) {
-			context.Unload();
-		}
-	}
-
-
 	public void Start() {
 		if (_disposed) return;
-
 		if (_started) return;
 		_started = true;
 

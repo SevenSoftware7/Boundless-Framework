@@ -12,9 +12,9 @@ public static class ModLoader {
 	private static ModMetaData? ParseModConfig(DirectoryPath modDirectory) {
 		FilePath modConfigPath = modDirectory.CombineFile("mod.config.yml");
 
-		byte[]? file = Godot.FileAccess.GetFileAsBytes(modConfigPath);
+		byte[]? file = FileAccess.GetFileAsBytes(modConfigPath);
 		if (file.Length == 0) {
-			GD.PrintErr(Godot.FileAccess.GetOpenError());
+			GD.PrintErr(FileAccess.GetOpenError());
 			return null;
 		}
 		string modConfig = System.Text.Encoding.UTF8.GetString(file);
