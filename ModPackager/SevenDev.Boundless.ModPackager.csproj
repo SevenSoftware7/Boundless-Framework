@@ -6,12 +6,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>boundlesspackage</ToolCommandName>
+    <ToolCommandName>boundless-mod</ToolCommandName>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../Framework/SevenDev.Boundless.csproj" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="../Modding/SevenDev.Boundless.Modding.csproj" />
+
+    <PackageReference Include="SevenDev.Boundless.Utility" Version="1.0.7" />
+
     <PackageReference Include="Microsoft.Build.Locator" Version="1.9.1" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
   </ItemGroup>

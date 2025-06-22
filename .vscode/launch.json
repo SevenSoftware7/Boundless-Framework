@@ -7,12 +7,10 @@
       "request": "launch",
       "preLaunchTask": "build",
       "program": "${config:godot.path}",
-      "cwd": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}/Framework",
       "console": "internalConsole",
       "stopAtEntry": false,
       "args": [
-        "--path",
-        "${workspaceFolder}",
         "--debug-collisions",
         "--debug-paths",
         "--debug-navigation"
@@ -28,8 +26,6 @@
       "console": "internalConsole",
       "stopAtEntry": false,
       "args": [
-        "--path",
-        "${workspaceRoot}",
         "${command:godot.csharp.getLaunchScene}",
         "--debug-collisions",
       ]
@@ -50,8 +46,6 @@
       "console": "internalConsole",
       "stopAtEntry": false,
       "args": [
-        "--path",
-        "${workspaceRoot}",
         "--editor"
       ]
     }

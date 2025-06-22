@@ -1,4 +1,4 @@
-namespace SevenDev.Boundless;
+namespace SevenDev.Boundless.Modding;
 
 using Godot;
 using System;

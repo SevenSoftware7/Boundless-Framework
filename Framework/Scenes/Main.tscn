@@ -1,4 +1,4 @@
-[gd_scene load_steps=119 format=3 uid="uid://b505xodur2iff"]
+[gd_scene load_steps=120 format=3 uid="uid://b505xodur2iff"]
 
 [ext_resource type="Script" uid="uid://cvkvg45cwuu2" path="res://Scripts/Core/MainNode.cs" id="1_u7mjy"]
 [ext_resource type="RDShaderFile" uid="uid://br3hg0ejs6wif" path="res://Resources/Rendering/Shaders/FetchWaterData.glsl" id="2_5l7vn"]
@@ -19,6 +19,7 @@
 [ext_resource type="Script" uid="uid://d3j00f1kcv4c2" path="res://Scripts/Core/Item/Weapon/Collection/Implementations/MultiWeapon.cs" id="13_d6cna"]
 [ext_resource type="Script" uid="uid://demu2xbt0bpng" path="res://Scripts/Core/Traits/TraitModifierTrigger.cs" id="15_4yxf6"]
 [ext_resource type="PackedScene" uid="uid://b7b17ebmgtrfy" path="res://Resources/Weapons/Pax/Pax.tscn" id="15_x4bcq"]
+[ext_resource type="Script" uid="uid://bycrdvgqioks7" path="res://Scripts/Core/Traits/TraitModifier.cs" id="16_u7mjy"]
 [ext_resource type="PackedScene" uid="uid://bp1e6thwkkcrr" path="res://Resources/Weapons/Eleos/Eleos.tscn" id="17_jhoyp"]
 [ext_resource type="Script" uid="uid://clw5y4grhymdv" path="res://Scripts/Core/Traits/SetModifier.cs" id="18_6heos"]
 [ext_resource type="Script" uid="uid://cdkgbhb2txfvj" path="res://Scripts/Core/Damage/DamageArea.cs" id="18_pbwgl"]
@@ -1908,7 +1909,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.4761, 1.30216, -12.7711)
 collision_layer = 2048
 collision_mask = 2304
 script = ExtResource("15_4yxf6")
-_traitModifiers = [SubResource("Resource_btbly")]
+_traitModifiers = Array[ExtResource("16_u7mjy")]([SubResource("Resource_btbly")])
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/WitherArea3D"]
 shape = SubResource("SphereShape3D_d0jor")
@@ -1972,6 +1973,9 @@ skeleton = NodePath("../../CollisionShape3D/MeshInstance3D")
 [node name="Player" parent="." node_paths=PackedStringArray("Entity") instance=ExtResource("26_rkn04")]
 process_priority = -50
 Entity = NodePath("../Eos")
+
+[node name="FX" parent="Player/CameraController3D" index="0"]
+transform = Transform3D(-0.730305, -0.683105, -0.00474517, 2.32831e-09, -0.00694631, 0.999976, -0.683121, 0.730287, 0.00507292, 0, 0, 0)
 
 [node name="Bike" parent="." instance=ExtResource("20_pcyav")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.10534, 2, 32.9924)
@@ -2131,36 +2135,36 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, -2.5)
 
 [node name="WaterFloater" type="Node" parent="Boat/Floater" node_paths=PackedStringArray("Body", "Origin")]
 script = ExtResource("29_nhfxh")
-floaterCount = 4
 Body = NodePath("../..")
 Origin = NodePath("..")
+floaterCount = 4
 
 [node name="Floater_2" type="Node3D" parent="Boat"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, 2.5)
 
 [node name="WaterFloater" type="Node" parent="Boat/Floater_2" node_paths=PackedStringArray("Body", "Origin")]
 script = ExtResource("29_nhfxh")
-floaterCount = 4
 Body = NodePath("../..")
 Origin = NodePath("..")
+floaterCount = 4
 
 [node name="Floater_3" type="Node3D" parent="Boat"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, -2.5)
 
 [node name="WaterFloater" type="Node" parent="Boat/Floater_3" node_paths=PackedStringArray("Body", "Origin")]
 script = ExtResource("29_nhfxh")
-floaterCount = 4
 Body = NodePath("../..")
 Origin = NodePath("..")
+floaterCount = 4
 
 [node name="Floater_4" type="Node3D" parent="Boat"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 2.5)
 
 [node name="WaterFloater" type="Node" parent="Boat/Floater_4" node_paths=PackedStringArray("Body", "Origin")]
 script = ExtResource("29_nhfxh")
-floaterCount = 4
 Body = NodePath("../..")
 Origin = NodePath("..")
+floaterCount = 4
 
 [node name="Node3D" type="Node3D" parent="."]
 

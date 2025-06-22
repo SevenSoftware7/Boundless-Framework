@@ -1,4 +1,4 @@
-namespace SevenDev.Boundless;
+namespace SevenDev.Boundless.Modding;
 
 using System.Runtime.Loader;
 using System.Reflection;
@@ -23,7 +23,7 @@ public sealed class GodotResAssemblyLoadContext : AssemblyLoadContext {
 			string? assemblyPath = _assemblyPath.CombineDirectory($"{assemblyName.Name}.dll");
 			byte[]? file = Godot.FileAccess.GetFileAsBytes(assemblyPath);
 			if (file.Length == 0) {
-				GD.PrintErr(Godot.FileAccess.GetOpenError());
+				GD.PrintErr($"[Boundless.Modding]: {Godot.FileAccess.GetOpenError()}");
 				return null;
 			}
 
@@ -35,7 +35,7 @@ public sealed class GodotResAssemblyLoadContext : AssemblyLoadContext {
 		string? libraryPath = _assemblyPath.CombineFile($"{unmanagedDllName}.dll");
 		byte[]? file = Godot.FileAccess.GetFileAsBytes(libraryPath);
 		if (file.Length == 0) {
-			GD.PrintErr(Godot.FileAccess.GetOpenError());
+			GD.PrintErr($"[Boundless.Modding]: {Godot.FileAccess.GetOpenError()}");
 			return 0;
 		}
 

@@ -2,13 +2,11 @@ namespace SevenDev.Boundless.Modding;
 
 using System;
 using System.Collections.Generic;
-using Godot;
 using YamlDotNet.Serialization;
-using SevenDev.Boundless;
 using SevenDev.Boundless.Utility;
 
 
-public class ModMetaData : IEquatable<ModMetaData> {
+public class ModManifest : IEquatable<ModManifest> {
 	public static readonly IDeserializer Deserializer = new DeserializerBuilder()
 		.WithNamingConvention(YamlDotNet.Serialization.NamingConventions.HyphenatedNamingConvention.Instance)
 		.WithTypeConverter(new FilePathConverter())
@@ -45,25 +43,15 @@ public class ModMetaData : IEquatable<ModMetaData> {
 	public IEnumerable<string> Dependencies { get; set; } = [];
 
 
-	public static ModMetaData FromYaml(in string yaml) {
-		return Deserializer.Deserialize<ModMetaData>(yaml);
+	public static ModManifest FromYaml(in string yaml) {
+		return Deserializer.Deserialize<ModManifest>(yaml);
 	}
-	public static string ToYaml(in ModMetaData metaData) {
+	public static string ToYaml(in ModManifest metaData) {
 		return Serializer.Serialize(metaData);
 	}
 
 
-	public Mod? Load() {
-		try {
-			return Mod.Load(this);
-		}
-		catch (Exception e) {
-			GD.PrintErr(e.Message);
-			return null;
-		}
-	}
-
-	public bool Equals(ModMetaData? other) {
+	public bool Equals(ModManifest? other) {
 		if (other is null) return false;
 		if (ReferenceEquals(this, other)) return true;
 
@@ -73,7 +61,7 @@ public class ModMetaData : IEquatable<ModMetaData> {
 	}
 
 	public override bool Equals(object? obj) {
-		if (obj is ModMetaData other) {
+		if (obj is ModManifest other) {
 			return Equals(other);
 		}
 		return false;

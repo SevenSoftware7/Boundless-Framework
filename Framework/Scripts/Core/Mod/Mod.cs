@@ -12,28 +12,33 @@ using SevenDev.Boundless.Utility;
 
 
 public class Mod : IDisposable {
-	internal static readonly Dictionary<ModMetaData, Mod> LoadedModsDictionary = [];
-	public static IEnumerable<Mod> LoadedMods => LoadedModsDictionary.Values;
+	public static readonly Type ModInterfaceType = typeof(IModInterface);
 
+	internal static readonly Dictionary<ModManifest, Mod> LoadedModsDictionary = [];
+	public static IEnumerable<Mod> LoadedMods => LoadedModsDictionary.Values;
 	private static readonly DirectoryPath ModAssetsPath = new("res://ModAssets/");
+
 	private bool _disposed = false;
 	private bool _started = false;
 
-	public ModMetaData MetaData { get; init; }
+	public ModManifest MetaData { get; init; }
 
-	public (Assembly, AssemblyLoadContext)[] Assemblies { get; private set; }
-	public PckFile[] AssetPacks { get; private set; }
+	public IEnumerable<(Assembly, AssemblyLoadContext)> Assemblies { get; private set; }
+	public IEnumerable<IModInterface> ModInterfaces { get; private set; }
 
-	internal static Mod? Load(ModMetaData metaData) {
+	public IEnumerable<PckFile> AssetPacks { get; private set; }
+
+
+	internal static Mod? Load(ModManifest metaData) {
 		ref Mod? mod = ref CollectionsMarshal.GetValueRefOrAddDefault(LoadedModsDictionary, metaData, out bool exists);
 		if (exists) return mod;
 
-		return mod = new Mod(metaData);
-	}
-	private Mod(ModMetaData metaData) {
 		if (Engine.IsEditorHint()) {
 			throw new InvalidOperationException("Cannot load mods in the editor.");
 		}
+		return mod = new Mod(metaData);
+	}
+	private Mod(ModManifest metaData) {
 
 		MetaData = metaData;
 
@@ -44,11 +49,18 @@ public class Mod : IDisposable {
 				.OfType<(Assembly, AssemblyLoadContext)>()
 		];
 
-		AssetPacks = [..
-			metaData.AssetPaths
-				.Select(metaData.Path.Directory.Combine)
-				.Select(PckFile.Load)
+		ModInterfaces = [..
+			Assemblies.Select(pair => pair.Item1)
+				.SelectMany(assembly => assembly.GetTypes())
+				.SelectMany(type => type.GetMethods())
+				.Where(method => method.IsStatic && method.ReturnType == ModInterfaceType && method.GetParameters().Length == 0)
+				.Select(method => method.Invoke(null, null))
+				.OfType<IModInterface>()
 		];
+
+		AssetPacks = metaData.AssetPaths
+			.Select(metaData.Path.Directory.Combine)
+			.Select(PckFile.Load);
 	}
 
 	~Mod() {
@@ -70,7 +82,9 @@ public class Mod : IDisposable {
 		foreach ((_, AssemblyLoadContext context) in Assemblies) {
 			context.Unload();
 		}
+
 		Assemblies = null!;
+		ModInterfaces = null!;
 
 		AssetPacks = null!;
 	}
@@ -83,7 +97,7 @@ public class Mod : IDisposable {
 
 		byte[] file = Godot.FileAccess.GetFileAsBytes(assemblyPath);
 		if (file.Length == 0) {
-			GD.PrintErr(Godot.FileAccess.GetOpenError());
+			GD.PrintErr($"[Boundless.Modding]: {Godot.FileAccess.GetOpenError()}");
 			return null;
 		}
 		MemoryStream stream = new(file);
@@ -97,36 +111,33 @@ public class Mod : IDisposable {
 		if (_started) return;
 		_started = true;
 
-		GD.Print($"[Boundless.Modding] : Starting mod {MetaData.Name}");
+
+		GD.Print($"[Boundless.Modding]: Starting mod {MetaData.Name}");
 
 		DirectoryPath installPath = ModAssetsPath.CombineDirectory(MetaData.Name);
 		foreach (PckFile assetPack in AssetPacks) {
 			assetPack.Install(installPath);
 		}
-
-		foreach ((Assembly assembly, _) in Assemblies) {
-			assembly.GetTypes().SelectMany(type => type.GetMethods())
-				.Where(method => method.Name == "Main" && method.GetParameters().Length == 0)
-				.ToList().ForEach(method => method.Invoke(null, null));
+		foreach (IModInterface modInterface in ModInterfaces) {
+			modInterface.Start();
 		}
 
-		GD.Print($"[Boundless.Modding] : Started mod {MetaData.Name}");
+		GD.Print($"[Boundless.Modding]: Started mod {MetaData.Name}");
 	}
 	public void Stop() {
 		if (!_started) return;
 		_started = false;
 
-		GD.Print($"[Boundless.Modding] : Stopping mod {MetaData.Name}");
 
-		foreach ((Assembly assembly, _) in Assemblies) {
-			assembly.GetTypes().SelectMany(type => type.GetMethods())
-				.Where(method => method.Name == "Stop" && method.GetParameters().Length == 0)
-				.ToList().ForEach(method => method.Invoke(null, null));
+		GD.Print($"[Boundless.Modding]: Stopping mod {MetaData.Name}");
+
+		foreach (IModInterface modInterface in ModInterfaces) {
+			modInterface.Stop();
 		}
 		foreach (PckFile assetPack in AssetPacks) {
 			assetPack.Uninstall();
 		}
 
-		GD.Print($"[Boundless.Modding] : Stopped mod {MetaData.Name}");
+		GD.Print($"[Boundless.Modding]: Stopped mod {MetaData.Name}");
 	}
 }

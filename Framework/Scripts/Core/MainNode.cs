@@ -1,7 +1,12 @@
 namespace SevenDev.Boundless;
 
+using System.Reflection;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using SevenDev.Boundless.Injection;
+using SevenDev.Boundless.Modding;
 using SevenDev.Boundless.Persistence;
 
 [Tool]
@@ -23,14 +28,30 @@ public partial class MainNode : Node3D, ISerializationListener {
 		RegisterData();
 		this.PropagateInjection();
 
-		// if (Engine.IsEditorHint()) return;
+		if (Engine.IsEditorHint()) return;
 
 
-		// Mod? mod = ModLoader.LoadInternalMod("TestMod");
-		// mod?.Start();
+		IEnumerable<Mod> mods = ModLoader.LoadInternalModFolder("EndlessTwilight");
+		List<IItemDataProvider> addedRegistries = [];
+		foreach (Mod mod in mods) {
+			mod.Start();
+			foreach (IModInterface modInterface in mod.ModInterfaces) {
+				if (modInterface.ItemDataProvider is IItemDataProvider itemDataProvider) {
+					addedRegistries.Add(itemDataProvider);
+					_registries.AddRegistry(itemDataProvider);
+				}
+			}
+		}
 
+		GD.Print($"Loaded {mods.Count()} mods with {addedRegistries.Count} item data providers.");
 
-		// mod?.Stop();
+		foreach (IItemDataProvider itemDataProvider in addedRegistries) {
+			_registries.RemoveRegistry(itemDataProvider);
+		}
+
+		foreach (Mod mod in mods) {
+			mod.Stop();
+		}
 	}
 
 	public void OnBeforeSerialize() { }

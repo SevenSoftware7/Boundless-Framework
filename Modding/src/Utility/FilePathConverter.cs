@@ -1,4 +1,4 @@
-namespace SevenDev.Boundless;
+namespace SevenDev.Boundless.Modding;
 
 using System;
 using YamlDotNet.Serialization;
@@ -40,11 +40,21 @@ public class FilePathConverter : IYamlTypeConverter {
 
 		if (type == FilePathType) {
 			FilePath path = (FilePath)value;
-			emitter.Emit(new Scalar(null, null, path.Path ?? "null", ScalarStyle.DoubleQuoted, false, true));
+			if (path.Path is string pathString) {
+				emitter.Emit(new Scalar(null, null, pathString, ScalarStyle.DoubleQuoted, false, true));
+			}
+			else {
+				emitter.Emit(new Scalar("null"));
+			}
 		}
 		else if (type == DirectoryPathType) {
 			DirectoryPath path = (DirectoryPath)value;
-			emitter.Emit(new Scalar(null, null, path.Path ?? "null", ScalarStyle.DoubleQuoted, false, true));
+			if (path.Path is string pathString) {
+				emitter.Emit(new Scalar(null, null, pathString, ScalarStyle.DoubleQuoted, false, true));
+			}
+			else {
+				emitter.Emit(new Scalar("null"));
+			}
 		}
 	}
 }

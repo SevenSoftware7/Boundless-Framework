@@ -1,4 +1,4 @@
-namespace SevenDev.Boundless;
+namespace SevenDev.Boundless.Modding;
 
 using System;
 using System.Collections.Generic;
@@ -106,7 +106,7 @@ public record class UidCache {
 	public void WriteToFile(FilePath path) {
 		using Godot.FileAccess file = Godot.FileAccess.Open(path, Godot.FileAccess.ModeFlags.Write);
 		if (file is null) {
-			GD.PrintErr(Godot.FileAccess.GetOpenError());
+			GD.PrintErr($"[Boundless.Modding]: {Godot.FileAccess.GetOpenError()}");
 			return;
 		}
 

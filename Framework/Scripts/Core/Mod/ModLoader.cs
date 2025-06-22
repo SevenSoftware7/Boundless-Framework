@@ -6,28 +6,28 @@ using System.Linq;
 using Godot;
 using SevenDev.Boundless.Utility;
 
-internal static class ModLoader {
+public static class ModLoader {
 	private static readonly DirectoryPath ModDirectoryName = new("mods");
 	private static readonly DirectoryPath UserModsPath = ModDirectoryName with { Protocol = "user" };
 	private static readonly DirectoryPath InternalModsPath = ModDirectoryName with { Protocol = "res" };
 
 
-	private static ModMetaData? ParseModConfig(FilePath modFilePath) {
+	private static ModManifest? ParseModConfig(FilePath modFilePath) {
 
 		byte[]? file = FileAccess.GetFileAsBytes(modFilePath);
 		if (file.Length == 0) {
-			GD.PrintErr(FileAccess.GetOpenError());
+			GD.PrintErr($"[Boundless.Modding]: {FileAccess.GetOpenError()}");
 			return null;
 		}
 		string modConfig = System.Text.Encoding.UTF8.GetString(file);
 
-		ModMetaData metaData = ModMetaData.FromYaml(modConfig);
+		ModManifest metaData = ModManifest.FromYaml(modConfig);
 		metaData.Path = modFilePath;
 
 		return metaData;
 	}
 
-	private static IEnumerable<ModMetaData> ReadModFolder(DirectoryPath modFolder) {
+	private static IEnumerable<ModManifest> ReadModFolder(DirectoryPath modFolder) {
 		IEnumerable<string> modFilesNames = DirAccess.GetFilesAt(modFolder);
 
 		return modFilesNames
@@ -38,20 +38,40 @@ internal static class ModLoader {
 	}
 
 
-	public static IEnumerable<ModMetaData> ReadUserModFolder(string folderName) =>
+	public static IEnumerable<ModManifest> ReadUserModFolder(string folderName) =>
 		ReadModFolder(UserModsPath.CombineDirectory(folderName));
+	public static IEnumerable<Mod> LoadUserModFolder(string folderName) =>
+		ReadUserModFolder(folderName)
+			.Select(metaData => Mod.Load(metaData))
+			.Where(mod => mod is not null)
+			.Select(mod => mod!);
 
-	public static IEnumerable<ModMetaData> ReadInternalModFolder(string folderName) =>
+	public static IEnumerable<ModManifest> ReadInternalModFolder(string folderName) =>
 		ReadModFolder(InternalModsPath.CombineDirectory(folderName));
+	public static IEnumerable<Mod> LoadInternalModFolder(string folderName) =>
+		ReadInternalModFolder(folderName)
+			.Select(metaData => Mod.Load(metaData))
+			.Where(mod => mod is not null)
+			.Select(mod => mod!);
 
 
-	public static IEnumerable<ModMetaData> ReadAllUserMods() {
+	public static IEnumerable<ModManifest> ReadAllUserMods() {
 		IEnumerable<string> modFolderNames = DirAccess.GetDirectoriesAt(UserModsPath);
 		return modFolderNames.SelectMany(ReadUserModFolder);
 	}
+	public static IEnumerable<Mod> LoadAllUserMods() =>
+		ReadAllUserMods()
+			.Select(metaData => Mod.Load(metaData))
+			.Where(mod => mod is not null)
+			.Select(mod => mod!);
 
-	public static IEnumerable<ModMetaData> ReadAllInternalMods() {
+	public static IEnumerable<ModManifest> ReadAllInternalMods() {
 		IEnumerable<string> modFolderNames = DirAccess.GetDirectoriesAt(InternalModsPath);
 		return modFolderNames.SelectMany(ReadInternalModFolder);
 	}
+	public static IEnumerable<Mod> LoadAllInternalMods() =>
+		ReadAllInternalMods()
+			.Select(metaData => Mod.Load(metaData))
+			.Where(mod => mod is not null)
+			.Select(mod => mod!);
 }

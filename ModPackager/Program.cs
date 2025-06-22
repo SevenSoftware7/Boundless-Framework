@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Godot;
 using Microsoft.Build.Locator;
 using SevenDev.Boundless.Modding;
 using SevenDev.Boundless.Utility;
@@ -19,28 +20,33 @@ internal partial class Program {
 	[GeneratedRegex(@"<Version>(.*?)<\/Version>", RegexOptions.IgnoreCase)]
 	private static partial Regex CsprojVersionRegex();
 
+	[GeneratedRegex(@"<Description>(.*?)<\/Description>", RegexOptions.IgnoreCase)]
+	private static partial Regex CsprojDescriptionRegex();
+
 
 	private static async Task<int> Main(string[] args) {
-		Option<FileInfo[]> projectsOption = new("--projects", "List of Godot project.godot files");
-		Option<FileInfo?> godotExeOption = new("--godot", getDefaultValue: () => null, description: "Path to the Godot executable");
-		Option<DirectoryInfo> outputOption = new("--output", getDefaultValue: () => new("./mod/"), description: "Output folder for .dll and .pck files");
-		Option<string?> authorOption = new("--author", getDefaultValue: () => null, description: "Author name to include in the mod manifest");
-		Option<string?> versionOption = new("--verison", getDefaultValue: () => null, description: "Version to include in the mod manifest");
+		Option<FileInfo[]> projectsOption = new(["--projects", "-p"], "List of Godot project.godot files");
+		Option<FileInfo?> godotExeOption = new(["--godot", "-g"], getDefaultValue: () => null, description: "Path to the Godot executable");
+		Option<DirectoryInfo> outputOption = new(["--output", "-o"], getDefaultValue: () => new("./mod/"), description: "Output folder for .dll and .pck files");
+		Option<string?> authorOption = new(["--author", "-a"], getDefaultValue: () => null, description: "Author name to include in the mod manifest");
+		Option<string?> versionOption = new(["--project-version", "-v"], getDefaultValue: () => null, description: "Version to include in the mod manifest");
+		Option<string?> descriptionOption = new(["--description", "-d"], getDefaultValue: () => null, description: "Description to include in the mod manifest");
 
 		RootCommand? rootCommand = new("Godot Mod Packager") {
 			projectsOption,
 			godotExeOption,
 			outputOption,
 			authorOption,
-			versionOption
+			versionOption,
+			descriptionOption
 		};
 
-		rootCommand.SetHandler(Execute, projectsOption, godotExeOption, outputOption, authorOption, versionOption);
+		rootCommand.SetHandler(Execute, projectsOption, godotExeOption, outputOption, authorOption, versionOption, descriptionOption);
 
 		return await rootCommand.InvokeAsync(args);
 	}
 
-	private static void Execute(FileInfo[] godotProjects, FileInfo? godotExe, DirectoryInfo output, string? author, string? version) {
+	private static void Execute(FileInfo[] godotProjects, FileInfo? godotExe, DirectoryInfo output, string? author, string? version, string? description) {
 		MSBuildLocator.RegisterDefaults();
 
 		foreach (FileInfo godotProject in godotProjects) {
@@ -83,7 +89,7 @@ internal partial class Program {
 			}
 
 			if (version is null) {
-				version = "1.0.0"; // Default version if not provided
+				version = "1.0.0";
 
 				Match? versionMatch = CsprojVersionRegex().Match(csprojContent);
 				if (versionMatch?.Groups.Count > 1) {
@@ -91,20 +97,32 @@ internal partial class Program {
 				}
 			}
 
+			if (description is null) {
+				description = "";
+
+				Match? descriptionMatch = CsprojDescriptionRegex().Match(csprojContent);
+				if (descriptionMatch?.Groups.Count > 1) {
+					description = descriptionMatch.Groups[1].Value.Trim();
+				}
+			}
+
 
 			Console.WriteLine($"Building {assemblyName}.csproj ...");
-			string? dllFile = BuildGodotCsproj(csproj);
-			if (dllFile is null) {
+			(FilePath projectDll, FilePath[] accessoryDlls)? buildOutput = BuildGodotCsproj(csproj);
+			if (buildOutput is null) {
 				Console.WriteLine($"No DLL found for {assemblyName} in {projectDir}");
 				continue;
 			}
-			string dllFileName = Path.GetFileName(dllFile);
 
 			string assembliesPath = Path.Combine(output.FullName, "Assemblies");
 			Directory.CreateDirectory(assembliesPath);
 
-			string destPath = Path.Combine(assembliesPath, dllFileName);
-			File.Copy(dllFile, destPath, overwrite: true);
+			string destPath = Path.Combine(assembliesPath, buildOutput.Value.projectDll.FullFileName);
+			File.Copy(buildOutput.Value.projectDll.Path, destPath, overwrite: true);
+			foreach (FilePath accessoryDll in buildOutput.Value.accessoryDlls) {
+				string accessoryDestPath = Path.Combine(assembliesPath, accessoryDll.FullFileName);
+				File.Copy(accessoryDll.Path, accessoryDestPath, overwrite: true);
+			}
 
 			Console.WriteLine($"Successfully built {csproj} to {assembliesPath}");
 
@@ -116,27 +134,28 @@ internal partial class Program {
 			string? pckName = $"{projectName}.pck";
 			string? pckPath = Path.Combine(assetsPath, pckName);
 
-			int packResult = RunProcess(godotExe?.FullName ?? "godot", $"--path \"{projectDir}\" --export-pack \"Windows Desktop\" \"{pckPath}\"");
+			int packResult = RunProcess(godotExe?.FullName ?? "godot", $"--headless --path \"{projectDir}\" --export-pack \"Windows Desktop\" \"{pckPath}\"");
 			if (packResult != 0) {
 				Console.WriteLine($"Failed to pack assets for {projectFileContents}");
 				continue;
 			}
 
-			Console.WriteLine($"Successfully packed assets into {pckPath}");
+			Console.WriteLine($"Successfully packed assets into {assetsPath}");
 
 
 			// 3. Create mod manifest
 			string pascalCaseProjectName = ToPascalCase(projectName);
 			string modManifestPath = Path.Combine(output.FullName, $"{pascalCaseProjectName}.mod.yaml");
-			ModMetaData modMetaData = new() {
+			ModManifest modManifest = new() {
 				Name = projectName,
 				Version = version,
 				Author = author,
-				AssemblyPaths = [new FilePath($"Assemblies/{dllFileName}")],
+				Description = description,
+				AssemblyPaths = [new FilePath($"Assemblies/{buildOutput.Value.projectDll.FullFileName}")],
 				AssetPaths = [new FilePath($"Assets/{pckName}")],
 			};
 
-			File.WriteAllText(modManifestPath, ModMetaData.ToYaml(modMetaData));
+			File.WriteAllText(modManifestPath, ModManifest.ToYaml(modManifest));
 		}
 	}
 
@@ -151,11 +170,11 @@ internal partial class Program {
 		return pascalCase;
 	}
 
-	private static string? BuildGodotCsproj(string path) {
+	private static (FilePath projectDll, FilePath[] accessoryDlls)? BuildGodotCsproj(string path) {
 		string projectDir = Path.GetDirectoryName(path) ?? throw new ArgumentException("Invalid project file path.");
 		string assemblyName = Path.GetFileNameWithoutExtension(path);
 
-		int buildResult = RunProcess("dotnet", $"build \"{path}\" -c Release");
+		int buildResult = RunProcess("dotnet", $"publish \"{path}\" -c Release");
 		if (buildResult != 0) {
 			Console.WriteLine($"Failed to build {assemblyName}");
 			return null;
@@ -166,8 +185,21 @@ internal partial class Program {
 			return null;
 		}
 
-		// Find all DLLs matching the assembly name
-		return Directory.GetFiles(tempBinDir, $"{assemblyName}.dll", SearchOption.AllDirectories).FirstOrDefault();
+
+		FilePath[] dllFiles = [..
+			Directory.GetFiles(tempBinDir, "*.dll", SearchOption.AllDirectories)
+				.Select(filePath => new FilePath(filePath))
+		];
+		FilePath? projectDll = dllFiles.FirstOrDefault(file => file.FileName == assemblyName);
+		if (!projectDll.HasValue) {
+			Console.WriteLine($"No DLL found for {assemblyName} in {tempBinDir}");
+			return null;
+		}
+		Console.WriteLine($"Found project DLL: {projectDll.Value}");
+
+		dllFiles = [.. dllFiles.Where(file => Path.GetFileNameWithoutExtension(file) != assemblyName)];
+
+		return (projectDll.Value, dllFiles);
 	}
 
 	private static Process? StartProcess(string fileName, string arguments) {

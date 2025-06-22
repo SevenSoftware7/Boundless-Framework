@@ -18,7 +18,9 @@
     <Using Include="SimdLinq" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="SevenDev.Boundless.Utility" Version="1.0.6" />
+    <ProjectReference Include="../Modding/SevenDev.Boundless.Modding.csproj" />
+
+    <PackageReference Include="SevenDev.Boundless.Utility" Version="1.0.7" />
     <!-- <ProjectReference Include="../../Boundless.Utility/SevenDev.Boundless.Utility/SevenDev.Boundless.Utility.csproj" /> -->
 
     <PackageReference Include="SevenDev.Boundless.Injection" Version="1.1.9" />
@@ -31,6 +33,5 @@
 
     <PackageReference Include="KGySoft.CoreLibraries" Version="8.1.0" />
     <PackageReference Include="SimdLinq" Version="1.3.2" />
-    <PackageReference Include="YamlDotNet" Version="16.2.0" />
   </ItemGroup>
 </Project>
