@@ -1,10 +1,9 @@
-[gd_resource type="Resource" script_class="WeaponCostumeSceneData" load_steps=3 format=3 uid="uid://q68mneifjek2"]
+[gd_resource type="Resource" script_class="WeaponCostumeSceneData" load_steps=2 format=3 uid="uid://q68mneifjek2"]
 
-[ext_resource type="Resource" uid="uid://dw0tbdkonwsel" path="res://Resources/Weapons/Eleos/Costumes/Eleos-base_key.tres" id="1_0ygf1"]
 [ext_resource type="Script" uid="uid://2l2r58pjqet5" path="res://Scripts/Core/Item/Weapon/Costume/WeaponCostumeSceneData.cs" id="2_efaeu"]
 
 [resource]
 script = ExtResource("2_efaeu")
-KeyProvider = ExtResource("1_0ygf1")
+ItemKeyString = "eleos_base=cos"
 DisplayName = "Eleos (base)"
 ScenePath = "uid://chsj82irsedw6"

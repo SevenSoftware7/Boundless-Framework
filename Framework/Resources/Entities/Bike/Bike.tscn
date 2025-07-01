@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bxcpbr13uyeh1"]
+[gd_scene load_steps=13 format=3 uid="uid://bxcpbr13uyeh1"]
 
 [ext_resource type="Script" uid="uid://btpoqelwvyeef" path="res://Scripts/Core/Item/Entity/Entity.cs" id="1_46ioo"]
 [ext_resource type="Resource" uid="uid://q4arq6wxs6ho" path="res://Resources/Entities/Bike/Bike_data.tres" id="2_uy6xw"]
@@ -8,7 +8,6 @@
 [ext_resource type="Script" uid="uid://cpqri6cw2hye2" path="res://Scripts/Core/Traits/TraitsCollection.cs" id="5_8ie50"]
 [ext_resource type="Script" uid="uid://biyf7xcsm2ob8" path="res://Scripts/Vanilla/VehicleSeatInteractable.cs" id="5_kaq40"]
 [ext_resource type="Script" uid="uid://bycrdvgqioks7" path="res://Scripts/Core/Traits/TraitModifier.cs" id="6_uy6xw"]
-[ext_resource type="Resource" uid="uid://djkxop4aum535" path="res://Resources/Entities/Bike/Costumes/Bike-base_key.tres" id="8_5fcav"]
 
 [sub_resource type="Resource" id="Resource_xs8l5"]
 script = ExtResource("5_8ie50")
@@ -49,7 +48,7 @@ CenterOfMass = NodePath("CollisionShape3D/CenterOfMass")
 
 [node name="CostumeHolder" type="Node3D" parent="."]
 script = ExtResource("5_5toi3")
-CostumeKeyProvider = ExtResource("8_5fcav")
+ItemKeyString = "proioxis_base=cos"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)

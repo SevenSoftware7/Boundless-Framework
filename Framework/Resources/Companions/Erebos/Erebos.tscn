@@ -1,9 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://b7hcoc81x5g0i"]
+[gd_scene load_steps=5 format=3 uid="uid://b7hcoc81x5g0i"]
 
 [ext_resource type="Script" uid="uid://dwnwlqecyrjhn" path="res://Scripts/Vanilla/Companion/FloatingCompanion.cs" id="1_1r20i"]
 [ext_resource type="Resource" uid="uid://7o3ch4vnd7ux" path="res://Resources/Companions/Erebos/Erebos_data.tres" id="2_ca1ga"]
 [ext_resource type="Script" uid="uid://dwtp85ydlhl31" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="2_iwojg"]
-[ext_resource type="Resource" uid="uid://dld7ow8og42nk" path="res://Resources/Companions/Erebos/Costumes/Erebos-base_key.tres" id="5_avcnb"]
 
 [sub_resource type="Curve3D" id="Curve3D_11sy3"]
 _data = {
@@ -25,4 +24,4 @@ transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 
 
 [node name="CostumeHolder" type="Node3D" parent="."]
 script = ExtResource("2_iwojg")
-CostumeKeyProvider = ExtResource("5_avcnb")
+ItemKeyString = "erebos_base=cos"

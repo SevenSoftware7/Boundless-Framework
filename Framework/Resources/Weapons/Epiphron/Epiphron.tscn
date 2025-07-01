@@ -1,10 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://fbs6dr24ss3g"]
+[gd_scene load_steps=5 format=3 uid="uid://fbs6dr24ss3g"]
 
 [ext_resource type="Script" uid="uid://cy5ldswqbnvmh" path="res://Scripts/Vanilla/Weapon/Epiphron/EpiphronWeapon.cs" id="1_wltox"]
 [ext_resource type="Resource" uid="uid://7vx1dn4qvh34" path="res://Resources/Weapons/Epiphron/Epiphron_data.tres" id="2_4yl6i"]
 [ext_resource type="Script" uid="uid://dwtp85ydlhl31" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="2_b3qyv"]
 [ext_resource type="AnimationLibrary" uid="uid://b0gic15n8ccgn" path="res://Resources/Weapons/Epiphron/EpiphronAnimations.tres" id="2_v8v6b"]
-[ext_resource type="Resource" uid="uid://b5vpfmo67yl6e" path="res://Resources/Weapons/Epiphron/Costumes/Epiphron-base_key.tres" id="6_7myka"]
 
 [node name="Epiphron" type="Node3D" node_paths=PackedStringArray("_costumeHolder")]
 script = ExtResource("1_wltox")
@@ -14,4 +13,4 @@ _costumeHolder = NodePath("CostumeHolder")
 
 [node name="CostumeHolder" type="Node3D" parent="."]
 script = ExtResource("2_b3qyv")
-CostumeKeyProvider = ExtResource("6_7myka")
+ItemKeyString = "epiphron_base=cos"

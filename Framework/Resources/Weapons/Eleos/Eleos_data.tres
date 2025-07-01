@@ -1,10 +1,9 @@
-[gd_resource type="Resource" script_class="WeaponSceneData" load_steps=3 format=3 uid="uid://dwoudcgmk0aae"]
+[gd_resource type="Resource" script_class="WeaponSceneData" load_steps=2 format=3 uid="uid://dwoudcgmk0aae"]
 
-[ext_resource type="Resource" uid="uid://r7mx5ymlfh3l" path="res://Resources/Weapons/Eleos/Eleos_key.tres" id="1_a63nq"]
 [ext_resource type="Script" uid="uid://cjb4jgm8obkbv" path="res://Scripts/Core/Item/Weapon/WeaponSceneData.cs" id="2_w44ts"]
 
 [resource]
 script = ExtResource("2_w44ts")
-KeyProvider = ExtResource("1_a63nq")
+ItemKeyString = "eleos=arm"
 DisplayName = "Eleos"
 ScenePath = "uid://bp1e6thwkkcrr"

@@ -5,14 +5,13 @@ using SevenDev.Boundless.Persistence;
 
 [Tool]
 public abstract partial class SceneItemData<[MustBeVariant] T> : Resource, IItemData<T> where T : Node, IItem<T> {
-	ItemKey? IItemData.ItemKey => KeyProvider.ItemKey;
-	[Export] public ResourceItemKey KeyProvider {
-		get;
-		private set {
-			if (value is null) return;
-			field = value;
-		}
-	} = new();
+
+	[Export] private string ItemKeyString {
+		get => ItemKey?.String ?? string.Empty;
+		set => ItemKey = string.IsNullOrWhiteSpace(value) ? null : new ItemKey(value);
+	}
+	public ItemKey? ItemKey = new();
+	ItemKey? IItemData.ItemKey => ItemKey;
 
 	[Export] public string DisplayName { get; private set; } = string.Empty;
 	[Export] public Texture2D? DisplayPortrait { get; private set; } = null;

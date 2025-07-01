@@ -1,7 +1,0 @@
-[gd_resource type="Resource" script_class="ResourceItemKey" load_steps=2 format=3 uid="uid://4x2qnwvdg3se"]
-
-[ext_resource type="Script" uid="uid://dugqykx48qmhv" path="res://Scripts/Core/Item/ResourceItemKey.cs" id="1_a02qh"]
-
-[resource]
-script = ExtResource("1_a02qh")
-String = "pax=arm"

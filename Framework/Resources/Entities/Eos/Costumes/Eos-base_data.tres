@@ -1,10 +1,9 @@
-[gd_resource type="Resource" script_class="EntityCostumeSceneData" load_steps=3 format=3 uid="uid://dvcjw3gon7rak"]
+[gd_resource type="Resource" script_class="EntityCostumeSceneData" load_steps=2 format=3 uid="uid://dvcjw3gon7rak"]
 
-[ext_resource type="Resource" uid="uid://bi8pp11ga45x3" path="res://Resources/Entities/Eos/Costumes/Eos-base_key.tres" id="1_v1q1j"]
 [ext_resource type="Script" uid="uid://upq7u1vamnru" path="res://Scripts/Core/Item/Entity/Costume/EntityCostumeSceneData.cs" id="2_tibbh"]
 
 [resource]
 script = ExtResource("2_tibbh")
-KeyProvider = ExtResource("1_v1q1j")
+ItemKeyString = "eos_base=cos"
 DisplayName = "Eos (base)"
 ScenePath = "uid://hje36y5wrdyu"

@@ -1,10 +1,9 @@
-[gd_resource type="Resource" script_class="EntitySceneData" load_steps=3 format=3 uid="uid://q4arq6wxs6ho"]
+[gd_resource type="Resource" script_class="EntitySceneData" load_steps=2 format=3 uid="uid://q4arq6wxs6ho"]
 
-[ext_resource type="Resource" uid="uid://dyvavvfne7go" path="res://Resources/Entities/Bike/Bike_key.tres" id="1_gb7ed"]
 [ext_resource type="Script" uid="uid://b3kwj5my3j2ik" path="res://Scripts/Core/Item/Entity/EntitySceneData.cs" id="2_g1571"]
 
 [resource]
 script = ExtResource("2_g1571")
-KeyProvider = ExtResource("1_gb7ed")
+ItemKeyString = "proioxis=ent"
 DisplayName = "Proioxis"
 ScenePath = "uid://bxcpbr13uyeh1"

@@ -1,10 +1,9 @@
-[gd_resource type="Resource" script_class="EntitySceneData" load_steps=3 format=3 uid="uid://djyqyaq7lwdkr"]
+[gd_resource type="Resource" script_class="EntitySceneData" load_steps=2 format=3 uid="uid://djyqyaq7lwdkr"]
 
-[ext_resource type="Resource" uid="uid://b56txqwbw36sk" path="res://Resources/Entities/Eos/Eos_key.tres" id="1_g205y"]
 [ext_resource type="Script" uid="uid://b3kwj5my3j2ik" path="res://Scripts/Core/Item/Entity/EntitySceneData.cs" id="3_jssrc"]
 
 [resource]
 script = ExtResource("3_jssrc")
-KeyProvider = ExtResource("1_g205y")
+ItemKeyString = "eos=ent"
 DisplayName = "Eos"
 ScenePath = "uid://b7rhbgw2dujty"

@@ -1,10 +1,9 @@
-[gd_resource type="Resource" script_class="WeaponCostumeSceneData" load_steps=3 format=3 uid="uid://ctyrw08y4svjk"]
+[gd_resource type="Resource" script_class="WeaponCostumeSceneData" load_steps=2 format=3 uid="uid://ctyrw08y4svjk"]
 
-[ext_resource type="Resource" uid="uid://nv3cruo4dqdt" path="res://Resources/Weapons/Pax/Costumes/Pax-base_key.tres" id="1_got4r"]
 [ext_resource type="Script" uid="uid://2l2r58pjqet5" path="res://Scripts/Core/Item/Weapon/Costume/WeaponCostumeSceneData.cs" id="3_jdnfj"]
 
 [resource]
 script = ExtResource("3_jdnfj")
-KeyProvider = ExtResource("1_got4r")
+ItemKeyString = "pax_base=cos"
 DisplayName = "Pax (base)"
 ScenePath = "uid://cbkv4cstjgb7i"

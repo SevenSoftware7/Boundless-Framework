@@ -1,7 +1,0 @@
-[gd_resource type="Resource" script_class="ResourceItemKey" load_steps=2 format=3 uid="uid://dw0tbdkonwsel"]
-
-[ext_resource type="Script" uid="uid://dugqykx48qmhv" path="res://Scripts/Core/Item/ResourceItemKey.cs" id="1_nqu2a"]
-
-[resource]
-script = ExtResource("1_nqu2a")
-String = "eleos_base=cos"

@@ -1,10 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://bp1e6thwkkcrr"]
+[gd_scene load_steps=5 format=3 uid="uid://bp1e6thwkkcrr"]
 
 [ext_resource type="Script" uid="uid://dj6f2ox28deti" path="res://Scripts/Vanilla/Weapon/Eleos/EleosWeapon.cs" id="1_pwvbn"]
 [ext_resource type="AnimationLibrary" uid="uid://dvww6dpnwphxd" path="res://Resources/Weapons/Eleos/EleosAnimations.tres" id="2_7ftow"]
 [ext_resource type="Resource" uid="uid://dwoudcgmk0aae" path="res://Resources/Weapons/Eleos/Eleos_data.tres" id="2_d3dwn"]
 [ext_resource type="Script" uid="uid://dwtp85ydlhl31" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="2_n5f5j"]
-[ext_resource type="Resource" uid="uid://dw0tbdkonwsel" path="res://Resources/Weapons/Eleos/Costumes/Eleos-base_key.tres" id="6_nud0r"]
 
 [node name="Eleos" type="Node3D" node_paths=PackedStringArray("_costumeHolder")]
 script = ExtResource("1_pwvbn")
@@ -14,4 +13,4 @@ _costumeHolder = NodePath("CostumeHolder")
 
 [node name="CostumeHolder" type="Node3D" parent="."]
 script = ExtResource("2_n5f5j")
-CostumeKeyProvider = ExtResource("6_nud0r")
+ItemKeyString = "eleos_base=cos"

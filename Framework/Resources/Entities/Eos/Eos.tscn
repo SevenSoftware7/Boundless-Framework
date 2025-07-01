@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://b7rhbgw2dujty"]
+[gd_scene load_steps=20 format=3 uid="uid://b7rhbgw2dujty"]
 
 [ext_resource type="Script" uid="uid://btpoqelwvyeef" path="res://Scripts/Core/Item/Entity/Entity.cs" id="1_44rt4"]
 [ext_resource type="Resource" uid="uid://djyqyaq7lwdkr" path="res://Resources/Entities/Eos/Eos_data.tres" id="2_sat4e"]
@@ -13,7 +13,6 @@
 [ext_resource type="Script" uid="uid://dwtp85ydlhl31" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="9_8kq40"]
 [ext_resource type="Script" uid="uid://bycrdvgqioks7" path="res://Scripts/Core/Traits/TraitModifier.cs" id="10_2qnhm"]
 [ext_resource type="Script" uid="uid://c5j1rhlh34qan" path="res://Scripts/Core/Item/Entity/Behaviour/Implementations/BipedBehaviour.cs" id="14_5nb4q"]
-[ext_resource type="Resource" uid="uid://bi8pp11ga45x3" path="res://Resources/Entities/Eos/Costumes/Eos-base_key.tres" id="15_cn8qi"]
 [ext_resource type="Script" uid="uid://bqjcp5j1o01je" path="res://Scripts/Core/Item/Entity/Behaviour/Implementations/SwimmingBehaviour.cs" id="15_sat4e"]
 
 [sub_resource type="Resource" id="Resource_fafpq"]
@@ -70,7 +69,7 @@ transform = Transform3D(-1, 0, -1.50996e-07, 0, 1, 0, 1.50996e-07, 0, -1, 0, 0, 
 
 [node name="CostumeHolder" type="Node3D" parent="."]
 script = ExtResource("9_8kq40")
-CostumeKeyProvider = ExtResource("15_cn8qi")
+ItemKeyString = "eos_base=cos"
 
 [node name="Collisions" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)

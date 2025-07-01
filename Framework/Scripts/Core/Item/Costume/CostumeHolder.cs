@@ -23,18 +23,14 @@ public sealed partial class CostumeHolder : Node3D, ICustomizable {
 		}
 	}
 
-	[Export] public ResourceItemKey CostumeKeyProvider {
+	[Export] private string ItemKeyString {
+		get => ItemKey?.String ?? string.Empty;
+		set => ItemKey = string.IsNullOrWhiteSpace(value) ? null : new ItemKey(value);
+	}
+	public ItemKey? ItemKey {
 		get;
 		set {
 			field = value;
-			Reload();
-		}
-	} = new();
-
-	public ItemKey? ItemKey {
-		get => CostumeKeyProvider.ItemKey;
-		set {
-			CostumeKeyProvider.ItemKey = value;
 			Reload();
 		}
 	}
@@ -74,8 +70,8 @@ public sealed partial class CostumeHolder : Node3D, ICustomizable {
 		if (Registry is null) return;
 
 		Costume = costumeData.Load(Registry)?.ParentTo(this);
-		if (Costume?.Data?.KeyProvider is ResourceItemKey keyProvider) {
-			CostumeKeyProvider = keyProvider;
+		if (Costume?.Data?.ItemKey.HasValue ?? false) {
+			ItemKey = Costume.Data.ItemKey.Value;
 		}
 	}
 

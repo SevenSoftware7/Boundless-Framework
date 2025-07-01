@@ -1,10 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://b7b17ebmgtrfy"]
+[gd_scene load_steps=5 format=3 uid="uid://b7b17ebmgtrfy"]
 
 [ext_resource type="Script" uid="uid://b4v47ey7c4cm6" path="res://Scripts/Vanilla/Weapon/Pax/PaxWeapon.cs" id="1_vy2ad"]
 [ext_resource type="Script" uid="uid://dwtp85ydlhl31" path="res://Scripts/Core/Item/Costume/CostumeHolder.cs" id="2_cm0hb"]
 [ext_resource type="AnimationLibrary" uid="uid://caafq3ok75ukn" path="res://Resources/Weapons/Pax/PaxAnimations.tres" id="2_l4rjo"]
 [ext_resource type="Resource" uid="uid://ci6ahybitat4f" path="res://Resources/Weapons/Pax/Pax_data.tres" id="2_qmaoe"]
-[ext_resource type="Resource" uid="uid://nv3cruo4dqdt" path="res://Resources/Weapons/Pax/Costumes/Pax-base_key.tres" id="6_x50f5"]
 
 [node name="Pax" type="Node3D" node_paths=PackedStringArray("_costumeHolder")]
 script = ExtResource("1_vy2ad")
@@ -14,4 +13,4 @@ _costumeHolder = NodePath("CostumeHolder")
 
 [node name="CostumeHolder" type="Node3D" parent="."]
 script = ExtResource("2_cm0hb")
-CostumeKeyProvider = ExtResource("6_x50f5")
+ItemKeyString = "pax_base=cos"

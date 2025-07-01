@@ -1,10 +1,9 @@
-[gd_resource type="Resource" script_class="EntityCostumeSceneData" load_steps=3 format=3 uid="uid://bb3xo4pwx7g3y"]
+[gd_resource type="Resource" script_class="EntityCostumeSceneData" load_steps=2 format=3 uid="uid://bb3xo4pwx7g3y"]
 
-[ext_resource type="Resource" uid="uid://djkxop4aum535" path="res://Resources/Entities/Bike/Costumes/Bike-base_key.tres" id="1_japl1"]
 [ext_resource type="Script" uid="uid://upq7u1vamnru" path="res://Scripts/Core/Item/Entity/Costume/EntityCostumeSceneData.cs" id="4_j77cf"]
 
 [resource]
 script = ExtResource("4_j77cf")
-KeyProvider = ExtResource("1_japl1")
+ItemKeyString = "proioxis_base=cos"
 DisplayName = "Bike (base)"
 ScenePath = "uid://burrwvhjdl2u3"
