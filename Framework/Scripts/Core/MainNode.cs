@@ -31,7 +31,7 @@ public partial class MainNode : Node3D, ISerializationListener {
 		if (Engine.IsEditorHint()) return;
 
 
-		IEnumerable<Mod> mods = ModLoader.LoadInternalModFolder("EndlessTwilight");
+		IEnumerable<Mod> mods = ModLoader.LoadInternalModFile("EndlessTwilight");
 		List<IItemDataProvider> addedRegistries = [];
 		foreach (Mod mod in mods) {
 			mod.Start();

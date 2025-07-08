@@ -1,6 +1,7 @@
 namespace SevenDev.Boundless.Modding;
 
 using System;
+using System.IO;
 using Godot;
 
 
@@ -21,48 +22,29 @@ public readonly record struct PckFormat {
 	public readonly bool IsEncrypted => (Flags & 0x1) != 0;
 
 
-	public static PckFormat Parse(FileAccess archive) {
-		archive.Seek(0);
-
-		uint magic = archive.Get32();
+	public static PckFormat Parse(BinaryReader reader) {
+		uint magic = reader.ReadUInt32();
 		if (magic != GDPC) {
-			archive.Seek(archive.GetLength() - 4);
-			magic = archive.Get32();
-
-			if (magic != GDPC) {
-				throw new InvalidOperationException("Invalid file format.");
-			}
-
-			archive.Seek(archive.GetPosition() - 12);
-			ulong ds = archive.Get64();
-
-			archive.Seek(archive.GetPosition() - ds - 8);
-			magic = archive.Get32();
-
-			if (magic != GDPC) {
-				throw new InvalidOperationException("Invalid file format.");
-			}
-
-			// isEmbedded = true;
+			throw new InvalidOperationException("Invalid file format.");
 		}
 
-		uint formatVersion = archive.Get32();
-		uint verMajor = archive.Get32();
-		uint verMinor = archive.Get32();
-		uint verRev = archive.Get32();
+		uint formatVersion = reader.ReadUInt32();
+		uint verMajor = reader.ReadUInt32();
+		uint verMinor = reader.ReadUInt32();
+		uint verRev = reader.ReadUInt32();
 
 		// Determine files base offset
 		(uint fileFlags, ulong filesBaseOffset) = formatVersion switch {
 			0 or 1 => default,
-			2 => (archive.Get32(), archive.Get64()),
+			2 => (reader.ReadUInt32(), reader.ReadUInt64()),
 			_ => throw new InvalidOperationException("Unsupported format version.")
 		};
 
 		// Skip reserved bytes
-		archive.Seek(archive.GetPosition() + 16 * sizeof(uint));
+		reader.BaseStream.Seek(16 * sizeof(uint), SeekOrigin.Current);
 
 		// Read file count
-		uint fileCount = archive.Get32();
+		uint fileCount = reader.ReadUInt32();
 
 
 		return new PckFormat {

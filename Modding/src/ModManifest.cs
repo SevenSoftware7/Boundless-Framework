@@ -26,25 +26,18 @@ public class ModManifest : IEquatable<ModManifest> {
 	public required string Author { get; set; }
 	public string Description { get; set; } = "";
 
-	private FilePath _path;
-	[YamlIgnore]
-	public FilePath Path {
-		get => _path;
-		set {
-			if (value.Directory.Protocol is not "res" or "user") {
-				throw new ArgumentException("Directory must be a valid Godot path.");
-			}
-			_path = value;
-		}
-	}
-
 	public IEnumerable<FilePath> AssetPaths { get; set; } = [];
 	public IEnumerable<FilePath> AssemblyPaths { get; set; } = [];
 	public IEnumerable<string> Dependencies { get; set; } = [];
 
 
-	public static ModManifest FromYaml(in string yaml) {
-		return Deserializer.Deserialize<ModManifest>(yaml);
+	public static ModManifest? FromYaml(in string yaml) {
+		try {
+			return Deserializer.Deserialize<ModManifest>(yaml);
+		}
+		catch {
+			return null;
+		}
 	}
 	public static string ToYaml(in ModManifest metaData) {
 		return Serializer.Serialize(metaData);

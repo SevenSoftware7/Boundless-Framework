@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SevenDev.Boundless.Utility;
-
+using System.IO;
 
 public record class PckFile : IDisposable {
 	private bool _disposed = false;
@@ -32,35 +32,34 @@ public record class PckFile : IDisposable {
 	}
 
 
-	public PckFile(FileAccess archive) {
-		PckFormat format = PckFormat.Parse(archive);
+	public PckFile(BinaryReader reader) {
+		PckFormat format = PckFormat.Parse(reader);
 		List<PckFileEntry> files = [];
 
 		for (uint i = 0; i < format.FileCount; i++) {
-			uint pathSize = archive.Get32();
-			string path = Encoding.UTF8.GetString(archive.GetBuffer(pathSize));
-			path = path.Replace("\0", string.Empty);
-			FilePath entryPath = new(path);
+			uint pathSize = reader.ReadUInt32();
+			byte[] pathBytes = reader.ReadBytes((int)pathSize);
+			FilePath path = new(Encoding.UTF8.GetString(pathBytes).Replace("\0", string.Empty));
 
-			ulong offset = archive.Get64() + format.FilesBaseOffset;
+			ulong offset = reader.ReadUInt64() + format.FilesBaseOffset;
 
-			ulong size = archive.Get64();
+			ulong size = reader.ReadUInt64();
 
-			byte[] md5 = archive.GetBuffer(16);
+			byte[] md5 = reader.ReadBytes(16);
 
 			uint fileFlags = format.Version switch {
-				2 => archive.Get32(),
+				2 => reader.ReadUInt32(),
 				_ => 0
 			};
 
-			ulong currentOffset = archive.GetPosition();
-			archive.Seek(offset);
-			byte[] data = archive.GetBuffer((long)size);
-			archive.Seek(currentOffset);
+			long currentOffset = reader.BaseStream.Position;
+			reader.BaseStream.Position = (long)offset;
+			byte[] data = reader.ReadBytes((int)size);
+			reader.BaseStream.Position = currentOffset;
 
-			switch (entryPath.Path) {
+			switch (path.Path) {
 				case ".godot/uid_cache.bin": {
-						using System.IO.MemoryStream stream = new(data);
+						using MemoryStream stream = new(data);
 						UidCache = new(stream);
 					}
 					continue;
@@ -70,7 +69,7 @@ public record class PckFile : IDisposable {
 			}
 
 			files.Add(new PckFileEntry {
-				Path = entryPath,
+				Path = path,
 				Data = data,
 				Offset = offset,
 				Size = size,
@@ -83,10 +82,10 @@ public record class PckFile : IDisposable {
 		Entries = [.. files];
 	}
 
-	public static PckFile Load(FilePath path) {
-		using FileAccess archive = FileAccess.Open(path, FileAccess.ModeFlags.Read);
+	public static PckFile Load(Stream contents) {
+		using BinaryReader reader = new(contents);
 
-		return new(archive);
+		return new(reader);
 	}
 
 	public bool Install(DirectoryPath path) {
