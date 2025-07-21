@@ -21,8 +21,8 @@ TraitValues = Dictionary[StringName, float]({
 &"generic_acceleration": 50.0,
 &"generic_deceleration": 35.0,
 &"generic_fast_move_speed_multiplier": 1.5,
-&"generic_gravity": 32.0,
-&"generic_jump_height": 20.0,
+&"generic_gravity": 38.0,
+&"generic_jump_height": 15.0,
 &"generic_max_health": 25.0,
 &"generic_move_speed": 8.0,
 &"generic_slow_move_speed_multiplier": 0.375,
@@ -49,6 +49,7 @@ _data = {
 
 [node name="Eos" type="CharacterBody3D" node_paths=PackedStringArray("_costumeHolder", "Skeleton", "AnimationPlayer", "CurrentBehaviour", "Health", "CenterOfMass")]
 collision_layer = 256
+wall_min_slide_angle = 0.0436332
 floor_constant_speed = true
 platform_floor_layers = 4294963965
 platform_wall_layers = 4294963965

@@ -92,16 +92,14 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 
 		Entity.Movement += ProcessGroundedMovement(delta);
 
-		if (MoveStep(delta)) {
-			Entity.Movement = Vector3.Zero;
-		}
+		HandleStairStep(delta);
 
 		HandleJump(delta);
 
 		return Entity.Movement;
 
 
-		bool MoveStep(double delta) {
+		bool HandleStairStep(double delta) {
 			if (Mathf.IsZeroApprox(Entity.Movement.LengthSquared()) || !Entity.IsOnFloor()) return false;
 
 			Vector3 movement = Entity.Movement * (float)delta;
@@ -151,6 +149,7 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 
 			Entity.GlobalTransform = Entity.GlobalTransform with { Origin = destination - destinationHeight + pointHeight };
 
+			Entity.Movement = Vector3.Zero;
 			return true;
 		}
 	}
