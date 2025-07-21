@@ -26,7 +26,7 @@ public sealed partial class EleosWeapon : Weapon, IPlayerHandler {
 	}
 
 
-	public override Vector3 GetTipPosition() => new(0f, 5.3f, 0f);
+	public override Transform3D GetTipTransform() => GlobalTransform.TranslatedLocal(new(0f, 5.3f, 0f));
 
 
 	public override IEnumerable<EntityAction.Wrapper> GetAttacks(Entity target) {

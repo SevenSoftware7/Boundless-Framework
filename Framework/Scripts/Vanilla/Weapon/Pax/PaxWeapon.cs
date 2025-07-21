@@ -18,7 +18,7 @@ public sealed partial class PaxWeapon : Weapon, IPlayerHandler {
 	}
 
 
-	public override Vector3 GetTipPosition() => new(0f, 3.2f, 0f);
+	public override Transform3D GetTipTransform() => GlobalTransform.TranslatedLocal(new(0f, 3.2f, 0f));
 
 	public override IEnumerable<EntityAction.Wrapper> GetAttacks(Entity target) {
 		return [

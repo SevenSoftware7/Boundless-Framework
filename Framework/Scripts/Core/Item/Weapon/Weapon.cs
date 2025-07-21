@@ -101,7 +101,7 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, ICustomiz
 	}
 
 
-	public abstract Vector3 GetTipPosition();
+	public abstract Transform3D GetTipTransform();
 
 
 	public virtual IEnumerable<IUIObject> GetSubObjects() => [CostumeHolder];

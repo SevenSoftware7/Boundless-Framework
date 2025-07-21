@@ -23,8 +23,8 @@ public abstract partial class Attack : AnimationAction, IDamageDealerProxy {
 	}
 
 
-	public void CreateHitBox(AttackDamageAreaBuilder builder) {
-		DamageArea hitArea = builder.Build(this);
+	public void CreateHitBox(DamageAreaBuilder builder) {
+		DamageArea hitArea = builder.Build(this, this);
 
 		damageAreas.Add(hitArea);
 		hitArea.Destroyed += () => {

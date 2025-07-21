@@ -12,11 +12,11 @@ public ref struct DamageData {
 		Type = type;
 	}
 
-
-	public enum DamageType {
-		Standard,
-		Status,
-		Parry,
+	[Flags]
+	public enum DamageType : byte {
+		Standard = 1 << 0,
+		Status = 1 << 1,
+		Parry = 1 << 2,
 	}
 }
 

@@ -1,25 +1,33 @@
 namespace SevenDev.Boundless;
 
 using Godot;
+using Godot.Collections;
+using SevenDev.Boundless.Utility;
 
-public abstract partial class DamageAreaBuilder<T> : Resource where T : IDamageDealer {
+
+[Tool]
+[GlobalClass]
+public sealed partial class DamageAreaBuilder : Resource {
 	[Export] public ulong LifeTime = 250;
 
 	[Export] public float Damage = 1f;
 	[Export] public IDamageDealer.DamageFlags DamageType = IDamageDealer.DamageFlags.Physical;
+	[Export] public uint MaxImpacts = 0;
 
-	[Export] public Godot.Collections.Array<DamageHitboxBuilder> HitboxBuilders = [];
+	[Export] public Array<DamageHitboxBuilder> HitboxBuilders = [];
 
 
-	public DamageArea Build(T damageDealer) {
+	public DamageArea Build(IDamageDealer damageDealer, Node? parent = null) {
 		DamageArea damageArea = new() {
 			DamageDealer = damageDealer,
 			LifeTime = LifeTime,
 			Damage = Damage,
 			Flags = DamageType,
+			MaxImpacts = MaxImpacts,
 		};
-
-		SetupDamageArea(damageDealer, damageArea);
+		if (parent is not null) {
+			damageArea.ParentTo(parent);
+		}
 
 		foreach (DamageHitboxBuilder hitboxBuilder in HitboxBuilders) {
 			hitboxBuilder.Build(damageArea);
@@ -27,6 +35,4 @@ public abstract partial class DamageAreaBuilder<T> : Resource where T : IDamageD
 
 		return damageArea;
 	}
-
-	protected virtual void SetupDamageArea(T damageDealer, DamageArea area) { }
 }
