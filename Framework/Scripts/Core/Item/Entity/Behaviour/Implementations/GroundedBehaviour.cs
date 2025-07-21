@@ -108,22 +108,16 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 			Vector3 destination = Entity.GlobalTransform.Origin + movement;
 
 
-			// Search for obstacle (step) where the entity is moving
-			KinematicCollision3D? stepObstacleCollision = Entity.MoveAndCollide(movement, true);
-
-			// Not a valid step if the obstacle's surface is not steep
-			if (stepObstacleCollision is not null && Mathf.Abs(stepObstacleCollision.GetNormal().Dot(Entity.UpDirection)) >= Mathfs.RadToDot(Entity.FloorMaxAngle))
-				return false;
-
 			float margin = Mathf.Epsilon;
 
-			Vector3 sweepStart = destination;
-			Vector3 sweepMotion = (Entity.GetTraitValue(Traits.GenericStepHeight) + margin) * -Entity.UpDirection;
+			float stepHeight = Entity.GetTraitValue(Traits.GenericStepHeight);
+			if (stepHeight <= 0f) return false;
 
-			// Search above the obstacle to find a step upwards
-			if (stepObstacleCollision is not null) {
-				sweepStart -= sweepMotion;
-			}
+			Vector3 upDirection = Entity.UpDirection;
+
+			float sweepDistance = stepHeight * 2 + margin;
+			Vector3 sweepStart = destination + stepHeight * upDirection;
+			Vector3 sweepMotion = sweepDistance * -upDirection;
 
 			// Try to collide with the step upwards or downwards
 			PhysicsTestMotionResult3D stepTestResult = new();
@@ -136,12 +130,20 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 				stepTestResult
 			);
 
-			if (!findStep) return false;
+			if (!findStep || stepTestResult.GetCollisionSafeFraction() <= 0f) return false;
+			// if (!Entity.GetWorld3D().IntersectRay3D(
+			// 	sweepStart,
+			// 	sweepStart + sweepMotion,
+			// 	out Collisions.IntersectRay3DResult rayResult,
+			// 	Entity.CollisionMask
+			// )) return false;
+
+			// if (rayResult.Normal.Dot(upDirection) < Entity.FloorMaxAngle) return false;
 
 			Vector3 point = stepTestResult.GetCollisionPoint();
 
-			Vector3 destinationHeight = destination.Project(Entity.UpDirection);
-			Vector3 pointHeight = point.Project(Entity.UpDirection);
+			Vector3 destinationHeight = destination.Project(upDirection);
+			Vector3 pointHeight = point.Project(upDirection);
 
 			float stepHeightSquared = destinationHeight.DistanceSquaredTo(pointHeight);
 			if (stepHeightSquared >= sweepMotion.LengthSquared()) return false;
@@ -194,10 +196,8 @@ public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHand
 			Entity.Inertia = newInertia;
 		}
 		else {
-			float fallSpeed = Entity.GetTraitValue(Traits.GenericGravity);
-
 			float fallInertia = Entity.Gravity.Dot(-upDirection);
-			Vector3 targetGravity = -upDirection * fallSpeed;
+			Vector3 targetGravity = -upDirection * Entity.GetTraitValue(Traits.GenericGravity);
 
 			// Slightly ramp up inertia when falling
 			float accelerateSpeed = Mathf.Clamp(Mathf.Remap(fallInertia, -2f, 2f, 0.9f, 0.4f), 0.4f, 0.9f);
