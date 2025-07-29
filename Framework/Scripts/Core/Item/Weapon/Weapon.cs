@@ -59,9 +59,9 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, ICustomiz
 	}
 	public virtual StyleState MaxStyle { get; } = StyleState.Primary;
 
-	public abstract IWeapon.WeaponKind Kind { get; }
-	public abstract IWeapon.WeaponUsage Usage { get; }
-	public abstract IWeapon.WeaponSize Size { get; }
+	public abstract WeaponKind Kind { get; }
+	public abstract WeaponUsage Usage { get; }
+	public abstract WeaponSize Size { get; }
 
 
 	[Export]
@@ -101,7 +101,8 @@ public abstract partial class Weapon : Node3D, IWeapon, IItem<Weapon>, ICustomiz
 	}
 
 
-	public abstract Transform3D GetTipTransform();
+	public abstract float Length { get; }
+	public virtual Transform3D GetTipTransform() => GlobalTransform.TranslatedLocal(new(0f, Length, 0f));
 
 
 	public virtual IEnumerable<IUIObject> GetSubObjects() => [CostumeHolder];

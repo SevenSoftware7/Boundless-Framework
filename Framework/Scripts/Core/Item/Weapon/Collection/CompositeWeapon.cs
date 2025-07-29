@@ -14,9 +14,9 @@ public abstract partial class CompositeWeapon : Node, IWeapon, ISerializationLis
 	public virtual string DisplayName => CurrentWeapon?.DisplayName ?? "";
 	public virtual Texture2D? DisplayPortrait => CurrentWeapon?.DisplayPortrait;
 
-	public virtual IWeapon.WeaponKind Kind => CurrentWeapon?.Kind ?? 0;
-	public virtual IWeapon.WeaponUsage Usage => CurrentWeapon?.Usage ?? 0;
-	public virtual IWeapon.WeaponSize Size => CurrentWeapon?.Size ?? 0;
+	public virtual WeaponKind Kind => CurrentWeapon?.Kind ?? 0;
+	public virtual WeaponUsage Usage => CurrentWeapon?.Usage ?? 0;
+	public virtual WeaponSize Size => CurrentWeapon?.Size ?? 0;
 
 	public abstract StyleState Style { get; }
 	public abstract StyleState MaxStyle { get; }

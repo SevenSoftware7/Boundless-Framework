@@ -8,17 +8,17 @@ using SevenDev.Boundless;
 [GlobalClass]
 public sealed partial class PaxWeapon : Weapon, IPlayerHandler {
 	private readonly SlashAttack.Builder slashAttack;
-	public override IWeapon.WeaponKind Kind => IWeapon.WeaponKind.Sword;
-	public override IWeapon.WeaponUsage Usage => IWeapon.WeaponUsage.Slash | IWeapon.WeaponUsage.Strike;
-	public override IWeapon.WeaponSize Size => IWeapon.WeaponSize.TwoHanded;
+	public override WeaponKind Kind { get; } = WeaponKind.Sword;
+	public override WeaponUsage Usage { get; } = WeaponUsage.Slash | WeaponUsage.Strike;
+	public override WeaponSize Size { get; } = WeaponSize.TwoHanded;
+
+	public override float Length { get; } = 3.2f;
 
 
 	public PaxWeapon() : base() {
 		slashAttack = new(this);
 	}
 
-
-	public override Transform3D GetTipTransform() => GlobalTransform.TranslatedLocal(new(0f, 3.2f, 0f));
 
 	public override IEnumerable<EntityAction.Wrapper> GetAttacks(Entity target) {
 		return [

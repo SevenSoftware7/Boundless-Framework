@@ -31,27 +31,27 @@ public partial class MainNode : Node3D, ISerializationListener {
 		if (Engine.IsEditorHint()) return;
 
 
-		IEnumerable<Mod> mods = ModLoader.LoadInternalModFile("EndlessTwilight");
-		List<IItemDataProvider> addedRegistries = [];
-		foreach (Mod mod in mods) {
-			mod.Start();
-			foreach (IModInterface modInterface in mod.ModInterfaces) {
-				if (modInterface.ItemDataProvider is IItemDataProvider itemDataProvider) {
-					addedRegistries.Add(itemDataProvider);
-					_registries.AddRegistry(itemDataProvider);
-				}
-			}
-		}
+		// IEnumerable<Mod> mods = ModLoader.LoadInternalModFile("EndlessTwilight");
+		// List<IItemDataProvider> addedRegistries = [];
+		// foreach (Mod mod in mods) {
+		// 	mod.Start();
+		// 	foreach (IModInterface modInterface in mod.ModInterfaces) {
+		// 		if (modInterface.ItemDataProvider is IItemDataProvider itemDataProvider) {
+		// 			addedRegistries.Add(itemDataProvider);
+		// 			_registries.AddRegistry(itemDataProvider);
+		// 		}
+		// 	}
+		// }
 
-		GD.Print($"Loaded {mods.Count()} mods with {addedRegistries.Count} item data providers.");
+		// GD.Print($"Loaded {mods.Count()} mods with {addedRegistries.Count} item data providers.");
 
-		foreach (IItemDataProvider itemDataProvider in addedRegistries) {
-			_registries.RemoveRegistry(itemDataProvider);
-		}
+		// foreach (IItemDataProvider itemDataProvider in addedRegistries) {
+		// 	_registries.RemoveRegistry(itemDataProvider);
+		// }
 
-		foreach (Mod mod in mods) {
-			mod.Stop();
-		}
+		// foreach (Mod mod in mods) {
+		// 	mod.Stop();
+		// }
 	}
 
 	public void OnBeforeSerialize() { }

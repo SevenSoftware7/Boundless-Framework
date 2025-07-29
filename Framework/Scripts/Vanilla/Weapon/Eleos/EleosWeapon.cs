@@ -10,9 +10,11 @@ public sealed partial class EleosWeapon : Weapon, IPlayerHandler {
 	private readonly SlashAttack.Builder slashAttack;
 	private readonly CompositeChargeAttack.Builder chargeAttack;
 
-	public override IWeapon.WeaponKind Kind => IWeapon.WeaponKind.Sword;
-	public override IWeapon.WeaponUsage Usage => IWeapon.WeaponUsage.Slash | IWeapon.WeaponUsage.Thrust;
-	public override IWeapon.WeaponSize Size => IWeapon.WeaponSize.OneHanded | IWeapon.WeaponSize.TwoHanded;
+	public override WeaponKind Kind { get; } = WeaponKind.Sword;
+	public override WeaponUsage Usage { get; } = WeaponUsage.Slash | WeaponUsage.Thrust;
+	public override WeaponSize Size { get; } = WeaponSize.OneHanded | WeaponSize.TwoHanded;
+
+	public override float Length { get; } = 5.3f;
 
 
 	public EleosWeapon() : base() {
@@ -24,9 +26,6 @@ public sealed partial class EleosWeapon : Weapon, IPlayerHandler {
 			[new PercentileModifier(Traits.GenericMoveSpeed, -0.7f), new PercentileModifier(Traits.GenericJumpHeight, -0.5f)]
 		);
 	}
-
-
-	public override Transform3D GetTipTransform() => GlobalTransform.TranslatedLocal(new(0f, 5.3f, 0f));
 
 
 	public override IEnumerable<EntityAction.Wrapper> GetAttacks(Entity target) {
