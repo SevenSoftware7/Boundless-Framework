@@ -1,4 +1,4 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 public enum Handedness : byte {
 	Right,

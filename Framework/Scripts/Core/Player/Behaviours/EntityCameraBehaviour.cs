@@ -1,7 +1,7 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using Godot;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 
 public abstract partial class EntityCameraBehaviour : CameraBehaviour {
 	public abstract Vector3 Velocity { get; protected set; }

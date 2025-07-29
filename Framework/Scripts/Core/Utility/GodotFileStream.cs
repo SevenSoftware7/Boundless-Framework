@@ -1,8 +1,8 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using System;
 using System.IO;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 
 public class GodotFileStream : Stream {
 	private bool _disposed = false;

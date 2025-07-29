@@ -1,6 +1,6 @@
-using SevenDev.Boundless.Persistence;
+using Seven.Boundless.Persistence;
 
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 public class CustomizableItemPersistenceData<T>(T item) : ItemPersistenceData<T>(item) where T : class, IItem, ICustomizable {
 	public readonly CustomizationData Customization = CustomizationData.GetFrom(item);

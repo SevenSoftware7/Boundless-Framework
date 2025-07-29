@@ -5,8 +5,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
 using Microsoft.Build.Locator;
-using SevenDev.Boundless.Modding;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Modding;
+using Seven.Boundless.Utility;
 
 internal partial class Program {
 	[GeneratedRegex(@"^project/assembly_name\s*=\s*""?(.*?)""?$", RegexOptions.Multiline)]

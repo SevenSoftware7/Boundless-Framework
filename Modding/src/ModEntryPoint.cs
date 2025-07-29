@@ -1,6 +1,6 @@
-namespace SevenDev.Boundless.Modding;
+namespace Seven.Boundless.Modding;
 
-using SevenDev.Boundless.Persistence;
+using Seven.Boundless.Persistence;
 
 
 public interface IModInterface {

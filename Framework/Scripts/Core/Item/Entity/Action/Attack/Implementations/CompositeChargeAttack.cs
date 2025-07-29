@@ -1,8 +1,8 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using System.Collections.Generic;
 using Godot;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 
 /// <summary>
 /// A Charge Attack composed of two Attacks, with a determinate charge time.

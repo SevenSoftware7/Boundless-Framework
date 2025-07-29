@@ -1,11 +1,11 @@
-namespace SevenDev.Boundless.Modding;
+namespace Seven.Boundless.Modding;
 
 using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 using System.IO;
 
 public record class PckFile : IDisposable {

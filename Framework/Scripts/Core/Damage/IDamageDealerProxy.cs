@@ -1,4 +1,4 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 public interface IDamageDealerProxy : IDamageDealer {
 	public IDamageDealer? Sender { get; }

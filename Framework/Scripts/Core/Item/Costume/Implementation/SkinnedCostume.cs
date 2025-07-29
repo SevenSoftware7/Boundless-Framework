@@ -1,8 +1,8 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using System.Linq;
 using Godot;
-using SevenDev.Boundless.Injection;
+using Seven.Boundless.Injection;
 
 [Tool]
 [GlobalClass]

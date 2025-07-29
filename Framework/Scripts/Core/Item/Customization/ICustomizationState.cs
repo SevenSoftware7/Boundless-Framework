@@ -1,3 +1,3 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 public interface ICustomizationState {}

@@ -1,10 +1,10 @@
-namespace SevenDev.Boundless.Modding;
+namespace Seven.Boundless.Modding;
 
 using System.Runtime.Loader;
 using System.Reflection;
 using System.IO;
 using Godot;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 
 
 public sealed class GodotResAssemblyLoadContext : AssemblyLoadContext {

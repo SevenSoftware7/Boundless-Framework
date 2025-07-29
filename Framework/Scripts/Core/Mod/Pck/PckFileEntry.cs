@@ -1,9 +1,9 @@
-namespace SevenDev.Boundless.Modding;
+namespace Seven.Boundless.Modding;
 
 using Godot;
 using System.Collections;
 using System.Security.Cryptography;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 
 
 public record class PckFileEntry {

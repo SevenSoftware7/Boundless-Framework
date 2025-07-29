@@ -1,9 +1,9 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Godot;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 
 [GlobalClass]
 public partial class DamageArea : Area3D {

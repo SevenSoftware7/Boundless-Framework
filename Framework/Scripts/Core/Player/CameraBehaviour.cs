@@ -1,8 +1,8 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using System;
 using Godot;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 
 public abstract partial class CameraBehaviour : Behaviour<CameraBehaviour> {
 	[Export(PropertyHint.Layers3DPhysics)] private uint CollisionMask = uint.MaxValue & ~(CollisionLayers.Water | CollisionLayers.Entity | CollisionLayers.Prop | CollisionLayers.Interactable | CollisionLayers.Damage);

@@ -1,10 +1,10 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using System.Linq;
 using Godot;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 using System.Collections.Generic;
-using static SevenDev.Boundless.Utility.Collisions;
+using static Seven.Boundless.Utility.Collisions;
 
 public struct InteractTarget(Interactable interactable, int shapeIndex) {
 	public readonly Interactable Interactable => interactable;

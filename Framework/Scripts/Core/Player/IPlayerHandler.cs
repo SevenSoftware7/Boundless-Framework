@@ -1,4 +1,4 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 /// <summary>
 /// Interface that is used to allow a class to Handle a Player.<para/>

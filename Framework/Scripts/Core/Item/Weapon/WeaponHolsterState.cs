@@ -1,4 +1,4 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 public readonly struct WeaponHolsterState {
 	public static readonly WeaponHolsterState Unholstered = new(false);

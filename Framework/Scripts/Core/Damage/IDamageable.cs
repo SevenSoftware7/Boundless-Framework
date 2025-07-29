@@ -1,4 +1,4 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 public interface IDamageable {
 	public void Damage(ref DamageData data);

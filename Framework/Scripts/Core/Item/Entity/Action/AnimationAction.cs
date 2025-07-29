@@ -1,10 +1,10 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 
 /// <summary>
 /// An Attack that mainly functions through Animation, with callback events.

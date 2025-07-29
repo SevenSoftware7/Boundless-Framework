@@ -1,4 +1,4 @@
-namespace SevenDev.Boundless.Modding;
+namespace Seven.Boundless.Modding;
 
 using System;
 using System.IO;

@@ -1,6 +1,6 @@
 using System;
 
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 public ref struct DamageData {
 	public float Amount;

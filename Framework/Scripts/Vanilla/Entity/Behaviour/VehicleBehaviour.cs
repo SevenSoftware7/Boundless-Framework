@@ -1,9 +1,9 @@
 namespace EndlessTwilight;
 
 using Godot;
-using SevenDev.Boundless;
-using SevenDev.Boundless.Utility;
-using static SevenDev.Boundless.Utility.Collisions;
+using Seven.Boundless;
+using Seven.Boundless.Utility;
+using static Seven.Boundless.Utility.Collisions;
 
 
 [Tool]

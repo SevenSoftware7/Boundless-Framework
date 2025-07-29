@@ -1,8 +1,8 @@
-namespace SevenDev.Boundless.Modding;
+namespace Seven.Boundless.Modding;
 
 using System;
 using Godot;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 
 
 public record class InstalledPckFile : IDisposable {

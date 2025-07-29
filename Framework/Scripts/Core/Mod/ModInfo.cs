@@ -1,7 +1,7 @@
 using System;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 
-namespace SevenDev.Boundless.Modding;
+namespace Seven.Boundless.Modding;
 
 public struct ModInfo : IEquatable<ModInfo> {
 	public FilePath ZipPath;

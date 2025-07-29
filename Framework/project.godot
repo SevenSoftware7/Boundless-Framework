@@ -39,7 +39,7 @@ window/size/mode.editor=0
 
 [dotnet]
 
-project/assembly_name="SevenDev.Boundless"
+project/assembly_name="Seven.Boundless"
 
 [editor]
 

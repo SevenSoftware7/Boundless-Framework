@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="SevenDev.Boundless.Utility" Version="1.0.7" />
-    <PackageReference Include="SevenDev.Boundless.Persistence" Version="1.3.0" />
+    <PackageReference Include="Seven.Boundless.Utility" Version="0.0.1" />
+    <PackageReference Include="Seven.Boundless.Persistence" Version="0.0.1" />
 
     <PackageReference Include="GodotSharp" Version="4.4.1" />
     <PackageReference Include="YamlDotNet" Version="16.2.0" />

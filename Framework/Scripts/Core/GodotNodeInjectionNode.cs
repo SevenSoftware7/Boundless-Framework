@@ -1,8 +1,8 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using System;
 using System.Collections.Generic;
-using SevenDev.Boundless.Injection;
+using Seven.Boundless.Injection;
 
 /// <summary>
 /// Represents a Godot node in an injection hierarchy.

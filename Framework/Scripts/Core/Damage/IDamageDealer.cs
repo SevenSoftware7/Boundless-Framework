@@ -1,6 +1,6 @@
 using System;
 
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 public interface IDamageDealer {
 	public virtual IDamageable? Damageable => null;

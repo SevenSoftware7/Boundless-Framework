@@ -1,10 +1,10 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using System;
 using System.ComponentModel.Design;
 using System.Diagnostics.CodeAnalysis;
 using Godot;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 
 
 [GlobalClass]

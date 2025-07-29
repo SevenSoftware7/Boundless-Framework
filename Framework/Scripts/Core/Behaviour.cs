@@ -1,7 +1,7 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using Godot;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 
 /// <summary>
 /// A Hierarchical state machine node, meant for use as a Node

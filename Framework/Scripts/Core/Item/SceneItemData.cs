@@ -1,7 +1,7 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using Godot;
-using SevenDev.Boundless.Persistence;
+using Seven.Boundless.Persistence;
 
 [Tool]
 public abstract partial class SceneItemData<[MustBeVariant] T> : Resource, IItemData<T> where T : Node, IItem<T> {

@@ -1,13 +1,13 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using SevenDev.Boundless.Injection;
-using SevenDev.Boundless.Modding;
-using SevenDev.Boundless.Persistence;
+using Seven.Boundless.Injection;
+using Seven.Boundless.Modding;
+using Seven.Boundless.Persistence;
 
 [Tool]
 [GlobalClass]

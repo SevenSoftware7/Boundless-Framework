@@ -1,4 +1,4 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 public interface IWaterCollisionListener {
 	public void OnEnterWater(Water water);

@@ -1,10 +1,10 @@
-namespace SevenDev.Boundless.Modding;
+namespace Seven.Boundless.Modding;
 
 using System;
 using YamlDotNet.Serialization;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 
 public class FilePathConverter : IYamlTypeConverter {
 	private static readonly Type FilePathType = typeof(FilePath);

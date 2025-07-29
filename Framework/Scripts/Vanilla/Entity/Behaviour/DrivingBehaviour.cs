@@ -1,7 +1,7 @@
 namespace EndlessTwilight;
 
 using Godot;
-using SevenDev.Boundless;
+using Seven.Boundless;
 
 [Tool]
 [GlobalClass]

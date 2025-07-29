@@ -2,7 +2,7 @@ namespace EndlessTwilight;
 
 using System.Collections.Generic;
 using Godot;
-using SevenDev.Boundless;
+using Seven.Boundless;
 
 [Tool]
 [GlobalClass]

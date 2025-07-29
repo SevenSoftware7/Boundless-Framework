@@ -1,7 +1,7 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using Godot;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 
 public sealed partial class GimbleCameraBehaviour : EntityCameraBehaviour {
 

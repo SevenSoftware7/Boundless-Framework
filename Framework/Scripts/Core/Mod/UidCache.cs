@@ -1,4 +1,4 @@
-namespace SevenDev.Boundless.Modding;
+namespace Seven.Boundless.Modding;
 
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Godot;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 
 public record class UidCache {
 	private static readonly FilePath GlobalCacheBackupPath = new("res://.godot/uid_cache.backup.bin");

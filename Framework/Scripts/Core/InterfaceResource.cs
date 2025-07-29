@@ -1,7 +1,7 @@
 using System;
 using Godot;
 
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 [Tool]
 public partial class InterfaceResource<T> : Resource where T : class {

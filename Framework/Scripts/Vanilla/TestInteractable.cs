@@ -4,10 +4,10 @@ using System.IO;
 using System.Threading.Tasks;
 using Godot;
 using KGySoft.Serialization.Binary;
-using SevenDev.Boundless;
-using SevenDev.Boundless.Utility;
-using SevenDev.Boundless.Persistence;
-using SevenDev.Boundless.Injection;
+using Seven.Boundless;
+using Seven.Boundless.Utility;
+using Seven.Boundless.Persistence;
+using Seven.Boundless.Injection;
 
 [GlobalClass]
 public partial class TestInteractable : Interactable {

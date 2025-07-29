@@ -1,7 +1,7 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using System.Collections.Generic;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 
 
 

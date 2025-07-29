@@ -1,8 +1,8 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using Godot;
 using Godot.Collections;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 
 
 [Tool]

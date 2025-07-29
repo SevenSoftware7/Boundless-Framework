@@ -1,8 +1,8 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using System.Collections.Generic;
 using Godot;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 
 /// <summary>
 /// An Action is analogous to an RPG's turn action, for example, throwing a projectile, using a weapon or evading.<para/>
@@ -12,7 +12,7 @@ public abstract partial class EntityAction : Node {
 	/// <summary>
 	/// The Lifetime of the Action, when it was started onwards.
 	/// </summary>
-	public readonly SevenDev.Boundless.Utility.Timer Lifetime = new(false);
+	public readonly Seven.Boundless.Utility.Timer Lifetime = new(false);
 
 	/// <summary>
 	/// The Entity which is executing the Action

@@ -1,6 +1,6 @@
 using Godot;
 
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 [Tool]
 [GlobalClass]

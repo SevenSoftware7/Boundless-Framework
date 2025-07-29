@@ -1,4 +1,4 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using Godot;
 using static Boundless.IPortraitProvider;

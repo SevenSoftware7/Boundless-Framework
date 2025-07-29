@@ -1,7 +1,7 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using Godot;
-using SevenDev.Boundless.Utility;
+using Seven.Boundless.Utility;
 
 [Tool]
 public abstract partial class GroundedBehaviour : MovementBehaviour, IPlayerHandler {

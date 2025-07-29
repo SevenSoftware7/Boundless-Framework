@@ -1,7 +1,7 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using Godot;
-using static SevenDev.Boundless.IPortraitProvider;
+using static Seven.Boundless.IPortraitProvider;
 
 [Tool]
 [GlobalClass]

@@ -1,9 +1,9 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using SevenDev.Boundless.Persistence;
+using Seven.Boundless.Persistence;
 
 [Tool]
 [GlobalClass]

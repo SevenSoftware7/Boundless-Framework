@@ -1,6 +1,6 @@
 using Godot;
 
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 [GlobalClass]
 public abstract partial class DamageHitboxBehaviour : Resource {

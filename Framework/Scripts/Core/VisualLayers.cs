@@ -1,4 +1,4 @@
-namespace SevenDev.Boundless;
+namespace Seven.Boundless;
 
 public static class VisualLayers {
 	public static readonly uint Terrain = 1 << 0;
