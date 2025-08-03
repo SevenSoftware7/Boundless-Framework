@@ -1,5 +1,10 @@
-# Compiled .NET files
+.godot/
+/android/
 bin/
 obj/
 
 *.csproj.old*
+
+[Bb]uild/
+[Mm]ods/
+[Mm]od[Aa]ssets/

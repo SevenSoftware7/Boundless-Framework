@@ -1,0 +1,44 @@
+<Project Sdk="Godot.NET.Sdk/4.4.1">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>preview</LangVersion>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <RootNamespace>Seven.Boundless</RootNamespace>
+    <Nullable>enable</Nullable>
+    <!-- <PublishAot>true</PublishAot> -->
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\Generated</CompilerGeneratedFilesOutputPath>
+    <!-- <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild> -->
+  </PropertyGroup>
+  <!-- <ItemGroup>
+    <TrimmerRootAssembly Include="GodotSharp" />
+    <TrimmerRootAssembly Include="$(TargetName)" />
+  </ItemGroup> -->
+  <ItemGroup>
+    <Using Include="SimdLinq" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Seven.Boundless.Utility" Version="0.1.1" />
+    <!-- <ProjectReference Include="../Boundless.Utility/Seven.Boundless.Utility/Seven.Boundless.Utility.csproj" /> -->
+    <PackageReference Include="Seven.Boundless.Utility.Godot" Version="0.1.1" />
+    <!-- <ProjectReference Include="../Boundless.Utility/Seven.Boundless.Utility.Godot/Seven.Boundless.Utility.Godot.csproj" /> -->
+
+    <PackageReference Include="Seven.Boundless.Modding" Version="0.0.1" />
+    <!-- <ProjectReference Include="../Boundless.Modding/Seven.Boundless.Modding/Seven.Boundless.Modding.csproj" /> -->
+    <PackageReference Include="Seven.Boundless.Modding.Godot" Version="0.0.1" />
+    <!-- <ProjectReference Include="../Boundless.Modding/Seven.Boundless.Modding.Godot/Seven.Boundless.Modding.Godot.csproj" /> -->
+
+    <PackageReference Include="Seven.Boundless.Injection" Version="0.0.1" />
+    <!-- <ProjectReference Include="../Boundless.Injection/Seven.Boundless.Injection/Seven.Boundless.Injection.csproj" /> -->
+    <PackageReference Include="Seven.Boundless.Injection.Godot" Version="0.0.1" />
+    <!-- <ProjectReference Include="../Boundless.Injection/Seven.Boundless.Injection.Godot/Seven.Boundless.Injection.Godot.csproj" /> -->
+    <PackageReference Include="Seven.Boundless.Injection.Generators" Version="0.0.1" PrivateAssets="all" IncludeAssets="analyzers" />
+    <!-- <ProjectReference Include="../Boundless.Injection/Seven.Boundless.Injection.Generators/Seven.Boundless.Injection.Generators.csproj" PrivateAssets="all" OutputItemType="analyzer" /> -->
+
+    <PackageReference Include="Seven.Boundless.Persistence" Version="0.0.1" />
+    <!-- <ProjectReference Include="../Boundless.Persistence/Seven.Boundless.Persistence/Seven.Boundless.Persistence.csproj" /> -->
+
+    <PackageReference Include="KGySoft.CoreLibraries" Version="8.1.0" />
+    <PackageReference Include="SimdLinq" Version="1.3.2" />
+  </ItemGroup>
+</Project>
