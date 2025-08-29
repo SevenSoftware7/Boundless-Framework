@@ -1,6 +1,7 @@
 namespace Seven.Boundless;
 
 using System;
+using System.Linq;
 using Godot;
 using Seven.Boundless.Utility;
 
@@ -16,12 +17,9 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 	private RDShaderFile? RenderShaderFile {
 		get;
 		set {
+			DestructRenderPipeline();
 			field = value;
-
-			if (RenderingDevice is not null) {
-				Destruct();
-				Construct();
-			}
+			ConstructRenderPipeline();
 		}
 	}
 	private Rid renderShader;
@@ -30,12 +28,9 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 	private RDShaderFile? ComputeShaderFile {
 		get;
 		set {
+			DestructComputePipeline();
 			field = value;
-
-			if (RenderingDevice is not null) {
-				Destruct();
-				Construct();
-			}
+			ConstructComputePipeline();
 		}
 	}
 	private Rid computeShader;
@@ -56,7 +51,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 		Samples = RenderingDevice.TextureSamples.Samples1,
 		UsageFlags = (uint)RenderingDevice.TextureUsageBits.DepthStencilAttachmentBit,
 	};
-	private long framebufferFormat;
+	private long? framebufferFormat;
 
 	private readonly RDVertexAttribute vertexAttribute = new() {
 		Format = RenderingDevice.DataFormat.R32G32B32A32Sfloat,
@@ -64,7 +59,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 		Stride = sizeof(float) * 4,
 	};
 	private readonly uint vertexLength = 4;
-	private long vertexFormat;
+	private long? vertexFormat;
 
 	private Rid renderPipeline;
 	private Rid computePipeline;
@@ -73,6 +68,8 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 
 	public UnderwaterEffect() : base() {
 		EffectCallbackType = EffectCallbackTypeEnum.PreTransparent;
+
+		ConstructSamplers();
 	}
 
 
@@ -80,7 +77,8 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 	public override void _RenderCallback(int effectCallbackType, RenderData renderData) {
 		base._RenderCallback(effectCallbackType, renderData);
 
-		if (RenderingDevice is null || RenderShaderFile is null || ComputeShaderFile is null) return;
+		if (RenderShaderFile is null || ComputeShaderFile is null) return;
+		if (vertexFormat is null || framebufferFormat is null) return;
 		if (WaterDisplacementTexture is null || !WaterDisplacementTexture.TextureRdRid.IsValid) return;
 
 
@@ -99,7 +97,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 		uint[] waterMeshIndices = WaterMeshManager.WaterIndices;
 		if (waterMeshVertices.Length == 0 || waterMeshIndices.Length == 0) return;
 
-		(Rid vertexBuffer, Rid vertexArray) = RenderingDevice.VertexArrayCreate(waterMeshVertices, vertexFormat, vertexLength);
+		(Rid vertexBuffer, Rid vertexArray) = RenderingDevice.VertexArrayCreate(waterMeshVertices, vertexFormat.Value, vertexLength);
 		(Rid indexBuffer, Rid indexArray) = RenderingDevice.IndexArrayCreate(waterMeshIndices, 3);
 
 		// ----- Water Mesh Info -----
@@ -118,7 +116,7 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			Rid waterMap = sceneBuffers.GetTextureSlice(Context, WaterMapName, view, 0, 1, 1);
 			Rid waterDepth = sceneBuffers.GetTextureSlice(Context, WaterDepthName, view, 0, 1, 1);
 
-			Rid waterBuffer = RenderingDevice.FramebufferCreate([waterMap, waterDepth], framebufferFormat);
+			Rid waterBuffer = RenderingDevice.FramebufferCreate([waterMap, waterDepth], framebufferFormat.Value);
 			if (!waterBuffer.IsValid) {
 				throw new ArgumentException("Water Mask Frame Buffer is Invalid");
 			}
@@ -294,12 +292,20 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 		}
 	}
 
-	protected override void ConstructBehaviour(RenderingDevice renderingDevice) {
-		// Framebuffer Format includes a depth attachment to Self-occlude
-		framebufferFormat = renderingDevice.FramebufferFormatCreate([waterMapAttachmentFormat, waterDepthAttachmentFormat]);
-		vertexFormat = renderingDevice.VertexFormatCreate([vertexAttribute]);
+	protected override void ConstructBehaviour() {
+		ConstructSamplers();
+		ConstructRenderPipeline();
+		ConstructComputePipeline();
+	}
+	protected override void DestructBehaviour() {
+		DestructSamplers();
+		DestructRenderPipeline();
+		DestructComputePipeline();
+	}
 
-		displacementSampler = renderingDevice.SamplerCreate(new() {
+
+	private void ConstructSamplers() {
+		displacementSampler = RenderingDevice.SamplerCreate(new() {
 			MinFilter = RenderingDevice.SamplerFilter.Linear,
 			MagFilter = RenderingDevice.SamplerFilter.Linear,
 			RepeatU = RenderingDevice.SamplerRepeatMode.Repeat,
@@ -307,87 +313,92 @@ public partial class UnderwaterEffect : BaseCompositorEffect {
 			RepeatW = RenderingDevice.SamplerRepeatMode.Repeat,
 		});
 
-		depthSampler = renderingDevice.SamplerCreate(new() {
+		depthSampler = RenderingDevice.SamplerCreate(new() {
 			MinFilter = RenderingDevice.SamplerFilter.Nearest,
 			MagFilter = RenderingDevice.SamplerFilter.Nearest
 		});
-
-		ConstructRenderPipeline(renderingDevice);
-		ConstructComputePipeline(renderingDevice);
-
-
-
-		void ConstructRenderPipeline(RenderingDevice renderingDevice) {
-			if (RenderShaderFile is null) return;
-
-			renderShader = renderingDevice.ShaderCreateFromSpirV(RenderShaderFile.GetSpirV());
-			if (!renderShader.IsValid) {
-				throw new ArgumentException("Render Shader is Invalid");
-			}
-
-
-			RDPipelineColorBlendState blend = new() {
-				Attachments = [new RDPipelineColorBlendStateAttachment()]
-			};
-
-			renderPipeline = renderingDevice.RenderPipelineCreate(
-				renderShader,
-				framebufferFormat,
-				vertexFormat,
-				RenderingDevice.RenderPrimitive.Triangles,
-				new RDPipelineRasterizationState(),
-				new RDPipelineMultisampleState(),
-				new RDPipelineDepthStencilState() {
-					// Enable Self-occlusion via Depth Test
-					EnableDepthTest = true,
-					EnableDepthWrite = true,
-					DepthCompareOperator = RenderingDevice.CompareOperator.GreaterOrEqual
-				},
-				blend
-			);
-			if (!renderPipeline.IsValid) {
-				throw new ArgumentException("Render Pipeline is Invalid");
-			}
-		}
-
-		void ConstructComputePipeline(RenderingDevice renderingDevice) {
-			if (ComputeShaderFile is null) return;
-
-			computeShader = renderingDevice.ShaderCreateFromSpirV(ComputeShaderFile.GetSpirV());
-			if (!computeShader.IsValid) {
-				throw new ArgumentException("Compute Shader is Invalid");
-			}
-
-			computePipeline = renderingDevice.ComputePipelineCreate(computeShader);
-			if (!computePipeline.IsValid) {
-				throw new ArgumentException("Compute Pipeline is Invalid");
-			}
-		}
 	}
-
-	protected override void DestructBehaviour(RenderingDevice renderingDevice) {
+	private void DestructSamplers() {
 		if (displacementSampler.IsValid) {
-			renderingDevice.FreeRid(displacementSampler);
+			RenderingDevice.FreeRid(displacementSampler);
 			displacementSampler = default;
 		}
 
 		if (depthSampler.IsValid) {
-			renderingDevice.FreeRid(depthSampler);
+			RenderingDevice.FreeRid(depthSampler);
 			depthSampler = default;
 		}
+	}
 
+	private void ConstructRenderPipeline() {
+		if (RenderShaderFile is null) return;
+
+		renderShader = RenderingDevice.ShaderCreateFromSpirV(RenderShaderFile.GetSpirV());
+		if (!renderShader.IsValid) {
+			throw new ArgumentException("Render Shader is Invalid");
+		}
+
+		// Framebuffer Format includes a depth attachment to Self-occlude
+		framebufferFormat ??= RenderingDevice.FramebufferFormatCreate([waterMapAttachmentFormat, waterDepthAttachmentFormat]);
+		vertexFormat ??= RenderingDevice.VertexFormatCreate([vertexAttribute]);
+
+		RDPipelineColorBlendState blend = new() {
+			Attachments = [new RDPipelineColorBlendStateAttachment()]
+		};
+
+		renderPipeline = RenderingDevice.RenderPipelineCreate(
+			renderShader,
+			framebufferFormat.Value,
+			vertexFormat.Value,
+			RenderingDevice.RenderPrimitive.Triangles,
+			new RDPipelineRasterizationState(),
+			new RDPipelineMultisampleState(),
+			new RDPipelineDepthStencilState() {
+				// Enable Self-occlusion via Depth Test
+				EnableDepthTest = true,
+				EnableDepthWrite = true,
+				DepthCompareOperator = RenderingDevice.CompareOperator.GreaterOrEqual
+			},
+			blend
+		);
+		if (!renderPipeline.IsValid) {
+			throw new ArgumentException("Render Pipeline is Invalid");
+		}
+	}
+	private void DestructRenderPipeline() {
 		if (renderShader.IsValid) {
-			renderingDevice.FreeRid(renderShader);
+			RenderingDevice.FreeRid(renderShader);
 			renderShader = default;
 		}
 		// Don't need to free the pipeline as freeing the shader does that for us.
+		else if (renderPipeline.IsValid) {
+			RenderingDevice.FreeRid(renderPipeline);
+		}
 		renderPipeline = default;
+	}
 
+	private void ConstructComputePipeline() {
+		if (ComputeShaderFile is null) return;
+
+		computeShader = RenderingDevice.ShaderCreateFromSpirV(ComputeShaderFile.GetSpirV());
+		if (!computeShader.IsValid) {
+			throw new ArgumentException("Compute Shader is Invalid");
+		}
+
+		computePipeline = RenderingDevice.ComputePipelineCreate(computeShader);
+		if (!computePipeline.IsValid) {
+			throw new ArgumentException("Compute Pipeline is Invalid");
+		}
+	}
+	private void DestructComputePipeline() {
 		if (computeShader.IsValid) {
-			renderingDevice.FreeRid(computeShader);
+			RenderingDevice.FreeRid(computeShader);
 			computeShader = default;
 		}
-		// Same as above
+		// Don't need to free the pipeline as freeing the shader does that for us.
+		else if (computePipeline.IsValid) {
+			RenderingDevice.FreeRid(computePipeline);
+		}
 		computePipeline = default;
 	}
 }

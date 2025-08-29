@@ -14,11 +14,9 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 	private Texture2Drd? Texture {
 		get;
 		set {
-			if (RenderingDevice is not null) Destruct();
-
+			DestructDisplacementMap();
 			field = value;
-
-			if (RenderingDevice is not null) Construct();
+			ConstructDisplacementMap();
 		}
 	}
 
@@ -26,11 +24,9 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 	private RDShaderFile? ComputeShaderFile {
 		get;
 		set {
-			if (RenderingDevice is not null) Destruct();
-
+			DestructComputePipeline();
 			field = value;
-
-			if (RenderingDevice is not null) Construct();
+			ConstructComputePipeline();
 		}
 	}
 	private Rid computeShader;
@@ -42,11 +38,9 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 	private RDShaderFile? FetchShaderFile {
 		get;
 		set {
-			if (RenderingDevice is not null) Destruct();
-
+			DestructFetchPipeline();
 			field = value;
-
-			if (RenderingDevice is not null) Construct();
+			ConstructFetchPipeline();
 		}
 	}
 	private Rid fetchShader;
@@ -74,6 +68,8 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 
 	public WaterDisplacementEffect() : base() {
 		EffectCallbackType = EffectCallbackTypeEnum.PreTransparent;
+
+		ConstructSampler();
 	}
 
 
@@ -193,73 +189,97 @@ public partial class WaterDisplacementEffect : BaseCompositorEffect {
 
 
 
-	protected override void ConstructBehaviour(RenderingDevice renderingDevice) {
-		if (ComputeShaderFile is null || Texture is null) return;
+	protected override void ConstructBehaviour() {
+		ConstructSampler();
+		ConstructComputePipeline();
+		ConstructFetchPipeline();
+		ConstructDisplacementMap();
+	}
+	protected override void DestructBehaviour() {
+		DestructSampler();
+		DestructComputePipeline();
+		DestructFetchPipeline();
+		DestructDisplacementMap();
+	}
 
-		displacementSampler = renderingDevice.SamplerCreate(new() {
+
+	private void ConstructSampler() {
+		displacementSampler = RenderingDevice.SamplerCreate(new() {
 			MinFilter = RenderingDevice.SamplerFilter.Linear,
 			MagFilter = RenderingDevice.SamplerFilter.Linear,
 			RepeatU = RenderingDevice.SamplerRepeatMode.Repeat,
 			RepeatV = RenderingDevice.SamplerRepeatMode.Repeat,
 			RepeatW = RenderingDevice.SamplerRepeatMode.Repeat,
 		});
+	}
+	private void DestructSampler() {
+		if (displacementSampler.IsValid) {
+			RenderingDevice.FreeRid(displacementSampler);
+			displacementSampler = default;
+		}
+	}
 
-		computeShader = renderingDevice.ShaderCreateFromSpirV(ComputeShaderFile.GetSpirV());
+	private void ConstructComputePipeline() {
+		if (ComputeShaderFile is null) return;
+
+		computeShader = RenderingDevice.ShaderCreateFromSpirV(ComputeShaderFile.GetSpirV());
 		if (!computeShader.IsValid) {
 			throw new ArgumentException("Compute Shader is Invalid");
 		}
 
-		computePipeline = renderingDevice.ComputePipelineCreate(computeShader);
+		computePipeline = RenderingDevice.ComputePipelineCreate(computeShader);
 		if (!computePipeline.IsValid) {
 			throw new ArgumentException("Compute Pipeline is Invalid");
 		}
+	}
+	private void DestructComputePipeline() {
+		if (computeShader.IsValid) {
+			RenderingDevice.FreeRid(computeShader);
+			computeShader = default;
+		}
+		// Don't need to free the pipeline as freeing the shader does that for us.
+		else if (computePipeline.IsValid) {
+			RenderingDevice.FreeRid(computePipeline);
+		}
+		computePipeline = default;
+	}
 
+	private void ConstructFetchPipeline() {
 		if (FetchShaderFile is not null) {
-			fetchShader = renderingDevice.ShaderCreateFromSpirV(FetchShaderFile.GetSpirV());
+			fetchShader = RenderingDevice.ShaderCreateFromSpirV(FetchShaderFile.GetSpirV());
 			if (!fetchShader.IsValid) {
 				throw new ArgumentException("Fetch Shader is Invalid");
 			}
 
-			fetchPipeline = renderingDevice.ComputePipelineCreate(fetchShader);
+			fetchPipeline = RenderingDevice.ComputePipelineCreate(fetchShader);
 			if (!fetchPipeline.IsValid) {
 				throw new ArgumentException("Fetch Pipeline is Invalid");
 			}
 		}
-
-
-		waterDisplacementMap = renderingDevice.TextureCreate(waterDisplacementMapAttachmentFormat, new RDTextureView(), null);
-		Texture.TextureRdRid = waterDisplacementMap;
 	}
-
-
-	protected override void DestructBehaviour(RenderingDevice renderingDevice) {
-		if (displacementSampler.IsValid) {
-			renderingDevice.FreeRid(displacementSampler);
-			displacementSampler = default;
-		}
-
-
-		if (computeShader.IsValid) {
-			renderingDevice.FreeRid(computeShader);
-			computeShader = default;
-		}
-		// Don't need to free the pipeline as freeing the shader does that for us.
-		computePipeline = default;
-
-
+	private void DestructFetchPipeline() {
 		if (fetchShader.IsValid) {
-			renderingDevice.FreeRid(fetchShader);
+			RenderingDevice.FreeRid(fetchShader);
 			fetchShader = default;
 		}
 		// Don't need to free the pipeline as freeing the shader does that for us.
+		else if (fetchPipeline.IsValid) {
+			RenderingDevice.FreeRid(fetchPipeline);
+		}
 		fetchPipeline = default;
+	}
 
-
+	private void ConstructDisplacementMap() {
+		if (Texture is null) return;
+		waterDisplacementMap = RenderingDevice.TextureCreate(waterDisplacementMapAttachmentFormat, new RDTextureView(), null);
+		Texture.TextureRdRid = waterDisplacementMap;
+	}
+	private void DestructDisplacementMap() {
 		if (Texture is not null) {
 			Texture.TextureRdRid = default;
 		}
 		if (waterDisplacementMap.IsValid) {
-			renderingDevice.FreeRid(waterDisplacementMap);
+			RenderingDevice.FreeRid(waterDisplacementMap);
 			waterDisplacementMap = default;
 		}
 	}

@@ -13,12 +13,9 @@ public partial class BlitCompositorEffect : BaseCompositorEffect {
 	private RDShaderFile? ShaderFile {
 		get;
 		set {
+			DestructComputePipeline();
 			field = value;
-
-			if (RenderingDevice is not null) {
-				Destruct();
-				Construct();
-			}
+			ConstructComputePipeline();
 		}
 	}
 	private Rid shader;
@@ -32,38 +29,7 @@ public partial class BlitCompositorEffect : BaseCompositorEffect {
 	}
 
 
-	protected virtual void BlitConstructBehaviour(in RenderingDevice renderingDevice) { }
-	protected virtual void BlitDestructBehaviour(in RenderingDevice renderingDevice) { }
-	protected virtual void ComputeListBind(in RenderingDevice renderingDevice, in long computeList, in Rid shader, in RenderSceneBuffersRD sceneBuffers, in uint view) { }
-
-
-	protected sealed override void ConstructBehaviour(RenderingDevice renderingDevice) {
-		if (ShaderFile is null) return;
-		shader = renderingDevice.ShaderCreateFromSpirV(ShaderFile.GetSpirV());
-
-		depthSampler = renderingDevice.SamplerCreate(new() {
-			MinFilter = RenderingDevice.SamplerFilter.Nearest,
-			MagFilter = RenderingDevice.SamplerFilter.Nearest
-		});
-
-		computePipeline = renderingDevice.ComputePipelineCreate(shader);
-
-		BlitConstructBehaviour(renderingDevice);
-	}
-	protected sealed override void DestructBehaviour(RenderingDevice renderingDevice) {
-		if (depthSampler.IsValid) {
-			renderingDevice.FreeRid(depthSampler);
-		}
-
-		if (computePipeline.IsValid) {
-			renderingDevice.FreeRid(computePipeline);
-		}
-		if (shader.IsValid) {
-			renderingDevice.FreeRid(shader);
-		}
-
-		BlitDestructBehaviour(renderingDevice);
-	}
+	protected virtual void ComputeListBind(in long computeList, in Rid shader, in RenderSceneBuffersRD sceneBuffers, in uint view) { }
 
 	public override void _RenderCallback(int effectCallbackType, RenderData renderData) {
 		base._RenderCallback(effectCallbackType, renderData);
@@ -88,11 +54,53 @@ public partial class BlitCompositorEffect : BaseCompositorEffect {
 			RenderingDevice.ComputeListBindComputePipeline(computeList, computePipeline);
 			RenderingDevice.ComputeListBindColor(computeList, shader, sceneBuffers, view, 0, 0);
 			RenderingDevice.ComputeListBindDepth(computeList, shader, sceneBuffers, view, depthSampler, 0, 1);
-			ComputeListBind(RenderingDevice, computeList, shader, sceneBuffers, view);
+			ComputeListBind(computeList, shader, sceneBuffers, view);
 			RenderingDevice.ComputeListDispatch(computeList, xGroups, yGroups, 1);
 			RenderingDevice.ComputeListEnd();
 		}
 
 		RenderingDevice.DrawCommandEndLabel();
+	}
+
+	protected virtual void BlitConstructBehaviour() { }
+	protected virtual void BlitDestructBehaviour() { }
+
+	protected sealed override void ConstructBehaviour() {
+		if (ShaderFile is null) return;
+
+		depthSampler = RenderingDevice.SamplerCreate(new() {
+			MinFilter = RenderingDevice.SamplerFilter.Nearest,
+			MagFilter = RenderingDevice.SamplerFilter.Nearest
+		});
+
+		ConstructComputePipeline();
+
+		BlitConstructBehaviour();
+	}
+	protected sealed override void DestructBehaviour() {
+		if (depthSampler.IsValid) {
+			RenderingDevice.FreeRid(depthSampler);
+		}
+
+		DestructComputePipeline();
+
+		BlitDestructBehaviour();
+	}
+
+
+	private void ConstructComputePipeline() {
+		if (ShaderFile is null) return;
+
+		shader = RenderingDevice.ShaderCreateFromSpirV(ShaderFile.GetSpirV());
+		computePipeline = RenderingDevice.ComputePipelineCreate(shader);
+	}
+
+	private void DestructComputePipeline() {
+		if (computePipeline.IsValid) {
+			RenderingDevice.FreeRid(computePipeline);
+		}
+		if (shader.IsValid) {
+			RenderingDevice.FreeRid(shader);
+		}
 	}
 }
