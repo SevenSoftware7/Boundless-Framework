@@ -19,13 +19,14 @@ layout(set = 1, binding = 0) readonly buffer InputBuffer {
 
 // Output buffer containing the requested XYZ Water displacement
 layout(set = 2, binding = 0) writeonly buffer OutputBuffer {
-	highp vec3 outputs[];
+	highp float outputs[];
 };
 
 
 
 void main() {
 	uint index = gl_GlobalInvocationID.x;
+	uint outputIndex = index * 3;
 
 	// Read UV coordinates from the buffer
 	WaterInput waterInput = inputs[index];
@@ -34,5 +35,7 @@ void main() {
 	highp vec3 displacement = (texture(displacement_image, waterInput.location / waterInput.water_scale).xyz * 2.0 - 1.0) * waterInput.intensity;
 
 	// Write the displacement to the buffer
-	outputs[index] = displacement;
+	outputs[outputIndex] = displacement.x;
+	outputs[outputIndex + 1] = displacement.y;
+	outputs[outputIndex + 2] = displacement.z;
 }
