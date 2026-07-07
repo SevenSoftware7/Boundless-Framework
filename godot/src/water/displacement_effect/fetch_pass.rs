@@ -6,7 +6,7 @@ use godot::obj::{Gd, NewGd};
 use crate::water::WaterDisplacement;
 
 
-pub(crate) fn run_fetch_displacement_pass(
+pub fn run_fetch_displacement_pass(
 	rd: &mut Gd<RenderingDevice>,
 	fetch_pipeline: Rid,
 	fetch_shader: Rid,
@@ -32,8 +32,10 @@ pub(crate) fn run_fetch_displacement_pass(
 	}
 	let input_data = PackedByteArray::from(input_bytes.as_slice());
 
+	#[allow(clippy::cast_possible_truncation)]
 	let output_byte_count = (batch.len() * 3 * std::mem::size_of::<f32>()) as u32;
 
+	#[allow(clippy::cast_possible_truncation)]
 	let input_buffer = rd
 		.storage_buffer_create_ex(input_data.len() as u32)
 		.data(&input_data)
@@ -86,6 +88,7 @@ pub(crate) fn run_fetch_displacement_pass(
 	rd.compute_list_bind_uniform_set(fetch_list, uniform_set0, 0);
 	rd.compute_list_bind_uniform_set(fetch_list, uniform_set1, 1);
 	rd.compute_list_bind_uniform_set(fetch_list, uniform_set2, 2);
+	#[allow(clippy::cast_possible_truncation)]
 	rd.compute_list_dispatch(fetch_list, batch.len() as u32, 1, 1);
 	rd.compute_list_end();
 	rd.draw_command_end_label();
@@ -96,7 +99,7 @@ pub(crate) fn run_fetch_displacement_pass(
 		fetched_xyz.push(f32::from_ne_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]));
 	}
 
-	WaterDisplacement::dispatch_fetched_updates(batch, &fetched_xyz);
+	WaterDisplacement::dispatch_fetched_updates(&batch, &fetched_xyz);
 
 	rd.free_rid(uniform_set0);
 	rd.free_rid(uniform_set1);

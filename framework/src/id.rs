@@ -19,13 +19,20 @@ impl Id {
 		}
 	}
 
-	pub fn from_normalized(normalized_name: &str) -> Self {
-		assert_eq!(normalized_name, normalize_id_name(normalized_name), "Id name must be normalized (lowercase, no spaces)");
+	/// # Panics
+	///
+	/// Will panic if given string `normalized_name` is not normalized.
+	/// When in doubt, use `from_unnormalized()`
+	#[must_use]
+	pub fn from_normalized(normalized_name: impl AsRef<str>) -> Self {
+		let str = normalized_name.as_ref();
+		debug_assert_eq!(str, normalize_id_name(str), "Id name must be normalized (lowercase, no spaces)");
 		Self {
-			id: DefaultAtom::from(normalized_name),
+			id: DefaultAtom::from(str),
 		}
 	}
 
+	#[must_use]
 	pub fn id(&self) -> &str {
 		&self.id
 	}
@@ -34,13 +41,13 @@ impl Id {
 
 impl From<&str> for Id {
 	fn from(value: &str) -> Self {
-		Id::from_unnormalized(value)
+		Self::from_unnormalized(value)
 	}
 }
 
 impl From<String> for Id {
 	fn from(value: String) -> Self {
-		Id::from_unnormalized(value)
+		Self::from_unnormalized(value)
 	}
 }
 

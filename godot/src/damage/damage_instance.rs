@@ -1,7 +1,6 @@
-use std::sync::{Arc, Mutex};
 use godot::prelude::*;
 
-use boundless::{damage::DamageInstance};
+use boundless::{damage::DamageInstance, sync::{BdlsMutex, BdlsPtr}};
 use godot::register::{GodotClass, godot_api};
 
 use crate::GodotId;
@@ -9,23 +8,24 @@ use crate::GodotId;
 #[derive(GodotClass, Clone)]
 #[class(base=RefCounted, no_init, rename=DamageInstance)]
 pub struct GodotDamageInstance {
-	damage_instance: Arc<Mutex<DamageInstance>>,
+	damage_instance: BdlsPtr<BdlsMutex<DamageInstance>>,
 }
 
 #[godot_api]
 impl GodotDamageInstance {
-	pub fn from(damage_instance: Arc<Mutex<DamageInstance>>) -> Self {
+	pub const fn from(damage_instance: BdlsPtr<BdlsMutex<DamageInstance>>) -> Self {
 		Self {
 			damage_instance,
 		}
 	}
-	pub fn gd_from(damage_instance: Arc<Mutex<DamageInstance>>) -> Gd<Self> {
+	pub fn gd_from(damage_instance: BdlsPtr<BdlsMutex<DamageInstance>>) -> Gd<Self> {
 		Gd::from_object(Self::from(damage_instance))
 	}
 
 	#[func]
+	#[must_use]
 	pub fn get_amount(&self) -> f32 {
-		self.damage_instance.lock().unwrap().amount()
+		self.damage_instance.borrow().amount()
 	}
 
 	#[func]
@@ -33,10 +33,9 @@ impl GodotDamageInstance {
 		&mut self,
 		resistance_attribute: GodotId,
 		strength_attribute: GodotId,
-		allow_negative: bool,
+		#[opt(default=false)] allow_negative: bool,
 	) {
-
-		self.damage_instance.lock().unwrap()
+		self.damage_instance.borrow_mut()
 			.scale(
 				&resistance_attribute.into(),
 				&strength_attribute.into(),

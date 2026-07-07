@@ -5,6 +5,8 @@ use godot::obj::{Gd, NewGd};
 
 use crate::water::underwater_effect::projection_utils;
 
+#[allow(clippy::too_many_arguments)]
+#[inline]
 pub(crate) fn run_apply_underwater_pass(
 	rd: &mut Gd<RenderingDevice>,
 	compute_pipeline: Rid,
@@ -15,10 +17,8 @@ pub(crate) fn run_apply_underwater_pass(
 	water_map: Rid,
 	parameters_buffer: Rid,
 	projection: Projection,
-	screen_w: i32,
-	screen_h: i32,
-	x_groups: u32,
-	y_groups: u32,
+	screen_size: (i32, i32),
+	groups: (u32, u32),
 ) {
 	let mut uniforms_set0 = Array::<Gd<RdUniform>>::new();
 	let mut color_uniform = RdUniform::new_gd();
@@ -75,10 +75,10 @@ pub(crate) fn run_apply_underwater_pass(
 
 	let mut compute_push_values = Vec::<u8>::with_capacity(18 * 4 + 8);
 	projection_utils::append_projection_bytes(&mut compute_push_values, projection.inverse());
-	compute_push_values.extend_from_slice(&(projection.z_near() as f32).to_ne_bytes());
-	compute_push_values.extend_from_slice(&(projection.z_far() as f32).to_ne_bytes());
-	compute_push_values.extend_from_slice(&screen_w.to_ne_bytes());
-	compute_push_values.extend_from_slice(&screen_h.to_ne_bytes());
+	compute_push_values.extend_from_slice(&projection.z_near().to_ne_bytes());
+	compute_push_values.extend_from_slice(&projection.z_far().to_ne_bytes());
+	compute_push_values.extend_from_slice(&screen_size.0.to_ne_bytes());
+	compute_push_values.extend_from_slice(&screen_size.1.to_ne_bytes());
 	let compute_push = PackedByteArray::from(compute_push_values.as_slice());
 
 	rd.draw_command_begin_label("Render Underwater Effect", Color::from_rgb(1.0, 1.0, 1.0));
@@ -88,8 +88,9 @@ pub(crate) fn run_apply_underwater_pass(
 	rd.compute_list_bind_uniform_set(compute_list, compute_set1, 1);
 	rd.compute_list_bind_uniform_set(compute_list, compute_set2, 2);
 	rd.compute_list_bind_uniform_set(compute_list, compute_set3, 3);
+	#[allow(clippy::cast_possible_truncation)]
 	rd.compute_list_set_push_constant(compute_list, &compute_push, compute_push.len() as u32);
-	rd.compute_list_dispatch(compute_list, x_groups, y_groups, 1);
+	rd.compute_list_dispatch(compute_list, groups.0, groups.1, 1);
 	rd.compute_list_end();
 	rd.draw_command_end_label();
 

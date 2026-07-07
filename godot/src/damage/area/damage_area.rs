@@ -1,11 +1,12 @@
 use std::{collections::{HashMap, HashSet}};
 
-use boundless::{damage::{Damage, DamageDealer, Damageable}};
+use boundless::{damage::{Damage, DamageDealer, DamageModifier, Damageable}, sync::BdlsPtr};
 use godot::{
 	classes::{Area3D, IArea3D}, prelude::*
 };
+use itertools::Itertools;
 
-use crate::{DamageAreaHitboxBuilder, GodotDamage, GodotDamageDealer, GodotDamageable, flatten_damage_builders};
+use crate::{DamageAreaHitboxBuilder, DamageModifierWrapper, GodotDamage, GodotDamageDealer, GodotDamageable};
 
 
 #[derive(GodotClass)]
@@ -44,6 +45,7 @@ pub struct DamageArea {
 
 #[godot_api]
 impl DamageArea {
+	#[must_use]
 	pub fn new(
 		base: Base<Area3D>,
 		flags: i64,
@@ -53,27 +55,31 @@ impl DamageArea {
 	) -> Self {
 		Self {
 			base,
-			flags: flags,
-			life_time: life_time,
-			max_impacts: max_impacts,
-			damage_multiplier: damage_multiplier,
-			damage_builders: Default::default(),
-			damage_dealer: Default::default(),
-			impacts_history: Default::default(),
-			impacts_buffer: Default::default(),
-			buffered_impacts_flush: Default::default(),
+			flags,
+			life_time,
+			max_impacts,
+			damage_multiplier,
+			damage_builders: Array::default(),
+			damage_dealer: None,
+			impacts_history: HashMap::default(),
+			impacts_buffer: HashSet::default(),
+			buffered_impacts_flush: false,
 		}
 	}
 
+	#[must_use]
 	pub fn with_dealer(mut self, dealer: DynGd<Node, dyn DamageDealer>) -> Self {
 		self.damage_dealer = Some(dealer);
 		self
 	}
 
-	pub fn with_hitbox(mut self, hitbox_builder: Gd<DamageAreaHitboxBuilder>) -> Self {
+	#[must_use]
+	pub fn with_hitbox(mut self, hitbox_builder: &Gd<DamageAreaHitboxBuilder>) -> Self {
 		hitbox_builder.bind().add_to(&mut self.base_mut());
 		self
 	}
+
+	#[must_use]
 	pub fn with_hitboxes(mut self, hitbox_builders: impl IntoIterator<Item = Gd<DamageAreaHitboxBuilder>>) -> Self {
 		for hitbox_builder in hitbox_builders {
 			hitbox_builder.bind().add_to(&mut self.base_mut());
@@ -83,7 +89,16 @@ impl DamageArea {
 	}
 
 	pub fn build_damages(&self) -> Vec<Damage> {
-		let mut damages = flatten_damage_builders(self.damage_builders.iter_shared());
+		let mut damages: Vec<Damage> = self.damage_builders.iter_shared().map(|builder| {
+			let builder_ref = builder.bind();
+			Damage::new(
+				builder_ref.amount,
+				builder_ref.modifiers.iter_shared()
+					.flatten()
+					.unique()
+					.map(|modifier| BdlsPtr::<DamageModifierWrapper>::new(modifier.into()) as BdlsPtr<dyn DamageModifier>),
+			)
+		}).collect();
 
 		for damage in &mut damages {
 			damage.amount *= self.damage_multiplier;
@@ -107,7 +122,7 @@ impl DamageArea {
 	}
 
 	pub fn get_impact_count(&self, target: &DynGd<Node, dyn Damageable>) -> i32 {
-		self.impacts_history.get(target).cloned().unwrap_or(0)
+		self.impacts_history.get(target).copied().unwrap_or(0)
 	}
 
 	fn buffer_impact(&mut self, target: DynGd<Node, dyn Damageable>) {
@@ -117,14 +132,14 @@ impl DamageArea {
 
 		self.impacts_buffer.insert(target);
 		if ! self.buffered_impacts_flush {
-			self.run_deferred(DamageArea::flush_buffered_impacts);
+			self.run_deferred(Self::flush_buffered_impacts);
 			self.buffered_impacts_flush = true;
 		}
 	}
 
 	pub fn flush_buffered_impacts(&mut self) {
-		let _buffered = std::mem::take(&mut self.impacts_buffer);
-		for target in _buffered {
+		let buffered = std::mem::take(&mut self.impacts_buffer);
+		for target in buffered {
 			self.inflict(target.clone());
 			*self.impacts_history.entry(target).or_insert(0) += 1;
 		}

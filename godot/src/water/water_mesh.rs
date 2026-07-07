@@ -17,43 +17,43 @@ pub struct WaterMesh {
 
 	#[var(set = set_shallow_color)]
 	#[export(color_no_alpha)]
-	#[init(val = Color::from_rgb(0.1395, 0.279225, 0.45))]
-	shallow_color: Color,
+	#[init(val = Color::from_rgb(0.1395, 0.279_225, 0.45))]
+	pub shallow_color: Color,
 
 	#[var(set = set_deep_color)]
 	#[export(color_no_alpha)]
 	#[init(val = Color::from_rgb(0.068, 0.127, 0.2))]
-	deep_color: Color,
+	pub deep_color: Color,
 
 	#[var(set = set_water_intensity)]
 	#[export]
 	#[init(val = 1.85)]
-	water_intensity: f32,
+	pub water_intensity: f32,
 
 	#[var(set = set_water_scale)]
 	#[export]
 	#[init(val = 45.0)]
-	water_scale: f32,
+	pub water_scale: f32,
 
 	#[var(set = set_fog_distance)]
 	#[export]
 	#[init(val = 60.0)]
-	fog_distance: f32,
+	pub fog_distance: f32,
 
 	#[var(set = set_fog_fade)]
 	#[export(range = (0.0, 20.0, 0.1))]
 	#[init(val = 3.5)]
-	fog_fade: f32,
+	pub fog_fade: f32,
 
 	#[var(set = set_transparency_distance)]
 	#[export]
 	#[init(val = 100.0)]
-	transparency_distance: f32,
+	pub transparency_distance: f32,
 
 	#[var(set = set_transparency_fade)]
 	#[export(range = (0.0, 20.0, 0.1))]
 	#[init(val = 2.5)]
-	transparency_fade: f32,
+	pub transparency_fade: f32,
 }
 
 #[godot_api]
@@ -83,7 +83,7 @@ impl IMeshInstance3D for WaterMesh {
 			return false;
 		};
 
-		self.set_base_mesh(mesh);
+		self.set_base_mesh(mesh.as_ref());
 		true
 	}
 }
@@ -112,9 +112,9 @@ impl WaterMesh {
 			// mesh.signals().changed().connect(update_params_callable);
 
 			self.tracked_mesh_id = Some(mesh.instance_id());
-		};
+		}
 
-		return true;
+		true
 	}
 
 	fn disconnect_mesh_callbacks(&mut self) -> bool {
@@ -138,12 +138,12 @@ impl WaterMesh {
 
 		self.tracked_mesh_id = None;
 
-		return true;
+		true
 	}
 
-	fn set_base_mesh(&mut self, mesh: Option<Gd<Mesh>>) {
+	fn set_base_mesh(&mut self, mesh: Option<&Gd<Mesh>>) {
 		match mesh.as_ref() {
-			Some(mesh_ref) => self.base_mut().set_mesh(mesh_ref),
+			Some(mesh_ref) => self.base_mut().set_mesh(*mesh_ref),
 			None => self.base_mut().set_mesh(Option::<&Gd<Mesh>>::None),
 		}
 
@@ -154,12 +154,11 @@ impl WaterMesh {
 	}
 
 
-	fn update_shallow_color(&mut self) {
-		if let Some(mesh) = self.base().get_mesh() {
-			if let Some(mut material) = mesh.surface_get_material(0) {
+	fn update_shallow_color(&self) {
+		if let Some(mesh) = self.base().get_mesh()
+			&& let Some(mut material) = mesh.surface_get_material(0) {
 				material.set("shader_parameter/water_shallow_color", &self.shallow_color.to_variant());
 			}
-		}
 	}
 	#[func]
 	pub fn set_shallow_color(&mut self, color: Color) {
@@ -167,12 +166,11 @@ impl WaterMesh {
 		self.update_shallow_color();
 	}
 
-	fn update_deep_color(&mut self) {
-		if let Some(mesh) = self.base().get_mesh() {
-			if let Some(mut material) = mesh.surface_get_material(0) {
+	fn update_deep_color(&self) {
+		if let Some(mesh) = self.base().get_mesh()
+			&& let Some(mut material) = mesh.surface_get_material(0) {
 				material.set("shader_parameter/water_deep_color", &self.deep_color.to_variant());
 			}
-		}
 	}
 	#[func]
 	pub fn set_deep_color(&mut self, color: Color) {
@@ -180,12 +178,11 @@ impl WaterMesh {
 		self.update_deep_color();
 	}
 
-	fn update_water_intensity(&mut self) {
-		if let Some(mesh) = self.base().get_mesh() {
-			if let Some(mut material) = mesh.surface_get_material(0) {
+	fn update_water_intensity(&self) {
+		if let Some(mesh) = self.base().get_mesh()
+			&& let Some(mut material) = mesh.surface_get_material(0) {
 				material.set("shader_parameter/water_intensity", &self.water_intensity.to_variant());
 			}
-		}
 	}
 	#[func]
 	pub fn set_water_intensity(&mut self, intensity: f32) {
@@ -193,12 +190,11 @@ impl WaterMesh {
 		self.update_water_intensity();
 	}
 
-	fn update_water_scale(&mut self) {
-		if let Some(mesh) = self.base().get_mesh() {
-			if let Some(mut material) = mesh.surface_get_material(0) {
+	fn update_water_scale(&self) {
+		if let Some(mesh) = self.base().get_mesh()
+			&& let Some(mut material) = mesh.surface_get_material(0) {
 				material.set("shader_parameter/water_scale", &self.water_scale.to_variant());
 			}
-		}
 	}
 	#[func]
 	pub fn set_water_scale(&mut self, scale: f32) {
@@ -206,12 +202,11 @@ impl WaterMesh {
 		self.update_water_scale();
 	}
 
-	fn update_fog_distance(&mut self) {
-		if let Some(mesh) = self.base().get_mesh() {
-			if let Some(mut material) = mesh.surface_get_material(0) {
+	fn update_fog_distance(&self) {
+		if let Some(mesh) = self.base().get_mesh()
+			&& let Some(mut material) = mesh.surface_get_material(0) {
 				material.set("shader_parameter/water_fog_distance", &self.fog_distance.to_variant());
 			}
-		}
 	}
 	#[func]
 	pub fn set_fog_distance(&mut self, distance: f32) {
@@ -219,12 +214,11 @@ impl WaterMesh {
 		self.update_fog_distance();
 	}
 
-	fn update_fog_fade(&mut self) {
-		if let Some(mesh) = self.base().get_mesh() {
-			if let Some(mut material) = mesh.surface_get_material(0) {
+	fn update_fog_fade(&self) {
+		if let Some(mesh) = self.base().get_mesh()
+			&& let Some(mut material) = mesh.surface_get_material(0) {
 				material.set("shader_parameter/water_fog_fade", &self.fog_fade.to_variant());
 			}
-		}
 	}
 	#[func]
 	pub fn set_fog_fade(&mut self, fade: f32) {
@@ -232,12 +226,11 @@ impl WaterMesh {
 		self.update_fog_fade();
 	}
 
-	fn update_transparency_distance(&mut self) {
-		if let Some(mesh) = self.base().get_mesh() {
-			if let Some(mut material) = mesh.surface_get_material(0) {
+	fn update_transparency_distance(&self) {
+		if let Some(mesh) = self.base().get_mesh()
+			&& let Some(mut material) = mesh.surface_get_material(0) {
 				material.set("shader_parameter/water_transparency_distance", &self.transparency_distance.to_variant());
 			}
-		}
 	}
 	#[func]
 	pub fn set_transparency_distance(&mut self, distance: f32) {
@@ -245,12 +238,11 @@ impl WaterMesh {
 		self.update_transparency_distance();
 	}
 
-	fn update_transparency_fade(&mut self) {
-		if let Some(mesh) = self.base().get_mesh() {
-			if let Some(mut material) = mesh.surface_get_material(0) {
+	fn update_transparency_fade(&self) {
+		if let Some(mesh) = self.base().get_mesh()
+			&& let Some(mut material) = mesh.surface_get_material(0) {
 				material.set("shader_parameter/water_transparency_fade", &self.transparency_fade.to_variant());
 			}
-		}
 	}
 	#[func]
 	pub fn set_transparency_fade(&mut self, fade: f32) {
@@ -258,7 +250,7 @@ impl WaterMesh {
 		self.update_transparency_fade();
 	}
 
-	fn update_all_shader_parameters(&mut self) {
+	fn update_all_shader_parameters(&self) {
 		self.update_shallow_color();
 		self.update_deep_color();
 		self.update_water_intensity();
@@ -269,40 +261,8 @@ impl WaterMesh {
 		self.update_transparency_fade();
 	}
 
-
+	#[must_use]
 	pub fn get_water_mesh(&self) -> Option<Gd<Mesh>> {
 		self.base().get_mesh()
-	}
-
-	pub fn shallow_color_value(&self) -> Color {
-		self.shallow_color
-	}
-
-	pub fn deep_color_value(&self) -> Color {
-		self.deep_color
-	}
-
-	pub fn water_intensity_value(&self) -> f32 {
-		self.water_intensity
-	}
-
-	pub fn water_scale_value(&self) -> f32 {
-		self.water_scale
-	}
-
-	pub fn fog_distance_value(&self) -> f32 {
-		self.fog_distance
-	}
-
-	pub fn fog_fade_value(&self) -> f32 {
-		self.fog_fade
-	}
-
-	pub fn transparency_distance_value(&self) -> f32 {
-		self.transparency_distance
-	}
-
-	pub fn transparency_fade_value(&self) -> f32 {
-		self.transparency_fade
 	}
 }

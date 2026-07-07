@@ -5,16 +5,15 @@ use boundless::{attributes::{AttributeProvider}, damage::{DamageInstance, Damage
 pub struct GodotDamageable(DynGd<Node, dyn Damageable>);
 
 impl GodotDamageable {
+	#[must_use]
 	pub fn from(damageable: DynGd<Node, dyn Damageable>) -> Self {
-		return Self {
-			0: damageable
-		}
+		Self(damageable)
 	}
 }
 
 impl AttributeProvider for GodotDamageable {
-	fn get_value(&self, id: &boundless::id::Id) -> Option<f32> {
-		self.0.dyn_bind().get_value(id)
+	fn get_attribute(&self, id: &boundless::id::Id) -> Option<f32> {
+		self.0.dyn_bind().get_attribute(id)
 	}
 }
 

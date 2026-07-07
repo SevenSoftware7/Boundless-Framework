@@ -1,3 +1,5 @@
+#![allow(clippy::must_use_candidate)] // must_use has false_positives with #[export]-annotated fields
+
 pub mod id;
 pub mod entity;
 pub mod attributes;
@@ -11,6 +13,7 @@ pub use attributes::*;
 pub use damage::*;
 pub use rendering::*;
 pub use water::*;
+
 
 #[cfg(feature = "standalone")]
 mod entry {

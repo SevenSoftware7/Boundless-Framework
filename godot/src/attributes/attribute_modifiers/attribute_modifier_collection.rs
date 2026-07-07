@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use boundless::id::Id;
 
 use godot::meta::{Element, ToArg};
@@ -7,145 +5,50 @@ use godot::meta::conv::ByValue;
 use godot::meta::shape::{ClassHeritage, GodotElementShape, GodotShape};
 use godot::prelude::*;
 
-use crate::{AttributeModifierEntries, GodotAttributeModifierEntry, GodotAttributeModifier, GodotId};
+use crate::{AttributeModifierEntry, AttributeModifierEntryWrapper};
 
 
 #[derive(GodotClass, Default, Clone)]
 #[class(init, tool)]
 pub struct AttributeModifierCollection {
-	pub modifiers_by_attribute: HashMap<Id, Gd<AttributeModifierEntries>>,
+	array: Array<Option<Gd<AttributeModifierEntry>>>
 }
 
 #[godot_api]
 impl AttributeModifierCollection {
+	#[must_use]
 	pub fn shape() -> GodotShape {
-		GodotShape::TypedDictionary {
-			key: GodotId::ELEMENT_SHAPE,
-			value: GodotElementShape::Class {
-				class_id: AttributeModifierEntries::class_id(),
+		GodotShape::TypedArray {
+			element: GodotElementShape::Class {
+				class_id: AttributeModifierEntry::class_id(),
 				heritage: ClassHeritage::Resource
 			}
 		}
 	}
 
-
-	#[func]
-	pub fn add(&mut self, id: GodotId, modifier: Gd<GodotAttributeModifier>, multiplier: f32) {
-		self.modifiers_by_attribute
-			.entry(id.into())
-			.or_default()
-			.bind_mut()
-			.add(Gd::from_object(GodotAttributeModifierEntry {
-				modifier: Some(modifier),
-				multiplier,
-			}));
+	pub const fn from(array: Array<Option<Gd<AttributeModifierEntry>>>) -> Self {
+		// modifiers_by_attribute: array.iter_shared()
+		// 	.flatten()
+		// 	.into_group_map_by(|e| e.bind().id.as_id().clone()),
+		Self { array }
 	}
-
-	#[func]
-	pub fn remove(&mut self, modifier: Gd<GodotAttributeModifier>) -> bool {
-		for modifiers in self.modifiers_by_attribute.values_mut() {
-			let found = modifiers.bind_mut().remove_modifier(&modifier);
-			if found {
-				return true;
-			}
-		}
-
-		false
-	}
-
-	pub fn remove_attribute(&mut self, id: &Id) -> bool {
-		self.modifiers_by_attribute.remove(id).is_some()
-	}
-
-	pub fn set_multiplier(&mut self, modifier: Gd<GodotAttributeModifier>, multiplier: f32) -> bool {
-		for modifiers in self.modifiers_by_attribute.values_mut() {
-
-			for mut entry in modifiers.bind_mut().iter() {
-				let is_match = entry.bind().modifier.as_ref().unwrap() == &modifier;
-				if is_match {
-					entry.bind_mut().multiplier = multiplier;
-					return true;
-				}
-			}
-		}
-
-		false
-	}
-
 
 	#[func]
 	pub fn clear(&mut self) {
-		self.modifiers_by_attribute.clear();
+		self.array.clear();
 	}
 
-	pub fn apply_modifiers(&self, id: &Id, base_value: f32) -> Option<f32> {
-		let Some(modifiers) = self.modifiers_by_attribute.get(id) else {
-			return None;
-		};
-
-		modifiers.bind().apply_modifiers(base_value)
-	}
-}
-
-
-impl IntoIterator for AttributeModifierCollection {
-	type Item = (Id, Gd<AttributeModifierEntries>);
-	type IntoIter = std::collections::hash_map::IntoIter<Id, Gd<AttributeModifierEntries>>;
-
-	fn into_iter(self) -> Self::IntoIter {
-		self.modifiers_by_attribute.into_iter()
-	}
-}
-
-impl<'a> IntoIterator for &'a AttributeModifierCollection {
-	type Item = (&'a Id, &'a Gd<AttributeModifierEntries>);
-	type IntoIter = std::collections::hash_map::Iter<'a, Id, Gd<AttributeModifierEntries>>;
-
-	fn into_iter(self) -> Self::IntoIter {
-		self.modifiers_by_attribute.iter()
-	}
-}
-
-impl<'a> IntoIterator for &'a mut AttributeModifierCollection {
-	type Item = (&'a Id, &'a mut Gd<AttributeModifierEntries>);
-	type IntoIter = std::collections::hash_map::IterMut<'a, Id, Gd<AttributeModifierEntries>>;
-
-	fn into_iter(self) -> Self::IntoIter {
-		self.modifiers_by_attribute.iter_mut()
-	}
-}
-
-impl FromIterator<(Id, Gd<AttributeModifierEntries>)> for AttributeModifierCollection {
-	fn from_iter<T: IntoIterator<Item = (Id, Gd<AttributeModifierEntries>)>>(iter: T) -> Self {
-		Self { modifiers_by_attribute: iter.into_iter().collect() }
-	}
-}
-
-impl Extend<(Id, Gd<AttributeModifierEntries>)> for AttributeModifierCollection {
-	fn extend<T: IntoIterator<Item = (Id, Gd<AttributeModifierEntries>)>>(&mut self, iter: T) {
-		self.modifiers_by_attribute.extend(iter);
-	}
-}
-impl FromIterator<(GodotId, Gd<AttributeModifierEntries>)> for AttributeModifierCollection {
-	fn from_iter<T: IntoIterator<Item = (GodotId, Gd<AttributeModifierEntries>)>>(iter: T) -> Self {
-		Self { modifiers_by_attribute: iter.into_iter()
-			.map(|(k, v)| (k.into(), v))
-			.collect() }
-	}
-}
-
-impl Extend<(GodotId, Gd<AttributeModifierEntries>)> for AttributeModifierCollection {
-	fn extend<T: IntoIterator<Item = (GodotId, Gd<AttributeModifierEntries>)>>(&mut self, iter: T) {
-		self.modifiers_by_attribute.extend(
-			iter.into_iter()
-				.map(|(k, v)| (Into::<Id>::into(k), v))
-		);
+	pub fn iter_attrs(&self, id: &Id) -> impl Iterator<Item = AttributeModifierEntryWrapper> {
+		self.array.iter_shared()
+			.flatten()
+			.filter(move |e| *e.bind().id.as_id() == *id)
+			.map(AttributeModifierEntryWrapper::wrap)
 	}
 }
 
 
 impl GodotConvert for AttributeModifierCollection {
-	type Via = Dictionary<GodotId, Gd<AttributeModifierEntries>>;
+	type Via = Array<Option<Gd<AttributeModifierEntry>>>;
 
 	fn godot_shape() -> GodotShape {
 		Self::shape()
@@ -154,9 +57,7 @@ impl GodotConvert for AttributeModifierCollection {
 
 impl FromGodot for AttributeModifierCollection {
 	fn try_from_godot(via: Self::Via) -> Result<Self, godot::prelude::ConvertError> {
-		Ok(
-			Self::from_iter(&via)
-		)
+		Ok(Self::from(via))
 	}
 }
 
@@ -164,11 +65,7 @@ impl ToGodot for AttributeModifierCollection {
 	type Pass = ByValue;
 
 	fn to_godot(&self) -> ToArg<'_, Self::Via, Self::Pass> {
-		self.into_iter()
-			.fold(Dictionary::new(), |mut dict, (key, value)| {
-				let _ = dict.insert(Into::<GodotId>::into(key.clone()), value);
-				dict
-			})
+		self.array.clone()
 	}
 }
 

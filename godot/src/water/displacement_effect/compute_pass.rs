@@ -5,7 +5,7 @@ use godot::obj::{Gd, NewGd};
 
 use crate::rendering::groups_for_size;
 
-pub(crate) fn run_displacement_compute_pass(
+pub fn run_displacement_compute_pass(
 	rd: &mut Gd<RenderingDevice>,
 	compute_pipeline: Rid,
 	compute_shader: Rid,
@@ -38,6 +38,7 @@ pub(crate) fn run_displacement_compute_pass(
 	let compute_list = rd.compute_list_begin();
 	rd.compute_list_bind_compute_pipeline(compute_list, compute_pipeline);
 	rd.compute_list_bind_uniform_set(compute_list, uniform_set, 0);
+	#[allow(clippy::cast_possible_truncation)]
 	rd.compute_list_set_push_constant(compute_list, &push, push.len() as u32);
 	rd.compute_list_dispatch(compute_list, x_groups, y_groups, 1);
 	rd.compute_list_end();

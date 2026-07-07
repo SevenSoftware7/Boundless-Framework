@@ -54,17 +54,17 @@ impl WaterMeshRegistry {
 		// godot_print!("Running scheduled water buffers rebuild for {} meshes.", self.scheduled_rebuilds.len());
 
 		let scheduled_ids = self.scheduled_rebuilds.drain().collect::<Vec<_>>();
-		for id in scheduled_ids.iter() {
+		for id in scheduled_ids {
 			self.rebuild_buffers(id);
 		}
 
 		self.scheduled_rebuilds.clear();
 	}
 
-	fn rebuild_buffers(&mut self, instance_id: &InstanceId) -> bool {
+	fn rebuild_buffers(&mut self, instance_id: InstanceId) -> bool {
 		let server = RenderingServer::singleton();
 
-		let Some(mesh_object) = Gd::<WaterMesh>::try_from_instance_id(instance_id.clone()).ok() else {
+		let Some(mesh_object) = Gd::<WaterMesh>::try_from_instance_id(instance_id).ok() else {
 			return false;
 		};
 
@@ -74,7 +74,7 @@ impl WaterMeshRegistry {
 		};
 
 		let (water_vertices, water_indices) = self.water_data
-			.entry(*instance_id)
+			.entry(instance_id)
 			.and_modify(|e| {
 				e.0.clear();
 				e.1.clear();
@@ -108,7 +108,7 @@ impl WaterMeshRegistry {
 			}
 		}
 
-		return true;
+		true
 	}
 
 	pub fn clear_buffers(&mut self, instance_id: &InstanceId) {
@@ -121,6 +121,7 @@ impl WaterMeshRegistry {
 		let mut registry = Self::singleton();
 		registry.bind_mut().schedule_rebuild_buffers(id);
 	}
+	#[must_use]
 	pub fn schedule_rebuild_callable(instance_id: InstanceId) -> Callable {
 		Callable::from_class_static("WaterMeshRegistry", "schedule_rebuild").bind(&[instance_id.to_variant()])
 	}
@@ -130,6 +131,7 @@ impl WaterMeshRegistry {
 		let mut registry = Self::singleton();
 		registry.bind_mut().scheduled_buffers_rebuild();
 	}
+	#[must_use]
 	pub fn scheduled_rebuild_callable() -> Callable {
 		Callable::from_class_static("WaterMeshRegistry", "scheduled_rebuild")
 	}
@@ -139,6 +141,7 @@ impl WaterMeshRegistry {
 		let mut registry = Self::singleton();
 		registry.bind_mut().clear_buffers(&id);
 	}
+	#[must_use]
 	pub fn clear_callable(instance_id: InstanceId) -> Callable {
 		Callable::from_class_static("WaterMeshRegistry", "clear").bind(&[instance_id.to_variant()])
 	}
@@ -148,6 +151,7 @@ impl WaterMeshRegistry {
 		let mut registry = Self::singleton();
 		registry.bind_mut().add_id(id);
 	}
+	#[must_use]
 	pub fn add_callable(instance_id: InstanceId) -> Callable {
 		Callable::from_class_static("WaterMeshRegistry", "add").bind(&[instance_id.to_variant()])
 	}
@@ -157,15 +161,18 @@ impl WaterMeshRegistry {
 		let mut registry = Self::singleton();
 		registry.bind_mut().remove_id(&id);
 	}
+	#[must_use]
 	pub fn remove_callable(instance_id: InstanceId) -> Callable {
 		Callable::from_class_static("WaterMeshRegistry", "remove").bind(&[instance_id.to_variant()])
 	}
 
+	#[must_use]
 	pub fn get_mesh_ids(&self) -> Vec<InstanceId> {
 		let mut ids = self.water_mesh_ids.iter().copied().collect::<Vec<_>>();
 		ids.sort_by_key(|id| id.to_i64());
 		ids
 	}
+	#[must_use]
 	pub fn get_mesh_data(&self, instance_id: &InstanceId) -> Option<&(PackedVector3Array, PackedInt32Array)> {
 		self.water_data.get(instance_id)
 	}

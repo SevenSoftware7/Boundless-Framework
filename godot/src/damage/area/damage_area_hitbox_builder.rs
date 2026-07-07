@@ -47,7 +47,7 @@ impl DamageAreaHitboxBuilder {
 				shape.set_height(self.size.y.max(0.01));
 				shape.upcast()
 			}
-			_ => {
+			HitboxShapeKind::Box => {
 				let mut shape = BoxShape3D::new_gd();
 				shape.set_size(self.size);
 				shape.upcast()

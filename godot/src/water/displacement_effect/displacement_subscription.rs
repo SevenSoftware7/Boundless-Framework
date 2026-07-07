@@ -23,14 +23,17 @@ pub struct WaterDisplacementFetchBatch {
 }
 
 impl WaterDisplacementFetchBatch {
-	pub fn len(&self) -> usize {
+	#[must_use]
+	pub const fn len(&self) -> usize {
 		self.queries.len()
 	}
 
-	pub fn is_empty(&self) -> bool {
+	#[must_use]
+	pub const fn is_empty(&self) -> bool {
 		self.queries.is_empty()
 	}
 
+	#[must_use]
 	pub fn queries(&self) -> &[WaterDisplacementQuery] {
 		&self.queries
 	}
@@ -62,8 +65,8 @@ fn next_handle_id() -> i64 {
 
 fn compute_displacement(query: WaterDisplacementQuery, time_seconds: f32) -> Vector3 {
 	let scale = query.scale.max(0.0001);
-	let phase_x = query.x * scale + time_seconds * 0.2;
-	let phase_z = query.z * scale - time_seconds * 0.2;
+	let phase_x = query.x.mul_add(scale, time_seconds * 0.2);
+	let phase_z = query.z.mul_add(scale, - (time_seconds * 0.2));
 
 	let lateral = 0.05 * query.intensity;
 	let vertical = query.intensity;
@@ -144,20 +147,25 @@ impl IRefCounted for WaterDisplacementHandle {
 	}
 
 	fn on_notification(&mut self, what: ObjectNotification) {
-		if what == ObjectNotification::PREDELETE {
-			if self.id > 0 {
+		if what == ObjectNotification::PREDELETE
+			&& self.id > 0 {
 				let _ = WaterDisplacement::remove_handle_internal(self.id);
 				self.id = 0;
 			}
-		}
 	}
 }
 
 #[godot_api]
 impl WaterDisplacementHandle {
-	#[func]
-	pub fn get_id(&self) -> i64 {
+	#[must_use]
+	pub const fn get_id(&self) -> i64 {
 		self.id
+	}
+	#[allow(clippy::missing_const_for_fn)]
+	#[must_use]
+	#[func(rename=get_id)]
+	pub fn gd_get_id(&self) -> i64 {
+		self.get_id()
 	}
 
 	#[func]
@@ -209,7 +217,7 @@ impl WaterDisplacement {
 		query: impl FnMut() -> Option<WaterDisplacementQuery> + 'static,
 		update: impl FnMut(Vector3) + 'static,
 	) -> u64 {
-		let id = next_handle_id() as u64;
+		let id = next_handle_id().cast_unsigned();
 		RUST_SUBSCRIBERS.with(|subscribers| {
 			subscribers.borrow_mut().insert(
 				id,
@@ -222,6 +230,7 @@ impl WaterDisplacement {
 		id
 	}
 
+	#[must_use]
 	pub fn unsubscribe_rust(id: u64) -> bool {
 		RUST_SUBSCRIBERS.with(|subscribers| subscribers.borrow_mut().remove(&id).is_some())
 	}
@@ -239,6 +248,7 @@ impl WaterDisplacement {
 		let _ = singleton.call("emit_updates_internal", &[Variant::from(time_seconds)]);
 	}
 
+	#[must_use]
 	pub fn collect_fetch_queries() -> WaterDisplacementFetchBatch {
 		let mut batch = WaterDisplacementFetchBatch {
 			rust_ids: Vec::new(),
@@ -281,7 +291,7 @@ impl WaterDisplacement {
 		batch
 	}
 
-	pub fn dispatch_fetched_updates(batch: WaterDisplacementFetchBatch, fetched_xyz: &[f32]) {
+	pub fn dispatch_fetched_updates(batch: &WaterDisplacementFetchBatch, fetched_xyz: &[f32]) {
 		let total = batch.len();
 		if fetched_xyz.len() < total * 3 {
 			godot_error!(
@@ -318,11 +328,10 @@ impl WaterDisplacement {
 			);
 
 			HANDLE_SUBSCRIBERS.with(|subscribers| {
-				if let Some(subscriber) = subscribers.borrow_mut().get_mut(handle_id) {
-					if let Some(update_callable) = &subscriber.update_callable {
+				if let Some(subscriber) = subscribers.borrow_mut().get_mut(handle_id)
+					&& let Some(update_callable) = &subscriber.update_callable {
 						update_callable.call_deferred(&[Variant::from(displacement)]);
 					}
-				}
 			});
 		}
 	}
@@ -412,6 +421,6 @@ impl WaterDisplacement {
 			fetched.push(displacement.z);
 		}
 
-		Self::dispatch_fetched_updates(batch, &fetched);
+		Self::dispatch_fetched_updates(&batch, &fetched);
 	}
 }

@@ -5,6 +5,8 @@ use godot::obj::{Gd, NewGd};
 
 use crate::water::underwater_effect::projection_utils;
 
+#[allow(clippy::too_many_arguments)]
+#[inline]
 pub(crate) fn run_render_mask_pass(
 	rd: &mut Gd<RenderingDevice>,
 	water_framebuffer: Rid,
@@ -61,6 +63,7 @@ pub(crate) fn run_render_mask_pass(
 	rd.draw_list_bind_index_array(draw_list, index_array);
 	rd.draw_list_bind_uniform_set(draw_list, render_set0, 0);
 	rd.draw_list_bind_uniform_set(draw_list, render_set1, 1);
+	#[allow(clippy::cast_possible_truncation)]
 	rd.draw_list_set_push_constant(draw_list, &render_push, render_push.len() as u32);
 	rd.draw_list_draw(draw_list, true, 2);
 	rd.draw_list_end();

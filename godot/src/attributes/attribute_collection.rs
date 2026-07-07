@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, hash_map};
 
 use godot::{meta::{Element, ToArg, conv::ByValue, shape::{GodotElementShape, GodotShape}}, prelude::*};
 
@@ -26,16 +26,20 @@ impl AttributeCollection {
 		self.attribute_values.insert(id, value)
 	}
 	#[func(rename=set)]
+	#[allow(clippy::needless_pass_by_value)]
 	pub fn gd_set(&mut self, id: GodotId, value: f32) -> f32 {
 		self.set(id, value)
 			.unwrap_or_default()
 	}
 
+	#[must_use]
 	pub fn get(&self, id: &GodotId) -> Option<&f32> {
 		self.attribute_values
-			.get(&id)
+			.get(id)
 	}
 	#[func(rename=get)]
+	#[must_use]
+	#[allow(clippy::needless_pass_by_value)]
 	pub fn gd_get(&self, id: GodotId, default_value: f32) -> f32 {
 		self.get(&id)
 			.copied()
@@ -43,6 +47,8 @@ impl AttributeCollection {
 	}
 
 	#[func]
+	#[must_use]
+	#[allow(clippy::needless_pass_by_value)]
 	pub fn remove(&mut self, id: GodotId) -> bool {
 		self.attribute_values
 			.remove(&id)
@@ -55,16 +61,27 @@ impl AttributeCollection {
 	}
 
 	#[func]
+	#[must_use]
+	#[allow(clippy::needless_pass_by_value)]
 	pub fn contains_attribute(&self, id: GodotId) -> bool {
 		self.attribute_values
 			.contains_key(&id)
+	}
+
+	#[must_use]
+	pub fn iter(&self) -> hash_map::Iter<'_, GodotId, f32> {
+		<&Self as IntoIterator>::into_iter(self)
+	}
+	#[must_use]
+	pub fn iter_mut(&mut self) -> hash_map::IterMut<'_, GodotId, f32> {
+		<&mut Self as IntoIterator>::into_iter(self)
 	}
 }
 
 
 impl IntoIterator for AttributeCollection {
 	type Item = (GodotId, f32);
-	type IntoIter = std::collections::hash_map::IntoIter<GodotId, f32>;
+	type IntoIter = hash_map::IntoIter<GodotId, f32>;
 
 	fn into_iter(self) -> Self::IntoIter {
 		self.attribute_values.into_iter()
@@ -73,7 +90,7 @@ impl IntoIterator for AttributeCollection {
 
 impl<'a> IntoIterator for &'a AttributeCollection {
 	type Item = (&'a GodotId, &'a f32);
-	type IntoIter = std::collections::hash_map::Iter<'a, GodotId, f32>;
+	type IntoIter = hash_map::Iter<'a, GodotId, f32>;
 
 	fn into_iter(self) -> Self::IntoIter {
 		self.attribute_values.iter()
@@ -82,7 +99,7 @@ impl<'a> IntoIterator for &'a AttributeCollection {
 
 impl<'a> IntoIterator for &'a mut AttributeCollection {
 	type Item = (&'a GodotId, &'a mut f32);
-	type IntoIter = std::collections::hash_map::IterMut<'a, GodotId, f32>;
+	type IntoIter = hash_map::IterMut<'a, GodotId, f32>;
 
 	fn into_iter(self) -> Self::IntoIter {
 		self.attribute_values.iter_mut()
@@ -103,7 +120,7 @@ impl Extend<(GodotId, f32)> for AttributeCollection {
 }
 
 impl AttributeProvider for AttributeCollection {
-	fn get_value(&self, id: &Id) -> Option<f32> {
+	fn get_attribute(&self, id: &Id) -> Option<f32> {
 		self.get(&id.clone().into())
 			.copied()
 	}

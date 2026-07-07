@@ -93,6 +93,7 @@ impl ICompositorEffect for UnderwaterEffect {
 		}
 	}
 
+	#[allow(clippy::too_many_lines)]
 	fn render_callback(&mut self, _effect_callback_type: i32, render_data: Option<Gd<RenderData>>) {
 		// if effect_callback_type != EffectCallbackType::POST_TRANSPARENT.ord() {
 		// 	return;
@@ -141,12 +142,9 @@ impl ICompositorEffect for UnderwaterEffect {
 			godot_error!("UnderwaterEffect render callback called but render_scene_buffers is not valid");
 			return;
 		};
-		let mut scene_buffers = match scene_buffers_base.try_cast::<RenderSceneBuffersRd>() {
-			Ok(buffers) => buffers,
-			Err(_) => {
-				godot_error!("UnderwaterEffect render callback called but render_scene_buffers is not valid");
-				return;
-			}
+		let Ok(mut scene_buffers) = scene_buffers_base.try_cast::<RenderSceneBuffersRd>() else {
+			godot_error!("UnderwaterEffect render callback called but render_scene_buffers is not valid");
+			return;
 		};
 
 		let Some(scene_data) = render_data.get_render_scene_data() else {
@@ -163,11 +161,13 @@ impl ICompositorEffect for UnderwaterEffect {
 		let view_count = scene_buffers.get_view_count();
 		textures::ensure_water_map_textures(&mut scene_buffers, view_count, render_size);
 
+		#[allow(clippy::cast_possible_truncation)]
+		let vertex_count = (mesh_data.vertex_floats.len() / 4) as u32;
 		let (vertex_buffer, vertex_array) = mesh_data::create_vertex_buffers(
 			rd,
 			&mesh_data.vertex_floats,
 			self.vertex_format,
-			(mesh_data.vertex_floats.len() / 4) as u32,
+			vertex_count,
 		);
 		if !vertex_buffer.is_valid() || !vertex_array.is_valid() {
 			if vertex_array.is_valid() {
@@ -272,10 +272,8 @@ impl ICompositorEffect for UnderwaterEffect {
 				water_map,
 				parameters_buffer,
 				projection,
-				screen_w,
-				screen_h,
-				x_groups,
-				y_groups,
+				(screen_w, screen_h),
+				(x_groups, y_groups),
 			);
 
 			rd.free_rid(water_framebuffer);
@@ -336,6 +334,7 @@ impl UnderwaterEffect {
 		let mut water_map_attachment = RdAttachmentFormat::new_gd();
 		water_map_attachment.set_format(DataFormat::R32G32B32A32_SFLOAT);
 		water_map_attachment.set_samples(TextureSamples::SAMPLES_1);
+		#[allow(clippy::cast_possible_truncation)]
 		water_map_attachment.set_usage_flags(
 			(TextureUsageBits::COLOR_ATTACHMENT_BIT | TextureUsageBits::STORAGE_BIT).ord() as u32,
 		);
@@ -343,8 +342,10 @@ impl UnderwaterEffect {
 		let mut water_depth_attachment = RdAttachmentFormat::new_gd();
 		water_depth_attachment.set_format(DataFormat::D32_SFLOAT);
 		water_depth_attachment.set_samples(TextureSamples::SAMPLES_1);
-		water_depth_attachment
-			.set_usage_flags(TextureUsageBits::DEPTH_STENCIL_ATTACHMENT_BIT.ord() as u32);
+		#[allow(clippy::cast_possible_truncation)]
+		water_depth_attachment.set_usage_flags(
+			TextureUsageBits::DEPTH_STENCIL_ATTACHMENT_BIT.ord() as u32
+		);
 
 		let mut attachments = Array::<Gd<RdAttachmentFormat>>::new();
 		attachments.push(&water_map_attachment);
@@ -357,6 +358,7 @@ impl UnderwaterEffect {
 		let mut vertex_attribute = RdVertexAttribute::new_gd();
 		vertex_attribute.set_format(DataFormat::R32G32B32A32_SFLOAT);
 		vertex_attribute.set_location(0);
+		#[allow(clippy::cast_possible_truncation)]
 		vertex_attribute.set_stride(4 * size_of::<f32>() as u32);
 		vertex_attribute.set_offset(0);
 

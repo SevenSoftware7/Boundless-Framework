@@ -1,14 +1,16 @@
 use godot::{classes::{RdShaderSource, RenderingDevice, rendering_device::{ShaderLanguage, ShaderStage}}, obj::{Gd, NewGd}};
 use godot::builtin::{Rid, PackedByteArray, Vector2i};
 
-pub fn groups_for_size(size: Vector2i, group_size: i32) -> (u32, u32) {
-	let width = size.x.max(1);
-	let height = size.y.max(1);
-	let x_groups = ((width - 1) / group_size + 1) as u32;
-	let y_groups = ((height - 1) / group_size + 1) as u32;
+#[must_use]
+pub fn groups_for_size(size: Vector2i, group_size: u32) -> (u32, u32) {
+	let width = size.x.max(1).cast_unsigned();
+	let height = size.y.max(1).cast_unsigned();
+	let x_groups = (width - 1) / group_size + 1;
+	let y_groups = (height - 1) / group_size + 1;
 	(x_groups, y_groups)
 }
 
+#[must_use]
 pub fn packed_bytes_from_i32(values: &[i32]) -> PackedByteArray {
 	let mut bytes = Vec::with_capacity(std::mem::size_of_val(values));
 	for value in values {
@@ -17,6 +19,7 @@ pub fn packed_bytes_from_i32(values: &[i32]) -> PackedByteArray {
 	PackedByteArray::from(bytes.as_slice())
 }
 
+#[must_use]
 pub fn sanitize_glsl_shader_source(source: &str) -> String {
 	source
 		.lines()

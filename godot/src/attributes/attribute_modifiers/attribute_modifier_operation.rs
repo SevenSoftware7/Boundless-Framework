@@ -4,7 +4,7 @@ use godot::prelude::*;
 
 #[derive(GodotConvert, Var, Export, Default, Clone, Eq, PartialEq, Debug, Hash)]
 #[godot(via = GString)]
-pub enum AttributeModifierOperation {
+pub enum AttributeOperator {
 	Set,
 	#[default]
 	Multiply,
@@ -13,14 +13,14 @@ pub enum AttributeModifierOperation {
 	LessThan,
 }
 
-impl Display for AttributeModifierOperation {
+impl Display for AttributeOperator {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		match self {
-			AttributeModifierOperation::Set => write!(f, "Set"),
-			AttributeModifierOperation::Multiply => write!(f, "Multiply"),
-			AttributeModifierOperation::Add => write!(f, "Add"),
-			AttributeModifierOperation::MoreThan => write!(f, "More Than"),
-			AttributeModifierOperation::LessThan => write!(f, "Less Than"),
+			Self::Set => write!(f, "Set"),
+			Self::Multiply => write!(f, "Multiply"),
+			Self::Add => write!(f, "Add"),
+			Self::MoreThan => write!(f, "More Than"),
+			Self::LessThan => write!(f, "Less Than"),
 		}
 	}
 }

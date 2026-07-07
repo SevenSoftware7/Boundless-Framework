@@ -16,17 +16,16 @@ pub(crate) fn ensure_water_map_textures(
 	let map_name = StringName::from(WATER_MAP_NAME);
 	let depth_name = StringName::from(WATER_DEPTH_NAME);
 
-	if scene_buffers.has_texture(&context, &map_name) {
-		if let Some(texture_format) = scene_buffers.get_texture_format(&context, &map_name) {
-			if texture_format.get_width() != render_size.x as u32
-				|| texture_format.get_height() != render_size.y as u32
+	if scene_buffers.has_texture(&context, &map_name)
+		&& let Some(texture_format) = scene_buffers.get_texture_format(&context, &map_name)
+			&& (texture_format.get_width() != render_size.x.cast_unsigned()
+				|| texture_format.get_height() != render_size.y.cast_unsigned())
 			{
 				scene_buffers.clear_context(&context);
 			}
-		}
-	}
 
 	if !scene_buffers.has_texture(&context, &map_name) {
+		#[allow(clippy::cast_possible_truncation)]
 		scene_buffers.create_texture(
 			&context,
 			&map_name,
@@ -42,6 +41,7 @@ pub(crate) fn ensure_water_map_textures(
 	}
 
 	if !scene_buffers.has_texture(&context, &depth_name) {
+		#[allow(clippy::cast_possible_truncation)]
 		scene_buffers.create_texture(
 			&context,
 			&depth_name,

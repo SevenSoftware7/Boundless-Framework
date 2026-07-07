@@ -39,6 +39,7 @@ pub(crate) fn collect_water_mesh_data() -> Option<WaterMeshGpuData> {
 			continue;
 		};
 
+		#[allow(clippy::cast_possible_truncation)]
 		let idx_offset = vertex_floats.len() as u32 / 4;
 		for vertex in water_vertices.as_slice().iter().copied() {
 			vertex_floats.push(vertex.x);
@@ -48,28 +49,28 @@ pub(crate) fn collect_water_mesh_data() -> Option<WaterMeshGpuData> {
 		}
 
 		for index in water_indices.as_slice().iter().copied() {
-			indices.push(index as u32 + idx_offset);
+			indices.push(index.cast_unsigned() + idx_offset);
 		}
 
 		let transform = Projection::from(mesh.base().get_global_transform());
 		append_projection_floats(&mut water_info_floats, transform);
-		water_info_floats.push(mesh.water_intensity_value());
-		water_info_floats.push(mesh.water_scale_value());
+		water_info_floats.push(mesh.water_intensity);
+		water_info_floats.push(mesh.water_scale);
 		water_info_floats.push(0.0);
 		water_info_floats.push(0.0);
 
-		let shallow = mesh.shallow_color_value().srgb_to_linear();
-		let deep = mesh.deep_color_value().srgb_to_linear();
+		let shallow = mesh.shallow_color.srgb_to_linear();
+		let deep = mesh.deep_color.srgb_to_linear();
 		water_params_floats.push(shallow.r);
 		water_params_floats.push(shallow.g);
 		water_params_floats.push(shallow.b);
-		water_params_floats.push(mesh.fog_distance_value());
+		water_params_floats.push(mesh.fog_distance);
 		water_params_floats.push(deep.r);
 		water_params_floats.push(deep.g);
 		water_params_floats.push(deep.b);
-		water_params_floats.push(mesh.fog_fade_value());
-		water_params_floats.push(mesh.transparency_distance_value());
-		water_params_floats.push(mesh.transparency_fade_value());
+		water_params_floats.push(mesh.fog_fade);
+		water_params_floats.push(mesh.transparency_distance);
+		water_params_floats.push(mesh.transparency_fade);
 		water_params_floats.push(0.0);
 		water_params_floats.push(0.0);
 
@@ -94,6 +95,7 @@ pub(crate) fn create_storage_buffer(rd: &mut Gd<RenderingDevice>, floats: &[f32]
 		bytes.extend_from_slice(&value.to_ne_bytes());
 	}
 	let packed = PackedByteArray::from(bytes.as_slice());
+	#[allow(clippy::cast_possible_truncation)]
 	rd.storage_buffer_create_ex(packed.len() as u32)
 		.data(&packed)
 		.done()
@@ -110,6 +112,7 @@ pub(crate) fn create_vertex_buffers(
 		bytes.extend_from_slice(&value.to_ne_bytes());
 	}
 	let packed = PackedByteArray::from(bytes.as_slice());
+	#[allow(clippy::cast_possible_truncation)]
 	let vertex_buffer = rd
 		.vertex_buffer_create_ex(packed.len() as u32)
 		.data(&packed)
@@ -131,6 +134,7 @@ pub(crate) fn create_index_buffers(rd: &mut Gd<RenderingDevice>, indices: &[u32]
 		bytes.extend_from_slice(&index.to_ne_bytes());
 	}
 	let packed = PackedByteArray::from(bytes.as_slice());
+	#[allow(clippy::cast_possible_truncation)]
 	let index_buffer = rd
 		.index_buffer_create_ex(indices.len() as u32, IndexBufferFormat::UINT32)
 		.data(&packed)
@@ -139,6 +143,7 @@ pub(crate) fn create_index_buffers(rd: &mut Gd<RenderingDevice>, indices: &[u32]
 		return (Rid::Invalid, Rid::Invalid);
 	}
 
+	#[allow(clippy::cast_possible_truncation)]
 	let index_array = rd.index_array_create(index_buffer, 0, indices.len() as u32);
 	(index_buffer, index_array)
 }

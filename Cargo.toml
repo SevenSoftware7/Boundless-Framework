@@ -5,3 +5,14 @@ members = [
 	"godot",
 ]
 resolver = "3"
+
+[workspace.lints.clippy]
+cargo = "allow"
+correctness = "forbid"
+complexity = "deny"
+suspicious = "deny"
+restriction = "allow"
+perf = "deny"
+style = "warn"
+pedantic = "warn"
+nursery = "warn"

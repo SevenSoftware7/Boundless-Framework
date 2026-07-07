@@ -19,24 +19,28 @@ impl GodotId {
 		metadata: ParamMetadata::NONE
 	};
 
+	#[must_use]
 	pub fn from_unnormalized(name: impl AsRef<str>) -> Self {
 		Self {
 			value: Id::from_unnormalized(name)
 		}
 	}
 
+	#[must_use]
 	pub fn from_normalized(normalized_name: &str) -> Self {
 		Self {
 			value: Id::from_normalized(normalized_name)
 		}
 	}
 
-	pub fn as_id(&self) -> &Id {
+	#[must_use]
+	pub const fn as_id(&self) -> &Id {
 		&self.value
 	}
 
+	#[must_use]
 	pub fn id(&self) -> &str {
-		&self.value.id()
+		self.value.id()
 	}
 }
 
@@ -46,9 +50,9 @@ impl From<Id> for GodotId {
 	}
 }
 
-impl Into<Id> for GodotId {
-	fn into(self) -> Id {
-		self.value
+impl From<GodotId> for Id {
+	fn from(val: GodotId) -> Self {
+		val.value
 	}
 }
 
@@ -106,18 +110,18 @@ impl Element for GodotId {}
 
 impl From<GString> for GodotId {
 	fn from(value: GString) -> Self {
-		GodotId::from_unnormalized(String::from(value))
+		Self::from_unnormalized(String::from(value))
 	}
 }
 
 impl From<StringName> for GodotId {
 	fn from(value: StringName) -> Self {
-		GodotId::from_unnormalized(String::from(value))
+		Self::from_unnormalized(String::from(value))
 	}
 }
 
-impl Into<String> for GodotId {
-	fn into(self) -> String {
-		self.id().to_string()
+impl From<GodotId> for String {
+	fn from(val: GodotId) -> Self {
+		val.id().to_string()
 	}
 }
